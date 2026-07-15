@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Volleyball Tracker V18",
+  title: "Volleyball Tracker V18.5",
   description: "20 Week Volleyball Athlete Operating System"
 };
 
