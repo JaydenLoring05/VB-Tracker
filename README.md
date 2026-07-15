@@ -17,16 +17,27 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
 - Progress graphs
 - Exercise library
 - Calendar and training load preview
-- LocalStorage saving
+- Account sign-up/login and per-user cloud data (Supabase)
 
 ## Tech Stack
 
-- Next.js
+- Next.js (App Router)
 - TypeScript
 - React
 - Recharts
 - CSS
-- LocalStorage
+- Supabase (Auth + Postgres)
+
+## Setup
+
+1. `npm install`
+2. Create a Supabase project, then create `.env.local` with:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your-project-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
+   ```
+3. Run `supabase/schema.sql` once in your project's SQL Editor to create the tables and row-level security policies.
+4. `npm run dev`
 
 ## Purpose
 

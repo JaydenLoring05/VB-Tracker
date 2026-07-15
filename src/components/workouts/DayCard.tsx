@@ -50,7 +50,7 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
             <input
               className="exercise-log-input"
               value={workoutLogs[logKey] || ""}
-              onChange={(event) => updateWorkoutLog(logKey, event.target.value)}
+              onChange={(event) => updateWorkoutLog(day.day, exercise, event.target.value)}
               placeholder="Log: weight x reps, jump height, pain level, speed..."
             />
           </div>
@@ -62,7 +62,7 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
           Day Notes
           <textarea
             value={workoutNotes[noteKey] || ""}
-            onChange={(event) => updateWorkoutNote(noteKey, event.target.value)}
+            onChange={(event) => updateWorkoutNote(day.day, event.target.value)}
             placeholder="How did the workout feel? Knee pain? Shoulder pain? Energy? Explosiveness?"
           />
         </label>
