@@ -105,11 +105,14 @@ function makeDefaultEvents(): Omit<CalendarEvent, "id">[] {
 }
 
 type TrackerContextValue = {
+  userId: string;
+
   week: number;
   setWeek: (week: number) => void;
 
   checked: Record<string, boolean>;
   toggleExercise: (day: string, exercise: string) => void;
+  setExerciseChecked: (week: number, day: string, exercise: string, checked: boolean) => void;
 
   stats: StatEntry;
   setStats: React.Dispatch<React.SetStateAction<StatEntry>>;
@@ -233,14 +236,23 @@ export function TrackerProvider({
 
   function toggleExercise(day: string, exercise: string) {
     const key = `${week}-${day}-${exercise}`;
-    const nextChecked = !checked[key];
+    setExerciseChecked(week, day, exercise, !checked[key]);
+  }
 
-    setChecked((current) => ({ ...current, [key]: nextChecked }));
+  function setExerciseChecked(
+    checkedWeek: number,
+    day: string,
+    exercise: string,
+    isChecked: boolean
+  ) {
+    const key = `${checkedWeek}-${day}-${exercise}`;
+
+    setChecked((current) => ({ ...current, [key]: isChecked }));
 
     supabase
       .from("exercise_checks")
       .upsert(
-        { user_id: userId, week, day, exercise, checked: nextChecked },
+        { user_id: userId, week: checkedWeek, day, exercise, checked: isChecked },
         { onConflict: "user_id,week,day,exercise" }
       )
       .then(({ error }) => {
@@ -368,10 +380,12 @@ export function TrackerProvider({
   }
 
   const value: TrackerContextValue = {
+    userId,
     week,
     setWeek,
     checked,
     toggleExercise,
+    setExerciseChecked,
     stats,
     setStats,
     history,

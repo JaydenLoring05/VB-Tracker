@@ -46,3 +46,22 @@ export type CalendarEvent = {
   title: string;
   notes?: string;
 };
+
+export type WorkoutSession = {
+  id: string;
+  week: number;
+  day: string;
+  started_at: string;
+  ended_at: string | null;
+  duration_seconds: number | null;
+};
+
+export type WorkoutSet = {
+  id: string;
+  session_id: string;
+  exercise: string;
+  set_number: number;
+  weight: number | null;
+  reps: number | null;
+  created_at: string;
+};

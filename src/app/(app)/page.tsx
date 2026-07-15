@@ -11,12 +11,12 @@ export default function DashboardPage() {
 
       <section className="panel" style={{ marginTop: 24 }}>
         <h2>
-          <Trophy size={22} /> Version 17.1 Status
+          <Trophy size={22} /> Version 18.5 Status
         </h2>
 
         <p className="muted">
-          The tracker has been split into routes, components, hooks, and smaller stylesheets.
-          Same features as before, now on an architecture that can actually grow.
+          Accounts, cloud sync, and Workout Mode are live: start a session, log sets with a rest
+          timer, and get a summary when you finish.
         </p>
       </section>
     </>

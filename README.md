@@ -18,6 +18,7 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
 - Exercise library
 - Calendar and training load preview
 - Account sign-up/login and per-user cloud data (Supabase)
+- Workout Mode: start a session, log sets with a rest timer, get a finish-of-workout summary
 
 ## Tech Stack
 
@@ -36,7 +37,7 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
    ```
-3. Run `supabase/schema.sql` once in your project's SQL Editor to create the tables and row-level security policies.
+3. Run `supabase/schema.sql`, then `supabase/schema_v18_5.sql`, once each in your project's SQL Editor to create the tables and row-level security policies.
 4. `npm run dev`
 
 ## Purpose

@@ -8,6 +8,7 @@ import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
 const navItems = [
   { href: "/", label: "🏠 Dashboard" },
   { href: "/workouts", label: "🏋️ Workouts" },
+  { href: "/workout", label: "▶️ Start Workout" },
   { href: "/stats", label: "📊 Stats" },
   { href: "/calendar", label: "🗓️ Calendar" },
   { href: "/library", label: "📚 Exercise Library" }
@@ -22,7 +23,7 @@ export function Sidebar() {
       <div className="brand">
         <div className="logo">🏐</div>
         <div>
-          <h2>V17.1 TRACKER</h2>
+          <h2>V18.5 TRACKER</h2>
           <p>ATHLETE OPERATING SYSTEM</p>
         </div>
       </div>
@@ -32,7 +33,9 @@ export function Sidebar() {
           <Link
             key={item.href}
             href={item.href}
-            className={pathname === item.href ? "active" : ""}
+            className={
+              pathname === item.href || pathname.startsWith(`${item.href}/`) ? "active" : ""
+            }
           >
             {item.label}
           </Link>

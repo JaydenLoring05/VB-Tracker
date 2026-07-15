@@ -1,6 +1,7 @@
 "use client";
 
-import { BarChart3, CalendarDays, HeartPulse, Trophy } from "lucide-react";
+import { BarChart3, CalendarDays, HeartPulse, Play, Trophy } from "lucide-react";
+import Link from "next/link";
 
 import { workoutDays } from "@/data/workoutPlan";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
@@ -24,6 +25,14 @@ export function DashboardCards() {
         </h3>
         <h2>{today}</h2>
         <p className="muted">{todayWorkout?.title}</p>
+
+        {todayWorkout && !todayWorkout.rest && (
+          <Link href="/workout">
+            <button style={{ marginTop: 14, width: "100%" }}>
+              <Play size={16} /> Start Workout
+            </button>
+          </Link>
+        )}
       </div>
 
       <div className="card">
