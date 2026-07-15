@@ -1,0 +1,124 @@
+.workout-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.day-card {
+  min-height: 250px;
+}
+
+.day-card.today {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(255, 196, 0, 0.25), 0 0 28px rgba(255, 196, 0, 0.14);
+}
+
+.exercise-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 9px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.exercise-log-block {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.exercise-log-input {
+  width: 100%;
+  min-height: 42px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.day-notes {
+  margin: 14px 0;
+}
+
+.day-notes label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.day-notes textarea {
+  min-height: 96px;
+  resize: vertical;
+  background: #0b0f14;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  font: inherit;
+  outline: none;
+}
+
+.day-notes textarea:focus {
+  border-color: var(--gold);
+}
+
+@media (max-width: 1200px) {
+  .workout-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .workout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .workout-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .day-card {
+    min-height: auto;
+  }
+
+  .day-card h3 {
+    font-size: 22px;
+    margin-bottom: 4px;
+    color: var(--gold);
+  }
+
+  .day-card h4 {
+    font-size: 16px;
+    margin: 6px 0;
+  }
+
+  .exercise-row {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 12px;
+    border-radius: 14px;
+    font-size: 14px;
+    align-items: center;
+  }
+
+  .exercise-row input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--gold);
+    flex: 0 0 auto;
+  }
+
+  .exercise-log-input {
+    min-height: 48px;
+    font-size: 14px;
+  }
+
+  .day-notes textarea {
+    min-height: 110px;
+    font-size: 14px;
+  }
+}
