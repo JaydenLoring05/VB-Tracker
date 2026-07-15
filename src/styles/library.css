@@ -13,8 +13,13 @@
   gap: 12px;
   background: #0b0f14;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 14px;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.exercise-card:hover {
+  border-color: rgba(255, 196, 0, 0.3);
 }
 
 .exercise-icon {
@@ -23,7 +28,7 @@
   display: grid;
   place-items: center;
   background: rgba(255, 196, 0, 0.12);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   font-size: 26px;
 }
 
@@ -175,22 +180,6 @@
   border-radius: 16px;
   padding: 22px;
   margin: 18px 0;
-}
-
-.exercise-name-button {
-  display: inline;
-  background: transparent;
-  color: var(--gold);
-  padding: 0;
-  border-radius: 0;
-  min-height: auto;
-  font-weight: 900;
-  text-align: left;
-}
-
-.exercise-name-button:hover {
-  text-decoration: underline;
-  transform: none;
 }
 
 @media (min-width: 1000px) {

@@ -6,6 +6,7 @@
 
 .day-card {
   min-height: 250px;
+  transition: border-color var(--transition);
 }
 
 .day-card.today {
@@ -13,26 +14,44 @@
   box-shadow: 0 0 0 1px rgba(255, 196, 0, 0.25), 0 0 28px rgba(255, 196, 0, 0.14);
 }
 
+.exercise-log-block {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.exercise-log-block:hover,
+.exercise-log-block:focus-within {
+  border-color: rgba(255, 196, 0, 0.18);
+  background: rgba(255, 255, 255, 0.035);
+}
+
 .exercise-row {
   display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  margin: 9px 0;
+  gap: 10px;
+  align-items: center;
   color: var(--muted);
   font-size: 13px;
 }
 
-.exercise-log-block {
-  display: grid;
-  gap: 8px;
-  margin: 10px 0;
+.exercise-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold);
+  flex: 0 0 auto;
+  cursor: pointer;
 }
 
 .exercise-log-input {
   width: 100%;
-  min-height: 42px;
+  min-height: 40px;
   font-size: 13px;
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(255, 255, 255, 0.03);
   border-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -53,7 +72,7 @@
   background: #0b0f14;
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 12px;
   font: inherit;
   outline: none;
@@ -97,19 +116,12 @@
   }
 
   .exercise-row {
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 12px;
-    border-radius: 14px;
     font-size: 14px;
-    align-items: center;
   }
 
   .exercise-row input[type="checkbox"] {
     width: 22px;
     height: 22px;
-    accent-color: var(--gold);
-    flex: 0 0 auto;
   }
 
   .exercise-log-input {
