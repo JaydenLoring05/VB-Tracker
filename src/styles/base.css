@@ -20,7 +20,8 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.25);
-  --transition: 0.16s ease;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --transition: 0.16s var(--ease-out);
 }
 
 html {
@@ -62,7 +63,7 @@ button:hover {
 }
 
 button:active {
-  transform: translateY(0);
+  transform: scale(0.97);
 }
 
 button:disabled {
@@ -70,6 +71,12 @@ button:disabled {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 input,
@@ -327,4 +334,17 @@ h3 {
   text-decoration: underline;
   transform: none;
   box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }

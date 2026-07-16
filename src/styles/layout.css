@@ -65,7 +65,7 @@
 .streak-box {
   margin-top: auto;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 18px;
   background: var(--panel);
 }

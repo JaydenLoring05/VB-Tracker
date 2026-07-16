@@ -54,7 +54,7 @@ export function StartWorkoutScreen() {
           <ul>
             {day.exercises.map((exercise) => (
               <li key={exercise}>
-                {exercise} — {getPrescription(week, exercise)}
+                {exercise}: {getPrescription(week, exercise)}
               </li>
             ))}
           </ul>

@@ -61,10 +61,9 @@ export function WorkoutSummary({
               const exerciseSets = sets.filter((s) => s.exercise === exercise);
               return (
                 <li key={exercise}>
-                  <strong>{exercise}</strong>
+                  <strong>{exercise}:</strong>
                   <span className="muted">
                     {" "}
-                    —{" "}
                     {exerciseSets
                       .map((s) => `${s.weight ?? "-"}x${s.reps ?? "-"}`)
                       .join(", ")}
