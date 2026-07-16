@@ -57,6 +57,13 @@
   padding: 0;
   border-radius: 999px;
   background: #2a3038;
+  position: relative;
+}
+
+.exercise-dot::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
 }
 
 .exercise-dot.done {
@@ -115,6 +122,11 @@
   margin-top: 12px;
 }
 
+.workout-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .workout-nav-row {
   display: flex;
   justify-content: space-between;
@@ -146,6 +158,10 @@
 }
 
 @media (max-width: 900px) {
+  .workout-mode-shell {
+    padding-bottom: 128px;
+  }
+
   .log-set-form {
     grid-template-columns: 1fr 1fr;
   }
@@ -155,6 +171,27 @@
   }
 
   .workout-elapsed {
+    font-size: 28px;
+  }
+
+  .exercise-dots {
+    gap: 16px;
+  }
+
+  .rest-timer-header {
     font-size: 24px;
+  }
+
+  .workout-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 76px;
+    z-index: 900;
+    margin: 0;
+    padding: 12px 14px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(5, 7, 10, 0.92);
+    backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(255, 196, 0, 0.2);
   }
 }

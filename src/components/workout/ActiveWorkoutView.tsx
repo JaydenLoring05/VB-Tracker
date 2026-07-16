@@ -183,25 +183,27 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
         )}
       </div>
 
-      <div className="workout-nav-row">
-        <button
-          className="ghost"
-          disabled={exerciseIndex === 0}
-          onClick={() => goToExercise(exerciseIndex - 1)}
-        >
-          <ChevronLeft size={16} /> Previous
-        </button>
+      <div className="workout-actions">
+        <div className="workout-nav-row">
+          <button
+            className="ghost"
+            disabled={exerciseIndex === 0}
+            onClick={() => goToExercise(exerciseIndex - 1)}
+          >
+            <ChevronLeft size={16} /> Previous
+          </button>
 
-        <button
-          className="ghost"
-          disabled={exerciseIndex === day.exercises.length - 1}
-          onClick={() => goToExercise(exerciseIndex + 1)}
-        >
-          Next <ChevronRight size={16} />
-        </button>
+          <button
+            className="ghost"
+            disabled={exerciseIndex === day.exercises.length - 1}
+            onClick={() => goToExercise(exerciseIndex + 1)}
+          >
+            Next <ChevronRight size={16} />
+          </button>
+        </div>
+
+        <button onClick={handleFinish}>Finish Workout</button>
       </div>
-
-      <button onClick={handleFinish}>Finish Workout</button>
     </div>
   );
 }
