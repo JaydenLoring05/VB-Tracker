@@ -2,9 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { workoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { createClient } from "@/lib/supabase/client";
 import { WorkoutSession, WorkoutSet } from "@/types";
+
+export type PreviousSet = { weight: number | null; reps: number | null };
 
 export function useActiveWorkoutSession(sessionId: string) {
   const { userId, setExerciseChecked } = useTrackerContext();
@@ -14,6 +17,8 @@ export function useActiveWorkoutSession(sessionId: string) {
   const [sets, setSets] = useState<WorkoutSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [previousSets, setPreviousSets] = useState<Record<string, PreviousSet>>({});
+  const [maxWeightByExercise, setMaxWeightByExercise] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -54,8 +59,47 @@ export function useActiveWorkoutSession(sessionId: string) {
     };
   }, [supabase, sessionId, userId]);
 
+  useEffect(() => {
+    if (!session) return;
+
+    let cancelled = false;
+    const day = workoutDays.find((d) => d.day === session.day);
+    if (!day) return;
+
+    supabase
+      .from("workout_sets")
+      .select("exercise, weight, reps, created_at")
+      .eq("user_id", userId)
+      .in("exercise", day.exercises)
+      .neq("session_id", sessionId)
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled || error || !data) return;
+
+        const lastSeen: Record<string, PreviousSet> = {};
+        const maxWeight: Record<string, number> = {};
+
+        data.forEach((row) => {
+          if (!(row.exercise in lastSeen)) {
+            lastSeen[row.exercise] = { weight: row.weight, reps: row.reps };
+          }
+          if (row.weight != null && row.weight > (maxWeight[row.exercise] ?? 0)) {
+            maxWeight[row.exercise] = row.weight;
+          }
+        });
+
+        setPreviousSets(lastSeen);
+        setMaxWeightByExercise(maxWeight);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, session, sessionId, userId]);
+
   async function logSet(exercise: string, weight: number | null, reps: number | null) {
     const setNumber = sets.filter((s) => s.exercise === exercise).length + 1;
+    const isNewPR = weight != null && weight > (maxWeightByExercise[exercise] ?? 0);
 
     const { data, error } = await supabase
       .from("workout_sets")
@@ -72,10 +116,17 @@ export function useActiveWorkoutSession(sessionId: string) {
 
     if (error) {
       console.error("Failed to log set", error);
-      return;
+      return null;
     }
 
-    setSets((current) => [...current, data as WorkoutSet]);
+    const newSet = data as WorkoutSet;
+    setSets((current) => [...current, newSet]);
+
+    if (isNewPR && weight != null) {
+      setMaxWeightByExercise((current) => ({ ...current, [exercise]: weight }));
+    }
+
+    return { set: newSet, isNewPR };
   }
 
   function deleteSet(setId: string) {
@@ -123,5 +174,14 @@ export function useActiveWorkoutSession(sessionId: string) {
     return { durationSeconds };
   }
 
-  return { loading, notFound, session, sets, logSet, deleteSet, finishWorkout };
+  return {
+    loading,
+    notFound,
+    session,
+    sets,
+    previousSets,
+    logSet,
+    deleteSet,
+    finishWorkout
+  };
 }

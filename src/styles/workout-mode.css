@@ -75,10 +75,26 @@
   background: var(--gold);
 }
 
+.last-time {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
 .logged-sets {
   display: grid;
   gap: 8px;
   margin: 16px 0;
+}
+
+@keyframes logged-set-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .logged-set {
@@ -91,6 +107,22 @@
   border-radius: 12px;
   padding: 10px 14px;
   font-size: 14px;
+  animation: logged-set-in 200ms var(--ease-out);
+}
+
+.pr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 196, 0, 0.16);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .log-set-form {
@@ -98,6 +130,25 @@
   grid-template-columns: 1fr 1fr auto;
   gap: 10px;
   margin-top: 16px;
+  align-items: start;
+}
+
+.weight-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.weight-increments {
+  display: flex;
+  gap: 6px;
+}
+
+.weight-increments button {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 12px;
+  min-height: auto;
 }
 
 .rest-timer {

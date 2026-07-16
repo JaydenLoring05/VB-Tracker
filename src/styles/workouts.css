@@ -17,18 +17,17 @@
 .exercise-log-block {
   display: grid;
   gap: 10px;
-  margin: 10px 0;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: border-color var(--transition), background var(--transition);
+  padding: 12px 0 12px 10px;
+  border-left: 2px solid transparent;
+  transition: border-color var(--transition);
 }
 
-.exercise-log-block:hover,
+.exercise-log-block + .exercise-log-block {
+  border-top: 1px solid var(--border);
+}
+
 .exercise-log-block:focus-within {
-  border-color: rgba(255, 196, 0, 0.18);
-  background: rgba(255, 255, 255, 0.035);
+  border-left-color: var(--gold);
 }
 
 .exercise-row {

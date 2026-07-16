@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { getPrescription, workoutDays } from "@/data/workoutPlan";
@@ -11,9 +11,16 @@ import { RestTimer } from "./RestTimer";
 import { WorkoutSummary } from "./WorkoutSummary";
 
 const REST_DURATION = 90;
+const WEIGHT_INCREMENTS = [5, 10];
+
+function vibrate(pattern: number | number[]) {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    navigator.vibrate(pattern);
+  }
+}
 
 export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
-  const { loading, notFound, session, sets, logSet, deleteSet, finishWorkout } =
+  const { loading, notFound, session, sets, previousSets, logSet, deleteSet, finishWorkout } =
     useActiveWorkoutSession(sessionId);
 
   const [exerciseIndex, setExerciseIndex] = useState(0);
@@ -23,6 +30,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [finished, setFinished] = useState(false);
   const [finishResult, setFinishResult] = useState<{ durationSeconds: number } | null>(null);
+  const [prSetIds, setPrSetIds] = useState<Record<string, boolean>>({});
 
   const day = useMemo(
     () => (session ? workoutDays.find((d) => d.day === session.day) : undefined),
@@ -44,7 +52,12 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   }, [session, showSummary]);
 
   useEffect(() => {
-    if (restSecondsLeft === null || restSecondsLeft <= 0) return;
+    if (restSecondsLeft === null) return;
+
+    if (restSecondsLeft <= 0) {
+      vibrate(200);
+      return;
+    }
 
     const timeout = setTimeout(
       () => setRestSecondsLeft((current) => (current !== null ? current - 1 : null)),
@@ -52,6 +65,35 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     );
     return () => clearTimeout(timeout);
   }, [restSecondsLeft]);
+
+  useEffect(() => {
+    if (showSummary || typeof navigator === "undefined" || !("wakeLock" in navigator)) return;
+
+    let sentinel: WakeLockSentinel | null = null;
+    let cancelled = false;
+
+    async function acquire() {
+      try {
+        sentinel = await navigator.wakeLock.request("screen");
+      } catch {
+        // Wake lock isn't critical to the workout flow; fail silently.
+      }
+    }
+
+    acquire();
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible" && !cancelled) acquire();
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      sentinel?.release().catch(() => {});
+    };
+  }, [showSummary]);
 
   if (loading) {
     return (
@@ -82,6 +124,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
 
   const exercise = day.exercises[exerciseIndex];
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
+  const lastTime = previousSets[exercise];
 
   function goToExercise(nextIndex: number) {
     setExerciseIndex(Math.max(0, Math.min(day!.exercises.length - 1, nextIndex)));
@@ -90,14 +133,24 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     setRestSecondsLeft(null);
   }
 
+  function bumpWeight(amount: number) {
+    const current = Number(weight) || 0;
+    setWeight(String(Math.max(0, current + amount)));
+  }
+
   async function handleLogSet(event: FormEvent) {
     event.preventDefault();
 
-    await logSet(
+    const result = await logSet(
       exercise,
       weight.trim() === "" ? null : Number(weight),
       reps.trim() === "" ? null : Number(reps)
     );
+
+    if (result?.isNewPR) {
+      vibrate([80, 40, 80]);
+      setPrSetIds((current) => ({ ...current, [result.set.id]: true }));
+    }
 
     setRestSecondsLeft(REST_DURATION);
   }
@@ -138,6 +191,11 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
       <div className="panel">
         <h3>{exercise}</h3>
         <p className="muted">Target: {getPrescription(session.week, exercise)}</p>
+        {lastTime && (
+          <p className="muted last-time">
+            Last time: {lastTime.weight ?? "-"} x {lastTime.reps ?? "-"}
+          </p>
+        )}
 
         {exerciseSets.length > 0 && (
           <div className="logged-sets">
@@ -145,6 +203,11 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
               <div className="logged-set" key={set.id}>
                 <span>
                   Set {set.set_number}: {set.weight ?? "-"} x {set.reps ?? "-"}
+                  {prSetIds[set.id] && (
+                    <span className="pr-badge">
+                      <Trophy size={12} /> New PR
+                    </span>
+                  )}
                 </span>
                 <button className="ghost danger-button" onClick={() => deleteSet(set.id)}>
                   Remove
@@ -162,13 +225,27 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
           />
         ) : (
           <form className="log-set-form" onSubmit={handleLogSet}>
-            <input
-              type="number"
-              inputMode="decimal"
-              placeholder="Weight"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-            />
+            <div className="weight-input-group">
+              <input
+                type="number"
+                inputMode="decimal"
+                placeholder="Weight"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+              />
+              <div className="weight-increments">
+                {WEIGHT_INCREMENTS.map((amount) => (
+                  <button
+                    type="button"
+                    key={amount}
+                    className="ghost"
+                    onClick={() => bumpWeight(amount)}
+                  >
+                    +{amount}
+                  </button>
+                ))}
+              </div>
+            </div>
             <input
               type="number"
               inputMode="decimal"
