@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Dumbbell,
   Flame,
+  GraduationCap,
   Home,
   Play
 } from "lucide-react";
@@ -20,7 +21,8 @@ const navItems = [
   { href: "/workout", label: "Start Workout", icon: Play },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
-  { href: "/library", label: "Exercise Library", icon: BookOpen }
+  { href: "/library", label: "Exercise Library", icon: BookOpen },
+  { href: "/coach", label: "Team", icon: GraduationCap }
 ];
 
 export function Sidebar() {

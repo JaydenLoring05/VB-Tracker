@@ -65,3 +65,32 @@ export type WorkoutSet = {
   reps: number | null;
   created_at: string;
 };
+
+export type TeamRole = "coach" | "athlete";
+
+export type Team = {
+  id: string;
+  coach_id: string;
+  name: string;
+  invite_code: string;
+  created_at: string;
+};
+
+export type TeamMember = {
+  id: string;
+  team_id: string;
+  user_id: string;
+  role: TeamRole;
+  display_name: string | null;
+  joined_at: string;
+};
+
+export type RosterAthlete = {
+  userId: string;
+  displayName: string;
+  joinedAt: string;
+  recovery: number;
+  recoveryLabel: string;
+  lastCheckIn: string | null;
+  needsCheckIn: boolean;
+};

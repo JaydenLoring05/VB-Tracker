@@ -69,15 +69,6 @@
   font-weight: 900;
 }
 
-.danger-button {
-  color: var(--red);
-  border-color: rgba(255, 98, 98, 0.45);
-}
-
-.danger-button:hover {
-  background: rgba(255, 98, 98, 0.12);
-}
-
 @media (max-width: 1200px) {
   .chart-grid {
     grid-template-columns: 1fr 1fr;

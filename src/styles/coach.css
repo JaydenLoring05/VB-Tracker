@@ -1,0 +1,138 @@
+.team-form {
+  display: grid;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.team-setup-error {
+  grid-column: 1 / -1;
+  border-color: rgba(255, 98, 98, 0.35);
+  background: rgba(255, 98, 98, 0.06);
+}
+
+.coach-dashboard {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
+
+.team-header h2 {
+  margin: 0 0 4px;
+}
+
+.invite-code-button {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.checkin-alert {
+  border-color: rgba(255, 196, 0, 0.35);
+}
+
+.checkin-alert h3 {
+  color: var(--gold);
+  margin: 0 0 4px;
+}
+
+.checkin-alert ul {
+  margin: var(--sp-2) 0 0;
+  padding-left: 18px;
+  color: var(--text);
+}
+
+.roster-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.roster-heading h2 {
+  margin: 0;
+}
+
+.roster-refresh {
+  font-size: var(--fs-sm);
+  padding: 6px 12px;
+  min-height: auto;
+}
+
+.roster-table {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.roster-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  background: #0b0f14;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.roster-athlete-name {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.roster-athlete-name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roster-flag {
+  background: rgba(255, 98, 98, 0.14);
+  border-color: rgba(255, 98, 98, 0.3);
+  color: var(--red);
+  flex: 0 0 auto;
+}
+
+.roster-recovery {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.roster-recovery-elite,
+.roster-recovery-good {
+  background: rgba(69, 212, 131, 0.14);
+  border-color: rgba(69, 212, 131, 0.3);
+  color: var(--green);
+}
+
+.roster-recovery-caution {
+  background: rgba(255, 196, 0, 0.14);
+  border-color: rgba(255, 196, 0, 0.3);
+  color: var(--gold);
+}
+
+.roster-recovery-low {
+  background: rgba(255, 98, 98, 0.14);
+  border-color: rgba(255, 98, 98, 0.3);
+  color: var(--red);
+}
+
+@media (max-width: 900px) {
+  .roster-row {
+    flex-wrap: wrap;
+  }
+
+  .roster-athlete-name {
+    flex-basis: 100%;
+  }
+}

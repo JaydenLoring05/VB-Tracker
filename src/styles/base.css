@@ -181,6 +181,15 @@ h4 {
   box-shadow: none;
 }
 
+.danger-button {
+  color: var(--red);
+  border-color: rgba(255, 98, 98, 0.45);
+}
+
+.danger-button:hover {
+  background: rgba(255, 98, 98, 0.12);
+}
+
 .secondary {
   background: var(--panel-2);
   color: var(--text);

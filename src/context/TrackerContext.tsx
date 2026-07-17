@@ -31,7 +31,7 @@ export type PRRecord = {
 export type WorkoutLogs = Record<string, string>;
 export type WorkoutNotes = Record<string, string>;
 
-type StatsRow = {
+export type StatsRow = {
   date: string | null;
   vertical: number | null;
   approach: number | null;
@@ -63,7 +63,7 @@ function toStatsRow(entry: StatEntry): StatsRow {
   };
 }
 
-function fromStatsRow(row: StatsRow): StatEntry {
+export function fromStatsRow(row: StatsRow): StatEntry {
   return {
     date: row.date ?? "",
     vertical: row.vertical ?? "",
