@@ -110,6 +110,12 @@
   flex: 0 0 auto;
 }
 
+.roster-last-active {
+  flex: 0 0 auto;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .roster-recovery {
   flex: 0 0 auto;
   white-space: nowrap;
@@ -140,6 +146,11 @@
   }
 
   .roster-athlete-name {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+  }
+
+  .roster-last-active {
     flex-basis: 100%;
   }
 }
@@ -201,6 +212,14 @@
   font-size: var(--fs-sm);
 }
 
+.athlete-stats-row-prs {
+  grid-template-columns: 0.8fr 1.3fr 1fr 1.4fr;
+}
+
+.athlete-stats-row-adherence {
+  grid-template-columns: 1fr 0.6fr 1fr 0.9fr;
+}
+
 .athlete-stats-row:not(.athlete-stats-header):nth-child(odd) {
   background: rgba(255, 255, 255, 0.02);
 }
@@ -213,9 +232,38 @@
   letter-spacing: 0.03em;
 }
 
+.athlete-adherence-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.athlete-adherence-summary div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-3);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.athlete-adherence-summary strong {
+  font-size: var(--fs-lg);
+}
+
+.athlete-adherence-summary .muted {
+  font-size: var(--fs-xs);
+}
+
 @media (max-width: 700px) {
   .athlete-stats-row {
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: auto;
+  }
+
+  .athlete-adherence-summary {
+    grid-template-columns: 1fr;
   }
 }

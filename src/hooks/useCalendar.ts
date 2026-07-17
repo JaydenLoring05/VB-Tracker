@@ -32,9 +32,10 @@ export function useCalendar() {
     const windowStart = new Date();
     windowStart.setDate(windowStart.getDate() - TRAINING_LOAD_WINDOW_DAYS);
     const windowStartIso = todayISO(windowStart);
+    const todayIso = todayISO();
 
     return calendarEvents.reduce((sum, event) => {
-      if (event.date < windowStartIso) return sum;
+      if (event.date < windowStartIso || event.date > todayIso) return sum;
 
       const weights = {
         workout: 3,

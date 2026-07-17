@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 
 import "./globals.css";
@@ -10,8 +10,14 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Volleyball Tracker V18.5",
+  title: "Volleyball Tracker",
   description: "20 Week Volleyball Athlete Operating System"
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#05070a"
 };
 
 export default function RootLayout({

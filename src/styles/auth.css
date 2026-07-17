@@ -73,6 +73,25 @@
   box-shadow: none;
 }
 
+.auth-resend {
+  background: transparent;
+  color: var(--gold);
+  padding: 0;
+  min-height: auto;
+  font-weight: 700;
+  font-size: 13px;
+  justify-self: start;
+}
+
+.auth-resend:hover {
+  text-decoration: underline;
+  transform: none;
+}
+
+.auth-resend:disabled {
+  color: var(--muted);
+}
+
 .auth-switch {
   margin-top: 18px;
   text-align: center;

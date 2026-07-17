@@ -4,6 +4,7 @@ import { AlertTriangle, Copy, RefreshCw, Trophy, UserMinus, Users } from "lucide
 import { useState } from "react";
 
 import { useCoachRoster } from "@/hooks/useCoachRoster";
+import { formatLastActive } from "@/lib/time";
 import { RosterAthlete, Team } from "@/types";
 
 import { AthleteStatsModal } from "./AthleteStatsModal";
@@ -107,6 +108,7 @@ export function CoachDashboard({ team }: { team: Team }) {
                 <div className="roster-athlete-name">
                   <strong>{athlete.displayName}</strong>
                   {athlete.needsCheckIn && <span className="pill roster-flag">Needs check-in</span>}
+                  <span className="muted roster-last-active">{formatLastActive(athlete.lastActiveAt)}</span>
                 </div>
 
                 <span className={`pill roster-recovery roster-recovery-${recoverySlug(athlete.recoveryLabel)}`}>

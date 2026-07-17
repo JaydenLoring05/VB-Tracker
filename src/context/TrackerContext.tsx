@@ -207,6 +207,18 @@ export function TrackerProvider({
   }
 
   useEffect(() => {
+    // Fire-and-forget: lets a coach see "last opened the app" for their
+    // roster. Not critical, so failures are logged but never surfaced to
+    // the user via reportSyncError.
+    supabase
+      .from("profiles")
+      .upsert({ user_id: userId, last_active_at: new Date().toISOString() }, { onConflict: "user_id" })
+      .then(({ error }) => {
+        if (error) console.error("Failed to update last-active timestamp", error);
+      });
+  }, [supabase, userId]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function load() {

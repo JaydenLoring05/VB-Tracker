@@ -54,13 +54,13 @@ export function useCoachRoster(team: Team | null) {
       return;
     }
 
-    const { data: statsRows, error: statsError } = await supabase
-      .from("latest_stats")
-      .select("*")
-      .in(
-        "user_id",
-        athletes.map((athlete) => athlete.user_id)
-      );
+    const athleteIds = athletes.map((athlete) => athlete.user_id);
+
+    const [{ data: statsRows, error: statsError }, { data: profileRows, error: profilesError }] =
+      await Promise.all([
+        supabase.from("latest_stats").select("*").in("user_id", athleteIds),
+        supabase.from("profiles").select("user_id, last_active_at").in("user_id", athleteIds)
+      ]);
 
     if (statsError) {
       console.error("Failed to load roster stats", statsError);
@@ -69,8 +69,15 @@ export function useCoachRoster(team: Team | null) {
       return;
     }
 
+    if (profilesError) {
+      console.error("Failed to load roster activity", profilesError);
+    }
+
     const statsByUser = new Map<string, StatsRow & { updated_at: string }>(
       (statsRows ?? []).map((row) => [row.user_id as string, row])
+    );
+    const lastActiveByUser = new Map<string, string>(
+      (profileRows ?? []).map((row) => [row.user_id as string, row.last_active_at as string])
     );
     const now = Date.now();
 
@@ -89,7 +96,8 @@ export function useCoachRoster(team: Team | null) {
         recovery,
         recoveryLabel: recoveryStatus(recovery).label,
         lastCheckIn,
-        needsCheckIn: daysSinceCheckIn >= STALE_DAYS
+        needsCheckIn: daysSinceCheckIn >= STALE_DAYS,
+        lastActiveAt: lastActiveByUser.get(member.user_id) ?? null
       };
     });
 

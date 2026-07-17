@@ -12,7 +12,7 @@ import { todayName } from "@/lib/storage";
 export function DashboardCards() {
   const today = todayName();
 
-  const { recovery, status } = useRecoveryStats();
+  const { recovery, status, hasLoggedStats } = useRecoveryStats();
   const { week, completedExercises, totalExercises, progress } = useWorkoutProgress();
   const { latestPR } = usePRs();
 
@@ -40,13 +40,22 @@ export function DashboardCards() {
         <h3>
           <HeartPulse size={18} /> Recovery
         </h3>
-        <h2>{recovery}%</h2>
-        <span className="pill">{status.label}</span>
-        <p className="muted">{status.message}</p>
+        {hasLoggedStats ? (
+          <>
+            <h2>{recovery}%</h2>
+            <span className="pill">{status.label}</span>
+            <p className="muted">{status.message}</p>
 
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${recovery}%` }} />
-        </div>
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${recovery}%` }} />
+            </div>
+          </>
+        ) : (
+          <>
+            <h2>--</h2>
+            <p className="muted">No stats logged yet. Fill out today&apos;s check-in to see your recovery.</p>
+          </>
+        )}
       </div>
 
       <div className="card">

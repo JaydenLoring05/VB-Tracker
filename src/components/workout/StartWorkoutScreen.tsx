@@ -10,7 +10,7 @@ import { todayName } from "@/lib/storage";
 
 export function StartWorkoutScreen() {
   const { week } = useTrackerContext();
-  const { loading, openSession, startWorkout, resumeWorkout } = useStartWorkout();
+  const { loading, starting, openSession, startWorkout, resumeWorkout } = useStartWorkout();
   const [selectedDay, setSelectedDay] = useState(todayName());
 
   const workoutDays = getWorkoutDays(week);
@@ -61,8 +61,8 @@ export function StartWorkoutScreen() {
           </ul>
         </div>
 
-        <button disabled={loading} onClick={() => startWorkout(selectedDay)}>
-          <Play size={16} /> Start Workout
+        <button disabled={loading || starting} onClick={() => startWorkout(selectedDay)}>
+          <Play size={16} /> {starting ? "Starting…" : "Start Workout"}
         </button>
       </div>
     </div>

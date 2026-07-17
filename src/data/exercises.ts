@@ -44,7 +44,7 @@ export const exercises: Exercise[] = [
     "Builds single-leg strength for jumping, cutting, and knee control.",
     ["Control the descent.", "Drive through the front foot.", "Keep knee tracking over toes.", "Stay tall."],
     ["Pushing too much off the back leg.", "Letting knee cave.", "Bouncing reps."],
-    ["Reverse Lunge", "Step-Up", "Split Squat"]
+    ["Reverse Lunges", "Step-Ups", "Split Squat"]
   ),
   ex(
     "Hip Thrust",
@@ -84,7 +84,7 @@ export const exercises: Exercise[] = [
     "Builds single-leg drive and control for jumping and court movement.",
     ["Drive through the working leg.", "Control the lowering.", "Keep knee stable.", "Stand tall at top."],
     ["Pushing off the back foot.", "Dropping down fast.", "Knee collapsing inward."],
-    ["Reverse Lunge", "Bulgarian Split Squat", "Split Squat"]
+    ["Reverse Lunges", "Bulgarian Split Squat", "Split Squat"]
   ),
   ex(
     "Reverse Lunges",
@@ -94,7 +94,7 @@ export const exercises: Exercise[] = [
     "Builds single-leg strength with less knee stress than forward lunges.",
     ["Step back under control.", "Keep front foot planted.", "Drive up strong.", "Stay balanced."],
     ["Pushing off the back leg too much.", "Leaning forward.", "Slamming the knee down."],
-    ["Split Squat", "Step-Up", "Bulgarian Split Squat"]
+    ["Split Squat", "Step-Ups", "Bulgarian Split Squat"]
   ),
   ex(
     "Hamstring Curls",
@@ -114,7 +114,7 @@ export const exercises: Exercise[] = [
     "Builds elite hamstring strength and injury resistance.",
     ["Lower slowly.", "Keep hips extended.", "Use hands to catch.", "Start with partial range."],
     ["Dropping too fast.", "Breaking at the hips.", "Doing too much volume."],
-    ["Hamstring Curl", "RDL", "Swiss Ball Curl"]
+    ["Hamstring Curls", "RDL", "Swiss Ball Curl"]
   ),
   ex(
     "Calf Raises",
@@ -258,7 +258,7 @@ export const exercises: Exercise[] = [
     "Builds back strength for hitting power, shoulder health, and calisthenics.",
     ["Start from dead hang.", "Pull chest toward bar.", "Drive elbows down.", "Control down."],
     ["Half reps.", "Kipping every rep.", "Shrugging shoulders."],
-    ["Band-Assisted Pull-Up", "Lat Pulldown", "Bodyweight Row"]
+    ["Band-Assisted Pull-Up", "Lat Pulldown", "Bodyweight Rows"]
   ),
   ex(
     "Band-Assisted Pull-Up",
@@ -268,7 +268,7 @@ export const exercises: Exercise[] = [
     "Builds toward a full pull-up by removing just enough bodyweight to keep every rep clean.",
     ["Loop a band around the bar and under a foot or knee.", "Full dead hang at the bottom.", "Pull chest toward the bar.", "Use the lightest band that still lets you finish the set with good form."],
     ["Using a band so strong it does all the work.", "Half reps.", "Kipping instead of pulling."],
-    ["Pull-Ups", "Lat Pulldown", "Bodyweight Row"]
+    ["Pull-Ups", "Lat Pulldown", "Bodyweight Rows"]
   ),
   ex(
     "Chin-Ups",
@@ -328,7 +328,7 @@ export const exercises: Exercise[] = [
     "Builds back strength and shoulder balance.",
     ["Pull elbow to hip.", "Keep torso still.", "Squeeze back.", "Control down."],
     ["Twisting body.", "Shrugging.", "Yanking weight."],
-    ["Chest-Supported Row", "Cable Row", "Bodyweight Row"]
+    ["Chest-Supported Row", "Cable Row", "Bodyweight Rows"]
   ),
   ex(
     "Bodyweight Rows",
@@ -390,7 +390,7 @@ export const exercises: Exercise[] = [
     "Builds anti-rotation core strength for hitting stability.",
     ["Brace hard.", "Press straight out.", "Do not rotate.", "Move slow."],
     ["Twisting with band.", "Shrugging.", "Too much weight."],
-    ["Dead Bug", "Side Plank", "Cable Anti-Rotation Hold"]
+    ["Dead Bugs", "Side Planks", "Cable Anti-Rotation Hold"]
   ),
   ex(
     "Med Ball Rotational Throws",
@@ -430,7 +430,7 @@ export const exercises: Exercise[] = [
     "Builds core strength, hip flexor strength, and control.",
     ["Control swing.", "Tuck pelvis.", "Raise with abs.", "Lower slowly."],
     ["Swinging wildly.", "Using momentum.", "Arching lower back."],
-    ["Hanging Knee Raises", "Reverse Crunch", "Dead Bug"]
+    ["Hanging Knee Raises", "Reverse Crunch", "Dead Bugs"]
   ),
   ex(
     "L-Sit Practice",
@@ -470,7 +470,7 @@ export const exercises: Exercise[] = [
     "Builds basic trunk stiffness and core endurance.",
     ["Ribs down.", "Squeeze glutes.", "Push floor away.", "Breathe slowly."],
     ["Sagging hips.", "Butt too high.", "Holding breath."],
-    ["Dead Bug", "Hollow Hold", "Stir-the-Pot"]
+    ["Dead Bugs", "Hollow Hold", "Stir-the-Pot"]
   ),
   ex(
     "Ab Wheel Rollout",
@@ -480,7 +480,7 @@ export const exercises: Exercise[] = [
     "Builds strong anti-extension core strength.",
     ["Ribs down.", "Glutes tight.", "Roll only as far as you control.", "Pull back with abs."],
     ["Arching lower back.", "Going too far.", "Rushing."],
-    ["Stability Ball Rollout", "Dead Bug", "Plank"]
+    ["Stability Ball Rollout", "Dead Bugs", "Planks"]
   ),
   ex(
     "Back Extensions",
@@ -572,7 +572,7 @@ export const exercises: Exercise[] = [
     "Builds VMO and knee control for jumper's knee prevention.",
     ["Control the lowering.", "Tap heel lightly.", "Keep knee tracking.", "Stay upright."],
     ["Dropping too fast.", "Collapsing knee.", "Using too high of a step."],
-    ["Patrick Step", "Step-Up", "Spanish Squat"]
+    ["Patrick Step", "Step-Ups", "Spanish Squat"]
   ),
   ex(
     "Reverse Sled Drag",
@@ -724,7 +724,7 @@ export const exercises: Exercise[] = [
     "Improves ankle dorsiflexion for squats, landings, and knee tracking.",
     ["Keep heel down.", "Drive knee forward.", "Move slow.", "Use pain-free range."],
     ["Heel lifting.", "Bouncing hard.", "Forcing pain."],
-    ["Knee-to-Wall Drill", "Deep Squat Hold", "Calf Stretch"]
+    ["Knee-to-Wall Drill", "Deep Squat Holds", "Calf Stretch"]
   ),
   ex(
     "Thoracic Rotations",

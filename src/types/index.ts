@@ -96,4 +96,5 @@ export type RosterAthlete = {
   recoveryLabel: string;
   lastCheckIn: string | null;
   needsCheckIn: boolean;
+  lastActiveAt: string | null;
 };

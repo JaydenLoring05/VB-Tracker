@@ -105,25 +105,6 @@
   font-weight: 900;
 }
 
-@media (max-width: 1200px) {
-  /* app-shell columns handled at 800px breakpoint below */
-}
-
-@media (max-width: 800px) {
-  .app-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    position: static;
-    height: auto;
-  }
-
-  .main {
-    padding: 22px;
-  }
-}
-
 @media (max-width: 900px) {
   .app-shell {
     display: block;
@@ -160,7 +141,7 @@
 
   .nav a {
     padding: 8px 4px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     flex-direction: column;
     justify-content: center;
     gap: 2px;

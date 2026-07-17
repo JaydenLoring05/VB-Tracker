@@ -219,12 +219,6 @@
   }
 }
 
-@media (max-width: 800px) {
-  .exercise-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 900px) {
   .exercise-heading {
     flex-direction: column;

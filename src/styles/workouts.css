@@ -127,12 +127,6 @@
   }
 }
 
-@media (max-width: 800px) {
-  .workout-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 900px) {
   .workout-grid {
     grid-template-columns: 1fr;

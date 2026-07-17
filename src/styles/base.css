@@ -160,7 +160,6 @@ h4 {
 }
 
 .tabs,
-.controls,
 .button-row,
 .filter-row {
   display: flex;
@@ -358,16 +357,13 @@ h3 {
     min-height: 46px;
   }
 
-  .controls,
   .button-row,
   .filter-row {
     gap: 10px;
   }
 
-  .controls button,
   .button-row button,
   .filter-row button,
-  .controls select,
   .tabs select {
     flex: 1 1 auto;
     min-height: 48px;

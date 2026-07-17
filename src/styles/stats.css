@@ -75,13 +75,6 @@
   }
 }
 
-@media (max-width: 800px) {
-  .chart-grid,
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 900px) {
   .stats-grid {
     grid-template-columns: 1fr;

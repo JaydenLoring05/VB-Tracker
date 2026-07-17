@@ -19,6 +19,7 @@ export function useActiveWorkoutSession(sessionId: string) {
   const [sets, setSets] = useState<WorkoutSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [previousSets, setPreviousSets] = useState<Record<string, PreviousSet>>({});
   const [maxWeightByExercise, setMaxWeightByExercise] = useState<Record<string, number>>({});
 
@@ -43,6 +44,14 @@ export function useActiveWorkoutSession(sessionId: string) {
 
       if (cancelled) return;
 
+      if (sessionRes.error || setsRes.error) {
+        console.error("Failed to load workout session", sessionRes.error ?? setsRes.error);
+        reportSyncError("Couldn't load this workout. Check your connection and try again.");
+        setLoadError(true);
+        setLoading(false);
+        return;
+      }
+
       if (!sessionRes.data) {
         setNotFound(true);
         setLoading(false);
@@ -59,7 +68,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     return () => {
       cancelled = true;
     };
-  }, [supabase, sessionId, userId]);
+  }, [supabase, sessionId, userId, reportSyncError]);
 
   useEffect(() => {
     if (!session) return;
@@ -197,6 +206,7 @@ export function useActiveWorkoutSession(sessionId: string) {
   return {
     loading,
     notFound,
+    loadError,
     session,
     sets,
     previousSets,

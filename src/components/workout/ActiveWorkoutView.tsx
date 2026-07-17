@@ -49,7 +49,7 @@ function playRestCompleteTone() {
 }
 
 export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
-  const { loading, notFound, session, sets, previousSets, logSet, deleteSet, finishWorkout } =
+  const { loading, notFound, loadError, session, sets, previousSets, logSet, deleteSet, finishWorkout } =
     useActiveWorkoutSession(sessionId);
 
   const [exerciseIndex, setExerciseIndex] = useState(0);
@@ -155,6 +155,15 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     return (
       <div className="panel">
         <p className="muted">Loading workout...</p>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="panel">
+        <h2>Couldn&apos;t load this workout</h2>
+        <p className="muted">Check your connection and refresh the page to try again.</p>
       </div>
     );
   }

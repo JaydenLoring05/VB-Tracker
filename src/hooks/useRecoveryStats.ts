@@ -4,9 +4,12 @@ import { calculateRecovery, coachRecommendations, recoveryStatus } from "@/lib/r
 export function useRecoveryStats() {
   const { stats, setStats, history, saveStats, clearStats } = useTrackerContext();
 
-  const recovery = calculateRecovery(stats);
+  const hasLoggedStats = history.length > 0;
+  const effectiveStats = hasLoggedStats ? stats : null;
+
+  const recovery = calculateRecovery(effectiveStats);
   const status = recoveryStatus(recovery);
-  const coachTips = coachRecommendations(stats);
+  const coachTips = coachRecommendations(effectiveStats);
 
   return {
     stats,
@@ -16,6 +19,7 @@ export function useRecoveryStats() {
     clearStats,
     recovery,
     status,
-    coachTips
+    coachTips,
+    hasLoggedStats
   };
 }
