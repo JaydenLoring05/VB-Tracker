@@ -69,7 +69,11 @@ export function PRTracker() {
       </div>
 
       <div className="pr-list">
-        {prs.length === 0 && <p className="muted">No PRs yet. Tragic. Fixable, but tragic.</p>}
+        {prs.length === 0 && (
+          <div className="empty-state">
+            <p className="muted">No PRs yet. Log a lift above or hit one in Workout Mode.</p>
+          </div>
+        )}
 
         {prs.slice(0, 8).map((pr) => (
           <div className="pr-card" key={pr.id}>

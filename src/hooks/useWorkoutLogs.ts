@@ -7,7 +7,7 @@ export function useWorkoutLogs() {
     useTrackerContext();
 
   const weeklyLogCount = useMemo(
-    () => Object.keys(workoutLogs).filter((key) => key.startsWith(`${week}-`)).length,
+    () => Object.keys(workoutLogs).filter((key) => key.split("-")[0] === String(week)).length,
     [workoutLogs, week]
   );
 

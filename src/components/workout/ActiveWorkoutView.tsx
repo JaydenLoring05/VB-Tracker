@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { getPrescription, workoutDays } from "@/data/workoutPlan";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
@@ -12,10 +12,38 @@ import { WorkoutSummary } from "./WorkoutSummary";
 
 const REST_DURATION = 90;
 const WEIGHT_INCREMENTS = [5, 10];
+const REPS_INCREMENTS = [1, 5];
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
     navigator.vibrate(pattern);
+  }
+}
+
+function playRestCompleteTone() {
+  if (typeof window === "undefined") return;
+  const AudioContextClass =
+    window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioContextClass) return;
+
+  try {
+    const ctx = new AudioContextClass();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = 880;
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.45);
+    oscillator.onended = () => ctx.close();
+  } catch {
+    // Audio isn't critical to the workout flow; fail silently.
   }
 }
 
@@ -26,11 +54,15 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
+  const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
   const [restSecondsLeft, setRestSecondsLeft] = useState<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [finished, setFinished] = useState(false);
   const [finishResult, setFinishResult] = useState<{ durationSeconds: number } | null>(null);
   const [prSetIds, setPrSetIds] = useState<Record<string, boolean>>({});
+  const [isLogging, setIsLogging] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const restCompleteFiredRef = useRef(false);
 
   const day = useMemo(
     () => (session ? workoutDays.find((d) => d.day === session.day) : undefined),
@@ -52,19 +84,33 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   }, [session, showSummary]);
 
   useEffect(() => {
-    if (restSecondsLeft === null) return;
-
-    if (restSecondsLeft <= 0) {
-      vibrate(200);
+    if (restEndsAt === null) {
+      setRestSecondsLeft(null);
       return;
     }
 
-    const timeout = setTimeout(
-      () => setRestSecondsLeft((current) => (current !== null ? current - 1 : null)),
-      1000
-    );
-    return () => clearTimeout(timeout);
-  }, [restSecondsLeft]);
+    restCompleteFiredRef.current = false;
+
+    function tick() {
+      const secondsLeft = Math.max(0, Math.round((restEndsAt! - Date.now()) / 1000));
+      setRestSecondsLeft(secondsLeft);
+
+      if (secondsLeft <= 0 && !restCompleteFiredRef.current) {
+        restCompleteFiredRef.current = true;
+        vibrate(200);
+        playRestCompleteTone();
+      }
+    }
+
+    tick();
+    const interval = setInterval(tick, 250);
+    document.addEventListener("visibilitychange", tick);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", tick);
+    };
+  }, [restEndsAt]);
 
   useEffect(() => {
     if (showSummary || typeof navigator === "undefined" || !("wakeLock" in navigator)) return;
@@ -130,7 +176,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     setExerciseIndex(Math.max(0, Math.min(day!.exercises.length - 1, nextIndex)));
     setWeight("");
     setReps("");
-    setRestSecondsLeft(null);
+    setRestEndsAt(null);
   }
 
   function bumpWeight(amount: number) {
@@ -138,27 +184,53 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     setWeight(String(Math.max(0, current + amount)));
   }
 
+  function bumpReps(amount: number) {
+    const current = Number(reps) || 0;
+    setReps(String(Math.max(0, current + amount)));
+  }
+
+  const canLogSet = reps.trim() !== "" && !isLogging;
+
   async function handleLogSet(event: FormEvent) {
     event.preventDefault();
+    if (!canLogSet) return;
 
-    const result = await logSet(
-      exercise,
-      weight.trim() === "" ? null : Number(weight),
-      reps.trim() === "" ? null : Number(reps)
-    );
+    setIsLogging(true);
+    try {
+      const result = await logSet(exercise, weight.trim() === "" ? null : Number(weight), Number(reps));
 
-    if (result?.isNewPR) {
-      vibrate([80, 40, 80]);
-      setPrSetIds((current) => ({ ...current, [result.set.id]: true }));
+      if (result?.isNewPR) {
+        vibrate([80, 40, 80]);
+        setPrSetIds((current) => ({ ...current, [result.set.id]: true }));
+      }
+
+      if (result) {
+        setRestEndsAt(Date.now() + REST_DURATION * 1000);
+      }
+    } finally {
+      setIsLogging(false);
     }
-
-    setRestSecondsLeft(REST_DURATION);
   }
 
   async function handleFinish() {
+    if (isFinishing) return;
+
+    const loggedCount = sets.length;
+    const confirmed = window.confirm(
+      loggedCount > 0
+        ? `Finish workout? ${loggedCount} set${loggedCount === 1 ? "" : "s"} logged.`
+        : "Finish workout? No sets have been logged yet."
+    );
+    if (!confirmed) return;
+
+    setIsFinishing(true);
     const result = await finishWorkout(day!.exercises);
-    setFinishResult(result);
-    setFinished(true);
+    setIsFinishing(false);
+
+    if (result) {
+      setFinishResult(result);
+      setFinished(true);
+    }
   }
 
   return (
@@ -184,6 +256,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
             }`}
             onClick={() => goToExercise(index)}
             title={name}
+            aria-label={name}
           />
         ))}
       </div>
@@ -233,7 +306,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
               />
-              <div className="weight-increments">
+              <div className="input-increments">
                 {WEIGHT_INCREMENTS.map((amount) => (
                   <button
                     type="button"
@@ -246,15 +319,30 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
                 ))}
               </div>
             </div>
-            <input
-              type="number"
-              inputMode="decimal"
-              placeholder="Reps"
-              value={reps}
-              onChange={(e) => setReps(e.target.value)}
-            />
-            <button type="submit">
-              <CheckCircle2 size={16} /> Log Set
+            <div className="weight-input-group">
+              <input
+                type="number"
+                inputMode="decimal"
+                placeholder="Reps"
+                value={reps}
+                onChange={(e) => setReps(e.target.value)}
+                required
+              />
+              <div className="input-increments">
+                {REPS_INCREMENTS.map((amount) => (
+                  <button
+                    type="button"
+                    key={amount}
+                    className="ghost"
+                    onClick={() => bumpReps(amount)}
+                  >
+                    +{amount}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button type="submit" disabled={!canLogSet}>
+              <CheckCircle2 size={16} /> {isLogging ? "Saving…" : "Log Set"}
             </button>
           </form>
         )}
@@ -279,7 +367,9 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
           </button>
         </div>
 
-        <button onClick={handleFinish}>Finish Workout</button>
+        <button className="secondary" onClick={handleFinish} disabled={isFinishing}>
+          {isFinishing ? "Finishing…" : "Finish Workout"}
+        </button>
       </div>
     </div>
   );

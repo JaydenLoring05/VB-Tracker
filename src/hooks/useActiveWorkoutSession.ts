@@ -10,7 +10,7 @@ import { WorkoutSession, WorkoutSet } from "@/types";
 export type PreviousSet = { weight: number | null; reps: number | null };
 
 export function useActiveWorkoutSession(sessionId: string) {
-  const { userId, setExerciseChecked } = useTrackerContext();
+  const { userId, setExerciseChecked, addPR, reportSyncError } = useTrackerContext();
   const supabase = useMemo(() => createClient(), []);
 
   const [session, setSession] = useState<WorkoutSession | null>(null);
@@ -116,6 +116,7 @@ export function useActiveWorkoutSession(sessionId: string) {
 
     if (error) {
       console.error("Failed to log set", error);
+      reportSyncError("That set didn't save. Check your connection and log it again.");
       return null;
     }
 
@@ -124,12 +125,19 @@ export function useActiveWorkoutSession(sessionId: string) {
 
     if (isNewPR && weight != null) {
       setMaxWeightByExercise((current) => ({ ...current, [exercise]: weight }));
+      addPR({
+        exercise,
+        value: reps != null ? `${weight} x ${reps}` : String(weight),
+        unit: "lbs",
+        note: "Set during Workout Mode"
+      });
     }
 
     return { set: newSet, isNewPR };
   }
 
   function deleteSet(setId: string) {
+    const previous = sets;
     setSets((current) => current.filter((s) => s.id !== setId));
 
     supabase
@@ -138,7 +146,11 @@ export function useActiveWorkoutSession(sessionId: string) {
       .eq("id", setId)
       .eq("user_id", userId)
       .then(({ error }) => {
-        if (error) console.error("Failed to delete set", error);
+        if (error) {
+          console.error("Failed to delete set", error);
+          setSets(previous);
+          reportSyncError("Couldn't remove that set. Try again.");
+        }
       });
   }
 
@@ -156,7 +168,11 @@ export function useActiveWorkoutSession(sessionId: string) {
       .eq("id", sessionId)
       .eq("user_id", userId);
 
-    if (error) console.error("Failed to finish workout", error);
+    if (error) {
+      console.error("Failed to finish workout", error);
+      reportSyncError("Couldn't finish the workout. Check your connection and try again.");
+      return null;
+    }
 
     const exercisesWithSets = new Set(sets.map((s) => s.exercise));
     exercisesInDay.forEach((exercise) => {

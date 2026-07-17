@@ -37,7 +37,7 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
    ```
-3. Run `supabase/schema.sql`, then `supabase/schema_v18_5.sql`, once each in your project's SQL Editor to create the tables and row-level security policies.
+3. Run `supabase/schema.sql`, then `supabase/schema_v18_5.sql`, then `supabase/schema_v19.sql`, once each in your project's SQL Editor to create the tables, row-level security policies, and constraints.
 4. `npm run dev`
 
 ## Purpose

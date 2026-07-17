@@ -45,6 +45,9 @@
 }
 
 .nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   color: var(--text);
   padding: 14px;
   border-radius: var(--radius-sm);
@@ -158,15 +161,15 @@
   .nav a {
     padding: 8px 4px;
     border-radius: 14px;
-    font-size: 0;
-    display: grid;
-    place-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
     color: var(--muted);
     min-height: 56px;
   }
 
-  .nav a::first-letter {
-    font-size: 24px;
+  .nav-label {
+    display: none;
   }
 
   .nav a:hover {

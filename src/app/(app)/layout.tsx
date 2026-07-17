@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { Sidebar } from "@/components/layout/Sidebar";
+import { SyncErrorToast } from "@/components/layout/SyncErrorToast";
 import { Topbar } from "@/components/layout/Topbar";
 import { TrackerProvider } from "@/context/TrackerContext";
 import { createClient } from "@/lib/supabase/server";
@@ -29,6 +30,8 @@ export default async function AppLayout({
           {children}
         </main>
       </div>
+
+      <SyncErrorToast />
     </TrackerProvider>
   );
 }

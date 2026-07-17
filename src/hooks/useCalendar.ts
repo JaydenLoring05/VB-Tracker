@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
+import { todayISO } from "@/lib/storage";
+
+const TRAINING_LOAD_WINDOW_DAYS = 7;
 
 export function useCalendar() {
   const { calendarEvents, addGame } = useTrackerContext();
@@ -12,7 +15,7 @@ export function useCalendar() {
     for (let i = 0; i < 14; i++) {
       const date = new Date(start);
       date.setDate(start.getDate() + i);
-      const iso = date.toISOString().slice(0, 10);
+      const iso = todayISO(date);
 
       days.push({
         iso,
@@ -26,7 +29,13 @@ export function useCalendar() {
   }, [calendarEvents]);
 
   const trainingLoad = useMemo(() => {
+    const windowStart = new Date();
+    windowStart.setDate(windowStart.getDate() - TRAINING_LOAD_WINDOW_DAYS);
+    const windowStartIso = todayISO(windowStart);
+
     return calendarEvents.reduce((sum, event) => {
+      if (event.date < windowStartIso) return sum;
+
       const weights = {
         workout: 3,
         practice: 4,

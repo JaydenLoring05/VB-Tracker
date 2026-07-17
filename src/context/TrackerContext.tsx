@@ -78,6 +78,22 @@ function fromStatsRow(row: StatsRow): StatEntry {
   };
 }
 
+function computeStreak(workoutDates: Set<string>): number {
+  const cursor = new Date();
+  let streak = 0;
+
+  if (!workoutDates.has(todayISO(cursor))) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  while (workoutDates.has(todayISO(cursor))) {
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return streak;
+}
+
 function makeDefaultEvents(): Omit<CalendarEvent, "id">[] {
   const start = new Date();
   const events: Omit<CalendarEvent, "id">[] = [];
@@ -85,7 +101,7 @@ function makeDefaultEvents(): Omit<CalendarEvent, "id">[] {
   for (let i = 0; i < 28; i++) {
     const date = new Date(start);
     date.setDate(start.getDate() + i);
-    const iso = date.toISOString().slice(0, 10);
+    const iso = todayISO(date);
     const day = date.getDay();
 
     if ([1, 3, 5, 6].includes(day)) {
@@ -139,6 +155,12 @@ type TrackerContextValue = {
   prs: PRRecord[];
   addPR: (pr: Omit<PRRecord, "id" | "date">) => void;
   deletePR: (id: string) => void;
+
+  workoutStreak: number;
+
+  syncError: string | null;
+  reportSyncError: (message: string) => void;
+  clearSyncError: () => void;
 };
 
 const TrackerContext = createContext<TrackerContextValue | null>(null);
@@ -164,12 +186,22 @@ export function TrackerProvider({
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLogs>({});
   const [workoutNotes, setWorkoutNotes] = useState<WorkoutNotes>({});
   const [prs, setPrs] = useState<PRRecord[]>([]);
+  const [workoutStreak, setWorkoutStreak] = useState(0);
+  const [syncError, setSyncError] = useState<string | null>(null);
+
+  function reportSyncError(message: string) {
+    setSyncError(message);
+  }
+
+  function clearSyncError() {
+    setSyncError(null);
+  }
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
-      const [checksRes, logsRes, notesRes, latestRes, historyRes, calendarRes, prsRes] =
+      const [checksRes, logsRes, notesRes, latestRes, historyRes, calendarRes, prsRes, sessionsRes] =
         await Promise.all([
           supabase.from("exercise_checks").select("week, day, exercise, checked").eq("user_id", userId),
           supabase.from("workout_logs").select("week, day, exercise, value").eq("user_id", userId),
@@ -188,7 +220,14 @@ export function TrackerProvider({
             .from("prs")
             .select("id, date, exercise, value, unit, note")
             .eq("user_id", userId)
-            .order("created_at", { ascending: false })
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("workout_sessions")
+            .select("ended_at")
+            .eq("user_id", userId)
+            .not("ended_at", "is", null)
+            .order("ended_at", { ascending: false })
+            .limit(60)
         ]);
 
       if (cancelled) return;
@@ -218,13 +257,26 @@ export function TrackerProvider({
         setCalendarEvents(calendarRes.data as CalendarEvent[]);
       } else {
         const defaults = makeDefaultEvents().map((event) => ({ ...event, user_id: userId }));
-        const inserted = await supabase.from("calendar_events").insert(defaults).select();
-        if (!cancelled && inserted.data) {
+        const inserted = await supabase
+          .from("calendar_events")
+          .upsert(defaults, { onConflict: "user_id,date,type,title", ignoreDuplicates: true })
+          .select();
+        if (cancelled) return;
+        if (inserted.error) {
+          reportSyncError("Couldn't set up your training calendar. Pull to refresh to try again.");
+        } else if (inserted.data) {
           setCalendarEvents(inserted.data as CalendarEvent[]);
         }
       }
 
       setPrs((prsRes.data ?? []) as PRRecord[]);
+
+      const workoutDates = new Set(
+        (sessionsRes.data ?? [])
+          .filter((row): row is { ended_at: string } => row.ended_at != null)
+          .map((row) => todayISO(new Date(row.ended_at)))
+      );
+      setWorkoutStreak(computeStreak(workoutDates));
     }
 
     load();
@@ -232,6 +284,7 @@ export function TrackerProvider({
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, userId]);
 
   function toggleExercise(day: string, exercise: string) {
@@ -246,6 +299,7 @@ export function TrackerProvider({
     isChecked: boolean
   ) {
     const key = `${checkedWeek}-${day}-${exercise}`;
+    const previous = checked[key];
 
     setChecked((current) => ({ ...current, [key]: isChecked }));
 
@@ -256,12 +310,18 @@ export function TrackerProvider({
         { onConflict: "user_id,week,day,exercise" }
       )
       .then(({ error }) => {
-        if (error) console.error("Failed to save exercise check", error);
+        if (error) {
+          console.error("Failed to save exercise check", error);
+          setChecked((current) => ({ ...current, [key]: previous }));
+          reportSyncError("Couldn't save that checkmark. Check your connection and try again.");
+        }
       });
   }
 
   function updateWorkoutLog(day: string, exercise: string, value: string) {
     const key = `${week}-${day}-${exercise}-log`;
+    const previous = workoutLogs[key];
+
     setWorkoutLogs((current) => ({ ...current, [key]: value }));
 
     supabase
@@ -271,12 +331,18 @@ export function TrackerProvider({
         { onConflict: "user_id,week,day,exercise" }
       )
       .then(({ error }) => {
-        if (error) console.error("Failed to save workout log", error);
+        if (error) {
+          console.error("Failed to save workout log", error);
+          setWorkoutLogs((current) => ({ ...current, [key]: previous }));
+          reportSyncError("Couldn't save that entry. Check your connection and try again.");
+        }
       });
   }
 
   function updateWorkoutNote(day: string, note: string) {
     const key = `${week}-${day}-notes`;
+    const previous = workoutNotes[key];
+
     setWorkoutNotes((current) => ({ ...current, [key]: note }));
 
     supabase
@@ -286,34 +352,56 @@ export function TrackerProvider({
         { onConflict: "user_id,week,day" }
       )
       .then(({ error }) => {
-        if (error) console.error("Failed to save workout note", error);
+        if (error) {
+          console.error("Failed to save workout note", error);
+          setWorkoutNotes((current) => ({ ...current, [key]: previous }));
+          reportSyncError("Couldn't save that note. Check your connection and try again.");
+        }
       });
   }
 
   function saveStats() {
+    const previousStats = stats;
+    const previousHistory = history;
     const entry = { ...stats, date: new Date().toLocaleDateString("en-US") };
 
     setStats(entry);
     setHistory((current) => [...current, entry]);
 
     const row = toStatsRow(entry);
+    let failed = false;
+
+    function rollbackOnce(message: string) {
+      if (failed) return;
+      failed = true;
+      setStats(previousStats);
+      setHistory(previousHistory);
+      reportSyncError(message);
+    }
 
     supabase
       .from("latest_stats")
       .upsert({ user_id: userId, ...row }, { onConflict: "user_id" })
       .then(({ error }) => {
-        if (error) console.error("Failed to save latest stats", error);
+        if (error) {
+          console.error("Failed to save latest stats", error);
+          rollbackOnce("Couldn't save your stats. Check your connection and try again.");
+        }
       });
 
     supabase
       .from("stats_history")
       .insert({ user_id: userId, ...row })
       .then(({ error }) => {
-        if (error) console.error("Failed to save stats history", error);
+        if (error) {
+          console.error("Failed to save stats history", error);
+          rollbackOnce("Couldn't save your stats. Check your connection and try again.");
+        }
       });
   }
 
   function clearStats() {
+    const previousHistory = history;
     setHistory([]);
 
     supabase
@@ -321,7 +409,11 @@ export function TrackerProvider({
       .delete()
       .eq("user_id", userId)
       .then(({ error }) => {
-        if (error) console.error("Failed to clear stats history", error);
+        if (error) {
+          console.error("Failed to clear stats history", error);
+          setHistory(previousHistory);
+          reportSyncError("Couldn't clear your stats history. Try again.");
+        }
       });
   }
 
@@ -336,6 +428,7 @@ export function TrackerProvider({
       .then(({ data, error }) => {
         if (error) {
           console.error("Failed to add game", error);
+          reportSyncError("Couldn't add that game to your calendar. Try again.");
           return;
         }
         setCalendarEvents((events) => [...events, data as CalendarEvent]);
@@ -360,6 +453,7 @@ export function TrackerProvider({
       .then(({ data, error }) => {
         if (error) {
           console.error("Failed to add PR", error);
+          reportSyncError("Couldn't save that PR. Try again.");
           return;
         }
         setPrs((current) => [data as PRRecord, ...current]);
@@ -367,6 +461,7 @@ export function TrackerProvider({
   }
 
   function deletePR(id: string) {
+    const previous = prs;
     setPrs((current) => current.filter((pr) => pr.id !== id));
 
     supabase
@@ -375,7 +470,11 @@ export function TrackerProvider({
       .eq("id", id)
       .eq("user_id", userId)
       .then(({ error }) => {
-        if (error) console.error("Failed to delete PR", error);
+        if (error) {
+          console.error("Failed to delete PR", error);
+          setPrs(previous);
+          reportSyncError("Couldn't delete that PR. Try again.");
+        }
       });
   }
 
@@ -406,7 +505,11 @@ export function TrackerProvider({
     updateWorkoutNote,
     prs,
     addPR,
-    deletePR
+    deletePR,
+    workoutStreak,
+    syncError,
+    reportSyncError,
+    clearSyncError
   };
 
   return <TrackerContext.Provider value={value}>{children}</TrackerContext.Provider>;

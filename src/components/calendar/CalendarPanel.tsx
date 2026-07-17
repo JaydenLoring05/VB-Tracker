@@ -1,16 +1,23 @@
 "use client";
 
 import { CalendarDays } from "lucide-react";
+import { FormEvent, useState } from "react";
 
 import { useCalendar } from "@/hooks/useCalendar";
 
 export function CalendarPanel() {
   const { calendarPreview, trainingLoad, addGame } = useCalendar();
+  const [isAddingGame, setIsAddingGame] = useState(false);
+  const [gameTitle, setGameTitle] = useState("");
 
-  function handleAddGame() {
-    const title = prompt("Game title?");
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    const title = gameTitle.trim();
     if (!title) return;
+
     addGame(title);
+    setGameTitle("");
+    setIsAddingGame(false);
   }
 
   return (
@@ -19,8 +26,31 @@ export function CalendarPanel() {
         <CalendarDays size={22} /> Calendar + Training Load
       </h2>
 
-      <p className="muted">Training Load: {trainingLoad}</p>
-      <button onClick={handleAddGame}>Add Game Today</button>
+      <p className="muted">Training Load (last 7 days): {trainingLoad}</p>
+
+      {isAddingGame ? (
+        <form className="add-game-form" onSubmit={handleSubmit}>
+          <input
+            autoFocus
+            value={gameTitle}
+            onChange={(e) => setGameTitle(e.target.value)}
+            placeholder="Game title"
+          />
+          <button type="submit">Add</button>
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              setIsAddingGame(false);
+              setGameTitle("");
+            }}
+          >
+            Cancel
+          </button>
+        </form>
+      ) : (
+        <button onClick={() => setIsAddingGame(true)}>Add Game Today</button>
+      )}
 
       <div className="calendar-preview" style={{ marginTop: 16 }}>
         {calendarPreview.map((day) => (

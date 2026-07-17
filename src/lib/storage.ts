@@ -1,5 +1,5 @@
-export function todayISO() {
-  const date = new Date();
+export function todayISO(from: Date = new Date()) {
+  const date = new Date(from);
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   return date.toISOString().slice(0, 10);
 }

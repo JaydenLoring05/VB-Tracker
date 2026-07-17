@@ -12,11 +12,11 @@ import {
 
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 
-const charts: [string, string][] = [
-  ["vertical", "Vertical"],
-  ["approach", "Approach"],
-  ["weight", "Weight"],
-  ["pullups", "Pull-Ups"]
+const charts: [string, string, string][] = [
+  ["vertical", "Vertical", "var(--gold)"],
+  ["approach", "Approach", "var(--blue)"],
+  ["weight", "Weight", "var(--purple)"],
+  ["pullups", "Pull-Ups", "var(--green)"]
 ];
 
 export function ProgressCharts() {
@@ -27,19 +27,33 @@ export function ProgressCharts() {
       <h2>Progress Graphs</h2>
 
       <div className="chart-grid">
-        {charts.map(([key, label]) => (
+        {charts.map(([key, label, color]) => (
           <div className="chart-card" key={key}>
             <h3>{label}</h3>
 
-            <ResponsiveContainer width="100%" height={180}>
-              <LineChart data={history}>
-                <CartesianGrid stroke="rgba(255,255,255,.08)" />
-                <XAxis dataKey="date" stroke="#a8b0bd" />
-                <YAxis stroke="#a8b0bd" />
-                <Tooltip />
-                <Line type="monotone" dataKey={key} stroke="#ffc400" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+            {history.length === 0 ? (
+              <div className="empty-state">
+                <p className="muted">Log stats to see your {label.toLowerCase()} trend.</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={180}>
+                <LineChart data={history}>
+                  <CartesianGrid stroke="var(--border)" />
+                  <XAxis dataKey="date" stroke="var(--muted)" tick={{ fontSize: 12 }} />
+                  <YAxis stroke="var(--muted)" tick={{ fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      background: "var(--panel-2)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "var(--radius-sm)"
+                    }}
+                    labelStyle={{ color: "var(--muted)" }}
+                    itemStyle={{ color: "var(--text)" }}
+                  />
+                  <Line type="monotone" dataKey={key} stroke={color} strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         ))}
       </div>

@@ -139,12 +139,12 @@
   gap: 6px;
 }
 
-.weight-increments {
+.input-increments {
   display: flex;
   gap: 6px;
 }
 
-.weight-increments button {
+.input-increments button {
   flex: 1;
   padding: 6px 4px;
   font-size: 12px;
