@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { workoutDays } from "@/data/workoutPlan";
+import { getWorkoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { createClient } from "@/lib/supabase/client";
 import { WorkoutSession, WorkoutSet } from "@/types";
 
@@ -11,6 +12,7 @@ export type PreviousSet = { weight: number | null; reps: number | null };
 
 export function useActiveWorkoutSession(sessionId: string) {
   const { userId, setExerciseChecked, addPR, reportSyncError } = useTrackerContext();
+  const { resolveExercise } = useExerciseSubstitutions();
   const supabase = useMemo(() => createClient(), []);
 
   const [session, setSession] = useState<WorkoutSession | null>(null);
@@ -63,14 +65,16 @@ export function useActiveWorkoutSession(sessionId: string) {
     if (!session) return;
 
     let cancelled = false;
-    const day = workoutDays.find((d) => d.day === session.day);
+    const day = getWorkoutDays(session.week).find((d) => d.day === session.day);
     if (!day) return;
+
+    const resolvedExercises = day.exercises.map(resolveExercise);
 
     supabase
       .from("workout_sets")
       .select("exercise, weight, reps, created_at")
       .eq("user_id", userId)
-      .in("exercise", day.exercises)
+      .in("exercise", resolvedExercises)
       .neq("session_id", sessionId)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
@@ -95,7 +99,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     return () => {
       cancelled = true;
     };
-  }, [supabase, session, sessionId, userId]);
+  }, [supabase, session, sessionId, userId, resolveExercise]);
 
   async function logSet(exercise: string, weight: number | null, reps: number | null) {
     const setNumber = sets.filter((s) => s.exercise === exercise).length + 1;

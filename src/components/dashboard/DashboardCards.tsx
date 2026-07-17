@@ -3,7 +3,7 @@
 import { BarChart3, CalendarDays, HeartPulse, Play, Trophy } from "lucide-react";
 import Link from "next/link";
 
-import { workoutDays } from "@/data/workoutPlan";
+import { getWorkoutDays } from "@/data/workoutPlan";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { usePRs } from "@/hooks/usePRs";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
@@ -11,11 +11,12 @@ import { todayName } from "@/lib/storage";
 
 export function DashboardCards() {
   const today = todayName();
-  const todayWorkout = workoutDays.find((day) => day.day === today);
 
   const { recovery, status } = useRecoveryStats();
-  const { completedExercises, totalExercises, progress } = useWorkoutProgress();
+  const { week, completedExercises, totalExercises, progress } = useWorkoutProgress();
   const { latestPR } = usePRs();
+
+  const todayWorkout = getWorkoutDays(week).find((day) => day.day === today);
 
   return (
     <section id="dashboard" className="grid-4">

@@ -46,6 +46,46 @@
   cursor: pointer;
 }
 
+.exercise-row span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.substituted-badge {
+  margin-left: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(118, 184, 255, 0.14);
+  border: 1px solid rgba(118, 184, 255, 0.3);
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.swap-toggle {
+  flex: 0 0 auto;
+  padding: 6px;
+  min-height: auto;
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.swap-toggle:hover {
+  color: var(--gold);
+}
+
+.swap-picker {
+  margin-left: 28px;
+}
+
+.swap-picker select {
+  width: 100%;
+  min-height: 40px;
+  font-size: 13px;
+}
+
 .exercise-log-input {
   width: 100%;
   min-height: 40px;

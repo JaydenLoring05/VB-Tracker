@@ -21,7 +21,12 @@ export function ExerciseCard({
         <div className="exercise-content">
           <div className="exercise-heading">
             <h3>{exercise.name}</h3>
-            <span className="exercise-category">{exercise.category}</span>
+            <div className="exercise-tags">
+              <span className="exercise-category">{exercise.category}</span>
+              <span className={`exercise-level exercise-level-${exercise.level.toLowerCase()}`}>
+                {exercise.level}
+              </span>
+            </div>
           </div>
 
           <p className="muted">{exercise.purpose}</p>

@@ -3,8 +3,9 @@
 import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
-import { getPrescription, workoutDays } from "@/data/workoutPlan";
+import { getPrescription, getWorkoutDays } from "@/data/workoutPlan";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
+import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { formatDuration } from "@/lib/time";
 
 import { RestTimer } from "./RestTimer";
@@ -63,10 +64,19 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const [isLogging, setIsLogging] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const restCompleteFiredRef = useRef(false);
+  const isLoggingRef = useRef(false);
+  const isFinishingRef = useRef(false);
+
+  const { resolveExercise } = useExerciseSubstitutions();
 
   const day = useMemo(
-    () => (session ? workoutDays.find((d) => d.day === session.day) : undefined),
+    () => (session ? getWorkoutDays(session.week).find((d) => d.day === session.day) : undefined),
     [session]
+  );
+
+  const resolvedExercises = useMemo(
+    () => (day ? day.exercises.map(resolveExercise) : []),
+    [day, resolveExercise]
   );
 
   const showSummary = finished || session?.ended_at != null;
@@ -168,12 +178,12 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     );
   }
 
-  const exercise = day.exercises[exerciseIndex];
+  const exercise = resolvedExercises[exerciseIndex];
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
   const lastTime = previousSets[exercise];
 
   function goToExercise(nextIndex: number) {
-    setExerciseIndex(Math.max(0, Math.min(day!.exercises.length - 1, nextIndex)));
+    setExerciseIndex(Math.max(0, Math.min(resolvedExercises.length - 1, nextIndex)));
     setWeight("");
     setReps("");
     setRestEndsAt(null);
@@ -224,7 +234,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     if (!confirmed) return;
 
     setIsFinishing(true);
-    const result = await finishWorkout(day!.exercises);
+    const result = await finishWorkout(resolvedExercises);
     setIsFinishing(false);
 
     if (result) {
@@ -247,7 +257,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
       </div>
 
       <div className="exercise-dots">
-        {day.exercises.map((name, index) => (
+        {resolvedExercises.map((name, index) => (
           <button
             key={name}
             type="button"
@@ -360,7 +370,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
 
           <button
             className="ghost"
-            disabled={exerciseIndex === day.exercises.length - 1}
+            disabled={exerciseIndex === resolvedExercises.length - 1}
             onClick={() => goToExercise(exerciseIndex + 1)}
           >
             Next <ChevronRight size={16} />

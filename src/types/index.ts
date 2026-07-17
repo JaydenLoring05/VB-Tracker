@@ -6,9 +6,12 @@ export type ExerciseCategory =
   | "Mobility"
   | "Rehab";
 
+export type ExerciseLevel = "Beginner" | "Intermediate" | "Advanced";
+
 export type Exercise = {
   name: string;
   category: ExerciseCategory;
+  level: ExerciseLevel;
   icon: string;
   purpose: string;
   cues: string[];

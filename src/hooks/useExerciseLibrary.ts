@@ -19,6 +19,8 @@ export function useExerciseLibrary() {
   const {
     selectedFilter,
     setSelectedFilter,
+    selectedLevel,
+    setSelectedLevel,
     exerciseSearch,
     setExerciseSearch,
     expandedExercises,
@@ -29,6 +31,7 @@ export function useExerciseLibrary() {
   const filteredExercises = useMemo(() => {
     return exercises.filter((exercise) => {
       const matchesCategory = selectedFilter === "All" || exercise.category === selectedFilter;
+      const matchesLevel = selectedLevel === "All" || exercise.level === selectedLevel;
       const search = exerciseSearch.toLowerCase().trim();
 
       const searchableText = [
@@ -44,9 +47,9 @@ export function useExerciseLibrary() {
 
       const matchesSearch = !search || searchableText.includes(search);
 
-      return matchesCategory && matchesSearch;
+      return matchesCategory && matchesLevel && matchesSearch;
     });
-  }, [selectedFilter, exerciseSearch]);
+  }, [selectedFilter, selectedLevel, exerciseSearch]);
 
   function expandAllVisibleExercises() {
     const expanded = { ...expandedExercises };
@@ -97,6 +100,8 @@ export function useExerciseLibrary() {
     setExerciseSearch,
     selectedFilter,
     setSelectedFilter,
+    selectedLevel,
+    setSelectedLevel,
     expandedExercises,
     toggleExerciseCard,
     expandAllVisibleExercises,

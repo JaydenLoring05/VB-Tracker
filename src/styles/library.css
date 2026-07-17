@@ -64,6 +64,13 @@
   margin-bottom: 6px;
 }
 
+.exercise-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
 .exercise-category {
   flex: 0 0 auto;
   font-size: var(--fs-xs);
@@ -73,6 +80,32 @@
   border: 1px solid rgba(255, 196, 0, 0.25);
   padding: 5px 8px;
   border-radius: 999px;
+}
+
+.exercise-level {
+  flex: 0 0 auto;
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  padding: 5px 8px;
+  border-radius: 999px;
+}
+
+.exercise-level-beginner {
+  color: var(--green);
+  background: rgba(69, 212, 131, 0.12);
+  border: 1px solid rgba(69, 212, 131, 0.25);
+}
+
+.exercise-level-intermediate {
+  color: var(--blue);
+  background: rgba(118, 184, 255, 0.12);
+  border: 1px solid rgba(118, 184, 255, 0.25);
+}
+
+.exercise-level-advanced {
+  color: var(--red);
+  background: rgba(255, 98, 98, 0.12);
+  border: 1px solid rgba(255, 98, 98, 0.25);
 }
 
 .exercise-details {

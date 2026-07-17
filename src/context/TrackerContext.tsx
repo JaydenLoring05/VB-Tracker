@@ -30,6 +30,7 @@ export type PRRecord = {
 
 export type WorkoutLogs = Record<string, string>;
 export type WorkoutNotes = Record<string, string>;
+export type ExerciseSubstitutions = Record<string, string>;
 
 export type StatsRow = {
   date: string | null;
@@ -141,6 +142,8 @@ type TrackerContextValue = {
 
   selectedFilter: string;
   setSelectedFilter: (filter: string) => void;
+  selectedLevel: string;
+  setSelectedLevel: (level: string) => void;
   exerciseSearch: string;
   setExerciseSearch: (search: string) => void;
   expandedExercises: Record<string, boolean>;
@@ -155,6 +158,10 @@ type TrackerContextValue = {
   prs: PRRecord[];
   addPR: (pr: Omit<PRRecord, "id" | "date">) => void;
   deletePR: (id: string) => void;
+
+  substitutions: ExerciseSubstitutions;
+  setSubstitution: (originalExercise: string, chosenExercise: string) => void;
+  clearSubstitution: (originalExercise: string) => void;
 
   workoutStreak: number;
 
@@ -180,12 +187,14 @@ export function TrackerProvider({
   const [history, setHistory] = useState<StatEntry[]>([]);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [selectedFilter, setSelectedFilter] = useState("All");
+  const [selectedLevel, setSelectedLevel] = useState("All");
   const [exerciseSearch, setExerciseSearch] = useState("");
   const [expandedExercises, setExpandedExercises] = useState<Record<string, boolean>>({});
 
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLogs>({});
   const [workoutNotes, setWorkoutNotes] = useState<WorkoutNotes>({});
   const [prs, setPrs] = useState<PRRecord[]>([]);
+  const [substitutions, setSubstitutions] = useState<ExerciseSubstitutions>({});
   const [workoutStreak, setWorkoutStreak] = useState(0);
   const [syncError, setSyncError] = useState<string | null>(null);
 
@@ -201,34 +210,47 @@ export function TrackerProvider({
     let cancelled = false;
 
     async function load() {
-      const [checksRes, logsRes, notesRes, latestRes, historyRes, calendarRes, prsRes, sessionsRes] =
-        await Promise.all([
-          supabase.from("exercise_checks").select("week, day, exercise, checked").eq("user_id", userId),
-          supabase.from("workout_logs").select("week, day, exercise, value").eq("user_id", userId),
-          supabase.from("workout_notes").select("week, day, note").eq("user_id", userId),
-          supabase.from("latest_stats").select("*").eq("user_id", userId).maybeSingle(),
-          supabase
-            .from("stats_history")
-            .select("*")
-            .eq("user_id", userId)
-            .order("created_at", { ascending: true }),
-          supabase
-            .from("calendar_events")
-            .select("id, date, type, title, notes")
-            .eq("user_id", userId),
-          supabase
-            .from("prs")
-            .select("id, date, exercise, value, unit, note")
-            .eq("user_id", userId)
-            .order("created_at", { ascending: false }),
-          supabase
-            .from("workout_sessions")
-            .select("ended_at")
-            .eq("user_id", userId)
-            .not("ended_at", "is", null)
-            .order("ended_at", { ascending: false })
-            .limit(60)
-        ]);
+      const [
+        checksRes,
+        logsRes,
+        notesRes,
+        latestRes,
+        historyRes,
+        calendarRes,
+        prsRes,
+        sessionsRes,
+        substitutionsRes
+      ] = await Promise.all([
+        supabase.from("exercise_checks").select("week, day, exercise, checked").eq("user_id", userId),
+        supabase.from("workout_logs").select("week, day, exercise, value").eq("user_id", userId),
+        supabase.from("workout_notes").select("week, day, note").eq("user_id", userId),
+        supabase.from("latest_stats").select("*").eq("user_id", userId).maybeSingle(),
+        supabase
+          .from("stats_history")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: true }),
+        supabase
+          .from("calendar_events")
+          .select("id, date, type, title, notes")
+          .eq("user_id", userId),
+        supabase
+          .from("prs")
+          .select("id, date, exercise, value, unit, note")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("workout_sessions")
+          .select("ended_at")
+          .eq("user_id", userId)
+          .not("ended_at", "is", null)
+          .order("ended_at", { ascending: false })
+          .limit(60),
+        supabase
+          .from("exercise_substitutions")
+          .select("original_exercise, chosen_exercise")
+          .eq("user_id", userId)
+      ]);
 
       if (cancelled) return;
 
@@ -270,6 +292,12 @@ export function TrackerProvider({
       }
 
       setPrs((prsRes.data ?? []) as PRRecord[]);
+
+      const substitutionsMap: ExerciseSubstitutions = {};
+      (substitutionsRes.data ?? []).forEach((row) => {
+        substitutionsMap[row.original_exercise] = row.chosen_exercise;
+      });
+      setSubstitutions(substitutionsMap);
 
       const workoutDates = new Set(
         (sessionsRes.data ?? [])
@@ -460,6 +488,58 @@ export function TrackerProvider({
       });
   }
 
+  function setSubstitution(originalExercise: string, chosenExercise: string) {
+    const previous = substitutions[originalExercise];
+
+    setSubstitutions((current) => ({ ...current, [originalExercise]: chosenExercise }));
+
+    supabase
+      .from("exercise_substitutions")
+      .upsert(
+        { user_id: userId, original_exercise: originalExercise, chosen_exercise: chosenExercise },
+        { onConflict: "user_id,original_exercise" }
+      )
+      .then(({ error }) => {
+        if (error) {
+          console.error("Failed to save exercise substitution", error);
+          setSubstitutions((current) => {
+            const next = { ...current };
+            if (previous === undefined) {
+              delete next[originalExercise];
+            } else {
+              next[originalExercise] = previous;
+            }
+            return next;
+          });
+          reportSyncError("Couldn't save that swap. Check your connection and try again.");
+        }
+      });
+  }
+
+  function clearSubstitution(originalExercise: string) {
+    const previous = substitutions[originalExercise];
+    if (previous === undefined) return;
+
+    setSubstitutions((current) => {
+      const next = { ...current };
+      delete next[originalExercise];
+      return next;
+    });
+
+    supabase
+      .from("exercise_substitutions")
+      .delete()
+      .eq("user_id", userId)
+      .eq("original_exercise", originalExercise)
+      .then(({ error }) => {
+        if (error) {
+          console.error("Failed to clear exercise substitution", error);
+          setSubstitutions((current) => ({ ...current, [originalExercise]: previous }));
+          reportSyncError("Couldn't reset that exercise. Try again.");
+        }
+      });
+  }
+
   function deletePR(id: string) {
     const previous = prs;
     setPrs((current) => current.filter((pr) => pr.id !== id));
@@ -494,6 +574,8 @@ export function TrackerProvider({
     addGame,
     selectedFilter,
     setSelectedFilter,
+    selectedLevel,
+    setSelectedLevel,
     exerciseSearch,
     setExerciseSearch,
     expandedExercises,
@@ -506,6 +588,9 @@ export function TrackerProvider({
     prs,
     addPR,
     deletePR,
+    substitutions,
+    setSubstitution,
+    clearSubstitution,
     workoutStreak,
     syncError,
     reportSyncError,

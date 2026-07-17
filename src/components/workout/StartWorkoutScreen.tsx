@@ -3,7 +3,7 @@
 import { Play, RotateCcw } from "lucide-react";
 import { useState } from "react";
 
-import { getPrescription, workoutDays } from "@/data/workoutPlan";
+import { getPrescription, getWorkoutDays } from "@/data/workoutPlan";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { todayName } from "@/lib/storage";
@@ -13,6 +13,7 @@ export function StartWorkoutScreen() {
   const { loading, openSession, startWorkout, resumeWorkout } = useStartWorkout();
   const [selectedDay, setSelectedDay] = useState(todayName());
 
+  const workoutDays = getWorkoutDays(week);
   const day = workoutDays.find((d) => d.day === selectedDay) ?? workoutDays[0];
 
   return (

@@ -8,6 +8,7 @@ import { useExerciseLibrary } from "@/hooks/useExerciseLibrary";
 import { ExerciseCard } from "./ExerciseCard";
 
 const filters = ["All", "Lower Body", "Upper Body", "Plyometrics", "Core", "Mobility", "Rehab"];
+const levels = ["All", "Beginner", "Intermediate", "Advanced"];
 
 export function ExerciseLibrary() {
   const {
@@ -15,6 +16,8 @@ export function ExerciseLibrary() {
     setExerciseSearch,
     selectedFilter,
     setSelectedFilter,
+    selectedLevel,
+    setSelectedLevel,
     expandedExercises,
     toggleExerciseCard,
     expandAllVisibleExercises,
@@ -68,6 +71,18 @@ export function ExerciseLibrary() {
             onClick={() => setSelectedFilter(filter)}
           >
             {filter}
+          </button>
+        ))}
+      </div>
+
+      <div className="filter-row">
+        {levels.map((level) => (
+          <button
+            key={level}
+            className={selectedLevel === level ? "" : "ghost"}
+            onClick={() => setSelectedLevel(level)}
+          >
+            {level}
           </button>
         ))}
       </div>

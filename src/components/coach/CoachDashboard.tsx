@@ -4,7 +4,9 @@ import { AlertTriangle, Copy, RefreshCw, Trophy, UserMinus, Users } from "lucide
 import { useState } from "react";
 
 import { useCoachRoster } from "@/hooks/useCoachRoster";
-import { Team } from "@/types";
+import { RosterAthlete, Team } from "@/types";
+
+import { AthleteStatsModal } from "./AthleteStatsModal";
 
 function recoverySlug(label: string) {
   return label.toLowerCase();
@@ -14,6 +16,7 @@ export function CoachDashboard({ team }: { team: Team }) {
   const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [selectedAthlete, setSelectedAthlete] = useState<RosterAthlete | null>(null);
 
   async function handleCopyCode() {
     try {
@@ -88,7 +91,19 @@ export function CoachDashboard({ team }: { team: Team }) {
         ) : (
           <div className="roster-table">
             {roster.map((athlete) => (
-              <div className="roster-row" key={athlete.userId}>
+              <div
+                role="button"
+                tabIndex={0}
+                className="roster-row"
+                key={athlete.userId}
+                onClick={() => setSelectedAthlete(athlete)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setSelectedAthlete(athlete);
+                  }
+                }}
+              >
                 <div className="roster-athlete-name">
                   <strong>{athlete.displayName}</strong>
                   {athlete.needsCheckIn && <span className="pill roster-flag">Needs check-in</span>}
@@ -101,7 +116,10 @@ export function CoachDashboard({ team }: { team: Team }) {
                 <button
                   type="button"
                   className="ghost danger-button"
-                  onClick={() => handleRemove(athlete.userId, athlete.displayName)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleRemove(athlete.userId, athlete.displayName);
+                  }}
                   disabled={removingId === athlete.userId}
                 >
                   <UserMinus size={14} /> Remove
@@ -116,6 +134,14 @@ export function CoachDashboard({ team }: { team: Team }) {
         <div className="empty-state">
           <p className="muted">{error}</p>
         </div>
+      )}
+
+      {selectedAthlete && (
+        <AthleteStatsModal
+          userId={selectedAthlete.userId}
+          displayName={selectedAthlete.displayName}
+          onClose={() => setSelectedAthlete(null)}
+        />
       )}
     </div>
   );
