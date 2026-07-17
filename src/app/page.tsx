@@ -133,11 +133,13 @@ export default function LandingPage() {
 
           <div className="landing-about">
             <p>
-              Volleyball Tracker was built by Jayden Loring, a two-year college volleyball
-              player and team captain who&apos;s also a Computer Science student — he built this
-              app himself. This isn&apos;t a generic fitness app built by people who&apos;ve
-              never played; it&apos;s built by someone who&apos;s been through the training
-              grind himself, from both sides of the roster.
+              I&apos;m Jayden Loring. I&apos;ve played volleyball at the college level for two
+              years now, including a stint as team captain, and I&apos;m studying Computer
+              Science, I built this whole app myself. I didn&apos;t want another generic fitness
+              template made by people who&apos;ve never actually been on a roster, so I built the
+              tool I wished I&apos;d had: something that understands what a season really looks
+              like, because I&apos;ve lived it from both sides, as a player logging the work and
+              as a captain trying to keep track of everyone else&apos;s.
             </p>
 
             <ul className="landing-about-facts">
