@@ -75,7 +75,7 @@ export function WorkoutSummary({
         </div>
       )}
 
-      <button onClick={() => router.push("/")}>Back to Dashboard</button>
+      <button onClick={() => router.push("/dashboard")}>Back to Dashboard</button>
     </div>
   );
 }

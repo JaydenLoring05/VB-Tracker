@@ -16,7 +16,7 @@ import { usePathname } from "next/navigation";
 import { useTrackerContext } from "@/context/TrackerContext";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: Home },
+  { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/workouts", label: "Workouts", icon: Dumbbell },
   { href: "/workout", label: "Start Workout", icon: Play },
   { href: "/stats", label: "Stats", icon: BarChart3 },

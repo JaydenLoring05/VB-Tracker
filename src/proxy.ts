@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/auth/callback"];
+const PUBLIC_PATHS = ["/", "/login", "/auth/callback"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -38,9 +38,9 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && isPublicPath) {
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = "/";
-    return NextResponse.redirect(homeUrl);
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = "/dashboard";
+    return NextResponse.redirect(dashboardUrl);
   }
 
   return response;

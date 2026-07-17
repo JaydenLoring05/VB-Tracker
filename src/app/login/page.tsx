@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
 
 type Mode = "sign-in" | "sign-up";
+type ResendState = "idle" | "sending" | "sent" | "error";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +18,50 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [resendState, setResendState] = useState<ResendState>("idle");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const authError = params.get("authError");
+    if (authError) {
+      setError(authError);
+      setNeedsConfirmation(true);
+    }
+
+    if (params.get("mode") === "sign-up") {
+      setMode("sign-up");
+    }
+
+    if (authError || params.has("mode")) {
+      window.history.replaceState(null, "", "/login");
+    }
+  }, []);
+
+  async function handleResend() {
+    if (!email.trim()) {
+      setError("Enter your email above first, then resend the confirmation link.");
+      return;
+    }
+
+    setResendState("sending");
+    const supabase = createClient();
+    const { error: resendError } = await supabase.auth.resend({
+      type: "signup",
+      email: email.trim()
+    });
+
+    if (resendError) {
+      setResendState("error");
+      setError(resendError.message);
+      return;
+    }
+
+    setResendState("sent");
+    setError("");
+    setMessage("Confirmation email sent. Check your inbox.");
+  }
 
   async function handleGoogleSignIn() {
     setError("");
@@ -36,6 +81,8 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
     setMessage("");
+    setNeedsConfirmation(false);
+    setResendState("idle");
     setLoading(true);
 
     const supabase = createClient();
@@ -53,7 +100,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/");
+      router.push("/dashboard");
       router.refresh();
       return;
     }
@@ -71,12 +118,13 @@ export default function LoginPage() {
     }
 
     if (data.session) {
-      router.push("/");
+      router.push("/dashboard");
       router.refresh();
       return;
     }
 
     setMessage("Check your email to confirm your account, then sign in.");
+    setNeedsConfirmation(true);
     setMode("sign-in");
   }
 
@@ -109,6 +157,17 @@ export default function LoginPage() {
 
           {error && <p className="auth-error">{error}</p>}
           {message && <p className="auth-success">{message}</p>}
+
+          {needsConfirmation && (
+            <button
+              type="button"
+              className="auth-resend"
+              onClick={handleResend}
+              disabled={resendState === "sending"}
+            >
+              {resendState === "sending" ? "Resending…" : "Resend confirmation email"}
+            </button>
+          )}
 
           <button type="submit" disabled={loading}>
             {loading
