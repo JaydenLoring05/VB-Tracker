@@ -5,16 +5,16 @@ import { Activity } from "lucide-react";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { StatEntry } from "@/types";
 
-const fields: [keyof StatEntry, string][] = [
+const fields: [keyof StatEntry, string, number?][] = [
   ["vertical", "Vertical Jump"],
   ["approach", "Approach Touch"],
   ["weight", "Body Weight"],
   ["pullups", "Max Pull-Ups"],
-  ["sleep", "Sleep Hours"],
-  ["kneePain", "Knee Pain"],
-  ["shoulderPain", "Shoulder Pain"],
-  ["soreness", "Soreness"],
-  ["energy", "Energy"]
+  ["sleep", "Sleep Hours", 10],
+  ["kneePain", "Knee Pain", 10],
+  ["shoulderPain", "Shoulder Pain", 10],
+  ["soreness", "Soreness", 10],
+  ["energy", "Energy", 10]
 ];
 
 export function StatsForm() {
@@ -27,18 +27,27 @@ export function StatsForm() {
       </h2>
 
       <div className="stats-grid">
-        {fields.map(([key, label]) => (
+        {fields.map(([key, label, max]) => (
           <label key={key}>
             {label}
+            {max ? ` (0-${max})` : ""}
             <input
               type="number"
+              min={max ? 0 : undefined}
+              max={max}
               value={stats[key]}
-              onChange={(e) =>
-                setStats((current) => ({
-                  ...current,
-                  [key]: e.target.value === "" ? "" : Number(e.target.value)
-                }))
-              }
+              onChange={(e) => {
+                if (e.target.value === "") {
+                  setStats((current) => ({ ...current, [key]: "" }));
+                  return;
+                }
+
+                let value = Number(e.target.value);
+                if (max && value > max) value = max;
+                if (value < 0) value = 0;
+
+                setStats((current) => ({ ...current, [key]: value }));
+              }}
             />
           </label>
         ))}
