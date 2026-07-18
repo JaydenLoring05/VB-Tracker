@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { formatLastActive } from "@/lib/time";
 import { RosterAthlete, Team } from "@/types";
+import { ConfirmModal } from "@/components/shared/ConfirmModal";
 
 import { AthleteStatsModal } from "./AthleteStatsModal";
 
@@ -18,6 +19,7 @@ export function CoachDashboard({ team }: { team: Team }) {
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedAthlete, setSelectedAthlete] = useState<RosterAthlete | null>(null);
+  const [pendingRemoval, setPendingRemoval] = useState<RosterAthlete | null>(null);
 
   async function handleCopyCode() {
     try {
@@ -29,12 +31,15 @@ export function CoachDashboard({ team }: { team: Team }) {
     }
   }
 
-  async function handleRemove(userId: string, displayName: string) {
+  function requestRemove(athlete: RosterAthlete) {
     if (removingId) return;
+    setPendingRemoval(athlete);
+  }
 
-    const confirmed = window.confirm(`Remove ${displayName} from your roster?`);
-    if (!confirmed) return;
-
+  async function confirmRemove() {
+    if (!pendingRemoval) return;
+    const userId = pendingRemoval.userId;
+    setPendingRemoval(null);
     setRemovingId(userId);
     await removeAthlete(userId);
     setRemovingId(null);
@@ -120,7 +125,7 @@ export function CoachDashboard({ team }: { team: Team }) {
                   className="ghost danger-button"
                   onClick={(event) => {
                     event.stopPropagation();
-                    handleRemove(athlete.userId, athlete.displayName);
+                    requestRemove(athlete);
                   }}
                   disabled={removingId === athlete.userId}
                 >
@@ -143,6 +148,17 @@ export function CoachDashboard({ team }: { team: Team }) {
           userId={selectedAthlete.userId}
           displayName={selectedAthlete.displayName}
           onClose={() => setSelectedAthlete(null)}
+        />
+      )}
+
+      {pendingRemoval && (
+        <ConfirmModal
+          title="Remove athlete?"
+          message={`Remove ${pendingRemoval.displayName} from your roster?`}
+          confirmLabel="Remove"
+          danger
+          onConfirm={confirmRemove}
+          onCancel={() => setPendingRemoval(null)}
         />
       )}
     </div>
