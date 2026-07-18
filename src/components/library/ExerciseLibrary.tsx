@@ -7,7 +7,19 @@ import { useExerciseLibrary } from "@/hooks/useExerciseLibrary";
 
 import { ExerciseCard } from "./ExerciseCard";
 
-const filters = ["All", "Lower Body", "Upper Body", "Plyometrics", "Core", "Mobility", "Rehab"];
+const filters = [
+  "All",
+  "Jump Development",
+  "Landing Mechanics",
+  "Knee Strength",
+  "Shoulder Health",
+  "Hitting Power",
+  "Rotational Core",
+  "Speed & Agility",
+  "Volleyball Conditioning",
+  "Mobility",
+  "Recovery"
+];
 const levels = ["All", "Beginner", "Intermediate", "Advanced"];
 
 export function ExerciseLibrary() {

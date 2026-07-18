@@ -1,10 +1,14 @@
 export type ExerciseCategory =
-  | "Lower Body"
-  | "Upper Body"
-  | "Plyometrics"
-  | "Core"
+  | "Jump Development"
+  | "Landing Mechanics"
+  | "Knee Strength"
+  | "Shoulder Health"
+  | "Hitting Power"
+  | "Rotational Core"
+  | "Speed & Agility"
+  | "Volleyball Conditioning"
   | "Mobility"
-  | "Rehab";
+  | "Recovery";
 
 export type ExerciseLevel = "Beginner" | "Intermediate" | "Advanced";
 

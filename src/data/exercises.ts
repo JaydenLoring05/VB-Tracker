@@ -25,10 +25,10 @@ const ex = (
 });
 
 export const exercises: Exercise[] = [
-  // LOWER BODY
+  // JUMP DEVELOPMENT
   ex(
     "Trap Bar Deadlift or RDL",
-    "Lower Body",
+    "Jump Development",
     "Intermediate",
     "🏋️",
     "Builds posterior-chain strength for jumping, landing, and hitting power.",
@@ -38,7 +38,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Bulgarian Split Squat",
-    "Lower Body",
+    "Jump Development",
     "Intermediate",
     "🦵",
     "Builds single-leg strength for jumping, cutting, and knee control.",
@@ -48,7 +48,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Hip Thrust",
-    "Lower Body",
+    "Jump Development",
     "Beginner",
     "🍑",
     "Builds glute strength for jumping, sprinting, and hip extension power.",
@@ -58,7 +58,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Heel-Elevated Goblet Squat",
-    "Lower Body",
+    "Jump Development",
     "Beginner",
     "🏆",
     "Builds quad strength and knee-friendly squat control.",
@@ -68,7 +68,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Front Squat",
-    "Lower Body",
+    "Jump Development",
     "Advanced",
     "🏋️",
     "Builds quad, core, and full-body strength for jumping.",
@@ -78,7 +78,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Step-Ups",
-    "Lower Body",
+    "Jump Development",
     "Beginner",
     "🪜",
     "Builds single-leg drive and control for jumping and court movement.",
@@ -88,7 +88,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Reverse Lunges",
-    "Lower Body",
+    "Jump Development",
     "Beginner",
     "↩️",
     "Builds single-leg strength with less knee stress than forward lunges.",
@@ -98,7 +98,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Hamstring Curls",
-    "Lower Body",
+    "Jump Development",
     "Beginner",
     "🧵",
     "Strengthens hamstrings for sprinting, jumping, and knee protection.",
@@ -108,7 +108,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Nordic Hamstring Curl",
-    "Lower Body",
+    "Jump Development",
     "Advanced",
     "🧊",
     "Builds elite hamstring strength and injury resistance.",
@@ -118,7 +118,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Calf Raises",
-    "Lower Body",
+    "Jump Development",
     "Beginner",
     "🦶",
     "Builds ankle strength and lower-leg durability for jumping.",
@@ -128,7 +128,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Soleus Raises",
-    "Lower Body",
+    "Jump Development",
     "Beginner",
     "🦶",
     "Builds bent-knee calf strength for landing, acceleration, and knee support.",
@@ -137,10 +137,10 @@ export const exercises: Exercise[] = [
     ["Seated Calf Raise", "Wall Soleus Raise", "Single-Leg Soleus Raise"]
   ),
 
-  // PLYOMETRICS / SPEED
+  // JUMP DEVELOPMENT / LANDING MECHANICS / SPEED & AGILITY / VOLLEYBALL CONDITIONING
   ex(
     "Approach Jumps",
-    "Plyometrics",
+    "Jump Development",
     "Advanced",
     "🏐",
     "Transfers strength into volleyball-specific jumping.",
@@ -150,7 +150,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Box Jumps",
-    "Plyometrics",
+    "Jump Development",
     "Intermediate",
     "📦",
     "Builds explosive jumping power with lower landing stress.",
@@ -160,7 +160,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Broad Jumps",
-    "Plyometrics",
+    "Jump Development",
     "Intermediate",
     "🚀",
     "Builds horizontal power for approach speed and explosiveness.",
@@ -170,7 +170,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Lateral Bounds",
-    "Plyometrics",
+    "Speed & Agility",
     "Intermediate",
     "↔️",
     "Builds side-to-side power for defense and court movement.",
@@ -180,7 +180,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Landing Mechanics Drill",
-    "Plyometrics",
+    "Landing Mechanics",
     "Beginner",
     "🎯",
     "Teaches the soft-knee, hips-back, quiet landing pattern that every jump and plyo exercise depends on -- do this before adding jump volume, not after.",
@@ -190,7 +190,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Pogo Hops",
-    "Plyometrics",
+    "Jump Development",
     "Beginner",
     "🦘",
     "Builds ankle stiffness and reactive bounce.",
@@ -200,7 +200,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Depth Drops",
-    "Plyometrics",
+    "Landing Mechanics",
     "Intermediate",
     "⬇️",
     "Builds landing mechanics and tendon tolerance.",
@@ -210,7 +210,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Drop Jumps",
-    "Plyometrics",
+    "Jump Development",
     "Advanced",
     "⚡",
     "Builds reactive jumping ability and fast ground contact.",
@@ -220,7 +220,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Sprint Starts",
-    "Plyometrics",
+    "Speed & Agility",
     "Intermediate",
     "💨",
     "Builds acceleration for approaches and defensive reactions.",
@@ -230,7 +230,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Court Sprints",
-    "Plyometrics",
+    "Volleyball Conditioning",
     "Beginner",
     "🏃",
     "Builds volleyball-specific conditioning and acceleration.",
@@ -240,7 +240,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Jump Rope",
-    "Plyometrics",
+    "Jump Development",
     "Beginner",
     "🪢",
     "Builds ankle rhythm, foot speed, and conditioning.",
@@ -249,10 +249,10 @@ export const exercises: Exercise[] = [
     ["Pogo Hops", "Line Hops", "Easy Bike"]
   ),
 
-  // UPPER BODY
+  // SHOULDER HEALTH / HITTING POWER
   ex(
     "Pull-Ups",
-    "Upper Body",
+    "Shoulder Health",
     "Intermediate",
     "💪",
     "Builds back strength for hitting power, shoulder health, and calisthenics.",
@@ -262,7 +262,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Band-Assisted Pull-Up",
-    "Upper Body",
+    "Shoulder Health",
     "Beginner",
     "🎗️",
     "Builds toward a full pull-up by removing just enough bodyweight to keep every rep clean.",
@@ -272,7 +272,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Chin-Ups",
-    "Upper Body",
+    "Shoulder Health",
     "Intermediate",
     "💪",
     "Builds lats, biceps, and pulling strength.",
@@ -282,7 +282,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "DB Bench Press",
-    "Upper Body",
+    "Hitting Power",
     "Beginner",
     "🏋️",
     "Builds pressing strength with shoulder-friendly movement.",
@@ -292,7 +292,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Push-Ups",
-    "Upper Body",
+    "Hitting Power",
     "Beginner",
     "⬆️",
     "Builds chest, triceps, shoulder control, and core stiffness.",
@@ -302,7 +302,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Incline Push-Up",
-    "Upper Body",
+    "Hitting Power",
     "Beginner",
     "📐",
     "The entry point into pressing strength -- hands elevated on a bench or box to reduce the load until a full push-up is ready.",
@@ -312,7 +312,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Dips",
-    "Upper Body",
+    "Hitting Power",
     "Intermediate",
     "🔻",
     "Builds chest, triceps, and calisthenics pressing strength.",
@@ -322,7 +322,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Single-Arm Row",
-    "Upper Body",
+    "Shoulder Health",
     "Beginner",
     "🛶",
     "Builds back strength and shoulder balance.",
@@ -332,7 +332,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Bodyweight Rows",
-    "Upper Body",
+    "Shoulder Health",
     "Beginner",
     "🛶",
     "Builds pulling endurance and shoulder balance.",
@@ -342,7 +342,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Landmine Press or DB Shoulder Press",
-    "Upper Body",
+    "Hitting Power",
     "Beginner",
     "💥",
     "Builds shoulder pressing power for hitting.",
@@ -352,7 +352,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Push Press",
-    "Upper Body",
+    "Hitting Power",
     "Advanced",
     "🚀",
     "Builds explosive pressing power and full-body force transfer.",
@@ -362,7 +362,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Pike Push-Ups",
-    "Upper Body",
+    "Hitting Power",
     "Intermediate",
     "🔺",
     "Builds shoulder strength for calisthenics and overhead power.",
@@ -372,7 +372,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Handstand Practice",
-    "Upper Body",
+    "Shoulder Health",
     "Advanced",
     "🤸",
     "Builds shoulder stability, body control, and calisthenics skill.",
@@ -381,10 +381,10 @@ export const exercises: Exercise[] = [
     ["Wall Handstand Hold", "Pike Hold", "Bear Crawl"]
   ),
 
-  // CORE / ROTATION
+  // ROTATIONAL CORE
   ex(
     "Pallof Press",
-    "Core",
+    "Rotational Core",
     "Beginner",
     "🧱",
     "Builds anti-rotation core strength for hitting stability.",
@@ -394,7 +394,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Med Ball Rotational Throws",
-    "Core",
+    "Rotational Core",
     "Intermediate",
     "🔁",
     "Builds rotational power for harder hitting.",
@@ -404,7 +404,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Cable Woodchoppers",
-    "Core",
+    "Rotational Core",
     "Intermediate",
     "🪓",
     "Builds rotational strength and control for hitting.",
@@ -414,7 +414,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Landmine Rotations",
-    "Core",
+    "Rotational Core",
     "Intermediate",
     "🔄",
     "Builds rotational trunk strength and power transfer.",
@@ -424,7 +424,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Hanging Leg Raises",
-    "Core",
+    "Rotational Core",
     "Advanced",
     "🧱",
     "Builds core strength, hip flexor strength, and control.",
@@ -434,7 +434,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "L-Sit Practice",
-    "Core",
+    "Rotational Core",
     "Advanced",
     "🧘",
     "Builds core compression, hip flexors, and calisthenics control.",
@@ -444,7 +444,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Dead Bugs",
-    "Core",
+    "Rotational Core",
     "Beginner",
     "🐞",
     "Builds core control and lower-back stability.",
@@ -454,7 +454,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Side Planks",
-    "Core",
+    "Rotational Core",
     "Beginner",
     "📏",
     "Builds lateral core strength for hitting and landing control.",
@@ -464,7 +464,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Planks",
-    "Core",
+    "Rotational Core",
     "Beginner",
     "🪵",
     "Builds basic trunk stiffness and core endurance.",
@@ -474,7 +474,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Ab Wheel Rollout",
-    "Core",
+    "Rotational Core",
     "Advanced",
     "⚙️",
     "Builds strong anti-extension core strength.",
@@ -484,7 +484,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Back Extensions",
-    "Core",
+    "Rotational Core",
     "Beginner",
     "🛡️",
     "Strengthens lower back, glutes, and hamstrings.",
@@ -494,7 +494,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Farmer Carries",
-    "Core",
+    "Rotational Core",
     "Beginner",
     "🧳",
     "Builds grip, traps, core stiffness, and durability.",
@@ -503,10 +503,10 @@ export const exercises: Exercise[] = [
     ["Suitcase Carry", "Trap Bar Carry", "KB Carries"]
   ),
 
-  // KNEE / SHOULDER REHAB
+  // KNEE STRENGTH / SHOULDER HEALTH
   ex(
     "Lateral Band Walks",
-    "Rehab",
+    "Knee Strength",
     "Beginner",
     "🎗️",
     "Trains the hip abductors and glute medius directly -- weak hip abductors are one of the biggest modifiable risk factors for knee valgus (caving-in) collapse on landing.",
@@ -516,7 +516,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Clamshells",
-    "Rehab",
+    "Knee Strength",
     "Beginner",
     "🐚",
     "Isolates the glute medius to build hip control that keeps the knee tracking properly on landing and cutting.",
@@ -526,7 +526,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Spanish Squat",
-    "Rehab",
+    "Knee Strength",
     "Intermediate",
     "🦿",
     "Builds quad and patellar tendon tolerance for knee health.",
@@ -536,7 +536,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Single-Leg Balance Reach",
-    "Rehab",
+    "Knee Strength",
     "Beginner",
     "🎯",
     "Trains proprioception and single-leg stability -- ACL-prevention research consistently pairs balance training with strength training, not strength alone.",
@@ -546,7 +546,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Tibialis Raises",
-    "Rehab",
+    "Knee Strength",
     "Beginner",
     "🦶",
     "Strengthens the front of the shin for knee and ankle durability.",
@@ -556,7 +556,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Patrick Step",
-    "Rehab",
+    "Knee Strength",
     "Intermediate",
     "🦵",
     "Builds knee control and tendon tolerance through controlled range.",
@@ -566,7 +566,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Poliquin Step-Down",
-    "Rehab",
+    "Knee Strength",
     "Intermediate",
     "📉",
     "Builds VMO and knee control for jumper's knee prevention.",
@@ -576,7 +576,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Reverse Sled Drag",
-    "Rehab",
+    "Knee Strength",
     "Beginner",
     "🛷",
     "Builds quad strength and knee blood flow with low joint stress.",
@@ -586,7 +586,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Face Pulls",
-    "Rehab",
+    "Shoulder Health",
     "Beginner",
     "🧵",
     "Builds rear delts and rotator cuff support.",
@@ -596,7 +596,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Band Pull-Aparts",
-    "Rehab",
+    "Shoulder Health",
     "Beginner",
     "🟡",
     "Builds rear delt and upper-back endurance for shoulder health.",
@@ -606,7 +606,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "External Rotations",
-    "Rehab",
+    "Shoulder Health",
     "Beginner",
     "🔧",
     "Strengthens the rotator cuff to protect your shoulder during hitting.",
@@ -616,7 +616,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Scap Push-Ups",
-    "Rehab",
+    "Shoulder Health",
     "Beginner",
     "🪽",
     "Builds serratus and scapular control for healthier shoulders.",
@@ -626,7 +626,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Y-T-W Raises",
-    "Rehab",
+    "Shoulder Health",
     "Beginner",
     "🪽",
     "Strengthens lower traps, rear delts, and shoulder stabilizers.",
@@ -636,7 +636,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Cuban Rotations",
-    "Rehab",
+    "Shoulder Health",
     "Intermediate",
     "🔄",
     "Builds rotator cuff strength and shoulder control.",
@@ -646,7 +646,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Light Shoulder Band Work",
-    "Rehab",
+    "Shoulder Health",
     "Beginner",
     "🟡",
     "Keeps rotator cuff and shoulders ready for hitting.",
@@ -655,7 +655,7 @@ export const exercises: Exercise[] = [
     ["Band Pull-Aparts", "External Rotations", "Face Pulls"]
   ),
 
-  // MOBILITY / RECOVERY
+  // MOBILITY / RECOVERY (unchanged block, plus 3 items reclassified into RECOVERY below)
   ex(
     "Full-Body Mobility Flow",
     "Mobility",
@@ -738,7 +738,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Walk 20-30 minutes",
-    "Mobility",
+    "Recovery",
     "Beginner",
     "🚶",
     "Improves recovery and blood flow without beating up your joints.",
@@ -748,7 +748,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Light Stretching",
-    "Mobility",
+    "Recovery",
     "Beginner",
     "🧘",
     "Helps recovery and keeps joints moving on rest days.",
@@ -758,7 +758,7 @@ export const exercises: Exercise[] = [
   ),
   ex(
     "Foam Roll",
-    "Mobility",
+    "Recovery",
     "Beginner",
     "🛞",
     "Helps reduce tightness and improve recovery before or after training.",
