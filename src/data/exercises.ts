@@ -509,7 +509,7 @@ export const exercises: Exercise[] = [
     "Knee Strength",
     "Beginner",
     "🎗️",
-    "Trains the hip abductors and glute medius directly -- weak hip abductors are one of the biggest modifiable risk factors for knee valgus (caving-in) collapse on landing.",
+    "Trains the hip abductors and glute medius to help control knee position on landing -- a commonly used piece of knee-injury-risk-reduction work, though the strength-to-valgus link isn't as clear-cut as often claimed.",
     ["Band above the knees or around the ankles.", "Slight knee bend throughout.", "Step sideways under tension, don't let the band go slack.", "Keep toes forward, hips level."],
     ["Standing too upright.", "Letting the band go slack between steps.", "Knees caving inward instead of pushing out against the band."],
     ["Clamshells", "Monster Walks", "Single-Leg Balance Reach"]
@@ -539,7 +539,7 @@ export const exercises: Exercise[] = [
     "Knee Strength",
     "Beginner",
     "🎯",
-    "Trains proprioception and single-leg stability -- ACL-prevention research consistently pairs balance training with strength training, not strength alone.",
+    "Builds single-leg stability and proprioception -- most useful as a supporting piece of ACL-injury-risk-reduction work alongside real strength and plyometric training, not as a stand-alone fix.",
     ["Stand tall on one leg, soft knee.", "Reach the free foot forward, side, and back under control.", "Keep the standing knee tracking over the toes.", "Return to a stable center each rep."],
     ["Standing knee caving in on the reach.", "Rushing through reaches without control.", "Letting the hips drop on the standing side."],
     ["Lateral Band Walks", "Single-Leg RDL", "Bosu Balance Hold"]
@@ -765,5 +765,87 @@ export const exercises: Exercise[] = [
     ["Roll slowly.", "Pause on tight spots.", "Breathe.", "Keep pressure tolerable."],
     ["Rolling too fast.", "Crushing painful spots.", "Expecting it to replace strength work."],
     ["Lacrosse Ball", "Massage Gun", "Light Mobility Flow"]
+  ),
+
+  // NEW CATALOG ENTRIES (Task 15)
+  ex(
+    "Lat Pulldown",
+    "Shoulder Health",
+    "Beginner",
+    "🏋️",
+    "Builds lat and pulling strength with adjustable assistance -- a scalable stepping stone toward bodyweight pull-ups.",
+    ["Pull the bar to your upper chest.", "Drive elbows down and back.", "Keep torso still, don't lean back to cheat.", "Control the return."],
+    ["Using body English/momentum.", "Pulling behind the neck.", "Only using arms, not lats."],
+    ["Pull-Ups", "Band-Assisted Pull-Up", "Bodyweight Rows"]
+  ),
+  ex(
+    "RDL",
+    "Jump Development",
+    "Intermediate",
+    "🏋️",
+    "Builds hip-hinge strength and hamstring loading for jumping and sprinting power, with less axial load than a full deadlift.",
+    ["Push hips back first.", "Keep the weight close to your legs.", "Soft knee bend -- this is a hinge, not a squat.", "Stop when you feel a hamstring stretch, before your back rounds."],
+    ["Squatting the weight down instead of hinging.", "Rounding the lower back.", "Locking the knees straight."],
+    ["Trap Bar Deadlift or RDL", "Hamstring Curls", "Nordic Hamstring Curl"]
+  ),
+  ex(
+    "Cable Row",
+    "Shoulder Health",
+    "Beginner",
+    "🚣",
+    "Builds mid-back and rear-shoulder pulling strength with continuous tension to balance out overhead hitting volume.",
+    ["Chest tall -- don't lean back to pull.", "Pull the handle to your lower ribs.", "Squeeze shoulder blades together.", "Control the return, don't let the weight yank you forward."],
+    ["Using the low back to heave the weight.", "Shrugging instead of pulling with the back.", "Partial range of motion."],
+    ["Single-Arm Row", "Bodyweight Rows", "Lat Pulldown"]
+  ),
+  ex(
+    "Hollow Hold",
+    "Rotational Core",
+    "Beginner",
+    "🛶",
+    "Builds anti-extension core strength and full-body tension -- the base position underneath planks, L-sits, and handstands.",
+    ["Press your low back into the floor.", "Arms and legs long, ribs down.", "Squeeze glutes slightly.", "Breathe without losing the low-back position."],
+    ["Lower back arching off the floor.", "Holding your breath instead of breathing through it.", "Letting the legs drop too low too soon."],
+    ["Dead Bugs", "Planks", "Ab Wheel Rollout"]
+  ),
+  ex(
+    "Swiss Ball Curl",
+    "Jump Development",
+    "Beginner",
+    "🧵",
+    "Builds hamstring strength and hip-hamstring coordination using just a stability ball -- a bodyweight, equipment-light option.",
+    ["Bridge your hips up first.", "Curl heels toward glutes by pulling with the hamstrings.", "Keep hips up the whole time.", "Roll back out under control."],
+    ["Hips sagging or dropping mid-set.", "Curling too fast and losing control of the ball.", "Doing partial-range curls."],
+    ["Hamstring Curls", "Nordic Hamstring Curl", "RDL"]
+  ),
+  ex(
+    "Bird Dog",
+    "Rotational Core",
+    "Beginner",
+    "🐕",
+    "Builds core and lower-back stability by training the trunk to resist rotation while opposite arm and leg move independently.",
+    ["Keep your back flat -- no sagging or arching.", "Move the opposite arm and leg together, slowly.", "Reach long instead of lifting high.", "Keep hips square to the floor."],
+    ["Rotating the hips as the leg lifts.", "Rushing through reps.", "Arching the lower back to fake more range."],
+    ["Dead Bugs", "Planks", "Pallof Press"]
+  ),
+  ex(
+    "Romanian Deadlift",
+    "Jump Development",
+    "Intermediate",
+    "🏋️",
+    "Builds hip-hinge strength and hamstring/glute loading for jumping and sprinting power.",
+    ["Bar stays close to your shins and thighs.", "Push hips back with a soft knee bend.", "Keep a neutral spine throughout.", "Stop the descent once hamstrings feel loaded, before the back rounds."],
+    ["Rounding the lower back.", "Letting the bar drift away from the body.", "Turning it into a squat."],
+    ["RDL", "Trap Bar Deadlift or RDL", "Hip Thrust"]
+  ),
+  ex(
+    "Glute Bridge",
+    "Jump Development",
+    "Beginner",
+    "🍑",
+    "Builds basic glute activation and the hip-extension pattern -- the entry point before loading a full hip thrust.",
+    ["Feet hip-width, heels close to glutes.", "Drive through your heels.", "Squeeze glutes hard at the top.", "Lower with control instead of dropping."],
+    ["Overarching the lower back at the top.", "Pushing through the toes instead of the heels.", "Rushing reps instead of pausing at the top."],
+    ["Hip Thrust", "Single-Leg Hip Thrust", "Cable Pull-Through"]
   )
 ];
