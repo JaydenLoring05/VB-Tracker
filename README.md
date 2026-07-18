@@ -1,6 +1,6 @@
-# Volleyball Tracker
+# ElevateOS
 
-A Next.js and TypeScript athlete tracking app built for volleyball training, recovery, stats, and performance monitoring.
+ElevateOS is a Next.js and TypeScript athlete training-and-recovery operating system built for volleyball teams.
 
 ## Live Demo
 
@@ -46,7 +46,7 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
    ```
-3. Run `supabase/schema.sql`, then `supabase/schema_v18_5.sql`, then `supabase/schema_v19.sql`, then `supabase/schema_v20_teams.sql`, then `supabase/schema_v21_substitutions.sql`, once each in your project's SQL Editor to create the tables, row-level security policies, and constraints.
+3. Run `supabase/schema.sql`, then `schema_v18_5.sql`, then `schema_v19.sql`, then `schema_v20_teams.sql`, then `schema_v21_substitutions.sql`, then `schema_v22_profiles.sql`, then `schema_v23_team_management.sql`, then `schema_v24_performance_profiles.sql`, once each in your project's SQL Editor to create the tables, row-level security policies, and constraints.
 4. `npm run dev`
 
 ## Purpose

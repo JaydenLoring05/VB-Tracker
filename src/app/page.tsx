@@ -170,14 +170,14 @@ export default function LandingPage() {
           <p className="muted">
             Reach out directly — happy to talk through how it&apos;d work for your team.
           </p>
-          <a href="mailto:jaydenloring05@gmail.com">
-            <button type="button">Email jaydenloring05@gmail.com</button>
+          <a href="mailto:hello@elevateos.com">
+            <button type="button">Email hello@elevateos.com</button>
           </a>
         </div>
       </section>
 
       <footer className="landing-footer">
-        <p className="muted">🏐 Volleyball Tracker</p>
+        <p className="muted">🏐 ElevateOS</p>
       </footer>
     </div>
   );

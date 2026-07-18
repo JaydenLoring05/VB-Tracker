@@ -7,7 +7,7 @@ export function LandingHeader() {
         <div className="landing-brand">
           <div className="landing-brand-logo">🏐</div>
           <div>
-            <h2>VOLLEYBALL TRACKER</h2>
+            <h2>ELEVATEOS</h2>
             <p>ATHLETE OPERATING SYSTEM</p>
           </div>
         </div>
