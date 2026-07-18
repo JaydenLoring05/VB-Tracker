@@ -24,6 +24,13 @@ const PROBLEMS = [
   }
 ];
 
+const STAT_CALLOUTS = [
+  { value: "20", label: "Week Program" },
+  { value: "4", label: "Training Phases" },
+  { value: "10", label: "Exercise Categories" },
+  { value: "80+", label: "Curated Exercises" }
+];
+
 const STEPS = [
   {
     icon: Trophy,
@@ -64,6 +71,17 @@ export default function LandingPage() {
               </button>
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="landing-section landing-stats">
+        <div className="landing-section-inner landing-stat-row">
+          {STAT_CALLOUTS.map((stat) => (
+            <div className="landing-stat" key={stat.label}>
+              <strong>{stat.value}</strong>
+              <span className="muted">{stat.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -112,17 +130,35 @@ export default function LandingPage() {
             <h2 className="landing-section-title">
               <ShieldCheck size={24} /> Why the program is built the way it is
             </h2>
-            <p>
-              The training program isn&apos;t a generic template — it&apos;s built on
-              phase-based periodization: foundation, build, power, and taper phases that shift
-              volume and intensity across the season instead of running the same workout on
-              repeat for months. Exercise selection targets the injury patterns volleyball
-              actually produces: shoulder-health work for hitters logging thousands of overhead
-              swings, and landing-mechanics and hip-stability training aimed at reducing
-              ACL-injury risk on landings and cuts. It&apos;s the kind of programming a strength
-              coach would build for a volleyball team specifically, not a fitness app&apos;s
-              workout of the day.
+            <p className="muted">
+              Not a generic template -- built on phase-based periodization and volleyball&apos;s
+              actual injury patterns.
             </p>
+
+            <div className="landing-philosophy-points">
+              <div>
+                <strong>Phase-based periodization</strong>
+                <p className="muted">
+                  Foundation, build, power, and taper phases shift volume and intensity across
+                  the season instead of running the same workout on repeat for months.
+                </p>
+              </div>
+              <div>
+                <strong>Volleyball-specific injury targeting</strong>
+                <p className="muted">
+                  Shoulder-health work for hitters logging thousands of overhead swings, and
+                  landing-mechanics and hip-stability training aimed at reducing ACL-injury risk
+                  on landings and cuts.
+                </p>
+              </div>
+              <div>
+                <strong>Built like a real strength program</strong>
+                <p className="muted">
+                  The kind of programming a strength coach would build for a volleyball team
+                  specifically, not a fitness app&apos;s workout of the day.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
