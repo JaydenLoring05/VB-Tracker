@@ -215,7 +215,7 @@
   padding: var(--sp-3) var(--sp-4);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: #0b0f14;
+  background: var(--surface-2);
   font-size: var(--fs-sm);
   color: var(--muted);
 }

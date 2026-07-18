@@ -108,7 +108,7 @@
 .day-notes textarea {
   min-height: 96px;
   resize: vertical;
-  background: #0b0f14;
+  background: var(--surface-2);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);

@@ -11,6 +11,7 @@
   --muted: #aeb6c4;
   --gold: #ffc400;
   --gold-2: #ffdd55;
+  --surface-2: #0b0f14;
   --green: #45d483;
   --red: #ff6262;
   --blue: #76b8ff;
@@ -101,7 +102,7 @@ a:focus-visible {
 input,
 select,
 textarea {
-  background: #0b0f14;
+  background: var(--surface-2);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
