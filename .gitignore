@@ -8,3 +8,5 @@ out
 .claude/
 scripts/dev.cmd
 tsconfig.tsbuildinfo
+scripts/playwright-verify/env.mjs
+scripts/playwright-verify/screenshots/

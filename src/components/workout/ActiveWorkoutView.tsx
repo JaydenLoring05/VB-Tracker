@@ -313,7 +313,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
           <RestTimer
             secondsLeft={restSecondsLeft}
             totalSeconds={REST_DURATION}
-            onSkip={() => setRestSecondsLeft(null)}
+            onSkip={() => setRestEndsAt(null)}
           />
         ) : (
           <form className="log-set-form" onSubmit={handleLogSet}>
