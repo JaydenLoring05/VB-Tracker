@@ -12,7 +12,7 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
 - Weekly training phases
 - Workout completion tracking
 - Recovery score
-- AI-style recovery recommendations
+- Rule-based recovery recommendations
 - Stats history
 - Progress graphs
 - Exercise library
