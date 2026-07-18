@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
       console.error("Failed to verify confirmation token", error);
       return redirectWithError(origin, EXPIRED_LINK_MESSAGE);
     }
+    if (type === "recovery") {
+      return NextResponse.redirect(`${origin}/auth/reset-password`);
+    }
     return NextResponse.redirect(`${origin}/`);
   }
 

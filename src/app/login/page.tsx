@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
 
-type Mode = "sign-in" | "sign-up";
+type Mode = "sign-in" | "sign-up" | "forgot-password";
 type ResendState = "idle" | "sending" | "sent" | "error";
 
 export default function LoginPage() {
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [resendState, setResendState] = useState<ResendState>("idle");
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -61,6 +62,29 @@ export default function LoginPage() {
     setResendState("sent");
     setError("");
     setMessage("Confirmation email sent. Check your inbox.");
+  }
+
+  async function handleForgotPassword() {
+    if (!email.trim()) {
+      setError("Enter your email above first.");
+      return;
+    }
+
+    setLoading(true);
+    const supabase = createClient();
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/auth/callback`
+    });
+    setLoading(false);
+
+    if (resetError) {
+      setError(resetError.message);
+      return;
+    }
+
+    setError("");
+    setResetSent(true);
+    setMessage("Check your email for a password reset link.");
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -119,7 +143,7 @@ export default function LoginPage() {
       <div className="panel auth-card">
         <div className="logo">🏐</div>
         <h1>{mode === "sign-in" ? "Welcome back" : "Create your account"}</h1>
-        <p className="muted">Volleyball Tracker Athlete Operating System</p>
+        <p className="muted">ElevateOS — Athlete Operating System</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <input
@@ -172,7 +196,13 @@ export default function LoginPage() {
                 Sign up
               </button>
             </span>
-          ) : (
+          ) : null}
+          {mode === "sign-in" && !resetSent && (
+            <button type="button" className="auth-resend" onClick={handleForgotPassword} disabled={loading}>
+              Forgot password?
+            </button>
+          )}
+          {mode !== "sign-in" && (
             <span>
               Already have an account?{" "}
               <button type="button" onClick={() => setMode("sign-in")}>
