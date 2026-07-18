@@ -74,3 +74,11 @@
   text-decoration: underline;
   transform: none;
 }
+
+.auth-switch .auth-resend {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  text-align: center;
+  justify-self: unset;
+}
