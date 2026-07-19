@@ -1,6 +1,7 @@
 import { AlertTriangle, Eye, HeartPulse, Link2, ShieldCheck, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 
+import { CONTACT_EMAIL } from "@/lib/contact";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { PricingSection } from "@/components/landing/PricingSection";
 
@@ -206,8 +207,8 @@ export default function LandingPage() {
           <p className="muted">
             Reach out directly — happy to talk through how it&apos;d work for your team.
           </p>
-          <a href="mailto:hello@elevateos.com">
-            <button type="button">Email hello@elevateos.com</button>
+          <a href={`mailto:${CONTACT_EMAIL}`}>
+            <button type="button">Email {CONTACT_EMAIL}</button>
           </a>
         </div>
       </section>
