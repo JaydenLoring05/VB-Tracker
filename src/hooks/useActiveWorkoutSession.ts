@@ -129,7 +129,9 @@ export function useActiveWorkoutSession(sessionId: string) {
 
     if (error) {
       console.error("Failed to log set", error);
-      reportSyncError("That set didn't save. Check your connection and log it again.");
+      reportSyncError("That set didn't save. Check your connection and log it again.", () =>
+        logSet(exercise, weight, reps)
+      );
       return null;
     }
 
@@ -162,7 +164,7 @@ export function useActiveWorkoutSession(sessionId: string) {
         if (error) {
           console.error("Failed to delete set", error);
           setSets(previous);
-          reportSyncError("Couldn't remove that set. Try again.");
+          reportSyncError("Couldn't remove that set. Try again.", () => deleteSet(setId));
         }
       });
   }
@@ -183,7 +185,9 @@ export function useActiveWorkoutSession(sessionId: string) {
 
     if (error) {
       console.error("Failed to finish workout", error);
-      reportSyncError("Couldn't finish the workout. Check your connection and try again.");
+      reportSyncError("Couldn't finish the workout. Check your connection and try again.", () =>
+        finishWorkout(exercisesInDay)
+      );
       return null;
     }
 

@@ -252,6 +252,21 @@ h4 {
   box-shadow: none;
 }
 
+.sync-toast-retry {
+  flex: 0 0 auto;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid rgba(255, 196, 0, 0.4);
+  padding: 4px 10px;
+  min-height: auto;
+  font-size: var(--fs-xs);
+}
+
+.sync-toast-retry:hover {
+  background: rgba(255, 196, 0, 0.08);
+  box-shadow: none;
+}
+
 .panel,
 .card {
   background: linear-gradient(155deg, rgba(22, 27, 34, 0.9), rgba(10, 13, 17, 0.94));
