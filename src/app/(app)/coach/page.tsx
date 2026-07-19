@@ -9,7 +9,7 @@ import { useTeam } from "@/hooks/useTeam";
 import "@/styles/coach.css";
 
 export default function CoachPage() {
-  const { loading, team, role, error, createTeam, joinTeam, refresh } = useTeam();
+  const { loading, team, role, error, removalNotice, createTeam, joinTeam, refresh } = useTeam();
 
   if (loading) {
     return (
@@ -20,7 +20,7 @@ export default function CoachPage() {
   }
 
   if (!team || !role) {
-    return <TeamSetup onCreateTeam={createTeam} onJoinTeam={joinTeam} error={error} />;
+    return <TeamSetup onCreateTeam={createTeam} onJoinTeam={joinTeam} error={error} notice={removalNotice} />;
   }
 
   if (role === "coach") {

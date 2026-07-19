@@ -6,11 +6,13 @@ import { FormEvent, useState } from "react";
 export function TeamSetup({
   onCreateTeam,
   onJoinTeam,
-  error
+  error,
+  notice
 }: {
   onCreateTeam: (name: string) => Promise<boolean>;
   onJoinTeam: (code: string) => Promise<boolean>;
   error: string | null;
+  notice?: string | null;
 }) {
   const [teamName, setTeamName] = useState("");
   const [inviteCode, setInviteCode] = useState("");
@@ -37,6 +39,11 @@ export function TeamSetup({
 
   return (
     <div className="team-setup lower-grid">
+      {notice && (
+        <div className="empty-state team-setup-notice">
+          <p className="muted">{notice}</p>
+        </div>
+      )}
       <div className="panel">
         <h2>
           <Users size={22} /> Create a Team
