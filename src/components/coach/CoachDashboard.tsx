@@ -4,8 +4,10 @@ import { AlertTriangle, Copy, RefreshCw, Trophy, UserMinus, Users } from "lucide
 import { useState } from "react";
 
 import { useCoachRoster } from "@/hooks/useCoachRoster";
+import { useTeam } from "@/hooks/useTeam";
 import { formatLastActive } from "@/lib/time";
 import { RosterAthlete, Team } from "@/types";
+import { ConfirmModal } from "@/components/shared/ConfirmModal";
 
 import { AthleteStatsModal } from "./AthleteStatsModal";
 
@@ -13,11 +15,15 @@ function recoverySlug(label: string) {
   return label.toLowerCase();
 }
 
-export function CoachDashboard({ team }: { team: Team }) {
+export function CoachDashboard({ team, onTeamChange }: { team: Team; onTeamChange?: () => void }) {
   const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
+  const { regenerateInviteCode } = useTeam();
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedAthlete, setSelectedAthlete] = useState<RosterAthlete | null>(null);
+  const [pendingRemoval, setPendingRemoval] = useState<RosterAthlete | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
+  const [regeneratedCode, setRegeneratedCode] = useState<string | null>(null);
 
   async function handleCopyCode() {
     try {
@@ -29,15 +35,30 @@ export function CoachDashboard({ team }: { team: Team }) {
     }
   }
 
-  async function handleRemove(userId: string, displayName: string) {
+  function requestRemove(athlete: RosterAthlete) {
     if (removingId) return;
+    setPendingRemoval(athlete);
+  }
 
-    const confirmed = window.confirm(`Remove ${displayName} from your roster?`);
-    if (!confirmed) return;
-
+  async function confirmRemove() {
+    if (!pendingRemoval) return;
+    const userId = pendingRemoval.userId;
+    setPendingRemoval(null);
     setRemovingId(userId);
     await removeAthlete(userId);
     setRemovingId(null);
+  }
+
+  async function handleRegenerateCode() {
+    if (regenerating) return;
+    setRegenerating(true);
+    const ok = await regenerateInviteCode();
+    setRegenerating(false);
+    if (ok) {
+      setRegeneratedCode("Invite code regenerated.");
+      onTeamChange?.();
+    }
+    setTimeout(() => setRegeneratedCode(null), 3000);
   }
 
   return (
@@ -52,9 +73,17 @@ export function CoachDashboard({ team }: { team: Team }) {
           </p>
         </div>
 
-        <button className="secondary invite-code-button" onClick={handleCopyCode} type="button">
-          <Copy size={16} /> {copied ? "Copied!" : `Invite code: ${team.invite_code}`}
-        </button>
+        <div className="team-header-actions">
+          <button className="secondary invite-code-button" onClick={handleCopyCode} type="button">
+            <Copy size={16} /> {copied ? "Copied!" : `Invite code: ${team.invite_code}`}
+          </button>
+
+          <button className="ghost" onClick={handleRegenerateCode} disabled={regenerating} type="button">
+            <RefreshCw size={16} /> {regenerating ? "Regenerating..." : "Regenerate code"}
+          </button>
+
+          {regeneratedCode && <span className="muted regenerate-code-status">{regeneratedCode}</span>}
+        </div>
       </div>
 
       {flagged.length > 0 && (
@@ -120,7 +149,7 @@ export function CoachDashboard({ team }: { team: Team }) {
                   className="ghost danger-button"
                   onClick={(event) => {
                     event.stopPropagation();
-                    handleRemove(athlete.userId, athlete.displayName);
+                    requestRemove(athlete);
                   }}
                   disabled={removingId === athlete.userId}
                 >
@@ -143,6 +172,17 @@ export function CoachDashboard({ team }: { team: Team }) {
           userId={selectedAthlete.userId}
           displayName={selectedAthlete.displayName}
           onClose={() => setSelectedAthlete(null)}
+        />
+      )}
+
+      {pendingRemoval && (
+        <ConfirmModal
+          title="Remove athlete?"
+          message={`Remove ${pendingRemoval.displayName} from your roster?`}
+          confirmLabel="Remove"
+          danger
+          onConfirm={confirmRemove}
+          onCancel={() => setPendingRemoval(null)}
         />
       )}
     </div>
