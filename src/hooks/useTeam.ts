@@ -43,7 +43,10 @@ export function useTeam() {
         .maybeSingle();
 
       if (notice) {
-        await supabase.from("removal_notices").delete().eq("id", notice.id);
+        const { error: deleteError } = await supabase.from("removal_notices").delete().eq("id", notice.id);
+        if (deleteError) {
+          console.error("Failed to dismiss removal notice", deleteError);
+        }
         setRemovalNotice(`You were removed from ${notice.team_name}.`);
       } else {
         setRemovalNotice(null);
