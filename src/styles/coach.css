@@ -33,6 +33,17 @@
   white-space: nowrap;
 }
 
+.team-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.regenerate-code-status {
+  white-space: nowrap;
+}
+
 .checkin-alert {
   border-color: rgba(255, 196, 0, 0.35);
 }

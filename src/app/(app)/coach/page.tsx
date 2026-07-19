@@ -9,7 +9,7 @@ import { useTeam } from "@/hooks/useTeam";
 import "@/styles/coach.css";
 
 export default function CoachPage() {
-  const { loading, team, role, error, createTeam, joinTeam } = useTeam();
+  const { loading, team, role, error, createTeam, joinTeam, refresh } = useTeam();
 
   if (loading) {
     return (
@@ -24,7 +24,7 @@ export default function CoachPage() {
   }
 
   if (role === "coach") {
-    return <CoachDashboard team={team} />;
+    return <CoachDashboard team={team} onTeamChange={refresh} />;
   }
 
   return (

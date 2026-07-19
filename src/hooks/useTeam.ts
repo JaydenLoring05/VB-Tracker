@@ -91,6 +91,20 @@ export function useTeam() {
     return true;
   }
 
+  async function regenerateInviteCode() {
+    setError(null);
+
+    const { error: rpcError } = await supabase.rpc("regenerate_invite_code");
+
+    if (rpcError) {
+      setError(rpcError.message || "Couldn't regenerate the invite code.");
+      return false;
+    }
+
+    await loadTeam();
+    return true;
+  }
+
   return {
     loading,
     team,
@@ -98,6 +112,7 @@ export function useTeam() {
     error,
     createTeam,
     joinTeam,
+    regenerateInviteCode,
     refresh: loadTeam
   };
 }
