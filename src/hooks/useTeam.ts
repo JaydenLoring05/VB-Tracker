@@ -14,6 +14,7 @@ export function useTeam() {
   const [team, setTeam] = useState<Team | null>(null);
   const [role, setRole] = useState<TeamRole | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [removalNotice, setRemovalNotice] = useState<string | null>(null);
 
   const loadTeam = useCallback(async () => {
     setLoading(true);
@@ -33,6 +34,21 @@ export function useTeam() {
     }
 
     if (!memberRow) {
+      const { data: notice } = await supabase
+        .from("removal_notices")
+        .select("id, team_name")
+        .eq("user_id", userId)
+        .order("removed_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (notice) {
+        await supabase.from("removal_notices").delete().eq("id", notice.id);
+        setRemovalNotice(`You were removed from ${notice.team_name}.`);
+      } else {
+        setRemovalNotice(null);
+      }
+
       setTeam(null);
       setRole(null);
       setLoading(false);
@@ -110,6 +126,7 @@ export function useTeam() {
     team,
     role,
     error,
+    removalNotice,
     createTeam,
     joinTeam,
     regenerateInviteCode,
