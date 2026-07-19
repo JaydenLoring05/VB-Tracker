@@ -166,7 +166,9 @@ type TrackerContextValue = {
   workoutStreak: number;
 
   syncError: string | null;
-  reportSyncError: (message: string) => void;
+  syncRetry: (() => void) | null;
+  reportSyncError: (message: string, retry?: () => void) => void;
+  retrySyncError: () => void;
   clearSyncError: () => void;
 };
 
@@ -197,13 +199,23 @@ export function TrackerProvider({
   const [substitutions, setSubstitutions] = useState<ExerciseSubstitutions>({});
   const [workoutStreak, setWorkoutStreak] = useState(0);
   const [syncError, setSyncError] = useState<string | null>(null);
+  const [syncRetry, setSyncRetry] = useState<(() => void) | null>(null);
 
-  function reportSyncError(message: string) {
+  function reportSyncError(message: string, retry?: () => void) {
     setSyncError(message);
+    setSyncRetry(() => retry ?? null);
   }
 
   function clearSyncError() {
     setSyncError(null);
+    setSyncRetry(null);
+  }
+
+  function retrySyncError() {
+    if (syncRetry) {
+      clearSyncError();
+      syncRetry();
+    }
   }
 
   useEffect(() => {
@@ -217,6 +229,16 @@ export function TrackerProvider({
         if (error) console.error("Failed to update last-active timestamp", error);
       });
   }, [supabase, userId]);
+
+  useEffect(() => {
+    function handleOnline() {
+      if (syncRetry) retrySyncError();
+    }
+
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncRetry]);
 
   useEffect(() => {
     let cancelled = false;
@@ -353,7 +375,10 @@ export function TrackerProvider({
         if (error) {
           console.error("Failed to save exercise check", error);
           setChecked((current) => ({ ...current, [key]: previous }));
-          reportSyncError("Couldn't save that checkmark. Check your connection and try again.");
+          reportSyncError(
+            "Couldn't save that checkmark. Check your connection and try again.",
+            () => setExerciseChecked(checkedWeek, day, exercise, isChecked)
+          );
         }
       });
   }
@@ -374,7 +399,10 @@ export function TrackerProvider({
         if (error) {
           console.error("Failed to save workout log", error);
           setWorkoutLogs((current) => ({ ...current, [key]: previous }));
-          reportSyncError("Couldn't save that entry. Check your connection and try again.");
+          reportSyncError(
+            "Couldn't save that entry. Check your connection and try again.",
+            () => updateWorkoutLog(day, exercise, value)
+          );
         }
       });
   }
@@ -395,7 +423,10 @@ export function TrackerProvider({
         if (error) {
           console.error("Failed to save workout note", error);
           setWorkoutNotes((current) => ({ ...current, [key]: previous }));
-          reportSyncError("Couldn't save that note. Check your connection and try again.");
+          reportSyncError(
+            "Couldn't save that note. Check your connection and try again.",
+            () => updateWorkoutNote(day, note)
+          );
         }
       });
   }
@@ -416,7 +447,7 @@ export function TrackerProvider({
       failed = true;
       setStats(previousStats);
       setHistory(previousHistory);
-      reportSyncError(message);
+      reportSyncError(message, () => saveStats());
     }
 
     supabase
@@ -452,7 +483,7 @@ export function TrackerProvider({
         if (error) {
           console.error("Failed to clear stats history", error);
           setHistory(previousHistory);
-          reportSyncError("Couldn't clear your stats history. Try again.");
+          reportSyncError("Couldn't clear your stats history. Try again.", () => clearStats());
         }
       });
   }
@@ -468,7 +499,7 @@ export function TrackerProvider({
       .then(({ data, error }) => {
         if (error) {
           console.error("Failed to add game", error);
-          reportSyncError("Couldn't add that game to your calendar. Try again.");
+          reportSyncError("Couldn't add that game to your calendar. Try again.", () => addGame(title));
           return;
         }
         setCalendarEvents((events) => [...events, data as CalendarEvent]);
@@ -493,7 +524,7 @@ export function TrackerProvider({
       .then(({ data, error }) => {
         if (error) {
           console.error("Failed to add PR", error);
-          reportSyncError("Couldn't save that PR. Try again.");
+          reportSyncError("Couldn't save that PR. Try again.", () => addPR(pr));
           return;
         }
         setPrs((current) => [data as PRRecord, ...current]);
@@ -523,7 +554,10 @@ export function TrackerProvider({
             }
             return next;
           });
-          reportSyncError("Couldn't save that swap. Check your connection and try again.");
+          reportSyncError(
+            "Couldn't save that swap. Check your connection and try again.",
+            () => setSubstitution(originalExercise, chosenExercise)
+          );
         }
       });
   }
@@ -547,7 +581,9 @@ export function TrackerProvider({
         if (error) {
           console.error("Failed to clear exercise substitution", error);
           setSubstitutions((current) => ({ ...current, [originalExercise]: previous }));
-          reportSyncError("Couldn't reset that exercise. Try again.");
+          reportSyncError("Couldn't reset that exercise. Try again.", () =>
+            clearSubstitution(originalExercise)
+          );
         }
       });
   }
@@ -565,7 +601,7 @@ export function TrackerProvider({
         if (error) {
           console.error("Failed to delete PR", error);
           setPrs(previous);
-          reportSyncError("Couldn't delete that PR. Try again.");
+          reportSyncError("Couldn't delete that PR. Try again.", () => deletePR(id));
         }
       });
   }
@@ -605,7 +641,9 @@ export function TrackerProvider({
     clearSubstitution,
     workoutStreak,
     syncError,
+    syncRetry,
     reportSyncError,
+    retrySyncError,
     clearSyncError
   };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, RefreshCw, X } from "lucide-react";
 import { useEffect } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
@@ -8,7 +8,7 @@ import { useTrackerContext } from "@/context/TrackerContext";
 const AUTO_DISMISS_MS = 6000;
 
 export function SyncErrorToast() {
-  const { syncError, clearSyncError } = useTrackerContext();
+  const { syncError, syncRetry, retrySyncError, clearSyncError } = useTrackerContext();
 
   useEffect(() => {
     if (!syncError) return;
@@ -23,6 +23,11 @@ export function SyncErrorToast() {
     <div className="sync-toast" role="alert">
       <AlertTriangle size={18} />
       <span>{syncError}</span>
+      {syncRetry && (
+        <button type="button" className="sync-toast-retry" onClick={retrySyncError} aria-label="Retry">
+          <RefreshCw size={14} /> Retry
+        </button>
+      )}
       <button
         type="button"
         className="sync-toast-dismiss"

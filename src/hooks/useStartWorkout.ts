@@ -51,7 +51,9 @@ export function useStartWorkout() {
 
     if (error) {
       console.error("Failed to start workout", error);
-      reportSyncError("Couldn't start that workout. Check your connection and try again.");
+      reportSyncError("Couldn't start that workout. Check your connection and try again.", () =>
+        startWorkout(day)
+      );
       setStarting(false);
       return;
     }
