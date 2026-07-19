@@ -21,7 +21,7 @@
 }
 
 .chart-card {
-  background: #0b0f14;
+  background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px;
@@ -48,7 +48,7 @@
   justify-content: space-between;
   gap: 14px;
   align-items: center;
-  background: #0b0f14;
+  background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px;

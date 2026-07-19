@@ -10,7 +10,7 @@ export function CoachPanel() {
   return (
     <div className="panel">
       <h2>
-        <HeartPulse size={22} /> AI Coach
+        <HeartPulse size={22} /> Recovery Coach
       </h2>
 
       <ul>

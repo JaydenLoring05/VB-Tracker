@@ -20,7 +20,7 @@
   min-height: 90px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  background: #0b0f14;
+  background: var(--surface-2);
   padding: 10px;
 }
 
@@ -51,6 +51,11 @@
 .recovery {
   background: rgba(69, 212, 131, 0.18);
   color: var(--green);
+}
+
+.rest {
+  background: rgba(174, 182, 196, 0.14);
+  color: var(--muted);
 }
 
 @media (max-width: 900px) {

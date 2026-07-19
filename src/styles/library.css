@@ -11,7 +11,7 @@
 .exercise-card {
   display: flex;
   gap: 12px;
-  background: #0b0f14;
+  background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px;
@@ -183,7 +183,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #0b0f14;
+  background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 10px 12px;

@@ -153,6 +153,22 @@
   color: var(--gold);
 }
 
+.landing-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  right: -12%;
+  width: 24%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 196, 0, 0.5), rgba(255, 196, 0, 0.05));
+}
+
+@media (max-width: 800px) {
+  .landing-step:not(:last-child)::after {
+    display: none;
+  }
+}
+
 .landing-step-number {
   position: absolute;
   top: -14px;
@@ -190,6 +206,49 @@
   margin: 0;
 }
 
+.landing-philosophy p.muted {
+  color: var(--muted);
+}
+
+.landing-philosophy-points {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-5);
+  margin-top: var(--sp-5);
+}
+
+.landing-philosophy-points strong {
+  display: block;
+  color: var(--gold);
+  margin-bottom: var(--sp-2);
+}
+
+@media (max-width: 800px) {
+  .landing-philosophy-points {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-stat-row {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: var(--sp-6);
+  text-align: center;
+}
+
+.landing-stat strong {
+  display: block;
+  font-size: var(--fs-display);
+  color: var(--gold);
+}
+
+@media (max-width: 800px) {
+  .landing-stat-row {
+    gap: var(--sp-4);
+  }
+}
+
 .landing-about {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
@@ -215,7 +274,7 @@
   padding: var(--sp-3) var(--sp-4);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: #0b0f14;
+  background: var(--surface-2);
   font-size: var(--fs-sm);
   color: var(--muted);
 }

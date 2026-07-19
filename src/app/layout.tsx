@@ -10,8 +10,8 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Volleyball Tracker",
-  description: "20 Week Volleyball Athlete Operating System"
+  title: "ElevateOS",
+  description: "ElevateOS — the athlete training and recovery operating system for volleyball teams"
 };
 
 export const viewport: Viewport = {
