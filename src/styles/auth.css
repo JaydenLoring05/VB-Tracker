@@ -1,7 +1,9 @@
 .auth-shell {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 24px;
 }
 
@@ -81,4 +83,39 @@
   margin-top: 8px;
   text-align: center;
   justify-self: unset;
+}
+
+.auth-back-link {
+  display: block;
+  max-width: 380px;
+  width: 100%;
+  margin: 0 auto 16px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.auth-back-link:hover {
+  color: var(--gold);
+}
+
+.auth-legal {
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.auth-legal p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.auth-legal a {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.auth-legal a:hover {
+  text-decoration: underline;
 }

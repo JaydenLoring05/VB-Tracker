@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -140,6 +141,10 @@ export default function LoginPage() {
 
   return (
     <div className="auth-shell">
+      <Link href="/" className="auth-back-link">
+        ← Back to ElevateOS
+      </Link>
+
       <div className="panel auth-card">
         <div className="logo">🏐</div>
         <h1>{mode === "sign-in" ? "Welcome back" : "Create your account"}</h1>
@@ -187,6 +192,21 @@ export default function LoginPage() {
                 : "Sign Up"}
           </button>
         </form>
+
+        {mode !== "sign-in" && (
+          <div className="auth-legal">
+            <p className="muted">
+              By creating an account you agree to our{" "}
+              <Link href="/terms">Terms of Service</Link> and{" "}
+              <Link href="/privacy">Privacy Policy</Link>.
+            </p>
+            <p className="muted">
+              ElevateOS doesn&apos;t diagnose injuries or provide medical advice — always
+              consult a medical professional for pain or injury concerns. Athletes under 18
+              should have a parent or guardian aware of their use of the app.
+            </p>
+          </div>
+        )}
 
         <div className="auth-switch">
           {mode === "sign-in" ? (
