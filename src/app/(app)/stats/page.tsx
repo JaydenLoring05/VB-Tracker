@@ -1,4 +1,5 @@
 import { CoachPanel } from "@/components/stats/CoachPanel";
+import { PerformanceProfileForm } from "@/components/stats/PerformanceProfileForm";
 import { PRTracker } from "@/components/stats/PRTracker";
 import { ProgressCharts } from "@/components/stats/ProgressCharts";
 import { StatsForm } from "@/components/stats/StatsForm";
@@ -16,6 +17,10 @@ export default function StatsPage() {
       <section className="lower-grid" style={{ marginTop: 24 }}>
         <PRTracker />
         <CoachPanel />
+      </section>
+
+      <section style={{ marginTop: 24 }}>
+        <PerformanceProfileForm />
       </section>
     </>
   );
