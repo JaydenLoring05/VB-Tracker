@@ -352,7 +352,7 @@ export function getPhase(week: number) {
   if (week <= 16) {
     return {
       name: "Power Phase",
-      focus: "Jump higher, hit harder, move faster -- lower volume, higher power output",
+      focus: "Jump higher, hit harder, move faster: lower volume, higher power output",
       sets: "3-5 sets",
       intensity: "High"
     };
@@ -360,7 +360,7 @@ export function getPhase(week: number) {
 
   return {
     name: "Taper Phase",
-    focus: "Reduced volume, more mobility and prehab -- staying healthy through accumulated in-season fatigue",
+    focus: "Reduced volume, more mobility and prehab, staying healthy through accumulated in-season fatigue",
     sets: "2-3 sets",
     intensity: "Light-Moderate"
   };

@@ -183,9 +183,9 @@ export const exercises: Exercise[] = [
     "Landing Mechanics",
     "Beginner",
     "🎯",
-    "Teaches the soft-knee, hips-back, quiet landing pattern that every jump and plyo exercise depends on -- do this before adding jump volume, not after.",
+    "Teaches the soft-knee, hips-back, quiet landing pattern that every jump and plyo exercise depends on. Do this before adding jump volume, not after.",
     ["Step off a low box or hop lightly in place.", "Land with hips back and knees soft.", "Land as quietly as possible.", "Freeze for 2 seconds on landing to prove control."],
-    ["Landing stiff-legged.", "Knees caving inward on contact.", "Landing loud -- that's a sign of too much force hitting the joints."],
+    ["Landing stiff-legged.", "Knees caving inward on contact.", "Landing loud: that's a sign of too much force hitting the joints."],
     ["Depth Drops", "Box Step-Offs", "Drop Squat"]
   ),
   ex(
@@ -305,7 +305,7 @@ export const exercises: Exercise[] = [
     "Hitting Power",
     "Beginner",
     "📐",
-    "The entry point into pressing strength -- hands elevated on a bench or box to reduce the load until a full push-up is ready.",
+    "The entry point into pressing strength: hands elevated on a bench or box reduce the load until a full push-up is ready.",
     ["Hands on a sturdy elevated surface.", "Body straight from head to heel.", "Chest lowers first.", "Lower the surface height as you get stronger."],
     ["Sagging hips.", "Surface too low too soon.", "Flaring elbows."],
     ["Push-Ups", "DB Bench Press", "Wall Push-Up"]
@@ -509,7 +509,7 @@ export const exercises: Exercise[] = [
     "Knee Strength",
     "Beginner",
     "🎗️",
-    "Trains the hip abductors and glute medius to help control knee position on landing -- a commonly used piece of knee-injury-risk-reduction work, though the strength-to-valgus link isn't as clear-cut as often claimed.",
+    "Trains the hip abductors and glute medius to help control knee position on landing, a commonly used piece of knee-injury-risk-reduction work, though the strength-to-valgus link isn't as clear-cut as often claimed.",
     ["Band above the knees or around the ankles.", "Slight knee bend throughout.", "Step sideways under tension, don't let the band go slack.", "Keep toes forward, hips level."],
     ["Standing too upright.", "Letting the band go slack between steps.", "Knees caving inward instead of pushing out against the band."],
     ["Clamshells", "Monster Walks", "Single-Leg Balance Reach"]
@@ -539,7 +539,7 @@ export const exercises: Exercise[] = [
     "Knee Strength",
     "Beginner",
     "🎯",
-    "Builds single-leg stability and proprioception -- most useful as a supporting piece of ACL-injury-risk-reduction work alongside real strength and plyometric training, not as a stand-alone fix.",
+    "Builds single-leg stability and proprioception, most useful as a supporting piece of ACL-injury-risk-reduction work alongside real strength and plyometric training, not as a stand-alone fix.",
     ["Stand tall on one leg, soft knee.", "Reach the free foot forward, side, and back under control.", "Keep the standing knee tracking over the toes.", "Return to a stable center each rep."],
     ["Standing knee caving in on the reach.", "Rushing through reaches without control.", "Letting the hips drop on the standing side."],
     ["Lateral Band Walks", "Single-Leg RDL", "Bosu Balance Hold"]
@@ -773,7 +773,7 @@ export const exercises: Exercise[] = [
     "Shoulder Health",
     "Beginner",
     "🏋️",
-    "Builds lat and pulling strength with adjustable assistance -- a scalable stepping stone toward bodyweight pull-ups.",
+    "Builds lat and pulling strength with adjustable assistance, a scalable stepping stone toward bodyweight pull-ups.",
     ["Pull the bar to your upper chest.", "Drive elbows down and back.", "Keep torso still, don't lean back to cheat.", "Control the return."],
     ["Using body English/momentum.", "Pulling behind the neck.", "Only using arms, not lats."],
     ["Pull-Ups", "Band-Assisted Pull-Up", "Bodyweight Rows"]
@@ -784,7 +784,7 @@ export const exercises: Exercise[] = [
     "Intermediate",
     "🏋️",
     "Builds hip-hinge strength and hamstring loading for jumping and sprinting power, with less axial load than a full deadlift.",
-    ["Push hips back first.", "Keep the weight close to your legs.", "Soft knee bend -- this is a hinge, not a squat.", "Stop when you feel a hamstring stretch, before your back rounds."],
+    ["Push hips back first.", "Keep the weight close to your legs.", "Soft knee bend: this is a hinge, not a squat.", "Stop when you feel a hamstring stretch, before your back rounds."],
     ["Squatting the weight down instead of hinging.", "Rounding the lower back.", "Locking the knees straight."],
     ["Trap Bar Deadlift or RDL", "Hamstring Curls", "Nordic Hamstring Curl"]
   ),
@@ -794,7 +794,7 @@ export const exercises: Exercise[] = [
     "Beginner",
     "🚣",
     "Builds mid-back and rear-shoulder pulling strength with continuous tension to balance out overhead hitting volume.",
-    ["Chest tall -- don't lean back to pull.", "Pull the handle to your lower ribs.", "Squeeze shoulder blades together.", "Control the return, don't let the weight yank you forward."],
+    ["Chest tall: don't lean back to pull.", "Pull the handle to your lower ribs.", "Squeeze shoulder blades together.", "Control the return, don't let the weight yank you forward."],
     ["Using the low back to heave the weight.", "Shrugging instead of pulling with the back.", "Partial range of motion."],
     ["Single-Arm Row", "Bodyweight Rows", "Lat Pulldown"]
   ),
@@ -803,7 +803,7 @@ export const exercises: Exercise[] = [
     "Rotational Core",
     "Beginner",
     "🛶",
-    "Builds anti-extension core strength and full-body tension -- the base position underneath planks, L-sits, and handstands.",
+    "Builds anti-extension core strength and full-body tension, the base position underneath planks, L-sits, and handstands.",
     ["Press your low back into the floor.", "Arms and legs long, ribs down.", "Squeeze glutes slightly.", "Breathe without losing the low-back position."],
     ["Lower back arching off the floor.", "Holding your breath instead of breathing through it.", "Letting the legs drop too low too soon."],
     ["Dead Bugs", "Planks", "Ab Wheel Rollout"]
@@ -813,7 +813,7 @@ export const exercises: Exercise[] = [
     "Jump Development",
     "Beginner",
     "🧵",
-    "Builds hamstring strength and hip-hamstring coordination using just a stability ball -- a bodyweight, equipment-light option.",
+    "Builds hamstring strength and hip-hamstring coordination using just a stability ball, a bodyweight, equipment-light option.",
     ["Bridge your hips up first.", "Curl heels toward glutes by pulling with the hamstrings.", "Keep hips up the whole time.", "Roll back out under control."],
     ["Hips sagging or dropping mid-set.", "Curling too fast and losing control of the ball.", "Doing partial-range curls."],
     ["Hamstring Curls", "Nordic Hamstring Curl", "RDL"]
@@ -824,7 +824,7 @@ export const exercises: Exercise[] = [
     "Beginner",
     "🐕",
     "Builds core and lower-back stability by training the trunk to resist rotation while opposite arm and leg move independently.",
-    ["Keep your back flat -- no sagging or arching.", "Move the opposite arm and leg together, slowly.", "Reach long instead of lifting high.", "Keep hips square to the floor."],
+    ["Keep your back flat: no sagging or arching.", "Move the opposite arm and leg together, slowly.", "Reach long instead of lifting high.", "Keep hips square to the floor."],
     ["Rotating the hips as the leg lifts.", "Rushing through reps.", "Arching the lower back to fake more range."],
     ["Dead Bugs", "Planks", "Pallof Press"]
   ),
@@ -843,7 +843,7 @@ export const exercises: Exercise[] = [
     "Jump Development",
     "Beginner",
     "🍑",
-    "Builds basic glute activation and the hip-extension pattern -- the entry point before loading a full hip thrust.",
+    "Builds basic glute activation and the hip-extension pattern, the entry point before loading a full hip thrust.",
     ["Feet hip-width, heels close to glutes.", "Drive through your heels.", "Squeeze glutes hard at the top.", "Lower with control instead of dropping."],
     ["Overarching the lower back at the top.", "Pushing through the toes instead of the heels.", "Rushing reps instead of pausing at the top."],
     ["Hip Thrust", "Single-Leg Hip Thrust", "Cable Pull-Through"]
@@ -854,7 +854,7 @@ export const exercises: Exercise[] = [
     "Jump Development",
     "Beginner",
     "🦿",
-    "Builds single-leg strength and balance from a stationary stance -- the base progression before adding a Bulgarian split squat's elevated rear foot.",
+    "Builds single-leg strength and balance from a stationary stance, the base progression before adding a Bulgarian split squat's elevated rear foot.",
     ["Feet split front-to-back, torso tall.", "Lower straight down, not forward.", "Front knee tracks over the toes.", "Push evenly through the whole front foot."],
     ["Leaning too far forward.", "Letting the front knee cave inward.", "Taking a stance too narrow to balance."],
     ["Bulgarian Split Squat", "Reverse Lunges", "Step-Ups"]
@@ -894,7 +894,7 @@ export const exercises: Exercise[] = [
     "Jump Development",
     "Beginner",
     "🦶",
-    "Isolates the soleus with the knee bent -- a key lower-leg muscle for jumping and landing that standing calf work doesn't fully reach.",
+    "Isolates the soleus with the knee bent, a key lower-leg muscle for jumping and landing that standing calf work doesn't fully reach.",
     ["Knees bent at roughly 90 degrees.", "Raise the heels as high as possible.", "Pause at the top.", "Lower under control for a full stretch."],
     ["Bouncing through the bottom.", "Using a tiny range of motion.", "Rushing the tempo."],
     ["Calf Raises", "Soleus Raises", "Single-Leg Calf Raise"]
@@ -904,7 +904,7 @@ export const exercises: Exercise[] = [
     "Landing Mechanics",
     "Beginner",
     "⬇️",
-    "Teaches a soft, controlled landing by stepping off a low box instead of jumping -- the entry point before adding depth drops or jump volume.",
+    "Teaches a soft, controlled landing by stepping off a low box instead of jumping, the entry point before adding depth drops or jump volume.",
     ["Step off, don't jump off.", "Land on both feet, hips back, knees soft.", "Land as quietly as possible.", "Stick the landing for a full second before resetting."],
     ["Landing stiff-legged.", "Knees caving in on contact.", "Using too high of a box too soon."],
     ["Landing Mechanics Drill", "Depth Drops", "Drop Squat"]
@@ -914,7 +914,7 @@ export const exercises: Exercise[] = [
     "Landing Mechanics",
     "Beginner",
     "🎯",
-    "Trains the body to absorb force fast by dropping quickly into a stable squat position -- builds the landing reflex jumping and cutting rely on.",
+    "Trains the body to absorb force fast by dropping quickly into a stable squat position. Builds the landing reflex jumping and cutting rely on.",
     ["Start standing tall.", "Drop quickly into a quarter-to-half squat.", "Land quiet with hips back and knees soft.", "Freeze in the landing position for two seconds."],
     ["Landing with straight legs.", "Knees collapsing inward.", "Wobbling instead of sticking the landing."],
     ["Landing Mechanics Drill", "Box Step-Offs", "Depth Drops"]
@@ -936,7 +936,7 @@ export const exercises: Exercise[] = [
     "🚴",
     "Low-impact cardio that raises blood flow for recovery without adding joint stress on rest or light days.",
     ["Keep the resistance light.", "Hold an easy, conversational pace.", "Relax your shoulders and grip.", "Stop before you feel fatigued, not after."],
-    ["Turning it into a hard workout.", "Gripping the bars too tight.", "Skipping it because it feels too easy -- that's the point."],
+    ["Turning it into a hard workout.", "Gripping the bars too tight.", "Skipping it because it feels too easy: that's the point."],
     ["Walk 20-30 minutes", "Light Swim", "Incline Walk"]
   ),
   ex(
@@ -944,7 +944,7 @@ export const exercises: Exercise[] = [
     "Rotational Core",
     "Beginner",
     "🎗️",
-    "Builds rotational core strength with a resistance band -- an accessible entry point before loading a cable or landmine rotation.",
+    "Builds rotational core strength with a resistance band, an accessible entry point before loading a cable or landmine rotation.",
     ["Anchor the band at chest height to your side.", "Rotate through the hips and ribs together.", "Keep arms long, don't just pull with the hands.", "Control the return, don't let the band snap you back."],
     ["Only rotating the arms, not the torso.", "Using too much band tension.", "Rushing the return."],
     ["Med Ball Rotational Throws", "Cable Woodchoppers", "Landmine Rotations"]

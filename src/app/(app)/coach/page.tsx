@@ -55,7 +55,7 @@ export default function CoachPage() {
       </h2>
       <p className="muted">
         You&apos;re on this team as an athlete. Your coach can see your recovery stats and
-        training history to check in on you -- your data stays read-only to them.
+        training history to check in on you. Your data stays read-only to them.
       </p>
     </div>
   );

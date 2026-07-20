@@ -113,7 +113,7 @@ function DayFullEditor({
         <p className="program-guardrail-warning">
           Heads up: this day no longer has any {missingCategories.join(" or ")} exercise
           {missingCategories.length > 1 ? "s" : ""}, which the original plan included here. This
-          isn&apos;t blocked -- just worth a second look before saving.
+          isn&apos;t blocked, just worth a second look before saving.
         </p>
       )}
 
@@ -181,7 +181,9 @@ export function ProgramEditor({ team }: { team: Team }) {
 
         return (
           <div className="panel program-day-card" key={day.day}>
-            <h3>{day.day} -- {day.title}</h3>
+            <h3>
+              {day.day}: {day.title}
+            </h3>
 
             {team.plan_tier === "paid" ? (
               <DayFullEditor
