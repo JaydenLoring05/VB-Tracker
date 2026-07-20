@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 import { todayISO } from "@/lib/storage";
+import { TeamOverrideData } from "@/lib/programResolution";
 import { CalendarEvent, StatEntry } from "@/types";
 
 export const emptyStats: StatEntry = {
@@ -162,6 +163,7 @@ type TrackerContextValue = {
   substitutions: ExerciseSubstitutions;
   setSubstitution: (originalExercise: string, chosenExercise: string) => void;
   clearSubstitution: (originalExercise: string) => void;
+  teamOverride: TeamOverrideData | null;
 
   workoutStreak: number;
 
@@ -197,6 +199,7 @@ export function TrackerProvider({
   const [workoutNotes, setWorkoutNotes] = useState<WorkoutNotes>({});
   const [prs, setPrs] = useState<PRRecord[]>([]);
   const [substitutions, setSubstitutions] = useState<ExerciseSubstitutions>({});
+  const [teamOverride, setTeamOverride] = useState<TeamOverrideData | null>(null);
   const [workoutStreak, setWorkoutStreak] = useState(0);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [syncRetry, setSyncRetry] = useState<(() => void) | null>(null);
@@ -253,7 +256,8 @@ export function TrackerProvider({
         calendarRes,
         prsRes,
         sessionsRes,
-        substitutionsRes
+        substitutionsRes,
+        teamMemberRes
       ] = await Promise.all([
         supabase.from("exercise_checks").select("week, day, exercise, checked").eq("user_id", userId),
         supabase.from("workout_logs").select("week, day, exercise, value").eq("user_id", userId),
@@ -283,7 +287,8 @@ export function TrackerProvider({
         supabase
           .from("exercise_substitutions")
           .select("original_exercise, chosen_exercise")
-          .eq("user_id", userId)
+          .eq("user_id", userId),
+        supabase.from("team_members").select("team_id").eq("user_id", userId).maybeSingle()
       ]);
 
       if (cancelled) return;
@@ -332,6 +337,38 @@ export function TrackerProvider({
         substitutionsMap[row.original_exercise] = row.chosen_exercise;
       });
       setSubstitutions(substitutionsMap);
+
+      const teamId = teamMemberRes.data?.team_id ?? null;
+      if (teamId) {
+        const [teamRes, defaultsRes, overridesRes] = await Promise.all([
+          supabase.from("teams").select("plan_tier").eq("id", teamId).maybeSingle(),
+          supabase
+            .from("team_exercise_defaults")
+            .select("original_exercise, chosen_exercise")
+            .eq("team_id", teamId),
+          supabase.from("team_day_overrides").select("phase, day, exercises").eq("team_id", teamId)
+        ]);
+
+        if (!cancelled) {
+          const exerciseDefaults: Record<string, string> = {};
+          (defaultsRes.data ?? []).forEach((row) => {
+            exerciseDefaults[row.original_exercise] = row.chosen_exercise;
+          });
+
+          const dayOverrides: Record<string, string[]> = {};
+          (overridesRes.data ?? []).forEach((row) => {
+            dayOverrides[`${row.phase}-${row.day}`] = row.exercises;
+          });
+
+          setTeamOverride({
+            planTier: (teamRes.data?.plan_tier as "pilot" | "paid") ?? "pilot",
+            exerciseDefaults,
+            dayOverrides
+          });
+        }
+      } else if (!cancelled) {
+        setTeamOverride(null);
+      }
 
       const workoutDates = new Set(
         (sessionsRes.data ?? [])
@@ -639,6 +676,7 @@ export function TrackerProvider({
     substitutions,
     setSubstitution,
     clearSubstitution,
+    teamOverride,
     workoutStreak,
     syncError,
     syncRetry,

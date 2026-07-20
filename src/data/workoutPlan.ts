@@ -362,6 +362,17 @@ export function getWorkoutDays(week: number): WorkoutDay[] {
   return taperDays;
 }
 
+const PHASE_REPRESENTATIVE_WEEK: Record<"foundation" | "build" | "power" | "taper", number> = {
+  foundation: 1,
+  build: 5,
+  power: 9,
+  taper: 17
+};
+
+export function getWorkoutDaysForPhase(phase: "foundation" | "build" | "power" | "taper"): WorkoutDay[] {
+  return getWorkoutDays(PHASE_REPRESENTATIVE_WEEK[phase]);
+}
+
 export function getPrescription(week: number, exercise: string) {
   if (exercise.includes("Landing Mechanics")) return "3x5 quality landings";
 
