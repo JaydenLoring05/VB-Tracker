@@ -10,8 +10,8 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "ElevateOS",
-  description: "ElevateOS — the athlete training and recovery operating system for volleyball teams"
+  title: "NextRep",
+  description: "NextRep: the athlete training and recovery operating system for volleyball teams"
 };
 
 export const viewport: Viewport = {

@@ -34,7 +34,7 @@ export function Sidebar() {
       <div className="brand">
         <div className="logo">🏐</div>
         <div>
-          <h2>V19 TRACKER</h2>
+          <h2>NEXTREP</h2>
           <p>ATHLETE OPERATING SYSTEM</p>
         </div>
       </div>

@@ -14,7 +14,7 @@ export default function TermsPage() {
         <p className="muted">Last updated July 19, 2026.</p>
 
         <p>
-          These are the plain-language terms for using ElevateOS during its pilot phase. By
+          These are the plain-language terms for using NextRep during its pilot phase. By
           creating an account, you&apos;re agreeing to them.
         </p>
 
@@ -34,21 +34,21 @@ export default function TermsPage() {
 
         <h2>Not medical advice</h2>
         <p>
-          ElevateOS tracks training and recovery data. It does not diagnose injuries or provide
+          NextRep tracks training and recovery data. It does not diagnose injuries or provide
           medical advice, and it isn&apos;t a substitute for a doctor, athletic trainer, or
           physical therapist.
         </p>
 
         <h2>Acceptable use</h2>
         <p>
-          Use ElevateOS for its intended purpose — tracking your own or your team&apos;s training
+          Use NextRep for its intended purpose: tracking your own or your team&apos;s training
           and recovery. Don&apos;t try to access another team&apos;s data, share invite codes
           outside your own roster, or use the service in a way that disrupts it for other teams.
         </p>
 
         <h2>No warranty</h2>
         <p>
-          ElevateOS is provided as-is during this pilot phase. We work to keep it reliable, but
+          NextRep is provided as-is during this pilot phase. We work to keep it reliable, but
           we don&apos;t guarantee uninterrupted or error-free service.
         </p>
 

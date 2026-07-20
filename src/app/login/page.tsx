@@ -142,13 +142,13 @@ export default function LoginPage() {
   return (
     <div className="auth-shell">
       <Link href="/" className="auth-back-link">
-        ← Back to ElevateOS
+        ← Back to NextRep
       </Link>
 
       <div className="panel auth-card">
         <div className="logo">🏐</div>
         <h1>{mode === "sign-in" ? "Welcome back" : "Create your account"}</h1>
-        <p className="muted">ElevateOS — Athlete Operating System</p>
+        <p className="muted">NextRep: Athlete Operating System</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <input
@@ -201,7 +201,7 @@ export default function LoginPage() {
               <Link href="/privacy">Privacy Policy</Link>.
             </p>
             <p className="muted">
-              ElevateOS doesn&apos;t diagnose injuries or provide medical advice — always
+              NextRep doesn&apos;t diagnose injuries or provide medical advice. Always
               consult a medical professional for pain or injury concerns. Athletes under 18
               should have a parent or guardian aware of their use of the app.
             </p>

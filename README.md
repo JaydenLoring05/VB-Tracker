@@ -1,6 +1,6 @@
-# ElevateOS
+# NextRep
 
-ElevateOS is a Next.js and TypeScript athlete training-and-recovery operating system built for volleyball teams.
+NextRep is a Next.js and TypeScript athlete training-and-recovery operating system built for volleyball teams.
 
 ## Live Demo
 

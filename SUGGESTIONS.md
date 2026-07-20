@@ -76,7 +76,7 @@ codebase, not generic advice.
 
 - **Real visual identity.** Replace the volleyball emoji with an actual
   logo/monogram. Keep this scoped to a single-sport (volleyball) identity
-  for now — a multi-sport brand hierarchy (e.g. "ElevateOS Volleyball /
+  for now, a multi-sport brand hierarchy (e.g. "NextRep Volleyball /
   Basketball / Football") was suggested in a product review but is
   deliberately deferred. Expanding brand scope before volleyball has proven
   out with a real paying client would dilute focus at exactly the wrong
