@@ -20,13 +20,19 @@ export default async function AppLayout({
     redirect("/login");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   return (
     <TrackerProvider userId={user.id}>
       <div className="app-shell">
         <Sidebar />
 
         <main className="main">
-          <Topbar userEmail={user.email ?? "Athlete"} />
+          <Topbar userEmail={user.email ?? "Athlete"} displayName={profile?.display_name} />
           {children}
         </main>
       </div>

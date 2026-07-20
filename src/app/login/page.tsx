@@ -14,6 +14,7 @@ type ResendState = "idle" | "sending" | "sent" | "error";
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("sign-in");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -128,8 +129,15 @@ export default function LoginPage() {
       return;
     }
 
-    if (data.session) {
-      router.push("/dashboard");
+    if (data.session && data.user) {
+      const trimmedName = name.trim();
+      if (trimmedName) {
+        await supabase
+          .from("profiles")
+          .upsert({ user_id: data.user.id, display_name: trimmedName }, { onConflict: "user_id" });
+      }
+
+      router.push("/onboarding");
       router.refresh();
       return;
     }
@@ -151,6 +159,17 @@ export default function LoginPage() {
         <p className="muted">NextRep: Athlete Operating System</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
+          {mode === "sign-up" && (
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Name"
+              autoComplete="name"
+            />
+          )}
+
           <input
             type="email"
             required

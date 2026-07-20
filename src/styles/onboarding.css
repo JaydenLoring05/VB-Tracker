@@ -1,0 +1,49 @@
+.onboarding-flow {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.onboarding-step-indicator {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: var(--fs-xs);
+  margin: 0;
+}
+
+.onboarding-step h2 {
+  margin: 0 0 var(--sp-4);
+}
+
+.onboarding-role-choice {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.onboarding-form {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.onboarding-form label {
+  display: grid;
+  gap: 6px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.onboarding-goals {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  display: grid;
+  gap: 8px;
+}
+
+.onboarding-goal-option {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  color: var(--text) !important;
+}

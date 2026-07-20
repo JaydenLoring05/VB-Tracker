@@ -1,7 +1,7 @@
 import { LogoutButton } from "@/components/auth/LogoutButton";
 
-export function Topbar({ userEmail }: { userEmail: string }) {
-  const displayName = userEmail.split("@")[0];
+export function Topbar({ userEmail, displayName: name }: { userEmail: string; displayName?: string | null }) {
+  const displayName = name && name.trim() ? name.trim() : userEmail.split("@")[0];
   const initial = displayName.charAt(0).toUpperCase();
 
   return (

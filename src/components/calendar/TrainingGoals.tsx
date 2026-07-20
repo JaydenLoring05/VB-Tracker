@@ -1,18 +1,33 @@
+"use client";
+
 import { Target } from "lucide-react";
 
+import { useProfile } from "@/hooks/useProfile";
+
+const DEFAULT_GOALS = [
+  "40+ inch vertical",
+  "11'6 approach touch",
+  "20 pull-ups",
+  "No knee pain",
+  "Stronger shoulder rotation",
+  "Faster approach and arm swing"
+];
+
 export function TrainingGoals() {
+  const { loading, profile } = useProfile();
+  const goals = profile?.training_goals?.length ? profile.training_goals : DEFAULT_GOALS;
+
   return (
     <div className="panel">
       <h2>
         <Target size={22} /> Training Goals
       </h2>
 
-      <p>□ 40+ inch vertical</p>
-      <p>□ 11&apos;6 approach touch</p>
-      <p>□ 20 pull-ups</p>
-      <p>□ No knee pain</p>
-      <p>□ Stronger shoulder rotation</p>
-      <p>□ Faster approach and arm swing</p>
+      {loading ? (
+        <p className="muted">Loading...</p>
+      ) : (
+        goals.map((goal) => <p key={goal}>&#9633; {goal}</p>)
+      )}
     </div>
   );
 }
