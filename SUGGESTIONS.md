@@ -20,8 +20,30 @@ codebase, not generic advice.
 
 - **`useCoachRoster` has no pagination.** Fine for a volleyball team (dozens
   of athletes at most), but the roster/stats/profiles queries load everyone
-  in one shot with no limit — worth revisiting only if this ever gets used
+  in one shot with no limit, worth revisiting only if this ever gets used
   for a much larger roster than a single team.
+- **Workout-timer active-time flush can lose the most recent window on a
+  hard navigation.** The 2026-07-20 timer fix (`useActiveWorkoutSession.ts`)
+  flushes accumulated active seconds to Supabase on unmount/pagehide, which
+  works reliably for normal in-app navigation (confirmed live) but can be
+  aborted by a hard page reload or tab close before the write completes,
+  since it's a regular `fetch` with no `keepalive`. This can only ever
+  under-count a few seconds/minutes of real active time, never resurrect
+  the original bug (each resume always starts a fresh active window), so
+  it was accepted as a trade-off rather than adding a raw
+  `fetch(..., { keepalive: true })` call to Supabase's REST API bypassing
+  the supabase-js client. Worth doing if it turns out to matter in
+  practice.
+- **The Attention Center's "missed workouts" signal is a proxy, not a
+  literal reading of "assigned days."** The app doesn't persist a
+  per-athlete current program week server-side (`week` in
+  `TrackerContext` is client-local UI state), so there's no coach-queryable
+  way to know which days were "assigned" to a given athlete on a given
+  week. `computeAttentionItems` (`src/lib/attentionCenter.ts`) instead
+  flags fewer than 2 completed `workout_sessions` in the trailing 7
+  calendar days. Revisit if a persisted per-athlete program week/start date
+  gets added later (the new `season_start`/`season_end` onboarding fields
+  on `profiles` are team-level, not a substitute for that).
 
 ## Auth
 
@@ -32,38 +54,37 @@ codebase, not generic advice.
 
 ## Coach experience
 
-- **Coach "Attention Center."** High priority — a strong differentiator
-  once there's real usage data to prioritize against. A prioritized list
-  surfacing what needs a coach's attention today (pain reports, missed
-  workouts, readiness drops, new PRs, missing check-ins), instead of
-  requiring the coach to read raw roster numbers and infer it themselves.
 - **Daily coach summary email.** A morning email with checked-in count,
   attention-needed count, average readiness, pain alerts, and today's
-  workout. This is a daily, at-a-glance digest — distinct from any future
-  weekly report, which would roll up trends over a longer window.
+  workout. This is a daily, at-a-glance digest, distinct from any future
+  weekly report, which would roll up trends over a longer window. (The
+  Attention Center itself, built 2026-07-20, covers the in-app
+  equivalent of this; the email is still open.)
 
 ## Marketing & onboarding
 
 - **Homepage product-demo section.** Real dashboard screenshots or a short
-  demo video showing roster, readiness, pain alerts, PRs, and trends — the
+  demo video showing roster, readiness, pain alerts, PRs, and trends, the
   landing page currently describes the product but never shows it.
 - **Public demo team/dashboard.** A read-only demo roster visitors can
   explore without signing up, so a skeptical coach can see the real UI
   before handing over an email address.
-- **Multi-step guided onboarding flow.** Replace the current bare
-  email/password signup with coach-vs-athlete branching, team setup, season
-  dates, and invite-athletes steps, with a progress indicator. The current
-  single-form signup works but front-loads every decision onto one screen.
 
 ## Season structure
 
-- **Volleyball season planning.** Practices, games, and tournaments entered
-  by the coach, with training load auto-adjusting around them.
+- **Training load auto-adjusting around team calendar events.** The
+  2026-07-20 pass added a coach-authored team calendar
+  (practice/match/tournament/travel/testing/playoffs), but `useCalendar`'s
+  training-load calculation still only weighs personal `calendar_events`,
+  not the new `team_calendar_events`. Worth folding in once there's a
+  sense of what weighting coach-authored event types should carry.
 - **Position-based starting program templates.** Outside/opposite, middle,
-  setter, libero, and beach-specific starting programs — picks the
-  starting program for a position. Distinct from (but related to) any
-  future position-specific in-app scorecards, which would track
-  position-specific stats on top of whatever program is running.
+  setter, libero, and beach-specific starting programs, picks the starting
+  program for a position. The 2026-07-20 onboarding pass derives initial
+  *training goals* from position, but the actual workout program is still
+  one universal 20-week plan regardless of position. Distinct from (but
+  related to) any future position-specific in-app scorecards, which would
+  track position-specific stats on top of whatever program is running.
 
 ## Trust & compliance
 
