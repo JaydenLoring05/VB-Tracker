@@ -7,7 +7,7 @@ import { getWorkoutDaysForPhase } from "@/data/workoutPlan";
 import { getSubstitutionCandidates } from "@/hooks/useExerciseSubstitutions";
 import { useTeamProgram } from "@/hooks/useTeamProgram";
 import { PhaseSlug } from "@/lib/programResolution";
-import { Team } from "@/types";
+import { Exercise, Team } from "@/types";
 
 const PHASES: { slug: PhaseSlug; label: string }[] = [
   { slug: "foundation", label: "Foundation" },
@@ -16,22 +16,38 @@ const PHASES: { slug: PhaseSlug; label: string }[] = [
   { slug: "taper", label: "Taper" }
 ];
 
+const PROTECTIVE_CATEGORIES: Exercise["category"][] = ["Shoulder Health", "Landing Mechanics", "Knee Strength"];
+
+function missingProtectiveCategories(baseExercises: string[], currentExercises: string[]): string[] {
+  const categoryOf = new Map(exerciseCatalog.map((exercise) => [exercise.name, exercise.category]));
+
+  const baseCategories = new Set(baseExercises.map((name) => categoryOf.get(name)).filter(Boolean));
+  const currentCategories = new Set(currentExercises.map((name) => categoryOf.get(name)).filter(Boolean));
+
+  return PROTECTIVE_CATEGORIES.filter(
+    (category) => baseCategories.has(category) && !currentCategories.has(category)
+  );
+}
+
 function DayFullEditor({
   phase,
   day,
   baseExercises,
   currentExercises,
-  onSave
+  onSave,
+  onReset
 }: {
   phase: PhaseSlug;
   day: string;
   baseExercises: string[];
   currentExercises: string[];
   onSave: (exercises: string[]) => void;
+  onReset: () => void;
 }) {
   const [draft, setDraft] = useState<string[]>(currentExercises);
   const [addChoice, setAddChoice] = useState("");
   const isEdited = JSON.stringify(currentExercises) !== JSON.stringify(baseExercises);
+  const missingCategories = missingProtectiveCategories(baseExercises, draft);
 
   function move(index: number, direction: -1 | 1) {
     const target = index + direction;
@@ -93,12 +109,20 @@ function DayFullEditor({
         </button>
       </div>
 
+      {missingCategories.length > 0 && (
+        <p className="program-guardrail-warning">
+          Heads up: this day no longer has any {missingCategories.join(" or ")} exercise
+          {missingCategories.length > 1 ? "s" : ""}, which the original plan included here. This
+          isn&apos;t blocked -- just worth a second look before saving.
+        </p>
+      )}
+
       <div className="program-full-editor-actions">
         <button type="button" onClick={() => onSave(draft)} disabled={draft.length === 0}>
           Save {day}
         </button>
         {isEdited && (
-          <button type="button" className="ghost" onClick={() => onSave(baseExercises)}>
+          <button type="button" className="ghost" onClick={onReset}>
             Reset {day} to default
           </button>
         )}
@@ -108,8 +132,16 @@ function DayFullEditor({
 }
 
 export function ProgramEditor({ team }: { team: Team }) {
-  const { loading, error, exerciseDefaults, setExerciseDefault, clearExerciseDefault, dayOverrides, setDayOverride } =
-    useTeamProgram(team);
+  const {
+    loading,
+    error,
+    exerciseDefaults,
+    setExerciseDefault,
+    clearExerciseDefault,
+    dayOverrides,
+    setDayOverride,
+    resetDayOverride
+  } = useTeamProgram(team);
   const [activePhase, setActivePhase] = useState<PhaseSlug>("foundation");
 
   if (loading) {
@@ -158,6 +190,7 @@ export function ProgramEditor({ team }: { team: Team }) {
                 baseExercises={day.exercises}
                 currentExercises={currentExercises}
                 onSave={(exercises) => setDayOverride(activePhase, day.day, exercises)}
+                onReset={() => resetDayOverride(activePhase, day.day)}
               />
             ) : (
               <>

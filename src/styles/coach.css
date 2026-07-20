@@ -399,3 +399,13 @@
   display: flex;
   gap: var(--sp-3);
 }
+
+.program-guardrail-warning {
+  margin: 0 0 var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid rgba(255, 196, 0, 0.35);
+  background: rgba(255, 196, 0, 0.06);
+  border-radius: var(--radius-md);
+  color: var(--gold);
+  font-size: var(--fs-sm);
+}
