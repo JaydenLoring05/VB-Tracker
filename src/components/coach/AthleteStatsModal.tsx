@@ -113,9 +113,13 @@ export function AthleteStatsModal({
                   <span>Date</span>
                   <span>Recovery</span>
                   <span>Sleep</span>
+                  <span>Stress</span>
+                  <span>Motivation</span>
                   <span>Soreness</span>
                   <span>Knee</span>
                   <span>Shoulder</span>
+                  <span>Low Back</span>
+                  <span>Ankle</span>
                 </div>
 
                 {[...history].reverse().map((entry, index) => (
@@ -125,9 +129,13 @@ export function AthleteStatsModal({
                       {entry.recovery}% · {entry.recoveryLabel}
                     </span>
                     <span>{entry.sleep || "-"}</span>
+                    <span>{entry.stress || "-"}</span>
+                    <span>{entry.motivation || "-"}</span>
                     <span>{entry.soreness || "-"}</span>
                     <span>{entry.kneePain || "-"}</span>
                     <span>{entry.shoulderPain || "-"}</span>
+                    <span>{entry.lowerBackPain || "-"}</span>
+                    <span>{entry.anklePain || "-"}</span>
                   </div>
                 ))}
               </div>

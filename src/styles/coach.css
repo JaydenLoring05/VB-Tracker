@@ -216,11 +216,13 @@
   display: grid;
   gap: var(--sp-1);
   margin-top: var(--sp-4);
+  overflow-x: auto;
 }
 
 .athlete-stats-row {
   display: grid;
-  grid-template-columns: 1fr 1.4fr 0.7fr 0.7fr 0.7fr 0.7fr;
+  grid-template-columns: 0.9fr 1.2fr repeat(8, minmax(60px, 0.6fr));
+  min-width: 720px;
   gap: var(--sp-2);
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--radius-sm);
@@ -229,10 +231,12 @@
 
 .athlete-stats-row-prs {
   grid-template-columns: 0.8fr 1.3fr 1fr 1.4fr;
+  min-width: 0;
 }
 
 .athlete-stats-row-adherence {
   grid-template-columns: 1fr 0.6fr 1fr 0.9fr;
+  min-width: 0;
 }
 
 .athlete-stats-row:not(.athlete-stats-header):nth-child(odd) {
@@ -276,6 +280,7 @@
   .athlete-stats-row {
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: auto;
+    min-width: 0;
   }
 
   .athlete-adherence-summary {
