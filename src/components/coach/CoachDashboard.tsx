@@ -4,20 +4,36 @@ import { AlertTriangle, Copy, RefreshCw, Trophy, UserMinus, Users } from "lucide
 import { useState } from "react";
 
 import { useCoachRoster } from "@/hooks/useCoachRoster";
-import { useTeam } from "@/hooks/useTeam";
 import { formatLastActive } from "@/lib/time";
 import { RosterAthlete, Team } from "@/types";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 
 import { AthleteStatsModal } from "./AthleteStatsModal";
+import { ProgramEditor } from "./ProgramEditor";
+import { TeamSwitcher } from "./TeamSwitcher";
 
 function recoverySlug(label: string) {
   return label.toLowerCase();
 }
 
-export function CoachDashboard({ team, onTeamChange }: { team: Team; onTeamChange?: () => void }) {
+export function CoachDashboard({
+  teams,
+  activeTeam,
+  onSelectTeam,
+  onCreateTeam,
+  regenerateInviteCode,
+  onTeamChange
+}: {
+  teams: Team[];
+  activeTeam: Team;
+  onSelectTeam: (teamId: string) => void;
+  onCreateTeam: (name: string) => Promise<boolean>;
+  regenerateInviteCode: (teamId: string) => Promise<boolean>;
+  onTeamChange?: () => void;
+}) {
+  const team = activeTeam;
   const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
-  const { regenerateInviteCode } = useTeam();
+  const [activeTab, setActiveTab] = useState<"roster" | "program">("roster");
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedAthlete, setSelectedAthlete] = useState<RosterAthlete | null>(null);
@@ -52,7 +68,7 @@ export function CoachDashboard({ team, onTeamChange }: { team: Team; onTeamChang
   async function handleRegenerateCode() {
     if (regenerating) return;
     setRegenerating(true);
-    const ok = await regenerateInviteCode();
+    const ok = await regenerateInviteCode(team.id);
     setRegenerating(false);
     if (ok) {
       setRegeneratedCode("Invite code regenerated.");
@@ -63,6 +79,29 @@ export function CoachDashboard({ team, onTeamChange }: { team: Team; onTeamChang
 
   return (
     <div className="coach-dashboard">
+      <TeamSwitcher teams={teams} activeTeamId={team.id} onSelect={onSelectTeam} onCreateTeam={onCreateTeam} />
+
+      <div className="tabs">
+        <button
+          type="button"
+          className={activeTab === "roster" ? "" : "ghost"}
+          onClick={() => setActiveTab("roster")}
+        >
+          Roster
+        </button>
+        <button
+          type="button"
+          className={activeTab === "program" ? "" : "ghost"}
+          onClick={() => setActiveTab("program")}
+        >
+          Program
+        </button>
+      </div>
+
+      {activeTab === "program" && <ProgramEditor team={team} />}
+
+      {activeTab === "roster" && (
+      <>
       <div className="panel team-header">
         <div>
           <h2>
@@ -184,6 +223,8 @@ export function CoachDashboard({ team, onTeamChange }: { team: Team; onTeamChang
           onConfirm={confirmRemove}
           onCancel={() => setPendingRemoval(null)}
         />
+      )}
+      </>
       )}
     </div>
   );

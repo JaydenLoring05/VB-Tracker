@@ -9,7 +9,19 @@ import { useTeam } from "@/hooks/useTeam";
 import "@/styles/coach.css";
 
 export default function CoachPage() {
-  const { loading, team, role, error, removalNotice, createTeam, joinTeam, refresh } = useTeam();
+  const {
+    loading,
+    teams,
+    activeTeam,
+    role,
+    error,
+    removalNotice,
+    createTeam,
+    joinTeam,
+    regenerateInviteCode,
+    selectTeam,
+    refresh
+  } = useTeam();
 
   if (loading) {
     return (
@@ -19,18 +31,27 @@ export default function CoachPage() {
     );
   }
 
-  if (!team || !role) {
+  if (teams.length === 0 || !activeTeam || !role) {
     return <TeamSetup onCreateTeam={createTeam} onJoinTeam={joinTeam} error={error} notice={removalNotice} />;
   }
 
   if (role === "coach") {
-    return <CoachDashboard team={team} onTeamChange={refresh} />;
+    return (
+      <CoachDashboard
+        teams={teams}
+        activeTeam={activeTeam}
+        onSelectTeam={selectTeam}
+        onCreateTeam={createTeam}
+        regenerateInviteCode={regenerateInviteCode}
+        onTeamChange={refresh}
+      />
+    );
   }
 
   return (
     <div className="panel">
       <h2>
-        <Users size={22} /> {team.name}
+        <Users size={22} /> {activeTeam.name}
       </h2>
       <p className="muted">
         You&apos;re on this team as an athlete. Your coach can see your recovery stats and
