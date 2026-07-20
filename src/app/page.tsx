@@ -1,6 +1,7 @@
 import { AlertTriangle, Eye, HeartPulse, Link2, ShieldCheck, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 
+import { CONTACT_EMAIL } from "@/lib/contact";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { PricingSection } from "@/components/landing/PricingSection";
 
@@ -49,6 +50,19 @@ const STEPS = [
   }
 ];
 
+const PILOT_POINTS = [
+  {
+    icon: Trophy,
+    title: "What your team gets",
+    body: "A full 90-day pilot season at no cost, direct access to me while I build, and priority say in what gets built next."
+  },
+  {
+    icon: Users,
+    title: "What we ask in return",
+    body: "Honest feedback as your team uses it week to week, and a short case study or quote once the pilot season wraps."
+  }
+];
+
 export default function LandingPage() {
   return (
     <div className="landing-page">
@@ -56,10 +70,11 @@ export default function LandingPage() {
 
       <section className="landing-hero">
         <div className="landing-hero-inner">
-          <h1>
-            A dashboard that helps volleyball coaches keep every athlete&apos;s training and
-            recovery on track — so nobody falls through the cracks before playoffs.
-          </h1>
+          <h1>Know who&apos;s ready. Know who needs attention.</h1>
+          <p className="landing-hero-sub muted">
+            Helps volleyball coaches monitor training, recovery, soreness, and athlete progress
+            from one team dashboard.
+          </p>
 
           <div className="landing-hero-actions">
             <Link href="/login?mode=sign-up">
@@ -169,13 +184,10 @@ export default function LandingPage() {
 
           <div className="landing-about">
             <p>
-              I&apos;m Jayden Loring. I&apos;ve played volleyball at the college level for two
-              years now, including a stint as team captain, and I&apos;m studying Computer
-              Science, I built this whole app myself. I didn&apos;t want another generic fitness
-              template made by people who&apos;ve never actually been on a roster, so I built the
-              tool I wished I&apos;d had: something that understands what a season really looks
-              like, because I&apos;ve lived it from both sides, as a player logging the work and
-              as a captain trying to keep track of everyone else&apos;s.
+              I&apos;m Jayden Loring, a collegiate volleyball player, former team captain, and
+              Computer Science student. I built this because I lived the problem — training
+              plans, soreness updates, and player progress scattered across group chats,
+              notebooks, and memory. This is the system I wish my own teams had.
             </p>
 
             <ul className="landing-about-facts">
@@ -193,9 +205,28 @@ export default function LandingPage() {
 
       <section className="landing-section">
         <div className="landing-section-inner">
-          <h2 className="landing-section-title">What coaches are saying</h2>
-          <div className="empty-state landing-testimonial-placeholder">
-            <p className="muted">Coach testimonials coming soon — check back after the pilot season.</p>
+          <h2 className="landing-section-title">Founding Team Pilot</h2>
+          <p className="landing-section-lead">
+            Looking for a handful of teams to run the first full season on ElevateOS.
+          </p>
+
+          <div className="landing-problem-grid landing-pilot-grid">
+            {PILOT_POINTS.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div className="panel landing-problem-card" key={item.title}>
+                  <Icon size={22} />
+                  <h3>{item.title}</h3>
+                  <p className="muted">{item.body}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="landing-pilot-cta">
+            <a href={`mailto:${CONTACT_EMAIL}?subject=Founding Team Pilot`}>
+              <button type="button">Apply for the Pilot</button>
+            </a>
           </div>
         </div>
       </section>
@@ -206,14 +237,18 @@ export default function LandingPage() {
           <p className="muted">
             Reach out directly — happy to talk through how it&apos;d work for your team.
           </p>
-          <a href="mailto:hello@elevateos.com">
-            <button type="button">Email hello@elevateos.com</button>
+          <a href={`mailto:${CONTACT_EMAIL}`}>
+            <button type="button">Email {CONTACT_EMAIL}</button>
           </a>
         </div>
       </section>
 
       <footer className="landing-footer">
         <p className="muted">🏐 ElevateOS</p>
+        <nav className="landing-footer-links">
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms of Service</Link>
+        </nav>
       </footer>
     </div>
   );

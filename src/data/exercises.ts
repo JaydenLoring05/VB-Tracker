@@ -847,5 +847,106 @@ export const exercises: Exercise[] = [
     ["Feet hip-width, heels close to glutes.", "Drive through your heels.", "Squeeze glutes hard at the top.", "Lower with control instead of dropping."],
     ["Overarching the lower back at the top.", "Pushing through the toes instead of the heels.", "Rushing reps instead of pausing at the top."],
     ["Hip Thrust", "Single-Leg Hip Thrust", "Cable Pull-Through"]
+  ),
+
+  ex(
+    "Split Squat",
+    "Jump Development",
+    "Beginner",
+    "🦿",
+    "Builds single-leg strength and balance from a stationary stance -- the base progression before adding a Bulgarian split squat's elevated rear foot.",
+    ["Feet split front-to-back, torso tall.", "Lower straight down, not forward.", "Front knee tracks over the toes.", "Push evenly through the whole front foot."],
+    ["Leaning too far forward.", "Letting the front knee cave inward.", "Taking a stance too narrow to balance."],
+    ["Bulgarian Split Squat", "Reverse Lunges", "Step-Ups"]
+  ),
+  ex(
+    "Single-Leg Hip Thrust",
+    "Jump Development",
+    "Intermediate",
+    "🍑",
+    "Builds single-leg glute strength and hip stability beyond what the two-leg hip thrust demands.",
+    ["Shoulders on a bench, one foot planted.", "Free leg stays relaxed, not driving the rep.", "Drive through the planted heel.", "Squeeze the glute hard at the top."],
+    ["Rotating the hips to help the working side.", "Overarching the lower back at the top.", "Rushing through reps."],
+    ["Hip Thrust", "Glute Bridge", "Cable Pull-Through"]
+  ),
+  ex(
+    "Cable Pull-Through",
+    "Jump Development",
+    "Beginner",
+    "🏋️",
+    "Builds hip-hinge strength and glute drive with constant cable tension and less spinal load than a barbell hinge.",
+    ["Hinge at the hips, not the knees.", "Keep the cable close to your body.", "Drive hips forward to finish.", "Squeeze glutes at the top."],
+    ["Squatting the weight instead of hinging.", "Rounding the lower back.", "Using the arms to pull."],
+    ["Hip Thrust", "RDL", "Single-Leg Hip Thrust"]
+  ),
+  ex(
+    "Goblet Squat",
+    "Jump Development",
+    "Beginner",
+    "🏆",
+    "Builds quad and core strength with a front-loaded hold that keeps the torso upright through the squat.",
+    ["Hold the weight close to your chest.", "Elbows brush inside the knees at the bottom.", "Keep your torso tall.", "Drive through the whole foot to stand."],
+    ["Letting the chest fall forward.", "Knees caving inward.", "Cutting depth short."],
+    ["Heel-Elevated Goblet Squat", "Front Squat", "Split Squat"]
+  ),
+  ex(
+    "Seated Calf Raise",
+    "Jump Development",
+    "Beginner",
+    "🦶",
+    "Isolates the soleus with the knee bent -- a key lower-leg muscle for jumping and landing that standing calf work doesn't fully reach.",
+    ["Knees bent at roughly 90 degrees.", "Raise the heels as high as possible.", "Pause at the top.", "Lower under control for a full stretch."],
+    ["Bouncing through the bottom.", "Using a tiny range of motion.", "Rushing the tempo."],
+    ["Calf Raises", "Soleus Raises", "Single-Leg Calf Raise"]
+  ),
+  ex(
+    "Box Step-Offs",
+    "Landing Mechanics",
+    "Beginner",
+    "⬇️",
+    "Teaches a soft, controlled landing by stepping off a low box instead of jumping -- the entry point before adding depth drops or jump volume.",
+    ["Step off, don't jump off.", "Land on both feet, hips back, knees soft.", "Land as quietly as possible.", "Stick the landing for a full second before resetting."],
+    ["Landing stiff-legged.", "Knees caving in on contact.", "Using too high of a box too soon."],
+    ["Landing Mechanics Drill", "Depth Drops", "Drop Squat"]
+  ),
+  ex(
+    "Drop Squat",
+    "Landing Mechanics",
+    "Beginner",
+    "🎯",
+    "Trains the body to absorb force fast by dropping quickly into a stable squat position -- builds the landing reflex jumping and cutting rely on.",
+    ["Start standing tall.", "Drop quickly into a quarter-to-half squat.", "Land quiet with hips back and knees soft.", "Freeze in the landing position for two seconds."],
+    ["Landing with straight legs.", "Knees collapsing inward.", "Wobbling instead of sticking the landing."],
+    ["Landing Mechanics Drill", "Box Step-Offs", "Depth Drops"]
+  ),
+  ex(
+    "Line Hops",
+    "Jump Development",
+    "Beginner",
+    "🦘",
+    "Builds ankle stiffness, rhythm, and reactive bounce using nothing but a line on the floor.",
+    ["Stay light on the balls of your feet.", "Hop side to side over the line.", "Keep ground contact time short.", "Keep knees soft, not locked."],
+    ["Jumping too high instead of quick.", "Landing heavy.", "Losing rhythm between hops."],
+    ["Pogo Hops", "Jump Rope", "Lateral Bounds"]
+  ),
+  ex(
+    "Easy Bike",
+    "Recovery",
+    "Beginner",
+    "🚴",
+    "Low-impact cardio that raises blood flow for recovery without adding joint stress on rest or light days.",
+    ["Keep the resistance light.", "Hold an easy, conversational pace.", "Relax your shoulders and grip.", "Stop before you feel fatigued, not after."],
+    ["Turning it into a hard workout.", "Gripping the bars too tight.", "Skipping it because it feels too easy -- that's the point."],
+    ["Walk 20-30 minutes", "Light Swim", "Incline Walk"]
+  ),
+  ex(
+    "Band Rotations",
+    "Rotational Core",
+    "Beginner",
+    "🎗️",
+    "Builds rotational core strength with a resistance band -- an accessible entry point before loading a cable or landmine rotation.",
+    ["Anchor the band at chest height to your side.", "Rotate through the hips and ribs together.", "Keep arms long, don't just pull with the hands.", "Control the return, don't let the band snap you back."],
+    ["Only rotating the arms, not the torso.", "Using too much band tension.", "Rushing the return."],
+    ["Med Ball Rotational Throws", "Cable Woodchoppers", "Landmine Rotations"]
   )
 ];

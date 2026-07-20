@@ -37,7 +37,9 @@ export function PricingSection() {
       <div className="landing-section-inner">
         <h2 className="landing-section-title">Pricing</h2>
         <p className="landing-section-lead">
-          Billed only during active-season months — no charge in the off-season.
+          Your first 90-day pilot is free, no card required. Afterward, plans start at
+          $29/month for teams up to 16 athletes, $49/month for 17+, paused automatically
+          during the off-season.
         </p>
 
         <div className="pricing-toggle" role="group" aria-label="Billing period">
@@ -84,10 +86,6 @@ export function PricingSection() {
             </div>
           ))}
         </div>
-
-        <p className="pricing-pilot-note muted">
-          Your first team's first season is free — no card required to try it with your roster.
-        </p>
       </div>
     </section>
   );
