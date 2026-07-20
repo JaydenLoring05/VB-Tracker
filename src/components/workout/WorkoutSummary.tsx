@@ -2,20 +2,35 @@
 
 import { Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { formatDuration } from "@/lib/time";
 import { WorkoutSet } from "@/types";
 
+const RPE_SCALE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
 export function WorkoutSummary({
   day,
   durationSeconds,
-  sets
+  sets,
+  rpe,
+  onRateRPE
 }: {
   day: string;
   durationSeconds: number | null;
   sets: WorkoutSet[];
+  rpe?: number | null;
+  onRateRPE?: (rpe: number) => Promise<boolean>;
 }) {
   const router = useRouter();
+  const [savingRPE, setSavingRPE] = useState(false);
+
+  async function handleRate(value: number) {
+    if (!onRateRPE || savingRPE) return;
+    setSavingRPE(true);
+    await onRateRPE(value);
+    setSavingRPE(false);
+  }
 
   const exerciseNames = Array.from(new Set(sets.map((s) => s.exercise)));
 
@@ -72,6 +87,27 @@ export function WorkoutSummary({
               );
             })}
           </ul>
+        </div>
+      )}
+
+      {onRateRPE && (
+        <div className="workout-rpe">
+          <h3>How hard did that feel?</h3>
+          <p className="muted">1 = very easy, 10 = maximum effort.</p>
+          <div className="workout-rpe-scale">
+            {RPE_SCALE.map((value) => (
+              <button
+                key={value}
+                type="button"
+                className={rpe === value ? "" : "ghost"}
+                disabled={savingRPE}
+                onClick={() => handleRate(value)}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+          {rpe != null && <p className="muted">Saved: {rpe}/10.</p>}
         </div>
       )}
 

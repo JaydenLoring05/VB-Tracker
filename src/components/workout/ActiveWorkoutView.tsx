@@ -3,13 +3,15 @@
 import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
-import { getPrescription, getWorkoutDays } from "@/data/workoutPlan";
+import { getExercise } from "@/data/exercises";
+import { getPrescription, getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { formatDuration } from "@/lib/time";
 
+import { DiscomfortSuggestion } from "./DiscomfortSuggestion";
 import { RestTimer } from "./RestTimer";
 import { WorkoutSummary } from "./WorkoutSummary";
 
@@ -51,8 +53,18 @@ function playRestCompleteTone() {
 }
 
 export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
-  const { loading, notFound, loadError, session, sets, previousSets, logSet, deleteSet, finishWorkout } =
-    useActiveWorkoutSession(sessionId);
+  const {
+    loading,
+    notFound,
+    loadError,
+    session,
+    sets,
+    previousSets,
+    logSet,
+    deleteSet,
+    finishWorkout,
+    updateSessionRPE
+  } = useActiveWorkoutSession(sessionId);
 
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [weight, setWeight] = useState("");
@@ -65,12 +77,14 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const [prSetIds, setPrSetIds] = useState<Record<string, boolean>>({});
   const [isLogging, setIsLogging] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [showWarmUp, setShowWarmUp] = useState(false);
+  const [showCues, setShowCues] = useState(false);
   const restCompleteFiredRef = useRef(false);
   const isLoggingRef = useRef(false);
   const isFinishingRef = useRef(false);
 
-  const { resolveExercise } = useExerciseSubstitutions();
-  const { teamOverride, substitutions } = useTrackerContext();
+  const { resolveExercise, setSubstitution } = useExerciseSubstitutions();
+  const { teamOverride, substitutions, stats } = useTrackerContext();
 
   const day = useMemo(
     () =>
@@ -198,19 +212,24 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
         day={session.day}
         durationSeconds={finishResult?.durationSeconds ?? session.duration_seconds}
         sets={sets}
+        rpe={session.rpe}
+        onRateRPE={updateSessionRPE}
       />
     );
   }
 
+  const originalExercise = day.exercises[exerciseIndex];
   const exercise = resolvedExercises[exerciseIndex];
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
   const lastTime = previousSets[exercise];
+  const cues = getExercise(originalExercise)?.cues ?? [];
 
   function goToExercise(nextIndex: number) {
     setExerciseIndex(Math.max(0, Math.min(resolvedExercises.length - 1, nextIndex)));
     setWeight("");
     setReps("");
     setRestEndsAt(null);
+    setShowCues(false);
   }
 
   function bumpWeight(amount: number) {
@@ -273,11 +292,26 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
         <div>
           <h2>{day.title}</h2>
           <p className="muted">
-            {session.day}, Week {session.week}
+            {session.day}, Week {session.week} &middot; Est. {day.minutes} min
           </p>
+          {day.notes && <p className="workout-purpose">{day.notes}</p>}
         </div>
 
         <div className="workout-elapsed">{formatDuration(elapsedSeconds)}</div>
+      </div>
+
+      <div className="panel workout-warm-up">
+        <button type="button" className="ghost warm-up-toggle" onClick={() => setShowWarmUp((current) => !current)}>
+          {showWarmUp ? "Hide warm-up" : "Show warm-up"}
+        </button>
+
+        {showWarmUp && (
+          <ul className="warm-up-list">
+            {STANDARD_WARM_UP.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="exercise-dots">
@@ -303,6 +337,28 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
             Last time: {lastTime.weight ?? "-"} x {lastTime.reps ?? "-"}
           </p>
         )}
+
+        {cues.length > 0 && (
+          <div className="exercise-cues">
+            <button type="button" className="ghost cues-toggle" onClick={() => setShowCues((current) => !current)}>
+              {showCues ? "Hide coaching cues" : "Show coaching cues"}
+            </button>
+            {showCues && (
+              <ul>
+                {cues.map((cue) => (
+                  <li key={cue}>{cue}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        <DiscomfortSuggestion
+          key={originalExercise}
+          originalExercise={originalExercise}
+          stats={stats}
+          onSwap={(chosen) => setSubstitution(originalExercise, chosen)}
+        />
 
         {exerciseSets.length > 0 && (
           <div className="logged-sets">

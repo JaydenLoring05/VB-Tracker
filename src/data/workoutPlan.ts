@@ -319,6 +319,17 @@ const taperDays: WorkoutDay[] = [
   }
 ];
 
+// A standard, non-exercise-specific warm-up shown before every workout.
+// Not phase or exercise dependent yet -- a reasonable default to raise body
+// temperature and prime the joints before the day's main work.
+export const STANDARD_WARM_UP: string[] = [
+  "Easy jog or jump rope, 3-5 minutes",
+  "Arm circles and shoulder rolls, 10 each direction",
+  "Bodyweight squats, 2x10",
+  "Walking lunges, 2x10 per leg",
+  "Dynamic leg swings (front-back and side-to-side), 10 each leg"
+];
+
 export function getPhase(week: number) {
   if (week <= 4) {
     return {

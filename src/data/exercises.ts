@@ -950,3 +950,7 @@ export const exercises: Exercise[] = [
     ["Med Ball Rotational Throws", "Cable Woodchoppers", "Landmine Rotations"]
   )
 ];
+
+export function getExercise(name: string): Exercise | undefined {
+  return exercises.find((exercise) => exercise.name === name);
+}

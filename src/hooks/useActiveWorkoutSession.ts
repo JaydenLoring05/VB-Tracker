@@ -297,6 +297,22 @@ export function useActiveWorkoutSession(sessionId: string) {
     return { durationSeconds };
   }
 
+  async function updateSessionRPE(rpe: number) {
+    const { error } = await supabase
+      .from("workout_sessions")
+      .update({ rpe })
+      .eq("id", sessionId)
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Failed to save RPE", error);
+      return false;
+    }
+
+    setSession((current) => (current ? { ...current, rpe } : current));
+    return true;
+  }
+
   return {
     loading,
     notFound,
@@ -306,6 +322,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     previousSets,
     logSet,
     deleteSet,
-    finishWorkout
+    finishWorkout,
+    updateSessionRPE
   };
 }
