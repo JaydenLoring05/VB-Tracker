@@ -1,5 +1,5 @@
 import { useTrackerContext } from "@/context/TrackerContext";
-import { calculateRecovery, coachRecommendations, recoveryStatus } from "@/lib/recovery";
+import { calculateRecovery, coachRecommendations, explainReadiness, recoveryStatus } from "@/lib/recovery";
 
 export function useRecoveryStats() {
   const { stats, setStats, history, saveStats, clearStats } = useTrackerContext();
@@ -9,7 +9,8 @@ export function useRecoveryStats() {
 
   const recovery = calculateRecovery(effectiveStats);
   const status = recoveryStatus(recovery);
-  const coachTips = coachRecommendations(effectiveStats);
+  const coachTips = coachRecommendations(effectiveStats, history);
+  const readinessExplanation = hasLoggedStats ? explainReadiness(effectiveStats, history, recovery) : null;
 
   return {
     stats,
@@ -20,6 +21,7 @@ export function useRecoveryStats() {
     recovery,
     status,
     coachTips,
+    readinessExplanation,
     hasLoggedStats
   };
 }

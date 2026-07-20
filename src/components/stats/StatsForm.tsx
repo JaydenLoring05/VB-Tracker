@@ -11,10 +11,14 @@ const fields: [keyof StatEntry, string, number?][] = [
   ["weight", "Body Weight"],
   ["pullups", "Max Pull-Ups"],
   ["sleep", "Sleep Hours", 10],
-  ["kneePain", "Knee Pain", 10],
-  ["shoulderPain", "Shoulder Pain", 10],
-  ["soreness", "Soreness", 10],
-  ["energy", "Energy", 10]
+  ["energy", "Energy", 10],
+  ["stress", "Stress", 10],
+  ["motivation", "Motivation", 10],
+  ["soreness", "General Soreness", 10],
+  ["kneePain", "Knee Discomfort", 10],
+  ["shoulderPain", "Shoulder Discomfort", 10],
+  ["lowerBackPain", "Lower-Back Discomfort", 10],
+  ["anklePain", "Ankle Discomfort", 10]
 ];
 
 export function StatsForm() {

@@ -14,10 +14,14 @@ export const emptyStats: StatEntry = {
   weight: "",
   pullups: "",
   sleep: "",
+  energy: "",
+  stress: "",
+  soreness: "",
   kneePain: "",
   shoulderPain: "",
-  soreness: "",
-  energy: ""
+  lowerBackPain: "",
+  anklePain: "",
+  motivation: ""
 };
 
 export type PRRecord = {
@@ -44,6 +48,10 @@ export type StatsRow = {
   shoulder_pain: number | null;
   soreness: number | null;
   energy: number | null;
+  stress: number | null;
+  lower_back_pain: number | null;
+  ankle_pain: number | null;
+  motivation: number | null;
 };
 
 function numOrNull(value: number | "") {
@@ -61,7 +69,11 @@ function toStatsRow(entry: StatEntry): StatsRow {
     knee_pain: numOrNull(entry.kneePain),
     shoulder_pain: numOrNull(entry.shoulderPain),
     soreness: numOrNull(entry.soreness),
-    energy: numOrNull(entry.energy)
+    energy: numOrNull(entry.energy),
+    stress: numOrNull(entry.stress),
+    lower_back_pain: numOrNull(entry.lowerBackPain),
+    ankle_pain: numOrNull(entry.anklePain),
+    motivation: numOrNull(entry.motivation)
   };
 }
 
@@ -76,7 +88,11 @@ export function fromStatsRow(row: StatsRow): StatEntry {
     kneePain: row.knee_pain ?? "",
     shoulderPain: row.shoulder_pain ?? "",
     soreness: row.soreness ?? "",
-    energy: row.energy ?? ""
+    energy: row.energy ?? "",
+    stress: row.stress ?? "",
+    lowerBackPain: row.lower_back_pain ?? "",
+    anklePain: row.ankle_pain ?? "",
+    motivation: row.motivation ?? ""
   };
 }
 
