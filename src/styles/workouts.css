@@ -14,6 +14,57 @@
   box-shadow: 0 0 0 1px rgba(255, 196, 0, 0.25), 0 0 28px rgba(255, 196, 0, 0.14);
 }
 
+.day-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.day-card-header h3 {
+  margin: 0;
+}
+
+.day-card-collapse-toggle {
+  padding: 4px 8px;
+  min-height: auto;
+}
+
+.day-card-collapsed {
+  min-height: auto;
+  align-self: start;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.day-card-collapsed-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.day-card-collapsed-body strong {
+  font-size: var(--fs-sm);
+}
+
+.day-card-collapsed-body span {
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.day-card-collapsed-count {
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
 .exercise-log-block {
   display: grid;
   gap: 10px;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Repeat } from "lucide-react";
+import { ChevronDown, ChevronRight, Repeat } from "lucide-react";
 import { useState } from "react";
 
 import { getPrescription } from "@/data/workoutPlan";
@@ -17,12 +17,52 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
   const { resolveExercise, setSubstitution, clearSubstitution } = useExerciseSubstitutions();
 
   const [swapOpenFor, setSwapOpenFor] = useState<string | null>(null);
+  // Today's card starts open; the rest of the week collapses to a compact
+  // summary row so the workouts tab reads at a glance instead of dumping
+  // every day's full exercise list on screen at once.
+  const [expanded, setExpanded] = useState(isToday);
 
   const noteKey = `${week}-${day.day}-notes`;
 
+  const resolvedExercises = day.exercises.map(resolveExercise);
+  const completedCount = resolvedExercises.filter(
+    (exercise) => checked[`${week}-${day.day}-${exercise}`]
+  ).length;
+
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        className={`panel day-card day-card-collapsed ${isToday ? "today" : ""}`}
+        onClick={() => setExpanded(true)}
+      >
+        <ChevronRight size={16} />
+        <div className="day-card-collapsed-body">
+          <strong>{day.day}</strong>
+          <span className="muted">{day.title}</span>
+        </div>
+        <span className="muted day-card-collapsed-count">
+          {completedCount}/{resolvedExercises.length}
+        </span>
+      </button>
+    );
+  }
+
   return (
     <div className={`panel day-card ${isToday ? "today" : ""}`}>
-      <h3>{day.day}</h3>
+      <div className="day-card-header">
+        <h3>{day.day}</h3>
+        {!isToday && (
+          <button
+            type="button"
+            className="ghost day-card-collapse-toggle"
+            onClick={() => setExpanded(false)}
+            aria-label={`Collapse ${day.day}`}
+          >
+            <ChevronDown size={14} />
+          </button>
+        )}
+      </div>
       <h4>{day.title}</h4>
       <p className="muted">⏱ {day.minutes}</p>
 

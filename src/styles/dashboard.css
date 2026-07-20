@@ -4,6 +4,33 @@
   gap: 20px;
 }
 
+.dashboard-hero-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 18px;
+  font-size: var(--fs-lg);
+  font-weight: 800;
+}
+
+.dashboard-phase-label {
+  margin: 4px 0 10px;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dashboard-pr-list {
+  list-style: none;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
 .dashboard-card {
   position: relative;
   overflow: hidden;
