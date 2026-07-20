@@ -40,10 +40,14 @@ export type StatEntry = {
   weight: number | "";
   pullups: number | "";
   sleep: number | "";
+  energy: number | "";
+  stress: number | "";
+  soreness: number | "";
   kneePain: number | "";
   shoulderPain: number | "";
-  soreness: number | "";
-  energy: number | "";
+  lowerBackPain: number | "";
+  anklePain: number | "";
+  motivation: number | "";
 };
 
 export type CalendarEvent = {
@@ -81,6 +85,7 @@ export type Team = {
   name: string;
   invite_code: string;
   created_at: string;
+  plan_tier: "pilot" | "paid";
 };
 
 export type TeamMember = {

@@ -353,3 +353,49 @@
   flex: 0 0 auto;
   min-width: 200px;
 }
+
+.program-paid-gate {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+.program-full-editor-list {
+  list-style: none;
+  margin: 0 0 var(--sp-3);
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.program-full-editor-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-2) var(--sp-3);
+}
+
+.program-full-editor-controls {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.program-full-editor-controls button {
+  font-size: var(--fs-xs);
+  padding: 6px 10px;
+  min-height: auto;
+}
+
+.program-full-editor-add {
+  display: flex;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.program-full-editor-actions {
+  display: flex;
+  gap: var(--sp-3);
+}
