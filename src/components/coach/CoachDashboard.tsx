@@ -12,6 +12,7 @@ import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { AthleteStatsModal } from "./AthleteStatsModal";
 import { AttentionCenter } from "./AttentionCenter";
 import { ProgramEditor } from "./ProgramEditor";
+import { TeamCalendarPanel } from "./TeamCalendarPanel";
 import { TeamSwitcher } from "./TeamSwitcher";
 
 function recoverySlug(label: string) {
@@ -136,6 +137,8 @@ export function CoachDashboard({
           {regeneratedCode && <span className="muted regenerate-code-status">{regeneratedCode}</span>}
         </div>
       </div>
+
+      <TeamCalendarPanel team={team} />
 
       {flagged.length > 0 && (
         <div className="panel checkin-alert">

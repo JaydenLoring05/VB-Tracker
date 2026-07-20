@@ -461,3 +461,38 @@
 .attention-row-body span {
   color: var(--text);
 }
+
+.team-event-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0;
+}
+
+.team-event-form input[type="text"],
+.team-event-form input:not([type]),
+.team-event-form input[placeholder] {
+  flex: 1;
+  min-width: 200px;
+}
+
+.team-event-list {
+  list-style: none;
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.team-event-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.team-event-row strong {
+  flex: 1;
+}

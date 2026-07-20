@@ -58,6 +58,39 @@
   color: var(--muted);
 }
 
+.match {
+  background: rgba(255, 98, 98, 0.18);
+  color: var(--red);
+}
+
+.tournament {
+  background: rgba(191, 132, 255, 0.18);
+  color: var(--purple, #bf84ff);
+}
+
+.travel {
+  background: rgba(174, 182, 196, 0.18);
+  color: var(--muted);
+}
+
+.testing {
+  background: rgba(69, 212, 131, 0.18);
+  color: var(--green);
+}
+
+.playoffs {
+  background: rgba(255, 196, 0, 0.18);
+  color: var(--gold);
+}
+
+.event-chip-team-tag {
+  display: inline-block;
+  margin-right: 4px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+}
+
 @media (max-width: 900px) {
   .calendar-preview {
     grid-template-columns: 1fr 1fr;

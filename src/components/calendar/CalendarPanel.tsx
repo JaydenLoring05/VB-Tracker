@@ -59,8 +59,9 @@ export function CalendarPanel() {
               {day.day} {day.number}
             </strong>
 
-            {day.events.slice(0, 2).map((event) => (
+            {day.events.slice(0, 3).map((event) => (
               <span key={event.id} className={`event-chip ${event.type}`}>
+                {event.source === "team" && <span className="event-chip-team-tag">Team</span>}
                 {event.title}
               </span>
             ))}

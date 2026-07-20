@@ -1,12 +1,26 @@
 import { useMemo } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTeam } from "@/hooks/useTeam";
+import { useTeamCalendar } from "@/hooks/useTeamCalendar";
 import { todayISO } from "@/lib/storage";
 
 const TRAINING_LOAD_WINDOW_DAYS = 7;
 
+export type CalendarPreviewEvent = {
+  id: string;
+  title: string;
+  type: string;
+  source: "personal" | "team";
+};
+
 export function useCalendar() {
   const { calendarEvents, addGame } = useTrackerContext();
+  // Reused as-is: useTeam() already resolves "the caller's team" for both
+  // roles, so an athlete gets their one team back here with no new fetch
+  // logic. useTeamCalendar() is read-only for non-coaches under RLS.
+  const { activeTeam } = useTeam();
+  const { events: teamEvents } = useTeamCalendar(activeTeam);
 
   const calendarPreview = useMemo(() => {
     const days = [];
@@ -17,16 +31,24 @@ export function useCalendar() {
       date.setDate(start.getDate() + i);
       const iso = todayISO(date);
 
+      const personal: CalendarPreviewEvent[] = calendarEvents
+        .filter((event) => event.date === iso)
+        .map((event) => ({ id: event.id, title: event.title, type: event.type, source: "personal" }));
+
+      const team: CalendarPreviewEvent[] = teamEvents
+        .filter((event) => event.date === iso)
+        .map((event) => ({ id: event.id, title: event.title, type: event.type, source: "team" }));
+
       days.push({
         iso,
         day: date.toLocaleDateString("en-US", { weekday: "short" }),
         number: date.getDate(),
-        events: calendarEvents.filter((event) => event.date === iso)
+        events: [...team, ...personal]
       });
     }
 
     return days;
-  }, [calendarEvents]);
+  }, [calendarEvents, teamEvents]);
 
   const trainingLoad = useMemo(() => {
     const windowStart = new Date();

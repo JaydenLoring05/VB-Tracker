@@ -58,6 +58,19 @@ export type CalendarEvent = {
   notes?: string;
 };
 
+export type TeamCalendarEventType = "practice" | "match" | "tournament" | "travel" | "testing" | "playoffs";
+
+export type TeamCalendarEvent = {
+  id: string;
+  team_id: string;
+  date: string;
+  type: TeamCalendarEventType;
+  title: string;
+  notes: string | null;
+  created_by: string;
+  created_at: string;
+};
+
 export type WorkoutSession = {
   id: string;
   week: number;
