@@ -2,7 +2,6 @@
 
 import { Dumbbell } from "lucide-react";
 
-import { getWorkoutDays } from "@/data/workoutPlan";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
 import { todayName } from "@/lib/storage";
 
@@ -10,8 +9,7 @@ import { DayCard } from "./DayCard";
 
 export function WorkoutGrid() {
   const today = todayName();
-  const { week } = useWorkoutProgress();
-  const workoutDays = getWorkoutDays(week);
+  const { workoutDays } = useWorkoutProgress();
 
   return (
     <section id="workouts">

@@ -1,12 +1,16 @@
 import { useMemo } from "react";
 
 import { getWorkoutDays } from "@/data/workoutPlan";
+import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
 
 export function useWorkoutProgress() {
-  const { week, setWeek, checked, toggleExercise } = useTrackerContext();
+  const { week, setWeek, checked, toggleExercise, teamOverride, substitutions } = useTrackerContext();
 
-  const workoutDays = useMemo(() => getWorkoutDays(week), [week]);
+  const workoutDays = useMemo(
+    () => resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions),
+    [week, teamOverride, substitutions]
+  );
 
   const totalExercises = useMemo(
     () => workoutDays.reduce((sum, day) => sum + day.exercises.length, 0),
@@ -32,6 +36,7 @@ export function useWorkoutProgress() {
     setWeek,
     checked,
     toggleExercise,
+    workoutDays,
     totalExercises,
     completedExercises,
     progress

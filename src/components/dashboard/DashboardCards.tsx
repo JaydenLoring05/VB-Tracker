@@ -4,6 +4,7 @@ import { BarChart3, CalendarDays, Flame, HeartPulse, Play, Trophy } from "lucide
 import Link from "next/link";
 
 import { useTrackerContext } from "@/context/TrackerContext";
+import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { usePRs } from "@/hooks/usePRs";
@@ -19,13 +20,15 @@ const RECOVERY_COLOR: Record<string, string> = {
 
 export function DashboardCards() {
   const today = todayName();
-  const { workoutStreak } = useTrackerContext();
+  const { workoutStreak, teamOverride, substitutions } = useTrackerContext();
 
   const { recovery, status, hasLoggedStats } = useRecoveryStats();
   const { week, completedExercises, totalExercises, progress } = useWorkoutProgress();
   const { latestPR } = usePRs();
 
-  const todayWorkout = getWorkoutDays(week).find((day) => day.day === today);
+  const todayWorkout = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions).find(
+    (day) => day.day === today
+  );
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";
 
   return (

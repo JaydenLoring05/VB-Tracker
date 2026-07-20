@@ -6,6 +6,8 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { getPrescription, getWorkoutDays } from "@/data/workoutPlan";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
+import { resolveWorkoutDays } from "@/lib/programResolution";
+import { useTrackerContext } from "@/context/TrackerContext";
 import { formatDuration } from "@/lib/time";
 
 import { RestTimer } from "./RestTimer";
@@ -68,10 +70,16 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const isFinishingRef = useRef(false);
 
   const { resolveExercise } = useExerciseSubstitutions();
+  const { teamOverride, substitutions } = useTrackerContext();
 
   const day = useMemo(
-    () => (session ? getWorkoutDays(session.week).find((d) => d.day === session.day) : undefined),
-    [session]
+    () =>
+      session
+        ? resolveWorkoutDays(getWorkoutDays(session.week), session.week, teamOverride, substitutions).find(
+            (d) => d.day === session.day
+          )
+        : undefined,
+    [session, teamOverride, substitutions]
   );
 
   const resolvedExercises = useMemo(

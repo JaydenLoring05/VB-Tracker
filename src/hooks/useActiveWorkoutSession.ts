@@ -5,13 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
+import { resolveWorkoutDays } from "@/lib/programResolution";
 import { createClient } from "@/lib/supabase/client";
 import { WorkoutSession, WorkoutSet } from "@/types";
 
 export type PreviousSet = { weight: number | null; reps: number | null };
 
 export function useActiveWorkoutSession(sessionId: string) {
-  const { userId, setExerciseChecked, addPR, reportSyncError } = useTrackerContext();
+  const { userId, setExerciseChecked, addPR, reportSyncError, teamOverride, substitutions } = useTrackerContext();
   const { resolveExercise } = useExerciseSubstitutions();
   const supabase = useMemo(() => createClient(), []);
 
@@ -74,7 +75,9 @@ export function useActiveWorkoutSession(sessionId: string) {
     if (!session) return;
 
     let cancelled = false;
-    const day = getWorkoutDays(session.week).find((d) => d.day === session.day);
+    const day = resolveWorkoutDays(getWorkoutDays(session.week), session.week, teamOverride, substitutions).find(
+      (d) => d.day === session.day
+    );
     if (!day) return;
 
     const resolvedExercises = day.exercises.map(resolveExercise);
@@ -108,7 +111,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     return () => {
       cancelled = true;
     };
-  }, [supabase, session, sessionId, userId, resolveExercise]);
+  }, [supabase, session, sessionId, userId, resolveExercise, teamOverride, substitutions]);
 
   async function logSet(exercise: string, weight: number | null, reps: number | null) {
     const setNumber = sets.filter((s) => s.exercise === exercise).length + 1;
