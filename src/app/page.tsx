@@ -1,111 +1,221 @@
-import { AlertTriangle, Eye, HeartPulse, Link2, ShieldCheck, Trophy, Users } from "lucide-react";
+import { Activity, Bone, Calendar, HeartPulse, Link2, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 
 import { CONTACT_EMAIL } from "@/lib/contact";
+import { AnnouncementBar } from "@/components/landing/AnnouncementBar";
+import { FAQSection } from "@/components/landing/FAQSection";
+import { LandingAttentionDemo } from "@/components/landing/LandingAttentionDemo";
+import { LandingDashboardMock } from "@/components/landing/LandingDashboardMock";
 import { LandingHeader } from "@/components/landing/LandingHeader";
+import { LandingWeeklyReport } from "@/components/landing/LandingWeeklyReport";
+import { LandingWorkoutMock } from "@/components/landing/LandingWorkoutMock";
 import { PricingSection } from "@/components/landing/PricingSection";
+import { AttentionItem } from "@/lib/attentionCenter";
 
 import "@/styles/landing.css";
 
-const PROBLEMS = [
+const SAMPLE_ATTENTION_ITEMS: AttentionItem[] = [
   {
-    icon: AlertTriangle,
-    title: "Notes live everywhere and nowhere",
-    body: "Training notes end up scattered across a phone, a group chat, or a notebook that stays in someone's bag — by week six, nobody remembers who's been consistent and who's fallen off."
+    id: "sample-pain",
+    userId: "sample-1",
+    displayName: "Maya Chen",
+    priority: "high",
+    reason: "Reported knee pain 3 days running",
+    action: "Check in",
+    signalDate: "2026-07-18"
   },
   {
-    icon: HeartPulse,
-    title: "No early warning",
-    body: "An athlete who's overtraining, under-sleeping, or quietly nursing a sore knee doesn't show up on a coach's radar until they're already hurt or burned out."
+    id: "sample-readiness",
+    userId: "sample-2",
+    displayName: "Jordan Park",
+    priority: "high",
+    reason: "Readiness dropped 24 points versus last week",
+    action: "Review workload",
+    signalDate: "2026-07-19"
   },
   {
-    icon: Users,
-    title: "No single view of the team",
-    body: "Sixteen athletes means sixteen different stories, tracked sixteen different ways — and no one place that puts them side by side."
+    id: "sample-missed",
+    userId: "sample-3",
+    displayName: "Sam Rivera",
+    priority: "medium",
+    reason: "No completed workouts in the last 7 days",
+    action: "Send reminder",
+    signalDate: "2026-07-17"
+  },
+  {
+    id: "sample-pr",
+    userId: "sample-4",
+    displayName: "Ava Thompson",
+    priority: "positive",
+    reason: "New PR: Vertical Jump",
+    action: "Recognize achievement",
+    signalDate: "2026-07-20"
   }
 ];
 
-const STAT_CALLOUTS = [
-  { value: "20", label: "Week Program" },
-  { value: "4", label: "Training Phases" },
-  { value: "10", label: "Exercise Categories" },
-  { value: "80+", label: "Curated Exercises" }
+const CAPABILITIES = [
+  {
+    icon: Activity,
+    title: "Jump Development",
+    body: "A phase-based plyometric and strength progression that supports building explosive vertical power over a full season, not a single workout of the day."
+  },
+  {
+    icon: Users,
+    title: "Shoulder Durability",
+    body: "Structured shoulder-health work built around the overhead swing volume hitters accumulate, aimed at supporting a healthy, durable shoulder over a long season."
+  },
+  {
+    icon: Bone,
+    title: "Knee & Landing Capacity",
+    body: "Landing-mechanics and hip-stability training that helps identify patterns in how an athlete lands and cuts, and supports building better landing habits over time."
+  },
+  {
+    icon: Calendar,
+    title: "Season-Aware Programming",
+    body: "Foundation, build, power, and taper phases shift volume and intensity across the season, and the team calendar keeps practices, matches, and tournaments part of the plan."
+  }
 ];
 
 const STEPS = [
   {
     icon: Trophy,
-    title: "Create a team",
-    body: "Set up your roster in a minute and get a unique invite code to share with your athletes."
+    title: "Create your team",
+    body: "Set your season dates, training schedule, roster, and goals in a few minutes."
   },
   {
     icon: Link2,
-    title: "Athletes join with a code",
-    body: "Each athlete signs up and enters your invite code — no separate accounts to manage, no spreadsheets to update."
+    title: "Invite your athletes",
+    body: "Share one team code. Each athlete signs up and joins, no spreadsheets, no separate accounts to manage."
   },
   {
-    icon: Eye,
-    title: "See the whole picture",
-    body: "Recovery trends, training consistency, and who needs a check-in — all in one roster view, updated as your athletes log in."
+    icon: HeartPulse,
+    title: "Start developing",
+    body: "Assign workouts and monitor readiness, consistency, and progress across the whole roster from one dashboard."
   }
 ];
 
-const PILOT_POINTS = [
-  {
-    icon: Trophy,
-    title: "What your team gets",
-    body: "A full 90-day pilot season at no cost, direct access to me while I build, and priority say in what gets built next."
-  },
-  {
-    icon: Users,
-    title: "What we ask in return",
-    body: "Honest feedback as your team uses it week to week, and a short case study or quote once the pilot season wraps."
-  }
+const FOUNDING_PILOT_POINTS = [
+  "30 days free",
+  "No credit card required",
+  "Personal onboarding",
+  "Direct founder support",
+  "Cancel anytime",
+  "Limited number of teams"
+];
+
+const FOUNDER_CREDENTIALS = [
+  "Team Captain, Varsity Volleyball, Durango High School (Las Vegas, NV)",
+  "Two-time First Team All-Conference (SNVCA, 2023 & 2024)",
+  "AVCA Western Region Player of the Week (2023)",
+  "Top-5 National Statistical Leader, Men's High School Volleyball (2023)"
 ];
 
 export default function LandingPage() {
   return (
     <div className="landing-page">
+      <AnnouncementBar />
       <LandingHeader />
 
       <section className="landing-hero">
         <div className="landing-hero-inner">
           <h1>Know who&apos;s ready. Know who needs attention.</h1>
           <p className="landing-hero-sub muted">
-            Helps volleyball coaches monitor training, recovery, soreness, and athlete progress
-            from one team dashboard.
+            NextRep gives volleyball teams structured workouts, daily readiness monitoring, and
+            clear progress tracking, all from one coach dashboard.
           </p>
 
           <div className="landing-hero-actions">
             <Link href="/login?mode=sign-up">
-              <button type="button">Start a free pilot</button>
+              <button type="button">Start Free Team Pilot</button>
             </Link>
-            <Link href="/login">
+            <a href="#product-preview">
               <button type="button" className="ghost">
-                Log in
+                View Demo Dashboard
               </button>
-            </Link>
+            </a>
+          </div>
+
+          <p className="muted landing-hero-reassurance">
+            Free for 30 days &bull; No credit card &bull; Set up your team in minutes
+          </p>
+        </div>
+      </section>
+
+      <section id="product-preview" className="landing-section">
+        <div className="landing-section-inner">
+          <LandingDashboardMock />
+        </div>
+      </section>
+
+      <section id="audiences" className="landing-section landing-section-alt">
+        <div className="landing-section-inner">
+          <h2 className="landing-section-title">One system. Two connected experiences.</h2>
+
+          <div className="landing-audience-grid">
+            <div id="for-coaches" className="panel landing-audience-card">
+              <h3>For Coaches</h3>
+              <ul>
+                <li>Roster-wide readiness at a glance</li>
+                <li>Workout completion, tracked automatically</li>
+                <li>Pain and discomfort trends across the team</li>
+                <li>Progress tracking for every athlete on the roster</li>
+              </ul>
+              <a href="#attention-center-demo">
+                <button type="button" className="secondary">
+                  Explore Coach Features
+                </button>
+              </a>
+            </div>
+
+            <div id="for-athletes" className="panel landing-audience-card">
+              <h3>For Athletes</h3>
+              <ul>
+                <li>Today&apos;s workout, with exercise demos and cues</li>
+                <li>Personal records tracked automatically</li>
+                <li>A daily readiness check-in that takes under a minute</li>
+                <li>A clear view of your own progress over the season</li>
+              </ul>
+              <a href="#workout-preview">
+                <button type="button" className="secondary">
+                  Explore Athlete Features
+                </button>
+              </a>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="landing-section landing-stats">
-        <div className="landing-section-inner landing-stat-row">
-          {STAT_CALLOUTS.map((stat) => (
-            <div className="landing-stat" key={stat.label}>
-              <strong>{stat.value}</strong>
-              <span className="muted">{stat.label}</span>
-            </div>
-          ))}
+      <section id="attention-center-demo" className="landing-section">
+        <div className="landing-section-inner">
+          <h2 className="landing-section-title">Stop searching through data. See what matters today.</h2>
+          <p className="landing-section-lead">
+            A prioritized list of what needs a coach&apos;s attention, computed from real check-in
+            and training data instead of raw numbers a coach has to interpret.
+          </p>
+
+          <LandingAttentionDemo items={SAMPLE_ATTENTION_ITEMS} />
+          <p className="muted landing-mock-badge landing-mock-badge-standalone">Sample data</p>
+        </div>
+      </section>
+
+      <section id="workout-preview" className="landing-section landing-section-alt">
+        <div className="landing-section-inner">
+          <h2 className="landing-section-title">How workouts work</h2>
+          <p className="landing-section-lead">
+            Purpose, target, and previous performance sit right next to every exercise, with a
+            rest timer and a substitute option built in.
+          </p>
+
+          <LandingWorkoutMock />
         </div>
       </section>
 
       <section className="landing-section">
         <div className="landing-section-inner">
-          <h2 className="landing-section-title">Training visibility usually breaks down</h2>
+          <h2 className="landing-section-title">Built around the demands of volleyball</h2>
 
           <div className="landing-problem-grid">
-            {PROBLEMS.map((item) => {
+            {CAPABILITIES.map((item) => {
               const Icon = item.icon;
               return (
                 <div className="panel landing-problem-card" key={item.title}>
@@ -120,6 +230,13 @@ export default function LandingPage() {
       </section>
 
       <section className="landing-section landing-section-alt">
+        <div className="landing-section-inner">
+          <h2 className="landing-section-title">A clear weekly picture, not a data dump</h2>
+          <LandingWeeklyReport />
+        </div>
+      </section>
+
+      <section className="landing-section">
         <div className="landing-section-inner">
           <h2 className="landing-section-title">How it works</h2>
 
@@ -139,63 +256,45 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="landing-section">
+      <section id="founding-pilot" className="landing-section landing-section-alt">
         <div className="landing-section-inner">
-          <div className="panel landing-philosophy">
-            <h2 className="landing-section-title">
-              <ShieldCheck size={24} /> Why the program is built the way it is
-            </h2>
-            <p className="muted">
-              Not a generic template -- built on phase-based periodization and volleyball&apos;s
-              actual injury patterns.
-            </p>
+          <h2 className="landing-section-title">Become a Founding Team</h2>
+          <p className="landing-section-lead">
+            We&apos;re selecting 3 volleyball programs to use NextRep free for 30 days. Founding
+            teams receive direct setup assistance and early access to new features in exchange
+            for honest feedback.
+          </p>
 
-            <div className="landing-philosophy-points">
-              <div>
-                <strong>Phase-based periodization</strong>
-                <p className="muted">
-                  Foundation, build, power, and taper phases shift volume and intensity across
-                  the season instead of running the same workout on repeat for months.
-                </p>
-              </div>
-              <div>
-                <strong>Volleyball-specific injury targeting</strong>
-                <p className="muted">
-                  Shoulder-health work for hitters logging thousands of overhead swings, and
-                  landing-mechanics and hip-stability training aimed at reducing ACL-injury risk
-                  on landings and cuts.
-                </p>
-              </div>
-              <div>
-                <strong>Built like a real strength program</strong>
-                <p className="muted">
-                  The kind of programming a strength coach would build for a volleyball team
-                  specifically, not a fitness app&apos;s workout of the day.
-                </p>
-              </div>
-            </div>
+          <ul className="landing-founding-list">
+            {FOUNDING_PILOT_POINTS.map((point) => (
+              <li key={point}>{point}</li>
+            ))}
+          </ul>
+
+          <div className="landing-pilot-cta">
+            <a href={`mailto:${CONTACT_EMAIL}?subject=Founding Team Pilot`}>
+              <button type="button">Apply for Founding Team Access</button>
+            </a>
           </div>
         </div>
       </section>
 
-      <section className="landing-section landing-section-alt">
+      <section className="landing-section">
         <div className="landing-section-inner">
-          <h2 className="landing-section-title">Built by someone who&apos;s lived it</h2>
+          <h2 className="landing-section-title">Built by an athlete who experienced the problem</h2>
 
           <div className="landing-about">
             <p>
               I&apos;m Jayden Loring, a collegiate volleyball player, former team captain, and
-              Computer Science student. I built this because I lived the problem — training
-              plans, soreness updates, and player progress scattered across group chats,
-              notebooks, and memory. This is the system I wish my own teams had.
+              Computer Science student. I built NextRep because my teams never had one place to
+              manage workouts, recovery, soreness, and athletic progress. NextRep is the system I
+              wish we had.
             </p>
 
             <ul className="landing-about-facts">
-              <li>Team Captain, Varsity Volleyball — Durango High School (Las Vegas, NV)</li>
-              <li>Advanced Honors Diploma, graduated 2024</li>
-              <li>Two-time First Team All-Conference (SNVCA, 2023 &amp; 2024)</li>
-              <li>AVCA Western Region Player of the Week (2023)</li>
-              <li>Top-5 National Statistical Leader, Men&apos;s High School Volleyball (2023)</li>
+              {FOUNDER_CREDENTIALS.map((fact) => (
+                <li key={fact}>{fact}</li>
+              ))}
             </ul>
           </div>
         </div>
@@ -203,48 +302,45 @@ export default function LandingPage() {
 
       <PricingSection />
 
-      <section className="landing-section">
+      <section className="landing-section landing-section-alt">
         <div className="landing-section-inner">
-          <h2 className="landing-section-title">Founding Team Pilot</h2>
-          <p className="landing-section-lead">
-            Looking for a handful of teams to run the first full season on ElevateOS.
-          </p>
-
-          <div className="landing-problem-grid landing-pilot-grid">
-            {PILOT_POINTS.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div className="panel landing-problem-card" key={item.title}>
-                  <Icon size={22} />
-                  <h3>{item.title}</h3>
-                  <p className="muted">{item.body}</p>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="landing-pilot-cta">
-            <a href={`mailto:${CONTACT_EMAIL}?subject=Founding Team Pilot`}>
-              <button type="button">Apply for the Pilot</button>
-            </a>
-          </div>
+          <h2 className="landing-section-title">Frequently asked questions</h2>
+          <FAQSection />
         </div>
       </section>
 
-      <section className="landing-section landing-section-alt landing-contact">
+      <section className="landing-section landing-final-cta">
         <div className="landing-section-inner">
-          <h2 className="landing-section-title">Questions before you start?</h2>
-          <p className="muted">
-            Reach out directly — happy to talk through how it&apos;d work for your team.
+          <h2 className="landing-section-title">
+            Give every athlete a clear plan, and every coach a clearer picture.
+          </h2>
+          <p className="landing-section-lead">
+            Start your free NextRep pilot and see your team&apos;s training, recovery, and
+            progress in one place.
           </p>
-          <a href={`mailto:${CONTACT_EMAIL}`}>
-            <button type="button">Email {CONTACT_EMAIL}</button>
-          </a>
+
+          <div className="landing-hero-actions">
+            <Link href="/login?mode=sign-up">
+              <button type="button">Start Free Team Pilot</button>
+            </Link>
+            <a href="#product-preview">
+              <button type="button" className="ghost">
+                View Demo Dashboard
+              </button>
+            </a>
+          </div>
+
+          <p className="muted landing-hero-reassurance">
+            No credit card &bull; Free onboarding &bull; Cancel anytime
+          </p>
         </div>
       </section>
 
       <footer className="landing-footer">
-        <p className="muted">🏐 ElevateOS</p>
+        <p className="muted">🏐 NextRep</p>
+        <p className="muted landing-footer-contact">
+          Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        </p>
         <nav className="landing-footer-links">
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms of Service</Link>

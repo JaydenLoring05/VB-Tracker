@@ -12,10 +12,17 @@ export function LandingHeader() {
           </div>
         </div>
 
+        <nav className="landing-header-links">
+          <a href="#product-preview">Product</a>
+          <a href="#for-coaches">For Coaches</a>
+          <a href="#for-athletes">For Athletes</a>
+          <a href="#pricing">Pricing</a>
+        </nav>
+
         <nav className="landing-header-nav">
           <Link href="/login">Log in</Link>
           <Link href="/login?mode=sign-up">
-            <button type="button">Start a free pilot</button>
+            <button type="button">Start Free Pilot</button>
           </Link>
         </nav>
       </div>

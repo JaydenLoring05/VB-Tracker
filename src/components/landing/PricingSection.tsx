@@ -1,73 +1,54 @@
-"use client";
-
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-
-type Billing = "monthly" | "annual";
 
 const TIERS = [
   {
-    name: "Up to 16 athletes",
-    monthly: 29,
-    annual: 290,
+    name: "Founding Pilot",
+    price: "Free",
+    period: "for 30 days",
+    highlight: true,
     features: [
-      "Full roster recovery + activity view",
-      "PRs and workout adherence per athlete",
-      "Unlimited invite codes"
-    ]
+      "For our first 3 founding volleyball teams",
+      "No credit card required",
+      "Full access to all core features",
+      "Direct setup assistance from the founder"
+    ],
+    cta: "Apply for Founding Team Access"
   },
   {
-    name: "17+ athletes",
-    monthly: 49,
-    annual: 490,
-    features: [
-      "Everything in the 16-athlete tier",
-      "No roster size limit",
-      "Priority support"
-    ]
+    name: "Team",
+    price: "$29",
+    period: "/month",
+    features: ["Up to 16 athletes", "Full roster recovery and readiness view", "All core features"],
+    cta: "Start Free Team Pilot"
+  },
+  {
+    name: "Program",
+    price: "$49",
+    period: "/month",
+    features: ["Unlimited athletes", "Multiple training groups", "Priority support"],
+    cta: "Start Free Team Pilot"
   }
 ];
 
 export function PricingSection() {
-  const [billing, setBilling] = useState<Billing>("monthly");
-
   return (
     <section id="pricing" className="landing-section">
       <div className="landing-section-inner">
         <h2 className="landing-section-title">Pricing</h2>
         <p className="landing-section-lead">
-          Your first 90-day pilot is free, no card required. Afterward, plans start at
-          $29/month for teams up to 16 athletes, $49/month for 17+, paused automatically
-          during the off-season.
+          Free for the first 30 days for each of our first 3 founding teams, no credit card
+          required. After that (or for any team beyond the first 3), plans start at $29/month.
+          NextRep is a year-round training tool, so there's no seasonal billing pause.
         </p>
 
-        <div className="pricing-toggle" role="group" aria-label="Billing period">
-          <button
-            type="button"
-            className={billing === "monthly" ? "" : "ghost"}
-            onClick={() => setBilling("monthly")}
-          >
-            Monthly
-          </button>
-          <button
-            type="button"
-            className={billing === "annual" ? "" : "ghost"}
-            onClick={() => setBilling("annual")}
-          >
-            Annual <span className="pricing-toggle-badge">2 months free</span>
-          </button>
-        </div>
-
-        <div className="pricing-grid">
+        <div className="pricing-grid pricing-grid-3">
           {TIERS.map((tier) => (
-            <div className="panel pricing-card" key={tier.name}>
+            <div className={`panel pricing-card ${tier.highlight ? "pricing-card-highlight" : ""}`} key={tier.name}>
               <h3>{tier.name}</h3>
               <div className="pricing-price">
-                <span className="pricing-amount">
-                  ${billing === "monthly" ? tier.monthly : tier.annual}
-                </span>
-                <span className="muted">/{billing === "monthly" ? "mo" : "yr"}</span>
+                <span className="pricing-amount">{tier.price}</span>
+                <span className="muted">{tier.period}</span>
               </div>
 
               <ul className="pricing-features">
@@ -79,8 +60,8 @@ export function PricingSection() {
               </ul>
 
               <Link href="/login?mode=sign-up">
-                <button type="button" className="secondary">
-                  Start a free pilot
+                <button type="button" className={tier.highlight ? "" : "secondary"}>
+                  {tier.cta}
                 </button>
               </Link>
             </div>
