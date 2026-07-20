@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
@@ -23,6 +23,11 @@ export function useActiveWorkoutSession(sessionId: string) {
   const [loadError, setLoadError] = useState(false);
   const [previousSets, setPreviousSets] = useState<Record<string, PreviousSet>>({});
   const [maxWeightByExercise, setMaxWeightByExercise] = useState<Record<string, number>>({});
+
+  const sessionRef = useRef(session);
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,6 +118,73 @@ export function useActiveWorkoutSession(sessionId: string) {
     };
   }, [supabase, session, sessionId, userId, resolveExercise, teamOverride, substitutions]);
 
+  // Tracks only the time this screen was actually open (not wall-clock time
+  // since the workout was started), so navigating away and coming back
+  // later doesn't inflate the recorded duration. See
+  // schema_v30_workout_active_time.sql for the active_seconds/resumed_at
+  // columns this reads and writes.
+  useEffect(() => {
+    if (!session || session.ended_at) return;
+
+    async function markResumed() {
+      const now = new Date().toISOString();
+      const { error } = await supabase
+        .from("workout_sessions")
+        .update({ resumed_at: now })
+        .eq("id", sessionId)
+        .eq("user_id", userId);
+
+      if (!error) {
+        setSession((current) => (current ? { ...current, resumed_at: now } : current));
+      }
+    }
+
+    async function flushActiveWindow() {
+      const current = sessionRef.current;
+      if (!current || !current.resumed_at) return;
+
+      const elapsed = Math.max(0, Math.round((Date.now() - new Date(current.resumed_at).getTime()) / 1000));
+      const nextActive = (current.active_seconds ?? 0) + elapsed;
+
+      const { error } = await supabase
+        .from("workout_sessions")
+        .update({ active_seconds: nextActive, resumed_at: null })
+        .eq("id", current.id)
+        .eq("user_id", userId);
+
+      if (!error) {
+        setSession((session) =>
+          session && session.id === current.id ? { ...session, active_seconds: nextActive, resumed_at: null } : session
+        );
+      }
+    }
+
+    // Always start a fresh active window on mount/resume, even if
+    // resumed_at was already set (e.g. the tab crashed instead of closing
+    // cleanly last time) -- overwriting it here means a missed cleanup
+    // undercounts a little rather than silently resurrecting the original
+    // bug of counting all the away time as active.
+    markResumed();
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "hidden") {
+        flushActiveWindow();
+      } else {
+        markResumed();
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", flushActiveWindow);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pagehide", flushActiveWindow);
+      flushActiveWindow();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.id, session?.ended_at]);
+
   async function logSet(exercise: string, weight: number | null, reps: number | null) {
     const setNumber = sets.filter((s) => s.exercise === exercise).length + 1;
     const isNewPR = weight != null && weight > (maxWeightByExercise[exercise] ?? 0);
@@ -176,13 +248,22 @@ export function useActiveWorkoutSession(sessionId: string) {
     if (!session) return null;
 
     const endedAt = new Date();
-    const durationSeconds = Math.round(
-      (endedAt.getTime() - new Date(session.started_at).getTime()) / 1000
-    );
+    // Flush whatever's left of the currently-open active window into the
+    // total instead of trusting ended_at - started_at, which would include
+    // any time the athlete spent away from this screen.
+    const openWindowSeconds = session.resumed_at
+      ? Math.max(0, Math.round((endedAt.getTime() - new Date(session.resumed_at).getTime()) / 1000))
+      : 0;
+    const durationSeconds = (session.active_seconds ?? 0) + openWindowSeconds;
 
     const { error } = await supabase
       .from("workout_sessions")
-      .update({ ended_at: endedAt.toISOString(), duration_seconds: durationSeconds })
+      .update({
+        ended_at: endedAt.toISOString(),
+        duration_seconds: durationSeconds,
+        active_seconds: durationSeconds,
+        resumed_at: null
+      })
       .eq("id", sessionId)
       .eq("user_id", userId);
 
@@ -203,7 +284,13 @@ export function useActiveWorkoutSession(sessionId: string) {
 
     setSession((current) =>
       current
-        ? { ...current, ended_at: endedAt.toISOString(), duration_seconds: durationSeconds }
+        ? {
+            ...current,
+            ended_at: endedAt.toISOString(),
+            duration_seconds: durationSeconds,
+            active_seconds: durationSeconds,
+            resumed_at: null
+          }
         : current
     );
 

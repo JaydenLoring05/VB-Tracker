@@ -65,6 +65,8 @@ export type WorkoutSession = {
   started_at: string;
   ended_at: string | null;
   duration_seconds: number | null;
+  active_seconds: number;
+  resumed_at: string | null;
 };
 
 export type WorkoutSet = {

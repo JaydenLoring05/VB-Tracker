@@ -92,9 +92,16 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   useEffect(() => {
     if (!session || showSummary) return;
 
-    const startedAt = new Date(session.started_at).getTime();
-    const tick = () =>
-      setElapsedSeconds(Math.max(0, Math.floor((Date.now() - startedAt) / 1000)));
+    // Based on active_seconds + the current open window, not raw
+    // started_at, so this doesn't jump to show wall-clock time away when
+    // the athlete returns after navigating off this screen.
+    const baseActive = session.active_seconds ?? 0;
+    const resumedAt = session.resumed_at ? new Date(session.resumed_at).getTime() : null;
+
+    const tick = () => {
+      const openWindow = resumedAt ? Math.max(0, Math.floor((Date.now() - resumedAt) / 1000)) : 0;
+      setElapsedSeconds(baseActive + openWindow);
+    };
     tick();
 
     const interval = setInterval(tick, 1000);
