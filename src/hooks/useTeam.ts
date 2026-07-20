@@ -6,25 +6,27 @@ import { useTrackerContext } from "@/context/TrackerContext";
 import { createClient } from "@/lib/supabase/client";
 import { Team, TeamRole } from "@/types";
 
+const ACTIVE_TEAM_KEY = "elevateos:activeTeamId";
+
 export function useTeam() {
   const { userId } = useTrackerContext();
   const supabase = useMemo(() => createClient(), []);
 
   const [loading, setLoading] = useState(true);
-  const [team, setTeam] = useState<Team | null>(null);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
   const [role, setRole] = useState<TeamRole | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [removalNotice, setRemovalNotice] = useState<string | null>(null);
 
-  const loadTeam = useCallback(async () => {
+  const loadTeams = useCallback(async () => {
     setLoading(true);
     setError(null);
 
-    const { data: memberRow, error: memberError } = await supabase
+    const { data: memberRows, error: memberError } = await supabase
       .from("team_members")
       .select("team_id, role")
-      .eq("user_id", userId)
-      .maybeSingle();
+      .eq("user_id", userId);
 
     if (memberError) {
       console.error("Failed to load team membership", memberError);
@@ -33,7 +35,7 @@ export function useTeam() {
       return;
     }
 
-    if (!memberRow) {
+    if (!memberRows || memberRows.length === 0) {
       const { data: notice } = await supabase
         .from("removal_notices")
         .select("id, team_name")
@@ -43,42 +45,54 @@ export function useTeam() {
         .maybeSingle();
 
       if (notice) {
-        const { error: deleteError } = await supabase.from("removal_notices").delete().eq("id", notice.id);
-        if (deleteError) {
-          console.error("Failed to dismiss removal notice", deleteError);
-        }
+        await supabase.from("removal_notices").delete().eq("id", notice.id);
         setRemovalNotice(`You were removed from ${notice.team_name}.`);
       } else {
         setRemovalNotice(null);
       }
 
-      setTeam(null);
+      setTeams([]);
+      setActiveTeamId(null);
       setRole(null);
       setLoading(false);
       return;
     }
 
-    const { data: teamRow, error: teamError } = await supabase
+    const teamIds = memberRows.map((row) => row.team_id);
+    const { data: teamRows, error: teamsError } = await supabase
       .from("teams")
       .select("*")
-      .eq("id", memberRow.team_id)
-      .maybeSingle();
+      .in("id", teamIds)
+      .order("created_at", { ascending: false });
 
-    if (teamError || !teamRow) {
-      console.error("Failed to load team", teamError);
+    if (teamsError || !teamRows) {
+      console.error("Failed to load teams", teamsError);
       setError("Couldn't load your team. Try again.");
       setLoading(false);
       return;
     }
 
-    setTeam(teamRow as Team);
-    setRole(memberRow.role as TeamRole);
+    setTeams(teamRows as Team[]);
+    setRole(memberRows[0].role as TeamRole);
+
+    const stored = typeof window !== "undefined" ? window.localStorage.getItem(ACTIVE_TEAM_KEY) : null;
+    const nextActiveId = teamRows.find((team) => team.id === stored)?.id ?? teamRows[0]?.id ?? null;
+    setActiveTeamId(nextActiveId);
     setLoading(false);
   }, [supabase, userId]);
 
   useEffect(() => {
-    loadTeam();
-  }, [loadTeam]);
+    loadTeams();
+  }, [loadTeams]);
+
+  function selectTeam(teamId: string) {
+    setActiveTeamId(teamId);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(ACTIVE_TEAM_KEY, teamId);
+    }
+  }
+
+  const activeTeam = teams.find((team) => team.id === activeTeamId) ?? null;
 
   async function createTeam(name: string) {
     setError(null);
@@ -90,7 +104,7 @@ export function useTeam() {
       return false;
     }
 
-    await loadTeam();
+    await loadTeams();
     return true;
   }
 
@@ -106,33 +120,37 @@ export function useTeam() {
       return false;
     }
 
-    await loadTeam();
+    await loadTeams();
     return true;
   }
 
-  async function regenerateInviteCode() {
+  async function regenerateInviteCode(teamId: string) {
     setError(null);
 
-    const { error: rpcError } = await supabase.rpc("regenerate_invite_code");
+    const { error: rpcError } = await supabase.rpc("regenerate_invite_code", {
+      p_team_id: teamId
+    });
 
     if (rpcError) {
       setError(rpcError.message || "Couldn't regenerate the invite code.");
       return false;
     }
 
-    await loadTeam();
+    await loadTeams();
     return true;
   }
 
   return {
     loading,
-    team,
+    teams,
+    activeTeam,
     role,
     error,
     removalNotice,
     createTeam,
     joinTeam,
     regenerateInviteCode,
-    refresh: loadTeam
+    selectTeam,
+    refresh: loadTeams
   };
 }
