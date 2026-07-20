@@ -409,3 +409,55 @@
   color: var(--gold);
   font-size: var(--fs-sm);
 }
+
+.attention-center h2 {
+  margin: 0 0 4px;
+}
+
+.attention-list {
+  list-style: none;
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.attention-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.attention-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.attention-high {
+  border-color: rgba(255, 98, 98, 0.35);
+  background: rgba(255, 98, 98, 0.06);
+  color: var(--red);
+}
+
+.attention-medium {
+  border-color: rgba(255, 196, 0, 0.35);
+  background: rgba(255, 196, 0, 0.06);
+  color: var(--gold);
+}
+
+.attention-positive {
+  border-color: rgba(84, 214, 138, 0.35);
+  background: rgba(84, 214, 138, 0.06);
+  color: var(--green);
+}
+
+.attention-row-body strong,
+.attention-row-body span {
+  color: var(--text);
+}

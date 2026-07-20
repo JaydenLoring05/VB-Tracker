@@ -3,12 +3,14 @@
 import { AlertTriangle, Copy, RefreshCw, Trophy, UserMinus, Users } from "lucide-react";
 import { useState } from "react";
 
+import { useAttentionCenter } from "@/hooks/useAttentionCenter";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { formatLastActive } from "@/lib/time";
 import { RosterAthlete, Team } from "@/types";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 
 import { AthleteStatsModal } from "./AthleteStatsModal";
+import { AttentionCenter } from "./AttentionCenter";
 import { ProgramEditor } from "./ProgramEditor";
 import { TeamSwitcher } from "./TeamSwitcher";
 
@@ -33,6 +35,7 @@ export function CoachDashboard({
 }) {
   const team = activeTeam;
   const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
+  const { loading: attentionLoading, items: attentionItems } = useAttentionCenter(team, roster);
   const [activeTab, setActiveTab] = useState<"roster" | "program">("roster");
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -80,6 +83,15 @@ export function CoachDashboard({
   return (
     <div className="coach-dashboard">
       <TeamSwitcher teams={teams} activeTeamId={team.id} onSelect={onSelectTeam} onCreateTeam={onCreateTeam} />
+
+      <AttentionCenter
+        items={attentionItems}
+        loading={attentionLoading}
+        onSelectAthlete={(userId) => {
+          const athlete = roster.find((candidate) => candidate.userId === userId);
+          if (athlete) setSelectedAthlete(athlete);
+        }}
+      />
 
       <div className="tabs">
         <button
