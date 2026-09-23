@@ -1,0 +1,150 @@
+.film-library-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.add-film-form select {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.film-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.film-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.film-list-item.active {
+  border-color: var(--gold);
+}
+
+.film-list-item-button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  text-align: left;
+  color: var(--text);
+  padding: 10px 12px;
+  min-height: auto;
+}
+
+.film-list-item-button:hover {
+  box-shadow: none;
+  color: var(--gold);
+}
+
+.film-list-item-delete {
+  flex: 0 0 auto;
+  margin-right: 6px;
+  padding: 6px;
+  min-height: auto;
+}
+
+.film-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.youtube-player-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+}
+
+.youtube-player-wrap iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.film-external-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.add-tag-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.add-tag-manual-time input {
+  max-width: 160px;
+}
+
+.tag-filter-row {
+  margin: 0;
+}
+
+.tag-chip.active {
+  background: rgba(255, 196, 0, 0.14);
+}
+
+.film-tag-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.film-tag-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  padding: var(--sp-2) var(--sp-3);
+}
+
+.film-tag-timestamp {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  padding: 4px 10px;
+  min-height: auto;
+}
+
+.film-tag-type {
+  font-weight: 600;
+}
+
+.film-tag-note {
+  flex: 1;
+}
+
+.film-tag-delete {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 6px;
+  min-height: auto;
+}
+
+@media (max-width: 900px) {
+  .film-page {
+    grid-template-columns: 1fr;
+  }
+}
