@@ -2,14 +2,12 @@
 
 - [ ] **Film tags v2**
 
-  > **Blocker, flag before starting:** this spec builds on a "film feature"
-  > (`supabase/schema_v35_team_film.sql`, a `film_tags` table, a
-  > `useTeamFilm` hook, `src/lib/tagMeta.ts`, `is_team_coach`-based RLS, and
-  > a base tagging UI with 8 tag types — set, kill, ace, block, dig, error,
-  > serve_error, note) that does not exist yet anywhere in this repo
-  > (checked `main`, all local/remote branches, and stale worktrees — none
-  > of it is there). Build that v1 film feature first, on its own
-  > branch/PR, before starting v2 below.
+  > **Depends on:** film-v1 (branch `film-v1`, PR "feat: film room v1")
+  > merging into `main` first. That PR adds `supabase/schema_v35_team_film.sql`,
+  > the `film_tags` table, `useTeamFilm`, `tagMeta.ts`, and the base tagging
+  > UI with 8 tag types (set, kill, ace, block, dig, error, serve_error,
+  > note) that this task's schema_v36 and UI changes build on. Do not start
+  > this task until film-v1 is merged.
 
   Build "film tags v2" on a new branch `film-tags-v2` off latest `main`.
   Follow existing patterns from the film feature (`useTeamFilm`,
