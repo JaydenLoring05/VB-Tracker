@@ -1,13 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { createClient } from "@/lib/supabase/client";
+import { useDemo } from "@/context/DemoContext";
+import { useSupabase } from "@/hooks/useSupabase";
 import { PhaseSlug } from "@/lib/programResolution";
 import { Team } from "@/types";
 
 export function useTeamProgram(team: Team) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [loading, setLoading] = useState(true);
   const [exerciseDefaults, setExerciseDefaults] = useState<Record<string, string>>({});
@@ -15,6 +17,12 @@ export function useTeamProgram(team: Team) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    if (demo) {
+      // The sample team runs the stock program with no customizations.
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -46,13 +54,18 @@ export function useTeamProgram(team: Team) {
     setDayOverrides(nextOverrides);
 
     setLoading(false);
-  }, [supabase, team.id]);
+  }, [supabase, demo, team.id]);
 
   useEffect(() => {
     load();
   }, [load]);
 
   async function setExerciseDefault(original: string, chosen: string) {
+    if (demo) {
+      demo.requestSignup("Customizing your team's program");
+      return false;
+    }
+
     setError(null);
     const { error: upsertError } = await supabase
       .from("team_exercise_defaults")
@@ -71,6 +84,11 @@ export function useTeamProgram(team: Team) {
   }
 
   async function clearExerciseDefault(original: string) {
+    if (demo) {
+      demo.requestSignup("Customizing your team's program");
+      return false;
+    }
+
     setError(null);
     const { error: deleteError } = await supabase
       .from("team_exercise_defaults")
@@ -88,6 +106,11 @@ export function useTeamProgram(team: Team) {
   }
 
   async function setDayOverride(phase: PhaseSlug, day: string, exercises: string[]) {
+    if (demo) {
+      demo.requestSignup("Saving program changes");
+      return false;
+    }
+
     setError(null);
     const { error: upsertError } = await supabase
       .from("team_day_overrides")
@@ -106,6 +129,11 @@ export function useTeamProgram(team: Team) {
   }
 
   async function resetDayOverride(phase: PhaseSlug, day: string) {
+    if (demo) {
+      demo.requestSignup("Saving program changes");
+      return false;
+    }
+
     setError(null);
     const { error: deleteError } = await supabase
       .from("team_day_overrides")

@@ -1,16 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { fromStatsRow, StatsRow } from "@/context/TrackerContext";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabase } from "@/hooks/useSupabase";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
 import { StatEntry } from "@/types";
 
 export type AthleteStatsPoint = StatEntry & { recovery: number; recoveryLabel: string };
 
+function toStatsPoint(entry: StatEntry): AthleteStatsPoint {
+  const recovery = calculateRecovery(entry);
+  return { ...entry, recovery, recoveryLabel: recoveryStatus(recovery).label };
+}
+
 export function useAthleteStatsHistory(userId: string | null) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<AthleteStatsPoint[]>([]);
@@ -19,6 +26,13 @@ export function useAthleteStatsHistory(userId: string | null) {
   useEffect(() => {
     if (!userId) {
       setHistory([]);
+      return;
+    }
+
+    if (demo) {
+      setHistory((demo.data.statsHistory[userId] ?? []).map(toStatsPoint));
+      setError(null);
+      setLoading(false);
       return;
     }
 
@@ -41,20 +55,14 @@ export function useAthleteStatsHistory(userId: string | null) {
           return;
         }
 
-        const points = ((data ?? []) as StatsRow[]).map((row) => {
-          const entry = fromStatsRow(row);
-          const recovery = calculateRecovery(entry);
-          return { ...entry, recovery, recoveryLabel: recoveryStatus(recovery).label };
-        });
-
-        setHistory(points);
+        setHistory(((data ?? []) as StatsRow[]).map((row) => toStatsPoint(fromStatsRow(row))));
         setLoading(false);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [supabase, userId]);
+  }, [supabase, demo, userId]);
 
   return { loading, history, error };
 }

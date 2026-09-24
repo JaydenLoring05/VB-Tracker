@@ -138,7 +138,7 @@ function makeDefaultEvents(): Omit<CalendarEvent, "id">[] {
   return events;
 }
 
-type TrackerContextValue = {
+export type TrackerContextValue = {
   userId: string;
 
   week: number;
@@ -190,7 +190,7 @@ type TrackerContextValue = {
   clearSyncError: () => void;
 };
 
-const TrackerContext = createContext<TrackerContextValue | null>(null);
+export const TrackerContext = createContext<TrackerContextValue | null>(null);
 
 export function TrackerProvider({
   userId,

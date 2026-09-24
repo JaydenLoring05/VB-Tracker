@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { fromStatsRow, StatsRow } from "@/context/TrackerContext";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabase } from "@/hooks/useSupabase";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
 import { RosterAthlete, Team } from "@/types";
 
@@ -16,7 +17,8 @@ type MemberRow = {
 };
 
 export function useCoachRoster(team: Team | null) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [loading, setLoading] = useState(true);
   const [roster, setRoster] = useState<RosterAthlete[]>([]);
@@ -25,6 +27,13 @@ export function useCoachRoster(team: Team | null) {
   const loadRoster = useCallback(async () => {
     if (!team) {
       setRoster([]);
+      setLoading(false);
+      return;
+    }
+
+    if (demo) {
+      setRoster(demo.data.roster);
+      setError(null);
       setLoading(false);
       return;
     }
@@ -103,13 +112,18 @@ export function useCoachRoster(team: Team | null) {
 
     setRoster(nextRoster);
     setLoading(false);
-  }, [supabase, team]);
+  }, [supabase, demo, team]);
 
   useEffect(() => {
     loadRoster();
   }, [loadRoster]);
 
   async function removeAthlete(userId: string) {
+    if (demo) {
+      demo.requestSignup("Managing your roster");
+      return false;
+    }
+
     if (!team) return false;
 
     const previous = roster;

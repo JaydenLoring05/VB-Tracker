@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { useTrackerContext } from "@/context/TrackerContext";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabase } from "@/hooks/useSupabase";
 import { Team, TeamCalendarEvent, TeamCalendarEventType } from "@/types";
 
 /**
@@ -14,7 +15,8 @@ import { Team, TeamCalendarEvent, TeamCalendarEventType } from "@/types";
  */
 export function useTeamCalendar(team: Team | null) {
   const { userId } = useTrackerContext();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<TeamCalendarEvent[]>([]);
@@ -23,6 +25,13 @@ export function useTeamCalendar(team: Team | null) {
   const load = useCallback(async () => {
     if (!team) {
       setEvents([]);
+      setLoading(false);
+      return;
+    }
+
+    if (demo) {
+      setEvents(demo.data.calendarEvents);
+      setError(null);
       setLoading(false);
       return;
     }
@@ -45,13 +54,18 @@ export function useTeamCalendar(team: Team | null) {
 
     setEvents((data ?? []) as TeamCalendarEvent[]);
     setLoading(false);
-  }, [supabase, team]);
+  }, [supabase, demo, team]);
 
   useEffect(() => {
     load();
   }, [load]);
 
   async function addEvent(input: { date: string; type: TeamCalendarEventType; title: string; notes?: string }) {
+    if (demo) {
+      demo.requestSignup("Scheduling team events");
+      return false;
+    }
+
     if (!team) return false;
     setError(null);
 
@@ -75,6 +89,11 @@ export function useTeamCalendar(team: Team | null) {
   }
 
   async function deleteEvent(id: string) {
+    if (demo) {
+      demo.requestSignup("Editing the team calendar");
+      return false;
+    }
+
     if (!team) return false;
     setError(null);
 
