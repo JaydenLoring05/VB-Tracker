@@ -4,6 +4,7 @@ import {
   BarChart3,
   BookOpen,
   CalendarDays,
+  Clapperboard,
   Dumbbell,
   Flame,
   GraduationCap,
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/workout", label: "Start Workout", icon: Play },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
+  { href: "/film", label: "Film", icon: Clapperboard },
   { href: "/library", label: "Exercise Library", icon: BookOpen },
   { href: "/coach", label: "Team", icon: GraduationCap }
 ];

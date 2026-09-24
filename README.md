@@ -28,6 +28,9 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
   another exercise in the same category, remembered across sessions
 - Exercise library tagged by Beginner/Intermediate/Advanced, including
   hip-abduction, single-leg balance, and landing-mechanics work
+- Team film review: coaches link YouTube (or other) game film to the team,
+  tag plays by type at a timestamp, and athletes can jump straight to a
+  tagged moment
 
 ## Tech Stack
 
@@ -46,7 +49,7 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
    ```
-3. Run every file in `supabase/`, once each, in your project's SQL Editor, in this order, to create the tables, row-level security policies, and constraints: `schema.sql`, `schema_v18_5.sql`, `schema_v19.sql`, `schema_v20_teams.sql`, `schema_v21_substitutions.sql`, `schema_v22_profiles.sql`, `schema_v23_team_management.sql`, `schema_v24_performance_profiles.sql`, `schema_v25_removal_notices.sql`, `schema_v26_multi_team_coach.sql`, `schema_v27_team_plan_tier.sql`, `schema_v28_team_exercise_defaults.sql`, `schema_v29_team_day_overrides.sql`, `schema_v30_workout_active_time.sql`, `schema_v31_readiness_expansion.sql`, `schema_v32_workout_rpe.sql`, `schema_v33_team_calendar.sql`, `schema_v34_profile_onboarding.sql`.
+3. Run every file in `supabase/`, once each, in your project's SQL Editor, in this order, to create the tables, row-level security policies, and constraints: `schema.sql`, `schema_v18_5.sql`, `schema_v19.sql`, `schema_v20_teams.sql`, `schema_v21_substitutions.sql`, `schema_v22_profiles.sql`, `schema_v23_team_management.sql`, `schema_v24_performance_profiles.sql`, `schema_v25_removal_notices.sql`, `schema_v26_multi_team_coach.sql`, `schema_v27_team_plan_tier.sql`, `schema_v28_team_exercise_defaults.sql`, `schema_v29_team_day_overrides.sql`, `schema_v30_workout_active_time.sql`, `schema_v31_readiness_expansion.sql`, `schema_v32_workout_rpe.sql`, `schema_v33_team_calendar.sql`, `schema_v34_profile_onboarding.sql`, `schema_v35_team_film.sql`.
 4. `npm run dev`
 
 ## Purpose

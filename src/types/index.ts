@@ -113,6 +113,29 @@ export type TeamMember = {
   joined_at: string;
 };
 
+export type FilmTagType = "kill" | "error" | "block" | "dig" | "ace" | "serve_error" | "set" | "note";
+
+export type TeamFilm = {
+  id: string;
+  team_id: string;
+  event_id: string | null;
+  title: string;
+  video_url: string;
+  created_by: string;
+  created_at: string;
+};
+
+export type FilmTag = {
+  id: string;
+  film_id: string;
+  team_id: string;
+  seconds: number;
+  tag: FilmTagType;
+  note: string | null;
+  created_by: string;
+  created_at: string;
+};
+
 export type RosterAthlete = {
   userId: string;
   displayName: string;
