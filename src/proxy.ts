@@ -96,11 +96,14 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
+// PWA files must be reachable without a session (and without the signed-in redirect):
+// the browser fetches the manifest and sw.js unauthenticated, and the service worker
+// precaches the static /offline page. None of them contain user data.
 export const config = {
-  // Skip Next internals and static/metadata files (robots.txt, sitemap.xml,
-  // icons, images). Without this they were redirected to /login for signed-out
-  // visitors, which broke robots.txt and any public asset.
+  // Skip Next internals and static/metadata/PWA files (robots.txt, sitemap.xml,
+  // manifest, service worker, icons, images) plus the static /offline page.
+  // Without this they were redirected to /login for signed-out visitors.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw\\.js$|icons/|offline$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
   ]
 };
