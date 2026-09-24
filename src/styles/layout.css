@@ -218,6 +218,19 @@
   }
 }
 
+/* While a field is focused on a phone the on-screen keyboard owns the bottom of the screen; the
+   fixed bars would otherwise squeeze the visible area down to a sliver above it. */
+@media (max-width: 900px) and (pointer: coarse) {
+  body:has(
+      input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+      textarea:focus,
+      select:focus
+    )
+    :is(.sidebar, .workout-actions, .install-banner) {
+    display: none;
+  }
+}
+
 @media (max-width: 520px) {
   .main {
     padding-left: var(--sp-4);

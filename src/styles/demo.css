@@ -111,6 +111,9 @@
 }
 
 .demo-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--muted);
   font-size: var(--fs-sm);
   text-decoration: underline;

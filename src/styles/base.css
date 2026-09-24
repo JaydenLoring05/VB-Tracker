@@ -451,6 +451,42 @@ select:focus-visible,
   }
 }
 
+/*
+ * Touch target floor. Dense desktop layouts size some buttons at 32-40px; on touch devices they
+ * get 44px (WCAG 2.5.8 asks for 24px, Apple and Google guidance for 44). :not(#_) lifts this above
+ * the component rules that set the smaller heights without touching each of them.
+ */
+@media (pointer: coarse) {
+  :is(
+      .btn,
+      .button-link,
+      .demo-cta,
+      .btn-sm,
+      .setup-hide,
+      .roster-refresh,
+      .roster-row > button,
+      .attention-row > button,
+      .logged-set > button,
+      .input-increments button,
+      .warm-up-toggle,
+      .cues-toggle,
+      .team-switcher-new,
+      .inline-error button,
+      .load-error-banner .sync-toast-retry,
+      .landing-header-nav .btn
+    ):not(#_) {
+    min-height: 44px;
+  }
+
+  .demo-tour-button:not(#_) {
+    min-width: 44px;
+  }
+
+  :is(.swap-picker select, .exercise-log-input):not(#_) {
+    min-height: 44px;
+  }
+}
+
 /* Any touch device, including tablets wider than the phone breakpoint: 16px fields
    stop iOS Safari zooming the page when a field is focused. */
 @media (pointer: coarse) {

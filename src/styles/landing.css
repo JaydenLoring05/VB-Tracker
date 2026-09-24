@@ -84,6 +84,10 @@
 }
 
 .landing-header-nav a:first-child {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
   color: var(--muted);
   font-size: var(--fs-sm);
   font-weight: 600;
@@ -862,6 +866,10 @@
 }
 
 .landing-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
   color: var(--muted);
   transition: color var(--transition);
 }
