@@ -37,7 +37,7 @@ function countPlannedExercises() {
 
 const PLANNED_EXERCISES = countPlannedExercises();
 
-function summarizeAdherence(sessions: CompletedSession[], exercisesCompleted: number): AthleteAdherence {
+export function summarizeAdherence(sessions: CompletedSession[], exercisesCompleted: number): AthleteAdherence {
   const totalMinutesTrained = Math.round(
     sessions.reduce((sum, session) => sum + (session.duration_seconds ?? 0), 0) / 60
   );
