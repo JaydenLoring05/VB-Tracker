@@ -6,10 +6,10 @@ import { isDeadSessionError } from "@/lib/authErrors";
 
 // Signed-in users are sent to the dashboard from these (marketing + sign-in).
 const AUTH_PAGES = ["/", "/login"];
-// Reachable without a session, and never bounced for a signed-in user: legal
-// pages, and the email-link callback (a signed-in user opening a password reset
-// or confirmation link must still be able to finish it).
-const ALWAYS_PUBLIC = ["/privacy", "/terms", "/auth/callback"];
+// Reachable without a session, and never bounced for a signed-in user: the pilot
+// application page, legal pages, and the email-link callback (a signed-in user
+// opening a password reset or confirmation link must still be able to finish it).
+const ALWAYS_PUBLIC = ["/pilot", "/privacy", "/terms", "/auth/callback"];
 
 function clearSupabaseCookies(request: NextRequest, response: NextResponse) {
   request.cookies
@@ -101,9 +101,12 @@ export async function proxy(request: NextRequest) {
 // precaches the static /offline page. None of them contain user data.
 export const config = {
   // Skip Next internals and static/metadata/PWA files (robots.txt, sitemap.xml,
-  // manifest, service worker, icons, images) plus the static /offline page.
-  // Without this they were redirected to /login for signed-out visitors.
+  // manifest, service worker, icons, images), generated metadata routes
+  // (icon, apple-icon, opengraph-image, twitter-image; Next appends a hash to
+  // their URLs, hence the prefix match), the public /api/pilot endpoint, and the
+  // static /offline page. Without this they were redirected to /login for
+  // signed-out visitors.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw\\.js$|icons/|offline$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw\\.js$|icons/|offline$|icon|apple-icon|opengraph-image|twitter-image|api/pilot|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
   ]
 };

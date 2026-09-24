@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
 
@@ -14,15 +14,23 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "NextRep: Volleyball Team Training & Readiness", template: "%s | NextRep" },
+  title: {
+    default: `${SITE_NAME}: volleyball readiness and training for coaches`,
+    template: `%s | ${SITE_NAME}`
+  },
   description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
-    title: "NextRep: Volleyball Team Training & Readiness",
+    title: `${SITE_NAME}: ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION
   },
-  twitter: { card: "summary" },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME}: ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION
+  },
   icons: {
     icon: [
       { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
@@ -30,7 +38,7 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }]
   },
-  appleWebApp: { capable: true, title: "NextRep", statusBarStyle: "black" }
+  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "black" }
 };
 
 export const viewport: Viewport = {

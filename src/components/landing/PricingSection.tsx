@@ -59,7 +59,7 @@ export function PricingSection() {
                 ))}
               </ul>
 
-              <Link href="/login?mode=sign-up">
+              <Link href="/pilot">
                 <button type="button" className={tier.highlight ? "" : "secondary"}>
                   {tier.cta}
                 </button>
