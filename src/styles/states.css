@@ -217,8 +217,8 @@
   border-color: rgba(255, 196, 0, 0.4);
 }
 
-.state-reference {
-  margin-top: var(--sp-5);
+.state-card .state-reference {
+  margin: var(--sp-5) auto 0;
   font-size: var(--fs-xs);
   color: var(--muted);
 }

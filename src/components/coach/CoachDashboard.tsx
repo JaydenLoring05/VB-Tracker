@@ -135,7 +135,11 @@ export function CoachDashboard({
             <Users size={22} /> {team.name}
           </h2>
           <p className="muted">
-            {roster.length} athlete{roster.length === 1 ? "" : "s"} on your roster
+            {loading
+              ? "Loading roster..."
+              : rosterLoadFailed
+                ? "Roster unavailable"
+                : `${roster.length} athlete${roster.length === 1 ? "" : "s"} on your roster`}
           </p>
         </div>
 
