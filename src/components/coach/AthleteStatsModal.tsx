@@ -86,7 +86,7 @@ export function AthleteStatsModal({
             </div>
           ) : history.length === 0 ? (
             <div className="empty-state">
-              <p className="muted">No stats logged yet.</p>
+              <p className="muted">{displayName} hasn&apos;t logged a check-in yet. Their readiness trend appears after the first one.</p>
             </div>
           ) : (
             <>
@@ -151,7 +151,7 @@ export function AthleteStatsModal({
             </div>
           ) : prs.length === 0 ? (
             <div className="empty-state">
-              <p className="muted">No PRs logged yet.</p>
+              <p className="muted">No PRs yet. They appear here when {displayName} beats a best in a workout or logs one.</p>
             </div>
           ) : (
             <div className="athlete-stats-table">
@@ -184,7 +184,7 @@ export function AthleteStatsModal({
             </div>
           ) : !adherence || adherence.totalSessions === 0 ? (
             <div className="empty-state">
-              <p className="muted">No workouts completed yet.</p>
+              <p className="muted">{displayName} hasn&apos;t finished a workout yet. Completed sessions and plan completion show here.</p>
             </div>
           ) : (
             <>

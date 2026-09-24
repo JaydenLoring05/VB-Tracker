@@ -21,7 +21,7 @@ export function LandingHeader() {
 
         <nav className="landing-header-nav">
           <Link href="/login">Log in</Link>
-          <Link href="/login?mode=sign-up">
+          <Link href="/pilot">
             <button type="button">Start Free Pilot</button>
           </Link>
         </nav>

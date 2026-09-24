@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
 import { createClient } from "@/lib/supabase/client";
+import { userFacingMessage } from "@/lib/supabaseErrors";
 import { Team, TeamRole } from "@/types";
 
 const ACTIVE_TEAM_KEY = "elevateos:activeTeamId";
@@ -18,10 +19,15 @@ export function useTeam() {
   const [role, setRole] = useState<TeamRole | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [removalNotice, setRemovalNotice] = useState<string | null>(null);
+  // Distinct from `error` (which create/join also set): true only when the
+  // list of teams itself couldn't be read. Without it a failed read looks
+  // like "no team yet" and shows the create/join screen to an existing coach.
+  const [loadFailed, setLoadFailed] = useState(false);
 
   const loadTeams = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setLoadFailed(false);
 
     const { data: memberRows, error: memberError } = await supabase
       .from("team_members")
@@ -31,6 +37,7 @@ export function useTeam() {
     if (memberError) {
       console.error("Failed to load team membership", memberError);
       setError("Couldn't load your team. Try again.");
+      setLoadFailed(true);
       setLoading(false);
       return;
     }
@@ -68,6 +75,7 @@ export function useTeam() {
     if (teamsError || !teamRows) {
       console.error("Failed to load teams", teamsError);
       setError("Couldn't load your team. Try again.");
+      setLoadFailed(true);
       setLoading(false);
       return;
     }
@@ -100,7 +108,8 @@ export function useTeam() {
     const { error: rpcError } = await supabase.rpc("create_team", { p_name: name });
 
     if (rpcError) {
-      setError(rpcError.message || "Couldn't create the team.");
+      console.error("Failed to create team", rpcError);
+      setError(userFacingMessage(rpcError, "Couldn't create the team. Check your connection and try again."));
       return false;
     }
 
@@ -116,7 +125,8 @@ export function useTeam() {
     });
 
     if (rpcError) {
-      setError(rpcError.message || "Couldn't join that team.");
+      console.error("Failed to join team", rpcError);
+      setError(userFacingMessage(rpcError, "Couldn't join that team. Check your connection and try again."));
       return false;
     }
 
@@ -132,7 +142,8 @@ export function useTeam() {
     });
 
     if (rpcError) {
-      setError(rpcError.message || "Couldn't regenerate the invite code.");
+      console.error("Failed to regenerate invite code", rpcError);
+      setError(userFacingMessage(rpcError, "Couldn't regenerate the invite code. Try again."));
       return false;
     }
 
@@ -146,6 +157,7 @@ export function useTeam() {
     activeTeam,
     role,
     error,
+    loadFailed,
     removalNotice,
     createTeam,
     joinTeam,

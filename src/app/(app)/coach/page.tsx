@@ -1,8 +1,9 @@
 "use client";
 
-import { Users } from "lucide-react";
-
+import { AthleteTeamView } from "@/components/coach/AthleteTeamView";
 import { CoachDashboard } from "@/components/coach/CoachDashboard";
+import { InlineError } from "@/components/shared/InlineError";
+import { Skeleton, SkeletonRegion, SkeletonRow } from "@/components/shared/Skeleton";
 import { TeamSetup } from "@/components/coach/TeamSetup";
 import { useTeam } from "@/hooks/useTeam";
 
@@ -15,6 +16,7 @@ export default function CoachPage() {
     activeTeam,
     role,
     error,
+    loadFailed,
     removalNotice,
     createTeam,
     joinTeam,
@@ -25,8 +27,23 @@ export default function CoachPage() {
 
   if (loading) {
     return (
+      <SkeletonRegion label="Loading your team">
+        <div className="panel">
+          <Skeleton className="skeleton-line-lg" style={{ width: "40%", marginBottom: 16 }} />
+          <SkeletonRow />
+          <SkeletonRow />
+          <SkeletonRow />
+        </div>
+      </SkeletonRegion>
+    );
+  }
+
+  // A failed read must not fall through to the create/join screen: an
+  // existing coach would be invited to create a second team.
+  if (loadFailed && teams.length === 0) {
+    return (
       <div className="panel">
-        <p className="muted">Loading your team...</p>
+        <InlineError message="We couldn't load your team. Your team and roster are safe." onRetry={refresh} />
       </div>
     );
   }
@@ -48,15 +65,5 @@ export default function CoachPage() {
     );
   }
 
-  return (
-    <div className="panel">
-      <h2>
-        <Users size={22} /> {activeTeam.name}
-      </h2>
-      <p className="muted">
-        You&apos;re on this team as an athlete. Your coach can see your recovery stats and
-        training history to check in on you. Your data stays read-only to them.
-      </p>
-    </div>
-  );
+  return <AthleteTeamView team={activeTeam} />;
 }

@@ -25,9 +25,9 @@ export function LandingDashboardMock() {
   return (
     <div className="panel landing-mock landing-dashboard-mock">
       <div className="landing-mock-header">
-        <h3>
+        <h2>
           <Users size={20} /> Varsity Girls Roster
-        </h3>
+        </h2>
         <span className="landing-mock-badge">Sample data</span>
       </div>
 

@@ -1,22 +1,29 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { useTrackerContext } from "@/context/TrackerContext";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabase } from "@/hooks/useSupabase";
 import { WorkoutSession } from "@/types";
 
 export function useStartWorkout() {
   const router = useRouter();
   const { userId, week, reportSyncError } = useTrackerContext();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [openSession, setOpenSession] = useState<WorkoutSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
+    if (demo) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
     supabase
@@ -29,7 +36,12 @@ export function useStartWorkout() {
       .maybeSingle()
       .then(({ data, error }) => {
         if (cancelled) return;
-        if (error) console.error("Failed to check for an open workout session", error);
+        if (error) {
+          // Without this an athlete mid-workout would see "Start" instead of
+          // "Continue" and could begin a duplicate session.
+          console.error("Failed to check for an open workout session", error);
+          reportSyncError("Couldn't check for a workout in progress. Check your connection and refresh.");
+        }
         setOpenSession(data as WorkoutSession | null);
         setLoading(false);
       });
@@ -37,9 +49,14 @@ export function useStartWorkout() {
     return () => {
       cancelled = true;
     };
-  }, [supabase, userId]);
+  }, [supabase, demo, userId]);
 
   async function startWorkout(day: string) {
+    if (demo) {
+      demo.requestSignup("Logging workouts");
+      return;
+    }
+
     if (starting) return;
     setStarting(true);
 

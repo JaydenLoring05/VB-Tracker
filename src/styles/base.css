@@ -267,6 +267,35 @@ h4 {
   box-shadow: none;
 }
 
+.load-error-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--panel-2);
+  border: 1px solid rgba(255, 98, 98, 0.4);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+}
+
+.load-error-banner svg:first-child {
+  flex: 0 0 auto;
+  color: var(--red);
+}
+
+.load-error-banner p {
+  margin: 0;
+  flex: 1;
+}
+
+.load-error-banner .sync-toast-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: 36px;
+}
+
 .panel,
 .card {
   background: linear-gradient(155deg, rgba(22, 27, 34, 0.9), rgba(10, 13, 17, 0.94));

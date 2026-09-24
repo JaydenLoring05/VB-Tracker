@@ -3,6 +3,10 @@
 import { AlertTriangle, PartyPopper, ShieldAlert } from "lucide-react";
 import { ComponentType } from "react";
 
+import { InlineError } from "@/components/shared/InlineError";
+import { SkeletonRegion, SkeletonRow } from "@/components/shared/Skeleton";
+import { EmptyState } from "@/components/shared/EmptyState";
+
 import { AttentionItem, AttentionPriority } from "@/lib/attentionCenter";
 
 const PRIORITY_META: Record<AttentionPriority, { icon: ComponentType<{ size?: number }>; className: string }> = {
@@ -14,10 +18,17 @@ const PRIORITY_META: Record<AttentionPriority, { icon: ComponentType<{ size?: nu
 export function AttentionCenter({
   items,
   loading,
+  error,
+  onRetry,
+  hasAthletes = true,
   onSelectAthlete
 }: {
   items: AttentionItem[];
   loading: boolean;
+  error?: string | null;
+  onRetry?: () => void;
+  /** False when the roster is empty, so "all caught up" isn't claimed about nobody. */
+  hasAthletes?: boolean;
   onSelectAthlete: (userId: string, displayName: string) => void;
 }) {
   return (
@@ -26,7 +37,22 @@ export function AttentionCenter({
       <p className="muted">What needs your attention today, ranked by priority.</p>
 
       {loading ? (
-        <p className="muted">Loading...</p>
+        <SkeletonRegion label="Loading attention items">
+          <SkeletonRow />
+          <SkeletonRow />
+          <SkeletonRow />
+        </SkeletonRegion>
+      ) : error ? (
+        // Never fall through to "All caught up" here: a failed load would tell
+        // a coach nothing needs attention when pain flags may be sitting unread.
+        <InlineError message={error} onRetry={onRetry} />
+      ) : !hasAthletes ? (
+        <EmptyState
+          compact
+          icon={ShieldAlert}
+          title="Nothing to watch yet"
+          description="Once athletes join and check in, this lists who is run down, in pain, or has missed workouts, plus new PRs to celebrate."
+        />
       ) : items.length === 0 ? (
         <div className="empty-state">
           <p className="muted">All caught up. Nothing needs your attention today.</p>

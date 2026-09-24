@@ -125,14 +125,14 @@ export default function LandingPage() {
           </p>
 
           <div className="landing-hero-actions">
-            <Link href="/login?mode=sign-up">
+            <Link href="/pilot">
               <button type="button">Start Free Team Pilot</button>
             </Link>
-            <a href="#product-preview">
+            <Link href="/demo">
               <button type="button" className="ghost">
                 View Demo Dashboard
               </button>
-            </a>
+            </Link>
           </div>
 
           <p className="muted landing-hero-reassurance">
@@ -272,9 +272,9 @@ export default function LandingPage() {
           </ul>
 
           <div className="landing-pilot-cta">
-            <a href={`mailto:${CONTACT_EMAIL}?subject=Founding Team Pilot`}>
+            <Link href="/pilot">
               <button type="button">Apply for Founding Team Access</button>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -320,14 +320,14 @@ export default function LandingPage() {
           </p>
 
           <div className="landing-hero-actions">
-            <Link href="/login?mode=sign-up">
+            <Link href="/pilot">
               <button type="button">Start Free Team Pilot</button>
             </Link>
-            <a href="#product-preview">
+            <Link href="/demo">
               <button type="button" className="ghost">
                 View Demo Dashboard
               </button>
-            </a>
+            </Link>
           </div>
 
           <p className="muted landing-hero-reassurance">

@@ -156,6 +156,11 @@ export function ProgramEditor({ team }: { team: Team }) {
 
   return (
     <div className="program-editor">
+      <p className="muted program-intro">
+        {team.name} already follows the standard four-phase plan, so athletes have a workout today with no setup.
+        Change an exercise below and it updates for the whole team.
+      </p>
+
       <div className="tabs program-phase-tabs">
         {PHASES.map((phase) => (
           <button

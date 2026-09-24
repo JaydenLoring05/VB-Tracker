@@ -2,6 +2,8 @@
 
 import { Ruler } from "lucide-react";
 
+import { InlineError } from "@/components/shared/InlineError";
+import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
 import { usePerformanceProfile } from "@/hooks/usePerformanceProfile";
 
 const POSITIONS = ["Outside Hitter", "Middle Blocker", "Opposite", "Setter", "Libero", "Defensive Specialist"];
@@ -11,12 +13,27 @@ function numOrNull(value: string) {
 }
 
 export function PerformanceProfileForm() {
-  const { loading, profile, setProfile, saveProfile } = usePerformanceProfile();
+  const { loading, profile, setProfile, saveProfile, error, retry } = usePerformanceProfile();
 
   if (loading) {
     return (
+      <SkeletonRegion label="Loading your profile" className="panel">
+        <Skeleton className="skeleton-line-lg" style={{ width: "45%", marginBottom: 16 }} />
+        <div className="skeleton-stack">
+          <Skeleton style={{ height: 44 }} />
+          <Skeleton style={{ height: 44 }} />
+          <Skeleton style={{ height: 44 }} />
+        </div>
+      </SkeletonRegion>
+    );
+  }
+
+  // Don't show an empty form after a failed load: saving it would overwrite
+  // the athlete's real measurements with blanks.
+  if (error) {
+    return (
       <div className="panel">
-        <p className="muted">Loading your profile...</p>
+        <InlineError message={error} onRetry={retry} />
       </div>
     );
   }

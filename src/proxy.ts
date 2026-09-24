@@ -1,9 +1,54 @@
 import { createServerClient } from "@supabase/ssr";
+import type { User } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/login", "/auth/callback", "/privacy", "/terms"];
+import { isDeadSessionError } from "@/lib/authErrors";
+
+// Signed-in users are sent to the dashboard from these (marketing + sign-in).
+const AUTH_PAGES = ["/", "/login"];
+// Reachable without a session, and never bounced for a signed-in user: the pilot
+// application page, legal pages, and the email-link callback (a signed-in user
+// opening a password reset or confirmation link must still be able to finish it).
+const ALWAYS_PUBLIC = ["/pilot", "/privacy", "/terms", "/auth/callback"];
+
+function clearSupabaseCookies(request: NextRequest, response: NextResponse) {
+  request.cookies
+    .getAll()
+    .filter(({ name }) => name.startsWith("sb-"))
+    .forEach(({ name }) => response.cookies.set(name, "", { path: "/", maxAge: 0 }));
+}
+
+function redirectTo(
+  request: NextRequest,
+  pathname: string,
+  from: NextResponse,
+  { clearSession = false }: { clearSession?: boolean } = {}
+) {
+  const url = request.nextUrl.clone();
+  url.pathname = pathname;
+  url.search = "";
+
+  const redirect = NextResponse.redirect(url);
+
+  // Carry over any cookies the Supabase client refreshed during this request.
+  // Dropping them would strand the rotated refresh token and cause
+  // "Invalid Refresh Token: Already Used" on the very next request.
+  from.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+
+  if (clearSession) clearSupabaseCookies(request, redirect);
+  return redirect;
+}
+
+// The public sales demo runs entirely on static sample data. It skips the
+// auth check (and its Supabase call) so it works logged out, and stays
+// viewable for a signed-in coach who wants to show it to someone else.
+const DEMO_PATH = "/demo";
 
 export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname === DEMO_PATH) {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -25,27 +70,52 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  let user: User | null = null;
+  let deadSession = false;
 
-  const isPublicPath = PUBLIC_PATHS.includes(request.nextUrl.pathname);
-
-  if (!user && !isPublicPath) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    return NextResponse.redirect(loginUrl);
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    user = data.user;
+    deadSession = isDeadSessionError(error);
+  } catch (error) {
+    // A transient failure talking to Supabase must not crash every page;
+    // treat it as signed out but leave the cookies alone so the session
+    // recovers on the next request.
+    console.error("Session check failed in proxy", error);
   }
 
-  if (user && isPublicPath) {
-    const dashboardUrl = request.nextUrl.clone();
-    dashboardUrl.pathname = "/dashboard";
-    return NextResponse.redirect(dashboardUrl);
+  const pathname = request.nextUrl.pathname;
+  const isAuthPage = AUTH_PAGES.includes(pathname);
+  const isPublic = isAuthPage || ALWAYS_PUBLIC.includes(pathname);
+
+  if (!user && !isPublic) {
+    return redirectTo(request, "/login", response, { clearSession: deadSession });
+  }
+
+  if (user && isAuthPage) {
+    return redirectTo(request, "/dashboard", response);
+  }
+
+  // Signed out on a public page with a dead session: drop the stale cookies so
+  // the browser stops retrying a refresh token that can never work again.
+  if (!user && deadSession) {
+    clearSupabaseCookies(request, response);
   }
 
   return response;
 }
 
+// PWA files must be reachable without a session (and without the signed-in redirect):
+// the browser fetches the manifest and sw.js unauthenticated, and the service worker
+// precaches the static /offline page. None of them contain user data.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
+  // Skip Next internals and static/metadata/PWA files (robots.txt, sitemap.xml,
+  // manifest, service worker, icons, images), generated metadata routes
+  // (icon, apple-icon, opengraph-image, twitter-image; Next appends a hash to
+  // their URLs, hence the optional suffix), the public /api/pilot endpoint, and the
+  // static /offline page. Without this they were redirected to /login for
+  // signed-out visitors.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw\\.js$|icons/|offline$|(?:icon|apple-icon|opengraph-image|twitter-image)(?:-[a-z0-9]+)?$|api/pilot$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
+  ]
 };

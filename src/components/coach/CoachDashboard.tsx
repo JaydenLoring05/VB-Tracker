@@ -1,18 +1,25 @@
 "use client";
 
 import { AlertTriangle, Copy, RefreshCw, Trophy, UserMinus, Users } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { useAttentionCenter } from "@/hooks/useAttentionCenter";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
+import { buildInviteMessage } from "@/lib/teamSetup";
 import { formatLastActive } from "@/lib/time";
 import { RosterAthlete, Team } from "@/types";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
+import { InlineError } from "@/components/shared/InlineError";
+import { SkeletonRegion, SkeletonRow } from "@/components/shared/Skeleton";
+import { CopyButton } from "@/components/shared/CopyButton";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 import { AthleteStatsModal } from "./AthleteStatsModal";
 import { AttentionCenter } from "./AttentionCenter";
 import { ProgramEditor } from "./ProgramEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
+import { TeamReadyChecklist } from "./TeamReadyChecklist";
 import { TeamSwitcher } from "./TeamSwitcher";
 
 function recoverySlug(label: string) {
@@ -35,8 +42,17 @@ export function CoachDashboard({
   onTeamChange?: () => void;
 }) {
   const team = activeTeam;
+  const demo = useDemo();
   const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
-  const { loading: attentionLoading, items: attentionItems } = useAttentionCenter(team, roster);
+  const {
+    loading: attentionLoading,
+    items: attentionItems,
+    error: attentionError,
+    retry: retryAttention
+  } = useAttentionCenter(team, roster);
+  // A failed roster load leaves the roster empty; a failed removal leaves it
+  // populated. Only the first should replace the roster with an error state.
+  const rosterLoadFailed = Boolean(error) && roster.length === 0;
   const [activeTab, setActiveTab] = useState<"roster" | "program">("roster");
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -44,6 +60,11 @@ export function CoachDashboard({
   const [pendingRemoval, setPendingRemoval] = useState<RosterAthlete | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [regeneratedCode, setRegeneratedCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    // The dashboard setup guide links here with #program.
+    if (window.location.hash === "#program") setActiveTab("program");
+  }, []);
 
   async function handleCopyCode() {
     try {
@@ -56,6 +77,11 @@ export function CoachDashboard({
   }
 
   function requestRemove(athlete: RosterAthlete) {
+    if (demo) {
+      demo.requestSignup("Managing your roster");
+      return;
+    }
+
     if (removingId) return;
     setPendingRemoval(athlete);
   }
@@ -85,9 +111,22 @@ export function CoachDashboard({
     <div className="coach-dashboard">
       <TeamSwitcher teams={teams} activeTeamId={team.id} onSelect={onSelectTeam} onCreateTeam={onCreateTeam} />
 
+      <TeamReadyChecklist
+        team={team}
+        roster={roster}
+        rosterLoading={loading}
+        programTabActive={activeTab === "program"}
+        onOpenProgram={() => setActiveTab("program")}
+      />
+
       <AttentionCenter
         items={attentionItems}
-        loading={attentionLoading}
+        // While the roster is still loading (or failed), the attention hook sees
+        // an empty roster; without this it would briefly report "All caught up".
+        loading={attentionLoading || loading}
+        error={rosterLoadFailed ? error : attentionError}
+        onRetry={rosterLoadFailed ? refresh : retryAttention}
+        hasAthletes={loading || roster.length > 0}
         onSelectAthlete={(userId) => {
           const athlete = roster.find((candidate) => candidate.userId === userId);
           if (athlete) setSelectedAthlete(athlete);
@@ -121,7 +160,11 @@ export function CoachDashboard({
             <Users size={22} /> {team.name}
           </h2>
           <p className="muted">
-            {roster.length} athlete{roster.length === 1 ? "" : "s"} on your roster
+            {loading
+              ? "Loading roster..."
+              : rosterLoadFailed
+                ? "Roster unavailable"
+                : `${roster.length} athlete${roster.length === 1 ? "" : "s"} on your roster`}
           </p>
         </div>
 
@@ -165,13 +208,50 @@ export function CoachDashboard({
         </div>
 
         {loading ? (
-          <p className="muted">Loading roster...</p>
+          <SkeletonRegion label="Loading roster">
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </SkeletonRegion>
+        ) : rosterLoadFailed && error ? (
+          <InlineError message={error} onRetry={refresh} />
         ) : roster.length === 0 ? (
-          <div className="empty-state">
-            <p className="muted">
-              No athletes yet. Share your invite code above to build your roster.
-            </p>
-          </div>
+          <EmptyState
+            icon={Users}
+            title="No athletes on your roster yet"
+            description={
+              <>
+                Athletes join with your invite code{" "}
+                <strong className="invite-code-inline">{team.invite_code}</strong>. Once they do, each one shows up
+                here with a readiness score and when they last checked in. Tap a name to see their stats and PRs.
+              </>
+            }
+            actions={
+              <CopyButton
+                className=""
+                getText={() => buildInviteMessage(team.name, team.invite_code, window.location.origin)}
+              >
+                Copy invite message
+              </CopyButton>
+            }
+            preview={
+              <>
+                <div className="preview-row">
+                  <span>
+                    <strong>Jordan M.</strong> <span className="muted">Opened 2h ago</span>
+                  </span>
+                  <span className="pill roster-recovery roster-recovery-good">84% · Good</span>
+                </div>
+                <div className="preview-row">
+                  <span>
+                    <strong>Riley K.</strong> <span className="muted">Opened yesterday</span>
+                  </span>
+                  <span className="pill roster-recovery roster-recovery-caution">61% · Caution</span>
+                </div>
+              </>
+            }
+          />
         ) : (
           <div className="roster-table">
             {roster.map((athlete) => (
@@ -190,13 +270,20 @@ export function CoachDashboard({
               >
                 <div className="roster-athlete-name">
                   <strong>{athlete.displayName}</strong>
-                  {athlete.needsCheckIn && <span className="pill roster-flag">Needs check-in</span>}
+                  {athlete.needsCheckIn && athlete.lastCheckIn !== null && (
+                    <span className="pill roster-flag">Needs check-in</span>
+                  )}
                   <span className="muted roster-last-active">{formatLastActive(athlete.lastActiveAt)}</span>
                 </div>
 
-                <span className={`pill roster-recovery roster-recovery-${recoverySlug(athlete.recoveryLabel)}`}>
-                  {athlete.recovery}% · {athlete.recoveryLabel}
-                </span>
+                {athlete.lastCheckIn === null ? (
+                  // A brand-new athlete hasn't been scored yet. Showing "0% Low" would read as an emergency.
+                  <span className="pill roster-recovery roster-recovery-none">No check-in yet</span>
+                ) : (
+                  <span className={`pill roster-recovery roster-recovery-${recoverySlug(athlete.recoveryLabel)}`}>
+                    {athlete.recovery}% · {athlete.recoveryLabel}
+                  </span>
+                )}
 
                 <button
                   type="button"
@@ -215,7 +302,7 @@ export function CoachDashboard({
         )}
       </div>
 
-      {error && (
+      {error && !rosterLoadFailed && (
         <div className="empty-state">
           <p className="muted">{error}</p>
         </div>
