@@ -4,6 +4,7 @@ import { Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { Celebrate } from "@/components/shared/Celebrate";
 import { formatDuration } from "@/lib/time";
 import { WorkoutSet } from "@/types";
 
@@ -41,10 +42,16 @@ export function WorkoutSummary({
 
   return (
     <div className="panel workout-summary">
-      <h2>
-        <Trophy size={22} /> Workout Complete
-      </h2>
-      <p className="muted">{day}</p>
+      <div className="workout-summary-hero">
+        <div className="success-mark">
+          <Trophy size={28} aria-hidden="true" />
+          <Celebrate />
+        </div>
+        <div>
+          <h2>Workout Complete</h2>
+          <p className="muted">{day}</p>
+        </div>
+      </div>
 
       <div className="grid-4 workout-summary-stats">
         <div className="card">

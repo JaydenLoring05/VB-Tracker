@@ -1,3 +1,4 @@
+import { ProgressRing } from "@/components/shared/ProgressRing";
 import { DEMO_WORKOUTS_PER_WEEK, type DemoData } from "@/data/demoData";
 import { computeAttentionItems } from "@/lib/attentionCenter";
 import { recoveryStatus } from "@/lib/recovery";
@@ -36,24 +37,35 @@ export function DemoSnapshot({ data }: { data: DemoData }) {
     data.recentPRs
   ).filter((item) => item.priority === "high");
 
-  const tiles = [
-    { label: "Team readiness", value: `${readiness}%`, detail: `${recoveryStatus(readiness).label} across ${data.roster.length} athletes` },
-    { label: "Average vertical", value: `${latestVertical.toFixed(1)} in`, detail: `+${verticalGain.toFixed(1)} in since preseason` },
-    { label: "Workouts this week", value: `${completed}/${planned}`, detail: `${Math.round((completed / planned) * 100)}% of the plan done` },
+  const completionPercent = Math.round((completed / planned) * 100);
+
+  const tiles: { label: string; value: string; unit?: string; detail: string; tone?: "up" | "alert"; accent?: boolean; ring?: number }[] = [
+    { label: "Team readiness", value: String(readiness), unit: "%", detail: `${recoveryStatus(readiness).label} across ${data.roster.length} athletes`, accent: true },
+    { label: "Average vertical", value: latestVertical.toFixed(1), unit: "in", detail: `+${verticalGain.toFixed(1)} in since preseason`, tone: "up" },
+    { label: "Workouts this week", value: `${completed}/${planned}`, detail: `${completionPercent}% of the plan done`, ring: completionPercent },
     {
       label: "High-priority flags",
       value: String(highPriority.length),
-      detail: highPriority.map((item) => item.displayName.split(" ")[0]).join(", ") || "All clear"
+      detail: highPriority.length ? `Review now: ${highPriority.map((item) => item.displayName.split(" ")[0]).join(", ")}` : "All clear",
+      tone: highPriority.length ? "alert" : "up"
     }
   ];
 
   return (
     <section className="demo-snapshot" aria-label="Team snapshot">
       {tiles.map((tile) => (
-        <div className="demo-snapshot-tile" key={tile.label}>
-          <p className="demo-snapshot-label">{tile.label}</p>
-          <p className="demo-snapshot-value">{tile.value}</p>
-          <p className="muted demo-snapshot-detail">{tile.detail}</p>
+        <div className={`stat-tile demo-snapshot-tile${tile.accent ? " stat-tile-accent" : ""}`} key={tile.label}>
+          <p className="stat-label">{tile.label}</p>
+          <p className="stat-value">
+            {tile.value}
+            {tile.unit && <small>{tile.unit}</small>}
+          </p>
+          <p className={`stat-delta${tile.tone ? ` is-${tile.tone}` : ""}`}>{tile.detail}</p>
+          {tile.ring !== undefined && (
+            <div className="demo-snapshot-ring">
+              <ProgressRing value={tile.ring} size={52} />
+            </div>
+          )}
         </div>
       ))}
     </section>

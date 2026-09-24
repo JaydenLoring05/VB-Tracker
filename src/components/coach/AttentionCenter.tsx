@@ -5,9 +5,12 @@ import { ComponentType } from "react";
 
 import { InlineError } from "@/components/shared/InlineError";
 import { SkeletonRegion, SkeletonRow } from "@/components/shared/Skeleton";
+import { Avatar } from "@/components/shared/Avatar";
 import { EmptyState } from "@/components/shared/EmptyState";
 
 import { AttentionItem, AttentionPriority } from "@/lib/attentionCenter";
+
+import "@/styles/roster.css";
 
 const PRIORITY_META: Record<AttentionPriority, { icon: ComponentType<{ size?: number }>; className: string }> = {
   high: { icon: ShieldAlert, className: "attention-high" },
@@ -33,8 +36,11 @@ export function AttentionCenter({
 }) {
   return (
     <div className="panel attention-center">
-      <h2>Attention Center</h2>
-      <p className="muted">What needs your attention today, ranked by priority.</p>
+      <div className="section-heading">
+        <h2>Attention Center</h2>
+        <p className="section-caption">Ranked by priority</p>
+      </div>
+      <p className="muted attention-lead">What needs your attention today.</p>
 
       {loading ? (
         <SkeletonRegion label="Loading attention items">
@@ -65,11 +71,12 @@ export function AttentionCenter({
 
             return (
               <li key={item.id} className={`attention-row ${meta.className}`}>
-                <Icon size={18} />
+                <Avatar name={item.displayName} />
                 <div className="attention-row-body">
                   <strong>{item.displayName}</strong>
                   <span className="muted">{item.reason}</span>
                 </div>
+                <Icon size={18} />
                 <button
                   type="button"
                   className="ghost"

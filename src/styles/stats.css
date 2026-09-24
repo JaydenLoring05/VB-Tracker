@@ -56,7 +56,7 @@
 }
 
 .pr-card:hover {
-  border-color: rgba(255, 196, 0, 0.25);
+  border-color: color-mix(in srgb, var(--gold) 25%, transparent);
 }
 
 .pr-card strong {

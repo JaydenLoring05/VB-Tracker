@@ -1,9 +1,11 @@
 "use client";
 
-import { BarChart3, CalendarDays, Flame, HeartPulse, Play, Trophy } from "lucide-react";
+import { ArrowRight, BarChart3, CalendarDays, Flame, HeartPulse, Trophy } from "lucide-react";
 import Link from "next/link";
 
 import { TeamNudge } from "@/components/dashboard/TeamNudge";
+import { ProgressRing } from "@/components/shared/ProgressRing";
+import { statusTone } from "@/components/shared/StatusLabel";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
@@ -16,7 +18,7 @@ import { todayName } from "@/lib/storage";
 const RECOVERY_COLOR: Record<string, string> = {
   Elite: "var(--green)",
   Good: "var(--green)",
-  Caution: "var(--gold)",
+  Caution: "var(--warn)",
   Low: "var(--red)"
 };
 
@@ -43,8 +45,8 @@ export function DashboardCards() {
       {todayWorkout && !todayWorkout.rest && (
         <Link href="/workout">
           <button className="dashboard-hero-cta">
-            <Play size={20} />
             {openSession ? "Continue Workout" : "Start Today's Workout"}
+            <ArrowRight size={22} aria-hidden="true" />
           </button>
         </Link>
       )}
@@ -74,20 +76,11 @@ export function DashboardCards() {
 
           {hasLoggedStats ? (
             <div className="dashboard-recovery-body">
-              <div
-                className="recovery-ring"
-                style={{
-                  background: `conic-gradient(${ringColor} ${recovery * 3.6}deg, rgba(255, 255, 255, 0.08) 0deg)`
-                }}
-              >
-                <div className="recovery-ring-inner">
-                  <strong>{recovery}%</strong>
-                </div>
-              </div>
+              <ProgressRing value={recovery} color={ringColor} size={88}>
+                <strong>{recovery}%</strong>
+              </ProgressRing>
               <div>
-                <span className="pill" style={{ color: ringColor, borderColor: ringColor }}>
-                  {status.label}
-                </span>
+                <span className={`status status-${statusTone(status.label) ?? "ready"}`}>{status.label}</span>
                 <p className="muted">{readinessExplanation ?? status.message}</p>
               </div>
             </div>

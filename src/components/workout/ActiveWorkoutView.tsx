@@ -3,6 +3,7 @@
 import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
+import { Celebrate } from "@/components/shared/Celebrate";
 import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
 import { getExercise } from "@/data/exercises";
@@ -374,12 +375,13 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
         {exerciseSets.length > 0 && (
           <div className="logged-sets">
             {exerciseSets.map((set) => (
-              <div className="logged-set" key={set.id}>
+              <div className={`logged-set${prSetIds[set.id] ? " logged-set-pr" : ""}`} key={set.id}>
                 <span>
                   Set {set.set_number}: {set.weight ?? "-"} x {set.reps ?? "-"}
                   {prSetIds[set.id] && (
                     <span className="pr-badge">
                       <Trophy size={12} /> New PR
+                      <Celebrate />
                     </span>
                   )}
                 </span>

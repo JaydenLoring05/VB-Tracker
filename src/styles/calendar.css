@@ -1,8 +1,8 @@
 .add-game-form {
   display: flex;
-  gap: 10px;
+  gap: var(--sp-2);
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: var(--sp-2);
 }
 
 .add-game-form input {
@@ -13,74 +13,88 @@
 .calendar-preview {
   display: grid;
   grid-template-columns: repeat(7, minmax(80px, 1fr));
-  gap: 8px;
+  gap: var(--sp-2);
 }
 
 .calendar-day {
-  min-height: 90px;
+  min-height: 96px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--surface-2);
-  padding: 10px;
+  padding: var(--sp-3);
+}
+
+.calendar-day > strong {
+  display: block;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Today: the one solid-gold cell. */
+.calendar-day.is-today {
+  border-color: transparent;
+  background: var(--gold);
+  color: var(--on-gold);
+}
+
+.calendar-day.is-today > strong {
+  color: var(--on-gold);
+}
+
+.calendar-day.is-today .event-chip {
+  background: color-mix(in oklch, var(--on-gold) 14%, transparent);
+  color: var(--on-gold);
 }
 
 .event-chip {
   display: block;
   margin-top: 6px;
   padding: 4px 6px;
-  border-radius: 7px;
+  border-radius: 6px;
   font-size: 11px;
   font-weight: 800;
+  line-height: 1.25;
 }
 
 .workout {
-  background: rgba(255, 196, 0, 0.18);
+  background: color-mix(in oklch, var(--gold) 18%, transparent);
   color: var(--gold);
 }
 
 .practice {
-  background: rgba(80, 160, 255, 0.18);
+  background: color-mix(in oklch, var(--blue) 18%, transparent);
   color: var(--blue);
 }
 
-.game {
-  background: rgba(255, 98, 98, 0.18);
+.game,
+.match {
+  background: color-mix(in oklch, var(--red) 18%, transparent);
   color: var(--red);
 }
 
-.recovery {
-  background: rgba(69, 212, 131, 0.18);
+.recovery,
+.testing {
+  background: color-mix(in oklch, var(--green) 18%, transparent);
   color: var(--green);
 }
 
-.rest {
-  background: rgba(174, 182, 196, 0.14);
+.rest,
+.travel {
+  background: color-mix(in oklch, var(--muted) 16%, transparent);
   color: var(--muted);
-}
-
-.match {
-  background: rgba(255, 98, 98, 0.18);
-  color: var(--red);
 }
 
 .tournament {
-  background: rgba(191, 132, 255, 0.18);
-  color: var(--purple, #bf84ff);
-}
-
-.travel {
-  background: rgba(174, 182, 196, 0.18);
-  color: var(--muted);
-}
-
-.testing {
-  background: rgba(69, 212, 131, 0.18);
-  color: var(--green);
+  background: color-mix(in oklch, var(--purple) 18%, transparent);
+  color: var(--purple);
 }
 
 .playoffs {
-  background: rgba(255, 196, 0, 0.18);
-  color: var(--gold);
+  background: color-mix(in oklch, var(--warn) 18%, transparent);
+  color: var(--warn);
 }
 
 .event-chip-team-tag {
@@ -94,21 +108,20 @@
 @media (max-width: 900px) {
   .calendar-preview {
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: var(--sp-2);
   }
 
   .calendar-day {
     min-height: 104px;
-  }
-
-  .event-chip {
-    font-size: 11px;
-    line-height: 1.2;
   }
 }
 
 @media (max-width: 520px) {
   .calendar-preview {
     grid-template-columns: 1fr;
+  }
+
+  .calendar-day {
+    min-height: 0;
   }
 }

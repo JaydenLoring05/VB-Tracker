@@ -7,11 +7,11 @@ export function Topbar({ userEmail, displayName: name }: { userEmail: string; di
   return (
     <header className="topbar">
       <div>
-        <h1>Welcome back, {displayName} 👋</h1>
-        <p>Next.js + TypeScript Volleyball Athlete Tracker</p>
+        <h1>Welcome back, {displayName}</h1>
+        <p>Your training, readiness and team in one place.</p>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div className="topbar-user">
         <div className="avatar">{initial}</div>
         <LogoutButton />
       </div>

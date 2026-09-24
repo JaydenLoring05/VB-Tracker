@@ -1,6 +1,8 @@
 import { ArrowLeft, Compass } from "lucide-react";
 import Link from "next/link";
 
+import { BrandMark } from "@/components/shared/Brand";
+
 /**
  * Persistent header for every demo screen: always says the data is sample
  * data, always offers the pilot CTA, and always offers a way back home.
@@ -11,6 +13,7 @@ export function DemoBanner({ onStartTour }: { onStartTour: () => void }) {
       <div className="demo-banner-inner">
         <Link href="/" className="demo-banner-back" aria-label="Back to the NextRep home page">
           <ArrowLeft size={18} aria-hidden="true" />
+          <BrandMark size={26} />
           <span className="demo-banner-back-label">NextRep</span>
         </Link>
 
