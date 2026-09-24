@@ -21,6 +21,7 @@ export function useActiveWorkoutSession(sessionId: string) {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [previousSets, setPreviousSets] = useState<Record<string, PreviousSet>>({});
   const [maxWeightByExercise, setMaxWeightByExercise] = useState<Record<string, number>>({});
 
@@ -33,6 +34,9 @@ export function useActiveWorkoutSession(sessionId: string) {
     let cancelled = false;
 
     async function load() {
+      setLoading(true);
+      setLoadError(false);
+
       const [sessionRes, setsRes] = await Promise.all([
         supabase
           .from("workout_sessions")
@@ -52,7 +56,6 @@ export function useActiveWorkoutSession(sessionId: string) {
 
       if (sessionRes.error || setsRes.error) {
         console.error("Failed to load workout session", sessionRes.error ?? setsRes.error);
-        reportSyncError("Couldn't load this workout. Check your connection and try again.");
         setLoadError(true);
         setLoading(false);
         return;
@@ -69,12 +72,19 @@ export function useActiveWorkoutSession(sessionId: string) {
       setLoading(false);
     }
 
-    load();
+    load().catch((error) => {
+      // A rejected request (not just a returned { error }) must not leave the
+      // screen stuck on the loading state.
+      console.error("Failed to load workout session", error);
+      if (cancelled) return;
+      setLoadError(true);
+      setLoading(false);
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [supabase, sessionId, userId, reportSyncError]);
+  }, [supabase, sessionId, userId, loadAttempt]);
 
   useEffect(() => {
     if (!session) return;
@@ -317,6 +327,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     loading,
     notFound,
     loadError,
+    retryLoad: () => setLoadAttempt((attempt) => attempt + 1),
     session,
     sets,
     previousSets,

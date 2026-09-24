@@ -3,6 +3,8 @@
 import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
+import { InlineError } from "@/components/shared/InlineError";
+import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
 import { getExercise } from "@/data/exercises";
 import { getPrescription, getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
@@ -57,6 +59,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     loading,
     notFound,
     loadError,
+    retryLoad,
     session,
     sets,
     previousSets,
@@ -182,17 +185,25 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
 
   if (loading) {
     return (
-      <div className="panel">
-        <p className="muted">Loading workout...</p>
-      </div>
+      <SkeletonRegion label="Loading workout" className="panel">
+        <Skeleton className="skeleton-line" style={{ width: "30%", marginBottom: 14 }} />
+        <Skeleton className="skeleton-line-lg" style={{ width: "60%", marginBottom: 20 }} />
+        <div className="skeleton-stack">
+          <Skeleton style={{ height: 56 }} />
+          <Skeleton style={{ height: 56 }} />
+          <Skeleton style={{ height: 56 }} />
+        </div>
+      </SkeletonRegion>
     );
   }
 
   if (loadError) {
     return (
       <div className="panel">
-        <h2>Couldn&apos;t load this workout</h2>
-        <p className="muted">Check your connection and refresh the page to try again.</p>
+        <InlineError
+          message="We couldn't load this workout. Check your connection and try again. Anything you already logged is saved."
+          onRetry={retryLoad}
+        />
       </div>
     );
   }

@@ -8,6 +8,8 @@ import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { formatLastActive } from "@/lib/time";
 import { RosterAthlete, Team } from "@/types";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
+import { InlineError } from "@/components/shared/InlineError";
+import { SkeletonRegion, SkeletonRow } from "@/components/shared/Skeleton";
 
 import { AthleteStatsModal } from "./AthleteStatsModal";
 import { AttentionCenter } from "./AttentionCenter";
@@ -36,7 +38,15 @@ export function CoachDashboard({
 }) {
   const team = activeTeam;
   const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
-  const { loading: attentionLoading, items: attentionItems } = useAttentionCenter(team, roster);
+  const {
+    loading: attentionLoading,
+    items: attentionItems,
+    error: attentionError,
+    retry: retryAttention
+  } = useAttentionCenter(team, roster);
+  // A failed roster load leaves the roster empty; a failed removal leaves it
+  // populated. Only the first should replace the roster with an error state.
+  const rosterLoadFailed = Boolean(error) && roster.length === 0;
   const [activeTab, setActiveTab] = useState<"roster" | "program">("roster");
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -87,7 +97,11 @@ export function CoachDashboard({
 
       <AttentionCenter
         items={attentionItems}
-        loading={attentionLoading}
+        // While the roster is still loading (or failed), the attention hook sees
+        // an empty roster; without this it would briefly report "All caught up".
+        loading={attentionLoading || loading}
+        error={rosterLoadFailed ? error : attentionError}
+        onRetry={rosterLoadFailed ? refresh : retryAttention}
         onSelectAthlete={(userId) => {
           const athlete = roster.find((candidate) => candidate.userId === userId);
           if (athlete) setSelectedAthlete(athlete);
@@ -121,7 +135,11 @@ export function CoachDashboard({
             <Users size={22} /> {team.name}
           </h2>
           <p className="muted">
-            {roster.length} athlete{roster.length === 1 ? "" : "s"} on your roster
+            {loading
+              ? "Loading roster..."
+              : rosterLoadFailed
+                ? "Roster unavailable"
+                : `${roster.length} athlete${roster.length === 1 ? "" : "s"} on your roster`}
           </p>
         </div>
 
@@ -165,7 +183,14 @@ export function CoachDashboard({
         </div>
 
         {loading ? (
-          <p className="muted">Loading roster...</p>
+          <SkeletonRegion label="Loading roster">
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </SkeletonRegion>
+        ) : rosterLoadFailed && error ? (
+          <InlineError message={error} onRetry={refresh} />
         ) : roster.length === 0 ? (
           <div className="empty-state">
             <p className="muted">
@@ -215,7 +240,7 @@ export function CoachDashboard({
         )}
       </div>
 
-      {error && (
+      {error && !rosterLoadFailed && (
         <div className="empty-state">
           <p className="muted">{error}</p>
         </div>

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+
 import "./globals.css";
 
 const geist = Geist({
@@ -10,8 +12,16 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "NextRep",
-  description: "NextRep: the athlete training and recovery operating system for volleyball teams"
+  metadataBase: new URL(SITE_URL),
+  title: { default: "NextRep: Volleyball Team Training & Readiness", template: "%s | NextRep" },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: "NextRep: Volleyball Team Training & Readiness",
+    description: SITE_DESCRIPTION
+  },
+  twitter: { card: "summary" }
 };
 
 export const viewport: Viewport = {
