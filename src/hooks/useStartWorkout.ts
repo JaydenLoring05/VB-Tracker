@@ -1,22 +1,29 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { useTrackerContext } from "@/context/TrackerContext";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabase } from "@/hooks/useSupabase";
 import { WorkoutSession } from "@/types";
 
 export function useStartWorkout() {
   const router = useRouter();
   const { userId, week, reportSyncError } = useTrackerContext();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [openSession, setOpenSession] = useState<WorkoutSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
+    if (demo) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
     supabase
@@ -42,9 +49,14 @@ export function useStartWorkout() {
     return () => {
       cancelled = true;
     };
-  }, [supabase, userId]);
+  }, [supabase, demo, userId]);
 
   async function startWorkout(day: string) {
+    if (demo) {
+      demo.requestSignup("Logging workouts");
+      return;
+    }
+
     if (starting) return;
     setStarting(true);
 

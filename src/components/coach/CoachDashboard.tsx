@@ -3,6 +3,7 @@
 import { AlertTriangle, Copy, RefreshCw, Trophy, UserMinus, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { useAttentionCenter } from "@/hooks/useAttentionCenter";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { buildInviteMessage } from "@/lib/teamSetup";
@@ -41,6 +42,7 @@ export function CoachDashboard({
   onTeamChange?: () => void;
 }) {
   const team = activeTeam;
+  const demo = useDemo();
   const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
   const {
     loading: attentionLoading,
@@ -75,6 +77,11 @@ export function CoachDashboard({
   }
 
   function requestRemove(athlete: RosterAthlete) {
+    if (demo) {
+      demo.requestSignup("Managing your roster");
+      return;
+    }
+
     if (removingId) return;
     setPendingRemoval(athlete);
   }

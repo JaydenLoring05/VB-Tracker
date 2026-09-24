@@ -128,11 +128,11 @@ export default function LandingPage() {
             <Link href="/pilot">
               <button type="button">Start Free Team Pilot</button>
             </Link>
-            <a href="#product-preview">
+            <Link href="/demo">
               <button type="button" className="ghost">
                 View Demo Dashboard
               </button>
-            </a>
+            </Link>
           </div>
 
           <p className="muted landing-hero-reassurance">
@@ -323,11 +323,11 @@ export default function LandingPage() {
             <Link href="/pilot">
               <button type="button">Start Free Team Pilot</button>
             </Link>
-            <a href="#product-preview">
+            <Link href="/demo">
               <button type="button" className="ghost">
                 View Demo Dashboard
               </button>
-            </a>
+            </Link>
           </div>
 
           <p className="muted landing-hero-reassurance">

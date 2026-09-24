@@ -2,13 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { fromStatsRow, StatsRow } from "@/context/TrackerContext";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabase } from "@/hooks/useSupabase";
 import { AttentionItem, computeAttentionItems } from "@/lib/attentionCenter";
 import { RosterAthlete, StatEntry, Team } from "@/types";
 
 export function useAttentionCenter(team: Team | null, roster: RosterAthlete[]) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<AttentionItem[]>([]);
@@ -20,6 +22,14 @@ export function useAttentionCenter(team: Team | null, roster: RosterAthlete[]) {
   useEffect(() => {
     if (!team || !athleteIds) {
       setItems([]);
+      setLoading(false);
+      return;
+    }
+
+    if (demo) {
+      // Same real ranking logic, fed by the static sample data instead of Supabase.
+      setItems(computeAttentionItems(roster, demo.data.statsHistory, demo.data.completedLast7, demo.data.recentPRs));
+      setError(null);
       setLoading(false);
       return;
     }
@@ -77,7 +87,7 @@ export function useAttentionCenter(team: Team | null, roster: RosterAthlete[]) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, team, athleteIds, attempt]);
+  }, [supabase, demo, team, athleteIds, attempt]);
 
   const retry = () => setAttempt((current) => current + 1);
 

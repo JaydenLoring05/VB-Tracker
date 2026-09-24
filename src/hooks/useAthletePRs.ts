@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { createClient } from "@/lib/supabase/client";
+import { useDemo } from "@/context/DemoContext";
+import { useSupabase } from "@/hooks/useSupabase";
 import { PRRecord } from "@/context/TrackerContext";
 
 export function useAthletePRs(userId: string | null) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [loading, setLoading] = useState(false);
   const [prs, setPrs] = useState<PRRecord[]>([]);
@@ -15,6 +17,13 @@ export function useAthletePRs(userId: string | null) {
   useEffect(() => {
     if (!userId) {
       setPrs([]);
+      return;
+    }
+
+    if (demo) {
+      setPrs(demo.data.prs[userId] ?? []);
+      setError(null);
+      setLoading(false);
       return;
     }
 
@@ -44,7 +53,7 @@ export function useAthletePRs(userId: string | null) {
     return () => {
       cancelled = true;
     };
-  }, [supabase, userId]);
+  }, [supabase, demo, userId]);
 
   return { loading, prs, error };
 }

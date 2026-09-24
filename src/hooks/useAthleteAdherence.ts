@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useDemo } from "@/context/DemoContext";
 import { getWorkoutDays } from "@/data/workoutPlan";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabase } from "@/hooks/useSupabase";
 
 const TOTAL_WEEKS = 20;
 
@@ -36,8 +37,26 @@ function countPlannedExercises() {
 
 const PLANNED_EXERCISES = countPlannedExercises();
 
+function summarizeAdherence(sessions: CompletedSession[], exercisesCompleted: number): AthleteAdherence {
+  const totalMinutesTrained = Math.round(
+    sessions.reduce((sum, session) => sum + (session.duration_seconds ?? 0), 0) / 60
+  );
+
+  return {
+    sessions,
+    totalSessions: sessions.length,
+    totalMinutesTrained,
+    exercisesCompleted,
+    exercisesPlanned: PLANNED_EXERCISES,
+    completionPercent: PLANNED_EXERCISES
+      ? Math.round(Math.min(100, (exercisesCompleted / PLANNED_EXERCISES) * 100))
+      : 0
+  };
+}
+
 export function useAthleteAdherence(userId: string | null) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
 
   const [loading, setLoading] = useState(false);
   const [adherence, setAdherence] = useState<AthleteAdherence | null>(null);
@@ -46,6 +65,19 @@ export function useAthleteAdherence(userId: string | null) {
   useEffect(() => {
     if (!userId) {
       setAdherence(null);
+      return;
+    }
+
+    if (demo) {
+      const planPercent = demo.data.planCompletionPercent[userId] ?? 0;
+      setAdherence(
+        summarizeAdherence(
+          demo.data.completedSessions[userId] ?? [],
+          Math.round((PLANNED_EXERCISES * planPercent) / 100)
+        )
+      );
+      setError(null);
+      setLoading(false);
       return;
     }
 
@@ -75,29 +107,14 @@ export function useAthleteAdherence(userId: string | null) {
         return;
       }
 
-      const sessions = (sessionsRes.data ?? []) as CompletedSession[];
-      const exercisesCompleted = checksRes.count ?? 0;
-      const totalMinutesTrained = Math.round(
-        sessions.reduce((sum, session) => sum + (session.duration_seconds ?? 0), 0) / 60
-      );
-
-      setAdherence({
-        sessions,
-        totalSessions: sessions.length,
-        totalMinutesTrained,
-        exercisesCompleted,
-        exercisesPlanned: PLANNED_EXERCISES,
-        completionPercent: PLANNED_EXERCISES
-          ? Math.round(Math.min(100, (exercisesCompleted / PLANNED_EXERCISES) * 100))
-          : 0
-      });
+      setAdherence(summarizeAdherence((sessionsRes.data ?? []) as CompletedSession[], checksRes.count ?? 0));
       setLoading(false);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [supabase, userId]);
+  }, [supabase, demo, userId]);
 
   return { loading, adherence, error };
 }

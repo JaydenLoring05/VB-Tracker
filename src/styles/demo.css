@@ -1,0 +1,485 @@
+/* Public sales demo (/demo). Reuses the app's tokens; nothing here touches the real screens. */
+
+.demo-page {
+  min-height: 100vh;
+}
+
+/* Persistent banner ------------------------------------------------- */
+
+.demo-banner {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(5, 7, 10, 0.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 196, 0, 0.25);
+}
+
+.demo-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--sp-2) var(--sp-3);
+}
+
+.demo-banner-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 var(--sp-2);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-weight: 700;
+  transition: color var(--transition);
+}
+
+.demo-banner-back:hover {
+  color: var(--text);
+}
+
+.demo-banner-back-label {
+  display: none;
+}
+
+.demo-banner-label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+.demo-sample-chip {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 196, 0, 0.5);
+  border-radius: 999px;
+  background: rgba(255, 196, 0, 0.1);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.demo-banner-note {
+  display: none;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demo-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.demo-tour-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.demo-tour-button span {
+  display: none;
+}
+
+/* Gold call to action, used as a link in the banner, prompt and closing panel. */
+.demo-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--gold), #e7a900);
+  color: #14110a;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.demo-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(255, 196, 0, 0.22);
+}
+
+.demo-cta:active {
+  transform: scale(0.97);
+}
+
+.demo-cta-long {
+  display: none;
+}
+
+.demo-secondary-link {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.demo-secondary-link:hover {
+  color: var(--text);
+}
+
+/* Page body --------------------------------------------------------- */
+
+.demo-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--sp-5) var(--sp-4) 132px;
+}
+
+.demo-loading {
+  text-align: center;
+}
+
+.demo-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-5);
+}
+
+.demo-intro h1 {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.demo-intro p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.demo-view-switch {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.demo-view-switch button {
+  flex: 1 1 0;
+}
+
+.demo-view {
+  display: grid;
+  gap: var(--sp-5);
+  /* "backwards" only: a lingering transform animation would become the containing
+     block for the position:fixed athlete modal rendered inside this view. */
+  animation: demo-fade-in 0.28s var(--ease-out) backwards;
+}
+
+/* Team snapshot ------------------------------------------------------ */
+
+.demo-snapshot {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+.demo-snapshot-tile {
+  min-width: 0;
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.demo-snapshot-tile p {
+  margin: 0;
+}
+
+.demo-snapshot-label {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.demo-snapshot-value {
+  margin-top: 2px;
+  font-size: var(--fs-2xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.demo-snapshot-detail {
+  font-size: var(--fs-xs);
+  line-height: 1.35;
+}
+
+/* Closing panel ------------------------------------------------------ */
+
+.demo-closing {
+  margin-top: var(--sp-8);
+  text-align: center;
+}
+
+.demo-closing h2 {
+  justify-content: center;
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-xl);
+  text-wrap: balance;
+}
+
+.demo-closing p {
+  margin: 0 0 var(--sp-4);
+}
+
+.demo-closing-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+/* Sign-up prompt ------------------------------------------------------ */
+
+.demo-prompt {
+  width: calc(100vw - var(--sp-8));
+  max-width: 440px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.demo-prompt::backdrop {
+  background: rgba(2, 3, 4, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.demo-prompt-card {
+  padding: var(--sp-6);
+  border: 1px solid rgba(255, 196, 0, 0.35);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(155deg, #171c23, #0c0f14);
+  box-shadow: var(--shadow-md);
+}
+
+.demo-prompt[open] .demo-prompt-card {
+  animation: demo-rise 0.22s var(--ease-out) both;
+}
+
+.demo-prompt-card h2 {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-xl);
+}
+
+.demo-prompt-card p {
+  margin: 0 0 var(--sp-2);
+  text-wrap: pretty;
+}
+
+.demo-prompt-kicker {
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.demo-prompt-feature {
+  font-size: var(--fs-sm);
+}
+
+.demo-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.demo-prompt-actions > * {
+  flex: 1 1 160px;
+}
+
+/* Guided tour --------------------------------------------------------- */
+
+.demo-tour {
+  position: fixed;
+  right: var(--sp-3);
+  bottom: calc(var(--sp-3) + env(safe-area-inset-bottom));
+  left: var(--sp-3);
+  z-index: 900;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--sp-4);
+  border: 1px solid rgba(255, 196, 0, 0.4);
+  border-radius: var(--radius-lg);
+  background: var(--panel-2);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+  animation: demo-rise 0.22s var(--ease-out) both;
+}
+
+.demo-tour h2 {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-lg);
+}
+
+.demo-tour p {
+  margin: 0;
+}
+
+.demo-tour-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-2);
+}
+
+.demo-tour-header .demo-tour-step {
+  color: var(--gold);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.demo-tour-close {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: -10px -10px -10px 0;
+  padding: 0;
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.demo-tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.demo-tour-target {
+  outline: 2px solid var(--gold);
+  outline-offset: 6px;
+  border-radius: var(--radius-lg);
+  scroll-margin-top: 96px;
+}
+
+/* Motion ---------------------------------------------------------------- */
+
+@keyframes demo-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes demo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-view,
+  .demo-tour,
+  .demo-prompt[open] .demo-prompt-card {
+    animation: none;
+  }
+}
+
+/* Larger screens ----------------------------------------------------------- */
+
+@media (min-width: 520px) {
+  .demo-tour-button span {
+    display: inline;
+  }
+
+  .demo-banner-back-label {
+    display: inline;
+  }
+
+  .demo-cta-short {
+    display: none;
+  }
+
+  .demo-cta-long {
+    display: inline;
+  }
+}
+
+@media (min-width: 720px) {
+  .demo-banner-note {
+    display: block;
+  }
+
+  .demo-banner-inner {
+    padding: var(--sp-2) var(--sp-6);
+  }
+
+  .demo-view-switch button {
+    flex: 0 0 auto;
+  }
+}
+
+@media (min-width: 900px) {
+  .demo-main {
+    padding: var(--sp-8) var(--sp-8) 140px;
+  }
+
+  .demo-intro {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .demo-intro h1 {
+    font-size: var(--fs-display);
+  }
+
+  .demo-snapshot {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-3);
+  }
+
+  .demo-tour {
+    right: var(--sp-6);
+    bottom: var(--sp-6);
+    left: auto;
+    width: 380px;
+    margin: 0;
+  }
+
+  .demo-closing-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .demo-prompt {
+    width: 100vw;
+    max-width: none;
+    margin: auto 0 0;
+  }
+
+  .demo-prompt-card {
+    padding-bottom: calc(var(--sp-6) + env(safe-area-inset-bottom));
+    border-bottom: none;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}

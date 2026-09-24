@@ -39,7 +39,16 @@ function redirectTo(
   return redirect;
 }
 
+// The public sales demo runs entirely on static sample data. It skips the
+// auth check (and its Supabase call) so it works logged out, and stays
+// viewable for a signed-in coach who wants to show it to someone else.
+const DEMO_PATH = "/demo";
+
 export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname === DEMO_PATH) {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
