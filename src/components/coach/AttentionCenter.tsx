@@ -3,6 +3,8 @@
 import { AlertTriangle, PartyPopper, ShieldAlert } from "lucide-react";
 import { ComponentType } from "react";
 
+import { InlineError } from "@/components/shared/InlineError";
+import { SkeletonRegion, SkeletonRow } from "@/components/shared/Skeleton";
 import { AttentionItem, AttentionPriority } from "@/lib/attentionCenter";
 
 const PRIORITY_META: Record<AttentionPriority, { icon: ComponentType<{ size?: number }>; className: string }> = {
@@ -14,10 +16,14 @@ const PRIORITY_META: Record<AttentionPriority, { icon: ComponentType<{ size?: nu
 export function AttentionCenter({
   items,
   loading,
+  error,
+  onRetry,
   onSelectAthlete
 }: {
   items: AttentionItem[];
   loading: boolean;
+  error?: string | null;
+  onRetry?: () => void;
   onSelectAthlete: (userId: string, displayName: string) => void;
 }) {
   return (
@@ -26,7 +32,15 @@ export function AttentionCenter({
       <p className="muted">What needs your attention today, ranked by priority.</p>
 
       {loading ? (
-        <p className="muted">Loading...</p>
+        <SkeletonRegion label="Loading attention items">
+          <SkeletonRow />
+          <SkeletonRow />
+          <SkeletonRow />
+        </SkeletonRegion>
+      ) : error ? (
+        // Never fall through to "All caught up" here: a failed load would tell
+        // a coach nothing needs attention when pain flags may be sitting unread.
+        <InlineError message={error} onRetry={onRetry} />
       ) : items.length === 0 ? (
         <div className="empty-state">
           <p className="muted">All caught up. Nothing needs your attention today.</p>

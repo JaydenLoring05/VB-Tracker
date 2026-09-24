@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 import { todayISO } from "@/lib/storage";
@@ -188,6 +188,10 @@ type TrackerContextValue = {
   reportSyncError: (message: string, retry?: () => void) => void;
   retrySyncError: () => void;
   clearSyncError: () => void;
+
+  /** True when the initial data load failed (data on screen may be empty, not real). */
+  loadError: boolean;
+  reloadData: () => void;
 };
 
 const TrackerContext = createContext<TrackerContextValue | null>(null);
@@ -219,16 +223,33 @@ export function TrackerProvider({
   const [workoutStreak, setWorkoutStreak] = useState(0);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [syncRetry, setSyncRetry] = useState<(() => void) | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
-  function reportSyncError(message: string, retry?: () => void) {
+  useEffect(() => {
+    // If the session dies while the app is open (revoked, refresh token
+    // rejected, signed out in another tab), Supabase clears it and emits
+    // SIGNED_OUT. Send the user to sign in instead of leaving a half-working app.
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") window.location.assign("/login");
+    });
+
+    return () => data.subscription.unsubscribe();
+  }, [supabase]);
+
+  // Stable identities: hooks list these in effect dependency arrays, and a new
+  // function on every render made a failed load retry itself in a tight loop.
+  const reportSyncError = useCallback((message: string, retry?: () => void) => {
     setSyncError(message);
     setSyncRetry(() => retry ?? null);
-  }
+  }, []);
 
-  function clearSyncError() {
+  const clearSyncError = useCallback(() => {
     setSyncError(null);
     setSyncRetry(null);
-  }
+  }, []);
+
+  const reloadData = useCallback(() => setLoadAttempt((attempt) => attempt + 1), []);
 
   function retrySyncError() {
     if (syncRetry) {
@@ -263,6 +284,17 @@ export function TrackerProvider({
     let cancelled = false;
 
     async function load() {
+      setLoadError(false);
+
+      try {
+        await loadAll();
+      } catch (error) {
+        console.error("Failed to load tracker data", error);
+        if (!cancelled) setLoadError(true);
+      }
+    }
+
+    async function loadAll() {
       const [
         checksRes,
         logsRes,
@@ -308,6 +340,29 @@ export function TrackerProvider({
       ]);
 
       if (cancelled) return;
+
+      // A failed read comes back as { error, data: null }, which the code
+      // below would render as "no data yet". Flag it so the app can say the
+      // load failed (and offer a retry) instead of showing an empty account.
+      const failed = [
+        checksRes,
+        logsRes,
+        notesRes,
+        latestRes,
+        historyRes,
+        calendarRes,
+        prsRes,
+        sessionsRes,
+        substitutionsRes,
+        teamMemberRes
+      ].find((res) => res.error);
+
+      if (failed) {
+        console.error("Failed to load tracker data", failed.error);
+        setLoadError(true);
+        // Don't seed defaults or overwrite state from a partial read.
+        return;
+      }
 
       const checksMap: Record<string, boolean> = {};
       (checksRes.data ?? []).forEach((row) => {
@@ -400,7 +455,7 @@ export function TrackerProvider({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, userId]);
+  }, [supabase, userId, loadAttempt]);
 
   function toggleExercise(day: string, exercise: string) {
     const key = `${week}-${day}-${exercise}`;
@@ -698,7 +753,9 @@ export function TrackerProvider({
     syncRetry,
     reportSyncError,
     retrySyncError,
-    clearSyncError
+    clearSyncError,
+    loadError,
+    reloadData
   };
 
   return <TrackerContext.Provider value={value}>{children}</TrackerContext.Provider>;

@@ -29,7 +29,12 @@ export function useStartWorkout() {
       .maybeSingle()
       .then(({ data, error }) => {
         if (cancelled) return;
-        if (error) console.error("Failed to check for an open workout session", error);
+        if (error) {
+          // Without this an athlete mid-workout would see "Start" instead of
+          // "Continue" and could begin a duplicate session.
+          console.error("Failed to check for an open workout session", error);
+          reportSyncError("Couldn't check for a workout in progress. Check your connection and refresh.");
+        }
         setOpenSession(data as WorkoutSession | null);
         setLoading(false);
       });

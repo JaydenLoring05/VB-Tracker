@@ -13,6 +13,7 @@ export function useAttentionCenter(team: Team | null, roster: RosterAthlete[]) {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<AttentionItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   const athleteIds = useMemo(() => roster.map((athlete) => athlete.userId).sort().join(","), [roster]);
 
@@ -76,7 +77,9 @@ export function useAttentionCenter(team: Team | null, roster: RosterAthlete[]) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, team, athleteIds]);
+  }, [supabase, team, athleteIds, attempt]);
 
-  return { loading, items, error };
+  const retry = () => setAttempt((current) => current + 1);
+
+  return { loading, items, error, retry };
 }

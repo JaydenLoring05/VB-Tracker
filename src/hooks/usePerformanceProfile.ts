@@ -32,9 +32,13 @@ export function usePerformanceProfile() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<PerformanceProfile>(emptyProfile);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+
+    setLoading(true);
+    setError(null);
 
     supabase
       .from("performance_profiles")
@@ -55,7 +59,7 @@ export function usePerformanceProfile() {
     return () => {
       cancelled = true;
     };
-  }, [supabase, userId]);
+  }, [supabase, userId, attempt]);
 
   async function saveProfile() {
     setError(null);
@@ -87,5 +91,7 @@ export function usePerformanceProfile() {
     return true;
   }
 
-  return { loading, profile, setProfile, saveProfile, error };
+  const retry = () => setAttempt((current) => current + 1);
+
+  return { loading, profile, setProfile, saveProfile, error, retry };
 }
