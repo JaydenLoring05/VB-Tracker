@@ -251,7 +251,7 @@ export default function LandingPage() {
               const Icon = step.icon;
               return (
                 <div className="landing-step" key={step.title}>
-                  <div className="landing-step-number">{String(index + 1).padStart(2, "0")}</div>
+                  <div className="landing-step-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
                   <Icon size={22} />
                   <h3>{step.title}</h3>
                   <p className="muted">{step.body}</p>

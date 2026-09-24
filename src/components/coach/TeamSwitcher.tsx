@@ -39,6 +39,7 @@ export function TeamSwitcher({
       {teams.length > 1 && (
         <select
           className="team-switcher-select"
+          aria-label="Active team"
           value={activeTeamId}
           onChange={(event) => onSelect(event.target.value)}
         >
@@ -54,6 +55,7 @@ export function TeamSwitcher({
         type="button"
         className="ghost team-switcher-new"
         onClick={() => setShowNewTeamForm((current) => !current)}
+        aria-expanded={showNewTeamForm}
       >
         <Plus size={14} /> New Team
       </button>
@@ -61,6 +63,7 @@ export function TeamSwitcher({
       {showNewTeamForm && (
         <form className="team-switcher-new-form" onSubmit={handleCreate}>
           <input
+            aria-label="New team name"
             value={newTeamName}
             onChange={(event) => setNewTeamName(event.target.value)}
             placeholder="Team name, ex: JV Girls"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { useProfile } from "@/hooks/useProfile";
 import { useTeam } from "@/hooks/useTeam";
@@ -52,6 +52,20 @@ export function OnboardingFlow() {
   const [inviteCode, setInviteCode] = useState("");
 
   const [saving, setSaving] = useState(false);
+
+  // Each step replaces the last one in place, so move focus to the new step's heading:
+  // keyboard and screen reader users would otherwise be left on a control that vanished.
+  const flowRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const heading = flowRef.current?.querySelector<HTMLElement>("h2");
+    heading?.setAttribute("tabindex", "-1");
+    heading?.focus();
+  }, [step]);
 
   function selectRole(next: Role) {
     setRole(next);
@@ -104,7 +118,7 @@ export function OnboardingFlow() {
   }
 
   return (
-    <div className="panel onboarding-flow">
+    <div className="panel onboarding-flow" ref={flowRef}>
       <p className="muted onboarding-step-indicator">
         Step {step} of {TOTAL_STEPS}
       </p>
@@ -218,7 +232,11 @@ export function OnboardingFlow() {
               required
             />
           </label>
-          {teamError && <p className="muted">{teamError}</p>}
+          {teamError && (
+            <p className="muted" role="alert">
+              {teamError}
+            </p>
+          )}
           <button type="submit" disabled={!teamName.trim() || saving}>
             {saving ? "Creating..." : "Create Team"}
           </button>
@@ -234,11 +252,18 @@ export function OnboardingFlow() {
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               placeholder="Invite code"
+              autoCapitalize="characters"
+              autoComplete="off"
+              spellCheck={false}
               maxLength={6}
               required
             />
           </label>
-          {teamError && <p className="muted">{teamError}</p>}
+          {teamError && (
+            <p className="muted" role="alert">
+              {teamError}
+            </p>
+          )}
           <button type="submit" disabled={!inviteCode.trim() || saving}>
             {saving ? "Joining..." : "Join Team"}
           </button>

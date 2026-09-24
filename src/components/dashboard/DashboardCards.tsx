@@ -105,7 +105,7 @@ export function DashboardCards() {
           <p className="muted">
             {completedExercises} / {totalExercises} exercises completed
           </p>
-          <div className="progress-bar">
+          <div className="progress-bar" aria-hidden="true">
             <div className="progress-fill" style={{ width: `${progress}%` }} />
           </div>
         </div>

@@ -30,6 +30,7 @@ export function CalendarPanel() {
         <form className="add-game-form" onSubmit={handleSubmit}>
           <input
             autoFocus
+            aria-label="Game title"
             value={gameTitle}
             onChange={(e) => setGameTitle(e.target.value)}
             placeholder="Game title"

@@ -63,6 +63,9 @@ export function ExerciseLibrary() {
         <Search size={18} />
         <input
           type="text"
+          aria-label="Search exercises"
+          enterKeyHint="search"
+          autoComplete="off"
           value={exerciseSearch}
           onChange={(e) => setExerciseSearch(e.target.value)}
           placeholder="Search exercises, cues, mistakes, knee, shoulder, jump..."

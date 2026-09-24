@@ -17,7 +17,7 @@ export function WeekSelector() {
         </button>
       ))}
 
-      <select value={week} onChange={(e) => setWeek(Number(e.target.value))}>
+      <select aria-label="Jump to week" value={week} onChange={(e) => setWeek(Number(e.target.value))}>
         {Array.from({ length: 20 }, (_, i) => i + 1).map((value) => (
           <option key={value} value={value}>
             Week {value}

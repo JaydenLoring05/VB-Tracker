@@ -113,6 +113,7 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
             {swapOpen && (
               <div className="swap-picker">
                 <select
+                  aria-label={`Swap ${originalExercise} for another exercise`}
                   value={exercise}
                   onChange={(event) => {
                     const chosen = event.target.value;
@@ -136,6 +137,7 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
 
             <input
               className="exercise-log-input"
+              aria-label={`Log for ${exercise}`}
               value={workoutLogs[logKey] || ""}
               onChange={(event) => updateWorkoutLog(day.day, exercise, event.target.value)}
               placeholder="Log: weight x reps, jump height, pain level, speed..."

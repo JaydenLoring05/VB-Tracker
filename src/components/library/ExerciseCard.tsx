@@ -63,12 +63,13 @@ export function ExerciseCard({
           </div>
 
           <a className="video-link" href={exercise.video} target="_blank" rel="noreferrer">
-            Watch form video →
+            Watch form video <span aria-hidden="true">→</span>
+            <span className="sr-only"> (opens in a new tab)</span>
           </a>
         </div>
       )}
 
-      <button className="view-details-button" onClick={onToggle}>
+      <button type="button" className="view-details-button" onClick={onToggle} aria-expanded={isExpanded}>
         {isExpanded ? "Hide Details" : "View Details"}
       </button>
     </div>

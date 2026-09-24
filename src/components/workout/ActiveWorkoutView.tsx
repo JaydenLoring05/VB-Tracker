@@ -336,7 +336,8 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
             }`}
             onClick={() => goToExercise(index)}
             title={name}
-            aria-label={name}
+            aria-label={sets.some((s) => s.exercise === name) ? `${name}, logged` : name}
+            aria-current={index === exerciseIndex ? "step" : undefined}
           />
         ))}
       </div>
@@ -372,6 +373,13 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
           onSwap={(chosen) => setSubstitution(originalExercise, chosen)}
         />
 
+        {/* Always mounted so a screen reader announces each newly logged set. */}
+        <p className="sr-only" role="status">
+          {exerciseSets.length > 0
+            ? `${exerciseSets.length} set${exerciseSets.length === 1 ? "" : "s"} logged for ${exercise}`
+            : ""}
+        </p>
+
         {exerciseSets.length > 0 && (
           <div className="logged-sets">
             {exerciseSets.map((set) => (
@@ -385,7 +393,12 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
                     </span>
                   )}
                 </span>
-                <button className="ghost danger-button" onClick={() => deleteSet(set.id)}>
+                <button
+                  type="button"
+                  className="ghost danger-button"
+                  onClick={() => deleteSet(set.id)}
+                  aria-label={`Remove set ${set.set_number}`}
+                >
                   Remove
                 </button>
               </div>
@@ -405,6 +418,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
               <input
                 type="number"
                 inputMode="decimal"
+                aria-label="Weight"
                 placeholder="Weight"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
@@ -416,6 +430,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
                     key={amount}
                     className="ghost"
                     onClick={() => bumpWeight(amount)}
+                    aria-label={`Add ${amount} to weight`}
                   >
                     +{amount}
                   </button>
@@ -426,6 +441,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
               <input
                 type="number"
                 inputMode="decimal"
+                aria-label="Reps"
                 placeholder="Reps"
                 value={reps}
                 onChange={(e) => setReps(e.target.value)}
@@ -438,6 +454,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
                     key={amount}
                     className="ghost"
                     onClick={() => bumpReps(amount)}
+                    aria-label={`Add ${amount} to reps`}
                   >
                     +{amount}
                   </button>
