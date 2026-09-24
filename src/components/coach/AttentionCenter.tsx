@@ -3,6 +3,8 @@
 import { AlertTriangle, PartyPopper, ShieldAlert } from "lucide-react";
 import { ComponentType } from "react";
 
+import { EmptyState } from "@/components/shared/EmptyState";
+
 import { AttentionItem, AttentionPriority } from "@/lib/attentionCenter";
 
 const PRIORITY_META: Record<AttentionPriority, { icon: ComponentType<{ size?: number }>; className: string }> = {
@@ -14,10 +16,13 @@ const PRIORITY_META: Record<AttentionPriority, { icon: ComponentType<{ size?: nu
 export function AttentionCenter({
   items,
   loading,
+  hasAthletes = true,
   onSelectAthlete
 }: {
   items: AttentionItem[];
   loading: boolean;
+  /** False when the roster is empty, so "all caught up" isn't claimed about nobody. */
+  hasAthletes?: boolean;
   onSelectAthlete: (userId: string, displayName: string) => void;
 }) {
   return (
@@ -27,6 +32,13 @@ export function AttentionCenter({
 
       {loading ? (
         <p className="muted">Loading...</p>
+      ) : !hasAthletes ? (
+        <EmptyState
+          compact
+          icon={ShieldAlert}
+          title="Nothing to watch yet"
+          description="Once athletes join and check in, this lists who is run down, in pain, or has missed workouts, plus new PRs to celebrate."
+        />
       ) : items.length === 0 ? (
         <div className="empty-state">
           <p className="muted">All caught up. Nothing needs your attention today.</p>

@@ -3,6 +3,7 @@
 import { BarChart3, CalendarDays, Flame, HeartPulse, Play, Trophy } from "lucide-react";
 import Link from "next/link";
 
+import { TeamNudge } from "@/components/dashboard/TeamNudge";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
@@ -37,6 +38,8 @@ export function DashboardCards() {
 
   return (
     <>
+      <TeamNudge />
+
       {todayWorkout && !todayWorkout.rest && (
         <Link href="/workout">
           <button className="dashboard-hero-cta">
@@ -91,7 +94,10 @@ export function DashboardCards() {
           ) : (
             <>
               <h2>--</h2>
-              <p className="muted">No stats logged yet. Fill out today&apos;s check-in to see your recovery.</p>
+              <p className="muted">No check-in yet. Log sleep, energy and soreness to get today&apos;s recovery score.</p>
+              <Link href="/stats" className="button-link dashboard-card-cta">
+                Log today&apos;s check-in
+              </Link>
             </>
           )}
         </div>
@@ -133,7 +139,13 @@ export function DashboardCards() {
           ) : (
             <>
               <h2>0</h2>
-              <p className="muted">No PRs logged yet.</p>
+              <p className="muted">
+                No PRs yet. They&apos;re saved automatically when you beat a best in a workout, or add one on{" "}
+                <Link href="/stats" className="dashboard-inline-link">
+                  Stats
+                </Link>
+                .
+              </p>
             </>
           )}
         </div>
