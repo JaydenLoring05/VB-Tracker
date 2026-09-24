@@ -255,22 +255,19 @@ export function CoachDashboard({
         ) : (
           <div className="roster-table">
             {roster.map((athlete) => (
-              <div
-                role="button"
-                tabIndex={0}
-                className="roster-row"
-                key={athlete.userId}
-                onClick={() => setSelectedAthlete(athlete)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    setSelectedAthlete(athlete);
-                  }
-                }}
-              >
+              <div className="roster-row" key={athlete.userId}>
                 <Avatar name={athlete.displayName} />
                 <div className="roster-athlete-name">
-                  <strong>{athlete.displayName}</strong>
+                  {/* The name is the row's real button; its ::after stretches over the whole row so
+                      the entire row still clicks, without nesting the Remove button inside a button. */}
+                  <button
+                    type="button"
+                    className="roster-open"
+                    aria-haspopup="dialog"
+                    onClick={() => setSelectedAthlete(athlete)}
+                  >
+                    {athlete.displayName}
+                  </button>
                   {athlete.needsCheckIn && athlete.lastCheckIn !== null && (
                     <span className="pill roster-flag">Needs check-in</span>
                   )}
@@ -292,13 +289,11 @@ export function CoachDashboard({
                 <button
                   type="button"
                   className="ghost danger-button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    requestRemove(athlete);
-                  }}
+                  onClick={() => requestRemove(athlete)}
                   disabled={removingId === athlete.userId}
+                  aria-label={`Remove ${athlete.displayName}`}
                 >
-                  <UserMinus size={14} /> Remove
+                  <UserMinus size={14} aria-hidden="true" /> Remove
                 </button>
               </div>
             ))}

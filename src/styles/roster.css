@@ -31,6 +31,7 @@
 }
 
 .roster-row {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto auto;
   grid-template-areas: "av name status score btn";
@@ -40,7 +41,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--sp-3) var(--sp-4);
-  cursor: pointer;
   transition:
     border-color var(--transition),
     background-color var(--transition),
@@ -55,8 +55,14 @@
   }
 }
 
-.roster-row:focus-visible {
+.roster-row:has(.roster-open) {
+  cursor: pointer;
+}
+
+.roster-row:has(.roster-open:focus-visible) {
   border-color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .roster-row > .avatar-initials {
@@ -72,13 +78,45 @@
   min-width: 0;
 }
 
-.roster-athlete-name strong {
+.roster-athlete-name strong,
+.roster-open {
   flex: 1 1 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--fs-base);
   font-weight: 700;
+}
+
+/* The athlete's name as a plain-looking button; ::after makes the whole row its hit area. */
+.roster-open {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+  font-family: inherit;
+  line-height: 1.5;
+  text-align: left;
+  transform: none;
+}
+
+.roster-open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.roster-open:focus-visible {
+  outline: none;
+}
+
+.roster-open:active:not(:disabled) {
+  transform: none;
 }
 
 .roster-flag {
@@ -113,6 +151,7 @@
 }
 
 .roster-row > button {
+  position: relative; /* above the row-wide hit area of .roster-open */
   grid-area: btn;
   min-height: 34px;
   padding: 5px 10px;
@@ -164,7 +203,8 @@
     font-size: 28px;
   }
 
-  .roster-athlete-name strong {
+  .roster-athlete-name strong,
+  .roster-open {
     white-space: normal;
   }
 }
