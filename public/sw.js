@@ -63,13 +63,15 @@ function isCacheableStaticPath(pathname) {
   return pathname.startsWith("/_next/static/") || pathname.startsWith("/icons/");
 }
 
-// cache.keys() lists oldest first, so the oldest files go first. The offline page is never evicted.
+// cache.keys() lists oldest first, so the oldest build files go first. The offline page and the brand
+// icons are never evicted: they are rarely refetched, so they are always the oldest entries.
 async function trimStaticCache(cache) {
   const keys = await cache.keys();
   let excess = keys.length - MAX_STATIC_ENTRIES;
   for (const key of keys) {
     if (excess <= 0) break;
-    if (new URL(key.url).pathname === OFFLINE_URL) continue;
+    const { pathname } = new URL(key.url);
+    if (pathname === OFFLINE_URL || pathname.startsWith("/icons/")) continue;
     await cache.delete(key);
     excess -= 1;
   }

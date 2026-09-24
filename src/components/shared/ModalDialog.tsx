@@ -44,7 +44,10 @@ export function ModalDialog({
 
     return () => {
       if (dialog.open) dialog.close();
-      if (opener?.isConnected) opener.focus();
+      // If the opener was removed while the modal was open (a deleted row), land on the page's main
+      // landmark rather than dropping focus to the top of the document.
+      const target = opener?.isConnected ? opener : document.getElementById("main-content");
+      target?.focus();
     };
   }, []);
 

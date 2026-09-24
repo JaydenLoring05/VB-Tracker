@@ -26,13 +26,17 @@ export default function ResetPasswordPage() {
     event.preventDefault();
     setError("");
 
+    // Validation errors are set and cleared in the same tick, so the effect above would not see a
+    // change on a repeat attempt; focus the field directly here.
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
+      passwordRef.current?.focus();
       return;
     }
 
     if (password !== confirmPassword) {
       setError("Passwords don't match.");
+      passwordRef.current?.focus();
       return;
     }
 
