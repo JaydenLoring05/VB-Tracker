@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import { authErrorMessage } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
@@ -34,7 +35,7 @@ export default function ResetPasswordPage() {
     setLoading(false);
 
     if (updateError) {
-      setError(updateError.message);
+      setError(authErrorMessage(updateError));
       return;
     }
 

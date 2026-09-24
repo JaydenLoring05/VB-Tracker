@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 
+import { authErrorMessage } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
@@ -57,7 +58,7 @@ export default function LoginPage() {
 
     if (resendError) {
       setResendState("error");
-      setError(resendError.message);
+      setError(authErrorMessage(resendError));
       return;
     }
 
@@ -80,7 +81,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (resetError) {
-      setError(resetError.message);
+      setError(authErrorMessage(resetError));
       return;
     }
 
@@ -108,7 +109,7 @@ export default function LoginPage() {
       setLoading(false);
 
       if (signInError) {
-        setError(signInError.message);
+        setError(authErrorMessage(signInError));
         return;
       }
 
@@ -125,7 +126,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (signUpError) {
-      setError(signUpError.message);
+      setError(authErrorMessage(signUpError));
       return;
     }
 
