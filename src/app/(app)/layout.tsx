@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SyncErrorToast } from "@/components/layout/SyncErrorToast";
 import { Topbar } from "@/components/layout/Topbar";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { TrackerProvider } from "@/context/TrackerContext";
 import { createClient } from "@/lib/supabase/server";
 
@@ -38,6 +39,7 @@ export default async function AppLayout({
       </div>
 
       <SyncErrorToast />
+      <InstallPrompt />
     </TrackerProvider>
   );
 }
