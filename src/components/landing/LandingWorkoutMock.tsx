@@ -1,5 +1,7 @@
 import { Repeat, Timer } from "lucide-react";
 
+import "@/styles/workout-mode.css";
+
 export function LandingWorkoutMock() {
   return (
     <div className="panel landing-mock landing-workout-mock">
