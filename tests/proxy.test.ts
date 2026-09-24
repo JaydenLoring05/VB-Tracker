@@ -9,10 +9,9 @@ type CookieAdapter = {
 type GetUserResult = { data: { user: { id: string } | null }; error: unknown };
 
 const getUser = vi.fn<() => Promise<GetUserResult>>();
-const createServerClient = vi.fn((_url: string, _key: string, options: { cookies: CookieAdapter }) => {
-  void options;
-  return { auth: { getUser } };
-});
+const createServerClient = vi.fn((_url: string, _key: string, _options: { cookies: CookieAdapter }) => ({
+  auth: { getUser }
+}));
 
 vi.mock("@supabase/ssr", () => ({
   createServerClient: (...args: Parameters<typeof createServerClient>) => createServerClient(...args)
@@ -191,9 +190,12 @@ describe("proxy: refreshed cookies", () => {
 // Next compiles a matcher string with path-to-regexp; its single custom group
 // is a plain JS regex, so anchoring it reproduces which paths run the proxy.
 describe("proxy matcher", () => {
-  expect(config.matcher).toHaveLength(1);
   const pattern = new RegExp(`^${config.matcher[0]}$`);
   const runs = (path: string) => pattern.test(path);
+
+  it("declares a single matcher", () => {
+    expect(config.matcher).toHaveLength(1);
+  });
 
   it.each([
     "/sw.js",

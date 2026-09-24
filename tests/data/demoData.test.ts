@@ -256,28 +256,23 @@ describe("buildDemoData storylines through the real attention ranking", () => {
 
   const week = Array.from({ length: 14 }, (_, offset) => new Date(new Date("2026-07-13T15:00:00").getTime() + offset * DAY_MS));
 
-  it.each(week.map((day) => [day.toDateString(), day] as const))("shows a high, medium and positive item on %s", (_label, day) => {
-    const { items } = attentionFor(day);
-    const priorities = new Set(items.map((item) => item.priority));
-
-    expect(priorities).toEqual(new Set(["high", "medium", "positive"]));
-    expect(items[0].priority).toBe("high");
-  });
-
-  it.each(week.map((day) => [day.toDateString(), day] as const))("keeps the scripted athletes' storylines on %s", (_label, day) => {
+  it.each(week.map((day) => [day.toDateString(), day] as const))("keeps the storylines on %s", (_label, day) => {
     const { data, items } = attentionFor(day);
     const byUser = (id: string) => items.filter((item) => item.userId === id).map((item) => item.id);
 
+    // The ranking shows every priority tier, with a high one on top.
+    expect(new Set(items.map((item) => item.priority))).toEqual(new Set(["high", "medium", "positive"]));
+    expect(items[0].priority).toBe("high");
+
+    // Scripted athletes.
     expect(byUser("demo-maya")).toContain("demo-maya-pain");
     expect(data.completedLast7["demo-sam"]).toBe(0);
     expect(byUser("demo-sam")).toContain("demo-sam-missed-workouts");
     expect(data.completedLast7["demo-kayla"]).toBe(1);
     expect(byUser("demo-ava")).toContain("demo-ava-new-pr");
     expect(data.roster.find((athlete) => athlete.userId === "demo-priya")?.needsCheckIn).toBe(true);
-  });
 
-  it.each(week.map((day) => [day.toDateString(), day] as const))("gives everyone else at least two workouts on %s", (_label, day) => {
-    const { data } = attentionFor(day);
+    // Everyone else trained at least twice this week.
     const scripted = new Set(["demo-sam", "demo-kayla"]);
     for (const [userId, count] of Object.entries(data.completedLast7)) {
       if (!scripted.has(userId)) expect(count, userId).toBeGreaterThanOrEqual(2);
