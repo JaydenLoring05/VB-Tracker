@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import { Brand } from "@/components/shared/Brand";
 import { authErrorMessage } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
 
@@ -46,7 +47,9 @@ export default function ResetPasswordPage() {
   return (
     <div className="auth-shell">
       <div className="panel auth-card">
-        <div className="logo">🏐</div>
+        <div className="auth-brand">
+          <Brand />
+        </div>
         <h1>Set a new password</h1>
 
         <form className="auth-form" onSubmit={handleSubmit}>

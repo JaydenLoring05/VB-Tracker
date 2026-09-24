@@ -11,7 +11,7 @@
   gap: var(--sp-3);
   padding: var(--sp-3);
   background: var(--panel-2);
-  border: 1px solid rgba(255, 196, 0, 0.28);
+  border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   animation: install-banner-in 240ms var(--ease-out);

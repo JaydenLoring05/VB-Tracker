@@ -10,6 +10,8 @@
 
 .legal-content h1 {
   margin: 0 0 var(--sp-2);
+  font-size: clamp(38px, 9vw, 52px);
+  line-height: 1;
 }
 
 .legal-content .muted {
@@ -17,8 +19,8 @@
 }
 
 .legal-content h2 {
-  font-size: var(--fs-xl);
-  margin: var(--sp-6) 0 var(--sp-2);
+  font-size: var(--fs-2xl);
+  margin: var(--sp-8) 0 var(--sp-2);
 }
 
 .legal-content p,
@@ -41,9 +43,9 @@
 .legal-summary {
   margin: var(--sp-6) 0;
   padding: var(--sp-5);
-  border: 1px solid rgba(255, 196, 0, 0.35);
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
   border-radius: var(--radius-md);
-  background: rgba(255, 196, 0, 0.05);
+  background: color-mix(in srgb, var(--gold) 5%, transparent);
 }
 
 .legal-content .legal-summary h2 {

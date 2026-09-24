@@ -25,8 +25,8 @@ export default function GlobalError({
           display: "grid",
           placeItems: "center",
           padding: "24px 16px",
-          background: "#05070a",
-          color: "#f4f6f8",
+          background: "#070503",
+          color: "#f5f1e9",
           fontFamily:
             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
         }}
@@ -38,13 +38,13 @@ export default function GlobalError({
             maxWidth: 460,
             textAlign: "center",
             padding: 24,
-            background: "#101419",
-            border: "1px solid #272d36",
+            background: "#120f0b",
+            border: "1px solid #2f2b25",
             borderRadius: 20
           }}
         >
           <h1 style={{ margin: "0 0 8px", fontSize: 28, lineHeight: 1.15 }}>Something went wrong</h1>
-          <p style={{ margin: "0 auto", maxWidth: "36ch", lineHeight: 1.5, color: "#aeb6c4" }}>
+          <p style={{ margin: "0 auto", maxWidth: "36ch", lineHeight: 1.5, color: "#a09a91" }}>
             NextRep hit an unexpected problem. Your data is safe. Try again, and if it keeps
             happening, let your coach or the NextRep team know.
           </p>
@@ -65,8 +65,8 @@ export default function GlobalError({
                 padding: "11px 18px",
                 border: "none",
                 borderRadius: 10,
-                background: "#ffc400",
-                color: "#14110a",
+                background: "#e5ac4c",
+                color: "#090704",
                 font: "inherit",
                 fontWeight: 700,
                 cursor: "pointer"
@@ -83,9 +83,9 @@ export default function GlobalError({
                 alignItems: "center",
                 minHeight: 44,
                 padding: "0 18px",
-                border: "1px solid #272d36",
+                border: "1px solid #2f2b25",
                 borderRadius: 10,
-                color: "#f4f6f8",
+                color: "#f5f1e9",
                 fontWeight: 700,
                 textDecoration: "none"
               }}
@@ -94,7 +94,7 @@ export default function GlobalError({
             </a>
           </div>
           {error.digest && (
-            <p style={{ marginTop: 20, fontSize: 12, color: "#aeb6c4" }}>
+            <p style={{ marginTop: 20, fontSize: 12, color: "#a09a91" }}>
               Reference: <code>{error.digest}</code>
             </p>
           )}
