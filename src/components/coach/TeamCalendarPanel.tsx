@@ -3,6 +3,7 @@
 import { CalendarDays, Trash2 } from "lucide-react";
 import { FormEvent, useState } from "react";
 
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useTeamCalendar } from "@/hooks/useTeamCalendar";
 import { todayISO } from "@/lib/storage";
 import { Team, TeamCalendarEventType } from "@/types";
@@ -80,7 +81,19 @@ export function TeamCalendarPanel({ team }: { team: Team }) {
       {loading ? (
         <p className="muted">Loading team calendar...</p>
       ) : upcoming.length === 0 ? (
-        <p className="muted">No upcoming team events yet.</p>
+        <EmptyState
+          compact
+          icon={CalendarDays}
+          title="No upcoming team events"
+          description="Add practices, matches and travel days. Athletes see them on their own calendar, so nobody has to ask when the next one is."
+          actions={
+            !showForm && (
+              <button type="button" onClick={() => setShowForm(true)}>
+                Add your first event
+              </button>
+            )
+          }
+        />
       ) : (
         <ul className="team-event-list">
           {upcoming.map((event) => (

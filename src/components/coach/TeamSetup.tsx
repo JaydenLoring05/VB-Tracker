@@ -3,6 +3,8 @@
 import { KeyRound, Users } from "lucide-react";
 import { FormEvent, useState } from "react";
 
+import "@/styles/first-run.css";
+
 export function TeamSetup({
   onCreateTeam,
   onJoinTeam,
@@ -44,16 +46,36 @@ export function TeamSetup({
           <p className="muted">{notice}</p>
         </div>
       )}
+      <div className="team-setup-intro">
+        <h1>Set up your team</h1>
+        <p className="muted">
+          Coaches create a team and share its invite code. Athletes join with that code, so you can see how
+          everyone is recovering before practice. You can also use NextRep on your own without a team.
+        </p>
+        <ol className="team-setup-steps">
+          <li>
+            <span aria-hidden="true">1</span> Create the team
+          </li>
+          <li>
+            <span aria-hidden="true">2</span> Share the invite code
+          </li>
+          <li>
+            <span aria-hidden="true">3</span> Athletes check in
+          </li>
+        </ol>
+      </div>
+
       <div className="panel">
         <h2>
-          <Users size={22} /> Create a Team
+          <Users size={22} /> I coach a team
         </h2>
         <p className="muted">
-          Set up a roster and get an invite code to share with your athletes.
+          Create a team to get an invite code for your athletes. This takes about 10 seconds.
         </p>
 
         <form className="team-form" onSubmit={handleCreate}>
           <input
+            aria-label="Team name"
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
             placeholder="Team name, ex: Varsity Girls"
@@ -66,12 +88,14 @@ export function TeamSetup({
 
       <div className="panel">
         <h2>
-          <KeyRound size={22} /> Join a Team
+          <KeyRound size={22} /> I have an invite code
         </h2>
-        <p className="muted">Have an invite code from your coach? Enter it below.</p>
+        <p className="muted">Your coach gives you a 6-character code. Enter it to join their team.</p>
 
         <form className="team-form" onSubmit={handleJoin}>
           <input
+            aria-label="Invite code"
+            autoComplete="off"
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
             placeholder="Invite code"
@@ -84,7 +108,7 @@ export function TeamSetup({
       </div>
 
       {error && (
-        <div className="empty-state team-setup-error">
+        <div className="empty-state team-setup-error" role="alert">
           <p className="muted">{error}</p>
         </div>
       )}
