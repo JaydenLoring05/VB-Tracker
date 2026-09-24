@@ -1,7 +1,6 @@
 "use client";
 
-import { Users } from "lucide-react";
-
+import { AthleteTeamView } from "@/components/coach/AthleteTeamView";
 import { CoachDashboard } from "@/components/coach/CoachDashboard";
 import { TeamSetup } from "@/components/coach/TeamSetup";
 import { useTeam } from "@/hooks/useTeam";
@@ -48,15 +47,5 @@ export default function CoachPage() {
     );
   }
 
-  return (
-    <div className="panel">
-      <h2>
-        <Users size={22} /> {activeTeam.name}
-      </h2>
-      <p className="muted">
-        You&apos;re on this team as an athlete. Your coach can see your recovery stats and
-        training history to check in on you. Your data stays read-only to them.
-      </p>
-    </div>
-  );
+  return <AthleteTeamView team={activeTeam} />;
 }
