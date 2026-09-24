@@ -14,11 +14,11 @@ const manrope = Manrope({
   display: "swap"
 });
 
-// Display face for headlines, card titles and big numbers. Only the two weights the
-// design uses, to keep the font payload small.
+// Display face for headlines, card titles and big numbers. The design only ever sets this face
+// at 700, so that is the only weight downloaded.
 const barlow = Barlow_Condensed({
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["700"],
   variable: "--font-barlow",
   display: "swap"
 });

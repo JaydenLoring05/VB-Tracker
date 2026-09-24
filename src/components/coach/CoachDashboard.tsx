@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertTriangle, Copy, RefreshCw, UserMinus, Users } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 import { useDemo } from "@/context/DemoContext";
@@ -17,7 +18,6 @@ import { Avatar } from "@/components/shared/Avatar";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusLabel } from "@/components/shared/StatusLabel";
 
-import { AthleteStatsModal } from "./AthleteStatsModal";
 import { AttentionCenter } from "./AttentionCenter";
 import { ProgramEditor } from "./ProgramEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
@@ -26,6 +26,12 @@ import { TeamReadyChecklist } from "./TeamReadyChecklist";
 import { TeamSwitcher } from "./TeamSwitcher";
 
 import "@/styles/roster.css";
+
+// The stats modal pulls in the whole charting library, which the roster itself never needs. Load it
+// as a separate chunk (fetched when the browser is idle, see below) to keep the dashboard's first
+// load small.
+const loadAthleteStatsModal = () => import("./AthleteStatsModal").then((module) => module.AthleteStatsModal);
+const AthleteStatsModal = dynamic(loadAthleteStatsModal, { ssr: false });
 
 export function CoachDashboard({
   teams,
@@ -61,6 +67,16 @@ export function CoachDashboard({
   const [pendingRemoval, setPendingRemoval] = useState<RosterAthlete | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [regeneratedCode, setRegeneratedCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Warm the modal's chunk once the page has settled so the first click opens it instantly.
+    const idle = window.requestIdleCallback ?? ((callback: () => void) => window.setTimeout(callback, 2000));
+    const handle = idle(() => void loadAthleteStatsModal());
+    return () => {
+      if (window.cancelIdleCallback) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
+  }, []);
 
   useEffect(() => {
     // The dashboard setup guide links here with #program.

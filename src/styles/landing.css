@@ -892,10 +892,6 @@
     align-items: stretch;
   }
 
-  .landing-hero-actions a {
-    display: block;
-  }
-
   .landing-hero-actions .btn {
     width: 100%;
   }

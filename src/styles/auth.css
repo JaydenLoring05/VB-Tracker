@@ -132,6 +132,7 @@
 .auth-back-link {
   display: flex;
   align-items: center;
+  gap: var(--sp-2);
   min-height: 44px;
   max-width: 400px;
   width: 100%;
