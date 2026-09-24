@@ -46,6 +46,11 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
+// PWA files must be reachable without a session (and without the signed-in redirect):
+// the browser fetches the manifest and sw.js unauthenticated, and the service worker
+// precaches the static /offline page. None of them contain user data.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|sw\\.js$|manifest\\.webmanifest$|icons/|offline$).*)"
+  ]
 };
