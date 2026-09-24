@@ -73,7 +73,11 @@ export function DemoTrackerProvider({
       syncRetry: null,
       reportSyncError: () => {},
       retrySyncError: () => {},
-      clearSyncError: () => {}
+      clearSyncError: () => {},
+
+      // Static sample data never fails to load.
+      loadError: false,
+      reloadData: () => {}
     };
   }, [data, requestSignup]);
 
