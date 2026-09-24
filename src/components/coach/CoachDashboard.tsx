@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Copy, RefreshCw, Trophy, UserMinus, Users } from "lucide-react";
+import { AlertTriangle, Copy, RefreshCw, UserMinus, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useDemo } from "@/context/DemoContext";
@@ -13,18 +13,19 @@ import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { InlineError } from "@/components/shared/InlineError";
 import { SkeletonRegion, SkeletonRow } from "@/components/shared/Skeleton";
 import { CopyButton } from "@/components/shared/CopyButton";
+import { Avatar } from "@/components/shared/Avatar";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { StatusLabel } from "@/components/shared/StatusLabel";
 
 import { AthleteStatsModal } from "./AthleteStatsModal";
 import { AttentionCenter } from "./AttentionCenter";
 import { ProgramEditor } from "./ProgramEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
+import { TeamStatStrip } from "./TeamStatStrip";
 import { TeamReadyChecklist } from "./TeamReadyChecklist";
 import { TeamSwitcher } from "./TeamSwitcher";
 
-function recoverySlug(label: string) {
-  return label.toLowerCase();
-}
+import "@/styles/roster.css";
 
 export function CoachDashboard({
   teams,
@@ -156,9 +157,8 @@ export function CoachDashboard({
       <>
       <div className="panel team-header">
         <div>
-          <h2>
-            <Users size={22} /> {team.name}
-          </h2>
+          <p className="micro micro-gold">Team dashboard</p>
+          <h2>{team.name}</h2>
           <p className="muted">
             {loading
               ? "Loading roster..."
@@ -181,6 +181,8 @@ export function CoachDashboard({
         </div>
       </div>
 
+      {!demo && !loading && !rosterLoadFailed && <TeamStatStrip roster={roster} attentionItems={attentionItems} />}
+
       <TeamCalendarPanel team={team} />
 
       {flagged.length > 0 && (
@@ -199,9 +201,7 @@ export function CoachDashboard({
 
       <div className="panel">
         <div className="roster-heading">
-          <h2>
-            <Trophy size={22} /> Roster
-          </h2>
+          <h2>Roster</h2>
           <button type="button" className="ghost roster-refresh" onClick={refresh} disabled={loading}>
             <RefreshCw size={14} /> Refresh
           </button>
@@ -241,13 +241,13 @@ export function CoachDashboard({
                   <span>
                     <strong>Jordan M.</strong> <span className="muted">Opened 2h ago</span>
                   </span>
-                  <span className="pill roster-recovery roster-recovery-good">84% · Good</span>
+                  <StatusLabel label="Good" className="roster-status" />
                 </div>
                 <div className="preview-row">
                   <span>
                     <strong>Riley K.</strong> <span className="muted">Opened yesterday</span>
                   </span>
-                  <span className="pill roster-recovery roster-recovery-caution">61% · Caution</span>
+                  <StatusLabel label="Caution" className="roster-status" />
                 </div>
               </>
             }
@@ -268,6 +268,7 @@ export function CoachDashboard({
                   }
                 }}
               >
+                <Avatar name={athlete.displayName} />
                 <div className="roster-athlete-name">
                   <strong>{athlete.displayName}</strong>
                   {athlete.needsCheckIn && athlete.lastCheckIn !== null && (
@@ -278,11 +279,14 @@ export function CoachDashboard({
 
                 {athlete.lastCheckIn === null ? (
                   // A brand-new athlete hasn't been scored yet. Showing "0% Low" would read as an emergency.
-                  <span className="pill roster-recovery roster-recovery-none">No check-in yet</span>
+                  <span className="status roster-status">No check-in yet</span>
                 ) : (
-                  <span className={`pill roster-recovery roster-recovery-${recoverySlug(athlete.recoveryLabel)}`}>
-                    {athlete.recovery}% · {athlete.recoveryLabel}
-                  </span>
+                  <>
+                    <StatusLabel label={athlete.recoveryLabel} className="roster-status" />
+                    <span className="roster-score">
+                      {athlete.recovery}
+                    </span>
+                  </>
                 )}
 
                 <button

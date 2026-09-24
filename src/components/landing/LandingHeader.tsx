@@ -1,16 +1,14 @@
 import Link from "next/link";
 
+import { Brand } from "@/components/shared/Brand";
+
 export function LandingHeader() {
   return (
     <header className="landing-header">
       <div className="landing-header-inner">
-        <div className="landing-brand">
-          <div className="landing-brand-logo">🏐</div>
-          <div>
-            <h2>NEXTREP</h2>
-            <p>ATHLETE OPERATING SYSTEM</p>
-          </div>
-        </div>
+        <Link href="/" className="landing-brand" aria-label="NextRep home">
+          <Brand />
+        </Link>
 
         <nav className="landing-header-links">
           <a href="#product-preview">Product</a>

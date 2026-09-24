@@ -167,17 +167,17 @@
   place-items: center;
   border-radius: 999px;
   color: var(--gold);
-  background: rgba(255, 196, 0, 0.12);
-  border: 1px solid rgba(255, 196, 0, 0.3);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
 }
 
 .state-card h1,
 .state-card h2 {
   display: block;
   margin: 0 0 var(--sp-2);
-  font-size: var(--fs-2xl);
-  font-weight: 800;
-  line-height: 1.15;
+  justify-content: center;
+  font-size: var(--fs-display);
+  line-height: 1;
 }
 
 .state-card p {
@@ -204,17 +204,17 @@
 }
 
 .state-link {
-  padding: 11px 18px;
-  border: 1px solid var(--border);
+  padding: 9px 18px;
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   color: var(--text);
-  font-weight: 700;
+  font-weight: 600;
   transition: background var(--transition), border-color var(--transition);
 }
 
 .state-link:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 196, 0, 0.4);
+  border-color: color-mix(in srgb, var(--gold) 40%, transparent);
 }
 
 .state-card .state-reference {
@@ -234,9 +234,9 @@
   align-items: center;
   gap: var(--sp-3);
   padding: var(--sp-4);
-  border: 1px solid rgba(255, 98, 98, 0.4);
+  border: 1px solid color-mix(in srgb, var(--red) 40%, transparent);
   border-radius: var(--radius-md);
-  background: rgba(255, 98, 98, 0.06);
+  background: color-mix(in srgb, var(--red) 6%, transparent);
 }
 
 .inline-error > svg {

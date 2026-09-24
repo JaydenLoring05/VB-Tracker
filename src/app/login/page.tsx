@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 
+import { Brand } from "@/components/shared/Brand";
 import { authErrorMessage } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
 
@@ -155,7 +156,9 @@ export default function LoginPage() {
       </Link>
 
       <div className="panel auth-card">
-        <div className="logo">🏐</div>
+        <div className="auth-brand">
+          <Brand />
+        </div>
         <h1>{mode === "sign-in" ? "Welcome back" : "Create your account"}</h1>
         <p className="muted">NextRep: Athlete Operating System</p>
 

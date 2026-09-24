@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { Brand } from "@/components/shared/Brand";
 import { useTrackerContext } from "@/context/TrackerContext";
 
 const navItems = [
@@ -34,11 +35,7 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="logo">🏐</div>
-        <div>
-          <h2>NEXTREP</h2>
-          <p>ATHLETE OPERATING SYSTEM</p>
-        </div>
+        <Brand tagline="Athlete OS" />
       </div>
 
       <nav className="nav">

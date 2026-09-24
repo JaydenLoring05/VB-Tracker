@@ -1,14 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Barlow_Condensed, Manrope } from "next/font/google";
 
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
 
-const geist = Geist({
+// Body/UI face. One variable file covers every weight.
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-manrope",
+  display: "swap"
+});
+
+// Display face for headlines, card titles and big numbers. Only the two weights the
+// design uses, to keep the font payload small.
+const barlow = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-barlow",
   display: "swap"
 });
 
@@ -44,7 +54,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#05070a"
+  themeColor: "#070503"
 };
 
 export default function RootLayout({
@@ -53,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={geist.variable}>
+    <html lang="en" className={`${manrope.variable} ${barlow.variable}`}>
       <body>
         {children}
         <ServiceWorkerRegister />

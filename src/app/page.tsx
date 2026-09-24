@@ -1,7 +1,8 @@
-import { Activity, Bone, Calendar, HeartPulse, Link2, Trophy, Users } from "lucide-react";
+import { Activity, ArrowRight, Bone, Calendar, Check, HeartPulse, Link2, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 
 import { CONTACT_EMAIL } from "@/lib/contact";
+import { Brand } from "@/components/shared/Brand";
 import { AnnouncementBar } from "@/components/landing/AnnouncementBar";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { LandingAttentionDemo } from "@/components/landing/LandingAttentionDemo";
@@ -116,33 +117,45 @@ export default function LandingPage() {
       <AnnouncementBar />
       <LandingHeader />
 
-      <section className="landing-hero">
+      <section id="product-preview" className="landing-hero">
         <div className="landing-hero-inner">
-          <h1>Know who&apos;s ready. Know who needs attention.</h1>
-          <p className="landing-hero-sub muted">
-            NextRep gives volleyball teams structured workouts, daily readiness monitoring, and
-            clear progress tracking, all from one coach dashboard.
-          </p>
+          <div className="landing-hero-copy">
+            <p className="micro micro-gold">Built for volleyball performance</p>
+            <h1>
+              Know who&apos;s ready.{" "}
+              <span className="landing-hero-accent">Know who needs attention.</span>
+            </h1>
+            <p className="landing-hero-sub">
+              NextRep gives volleyball teams structured workouts, daily readiness monitoring, and
+              clear progress tracking, all from one coach dashboard.
+            </p>
 
-          <div className="landing-hero-actions">
-            <Link href="/pilot">
-              <button type="button">Start Free Team Pilot</button>
-            </Link>
-            <Link href="/demo">
-              <button type="button" className="ghost">
-                View Demo Dashboard
-              </button>
-            </Link>
+            <div className="landing-hero-actions">
+              <Link href="/pilot">
+                <button type="button" className="btn-lg">
+                  Start Free Team Pilot <ArrowRight size={18} aria-hidden="true" />
+                </button>
+              </Link>
+              <Link href="/demo">
+                <button type="button" className="ghost btn-lg">
+                  View Demo Dashboard
+                </button>
+              </Link>
+            </div>
+
+            <ul className="landing-checks">
+              <li>
+                <Check size={16} aria-hidden="true" /> Free for 30 days
+              </li>
+              <li>
+                <Check size={16} aria-hidden="true" /> No credit card
+              </li>
+              <li>
+                <Check size={16} aria-hidden="true" /> Set up your team in minutes
+              </li>
+            </ul>
           </div>
 
-          <p className="muted landing-hero-reassurance">
-            Free for 30 days &bull; No credit card &bull; Set up your team in minutes
-          </p>
-        </div>
-      </section>
-
-      <section id="product-preview" className="landing-section">
-        <div className="landing-section-inner">
           <LandingDashboardMock />
         </div>
       </section>
@@ -245,7 +258,7 @@ export default function LandingPage() {
               const Icon = step.icon;
               return (
                 <div className="landing-step" key={step.title}>
-                  <div className="landing-step-number">{index + 1}</div>
+                  <div className="landing-step-number">{String(index + 1).padStart(2, "0")}</div>
                   <Icon size={22} />
                   <h3>{step.title}</h3>
                   <p className="muted">{step.body}</p>
@@ -337,7 +350,9 @@ export default function LandingPage() {
       </section>
 
       <footer className="landing-footer">
-        <p className="muted">🏐 NextRep</p>
+        <p className="landing-footer-brand">
+          <Brand size={28} />
+        </p>
         <p className="muted landing-footer-contact">
           Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
         </p>

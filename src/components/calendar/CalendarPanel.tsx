@@ -1,9 +1,9 @@
 "use client";
 
-import { CalendarDays } from "lucide-react";
 import { FormEvent, useState } from "react";
 
 import { useCalendar } from "@/hooks/useCalendar";
+import { todayISO } from "@/lib/storage";
 
 export function CalendarPanel() {
   const { calendarPreview, trainingLoad, addGame } = useCalendar();
@@ -22,9 +22,7 @@ export function CalendarPanel() {
 
   return (
     <div id="calendar" className="panel">
-      <h2>
-        <CalendarDays size={22} /> Calendar + Training Load
-      </h2>
+      <h2>Calendar + Training Load</h2>
 
       <p className="muted">Training Load (last 7 days): {trainingLoad}</p>
 
@@ -54,7 +52,7 @@ export function CalendarPanel() {
 
       <div className="calendar-preview" style={{ marginTop: 16 }}>
         {calendarPreview.map((day) => (
-          <div className="calendar-day" key={day.iso}>
+          <div className={`calendar-day${day.iso === todayISO() ? " is-today" : ""}`} key={day.iso}>
             <strong>
               {day.day} {day.number}
             </strong>

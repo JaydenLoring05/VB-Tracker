@@ -19,7 +19,7 @@
 }
 
 .exercise-card:hover {
-  border-color: rgba(255, 196, 0, 0.3);
+  border-color: color-mix(in srgb, var(--gold) 30%, transparent);
 }
 
 .exercise-icon {
@@ -27,7 +27,7 @@
   height: 56px;
   display: grid;
   place-items: center;
-  background: rgba(255, 196, 0, 0.12);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
   border-radius: var(--radius-sm);
   font-size: 26px;
 }
@@ -76,8 +76,8 @@
   font-size: var(--fs-xs);
   font-weight: 900;
   color: var(--gold);
-  background: rgba(255, 196, 0, 0.12);
-  border: 1px solid rgba(255, 196, 0, 0.25);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 25%, transparent);
   padding: 5px 8px;
   border-radius: 999px;
 }
@@ -92,8 +92,8 @@
 
 .exercise-level-beginner {
   color: var(--green);
-  background: rgba(69, 212, 131, 0.12);
-  border: 1px solid rgba(69, 212, 131, 0.25);
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
 }
 
 .exercise-level-intermediate {
@@ -104,8 +104,8 @@
 
 .exercise-level-advanced {
   color: var(--red);
-  background: rgba(255, 98, 98, 0.12);
-  border: 1px solid rgba(255, 98, 98, 0.25);
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red) 25%, transparent);
 }
 
 .exercise-details {
@@ -147,18 +147,18 @@
 .view-details-button {
   width: 100%;
   margin-top: auto;
-  background: rgba(255, 196, 0, 0.12);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
   color: var(--gold);
-  border: 1px solid rgba(255, 196, 0, 0.25);
+  border: 1px solid color-mix(in srgb, var(--gold) 25%, transparent);
 }
 
 .view-details-button:hover {
-  background: rgba(255, 196, 0, 0.2);
+  background: color-mix(in srgb, var(--gold) 20%, transparent);
 }
 
 .exercise-card.expanded {
-  border-color: rgba(255, 196, 0, 0.38);
-  box-shadow: 0 0 24px rgba(255, 196, 0, 0.08);
+  border-color: color-mix(in srgb, var(--gold) 38%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--gold) 8%, transparent);
 }
 
 .library-header {

@@ -101,6 +101,7 @@ export function DemoExperience() {
             <DemoTrackerProvider data={data} requestSignup={requestSignup}>
               <div className="demo-intro">
                 <div>
+                  <p className="micro micro-gold">Interactive demo</p>
                   <h1>{view === "coach" ? "Coach dashboard" : "Athlete view"}</h1>
                   <p className="muted">
                     {view === "coach"

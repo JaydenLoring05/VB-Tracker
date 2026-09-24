@@ -20,10 +20,9 @@
 }
 
 .pilot-intro h1 {
-  margin: 0 0 var(--sp-3);
-  font-size: 28px;
-  line-height: 1.15;
-  text-wrap: balance;
+  margin: 0 0 var(--sp-4);
+  font-size: clamp(38px, 10vw, 48px);
+  line-height: 1;
 }
 
 .pilot-lead {
@@ -39,7 +38,7 @@
 
 .pilot-aside h2 {
   margin: 0 0 var(--sp-3);
-  font-size: var(--fs-lg);
+  font-size: var(--fs-xl);
 }
 
 .pilot-points {
@@ -126,7 +125,7 @@
 }
 
 .pilot-field [aria-invalid="true"]:focus {
-  box-shadow: 0 0 0 3px rgba(255, 98, 98, 0.2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 20%, transparent);
 }
 
 .pilot-optional {
@@ -194,13 +193,13 @@
 }
 
 .pilot-choice input:hover + label {
-  border-color: rgba(255, 196, 0, 0.5);
+  border-color: var(--border-strong);
 }
 
 .pilot-choice input:checked + label {
   border-color: var(--gold);
-  background: rgba(255, 196, 0, 0.12);
-  color: var(--gold-2);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  color: var(--gold);
 }
 
 .pilot-choice input:focus-visible + label {
@@ -248,9 +247,8 @@
 
 .pilot-result h2 {
   margin: 0;
-  font-size: var(--fs-2xl);
-  line-height: 1.2;
-  text-wrap: balance;
+  font-size: var(--fs-display);
+  line-height: 1;
 }
 
 .pilot-result h2 {
@@ -317,7 +315,7 @@
   }
 
   .pilot-intro h1 {
-    font-size: 40px;
+    font-size: 60px;
   }
 
   .pilot-lead {
