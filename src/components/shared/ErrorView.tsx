@@ -41,11 +41,17 @@ export function ErrorView({
     });
   }
 
+  const Wrapper = variant === "page" ? "main" : "div";
+
   return (
-    <div className={variant === "page" ? "state-page" : "state-inline"} role="alert">
+    <Wrapper
+      className={variant === "page" ? "state-page" : "state-inline"}
+      {...(variant === "page" ? { id: "main-content", tabIndex: -1 } : {})}
+    >
       <StateCard
         icon={AlertTriangle}
         title="Something went wrong"
+        role="alert"
         reference={error.digest}
         actions={
           <>
@@ -61,6 +67,6 @@ export function ErrorView({
         We hit a snag loading this page. Your data is safe. Give it another try, and if it keeps
         happening, let your coach or the NextRep team know.
       </StateCard>
-    </div>
+    </Wrapper>
   );
 }

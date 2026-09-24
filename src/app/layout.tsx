@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Manrope } from "next/font/google";
 
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { SkipLink } from "@/components/shared/SkipLink";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
@@ -54,6 +55,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: "#070503"
 };
 
@@ -65,6 +67,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${barlow.variable}`}>
       <body>
+        <SkipLink />
         {children}
         <ServiceWorkerRegister />
       </body>

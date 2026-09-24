@@ -20,7 +20,7 @@ export default function TermsPage() {
     <div className="legal-page">
       <LandingHeader />
 
-      <div className="legal-content">
+      <main id="main-content" tabIndex={-1} className="legal-content">
         <h1>Terms of Service</h1>
         <p className="muted">Last updated September 23, 2026.</p>
 
@@ -98,7 +98,7 @@ export default function TermsPage() {
         <p>
           Reach out any time at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
         </p>
-      </div>
+      </main>
     </div>
   );
 }

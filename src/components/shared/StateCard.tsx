@@ -10,7 +10,8 @@ export function StateCard({
   children,
   actions,
   reference,
-  headingLevel = 1
+  headingLevel = 1,
+  role
 }: {
   icon: LucideIcon;
   title: string;
@@ -18,11 +19,13 @@ export function StateCard({
   actions: React.ReactNode;
   reference?: string;
   headingLevel?: 1 | 2;
+  /** Set to "alert" for a failure that should be announced as it appears. */
+  role?: "alert";
 }) {
   const Heading = headingLevel === 1 ? "h1" : "h2";
 
   return (
-    <div className="panel state-card">
+    <div className="panel state-card" role={role}>
       <div className="state-mark">
         <Icon size={26} aria-hidden="true" />
       </div>

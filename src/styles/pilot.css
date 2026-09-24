@@ -272,7 +272,7 @@
   color: var(--gold);
 }
 
-.pilot-result a:not(:has(button)) {
+.pilot-result a:not(.btn) {
   color: var(--gold);
   text-decoration: underline;
   text-underline-offset: 3px;

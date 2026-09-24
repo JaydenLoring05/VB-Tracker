@@ -91,7 +91,7 @@ export function DemoExperience() {
     <div className="demo-page">
       <DemoBanner onStartTour={startTour} />
 
-      <main className="demo-main" onClickCapture={interceptAppLinks}>
+      <main id="main-content" tabIndex={-1} className="demo-main" onClickCapture={interceptAppLinks}>
         {!data || !demoValue ? (
           <div className="panel demo-loading" role="status">
             <p className="muted">Loading the sample team...</p>

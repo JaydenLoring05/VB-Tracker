@@ -117,6 +117,7 @@ export default function LandingPage() {
       <AnnouncementBar />
       <LandingHeader />
 
+      <main id="main-content" tabIndex={-1}>
       <section id="product-preview" className="landing-hero">
         <div className="landing-hero-inner">
           <div className="landing-hero-copy">
@@ -131,16 +132,12 @@ export default function LandingPage() {
             </p>
 
             <div className="landing-hero-actions">
-              <Link href="/pilot">
-                <button type="button" className="btn-lg">
+              <Link href="/pilot" className="btn btn-lg">
                   Start Free Team Pilot <ArrowRight size={18} aria-hidden="true" />
-                </button>
-              </Link>
-              <Link href="/demo">
-                <button type="button" className="ghost btn-lg">
+                </Link>
+              <Link href="/demo" className="btn ghost btn-lg">
                   View Demo Dashboard
-                </button>
-              </Link>
+                </Link>
             </div>
 
             <ul className="landing-checks">
@@ -173,11 +170,9 @@ export default function LandingPage() {
                 <li>Pain and discomfort trends across the team</li>
                 <li>Progress tracking for every athlete on the roster</li>
               </ul>
-              <a href="#attention-center-demo">
-                <button type="button" className="secondary">
+              <a href="#attention-center-demo" className="btn secondary">
                   Explore Coach Features
-                </button>
-              </a>
+                </a>
             </div>
 
             <div id="for-athletes" className="panel landing-audience-card">
@@ -188,11 +183,9 @@ export default function LandingPage() {
                 <li>A daily readiness check-in that takes under a minute</li>
                 <li>A clear view of your own progress over the season</li>
               </ul>
-              <a href="#workout-preview">
-                <button type="button" className="secondary">
+              <a href="#workout-preview" className="btn secondary">
                   Explore Athlete Features
-                </button>
-              </a>
+                </a>
             </div>
           </div>
         </div>
@@ -285,9 +278,7 @@ export default function LandingPage() {
           </ul>
 
           <div className="landing-pilot-cta">
-            <Link href="/pilot">
-              <button type="button">Apply for Founding Team Access</button>
-            </Link>
+            <Link href="/pilot" className="btn">Apply for Founding Team Access</Link>
           </div>
         </div>
       </section>
@@ -333,14 +324,10 @@ export default function LandingPage() {
           </p>
 
           <div className="landing-hero-actions">
-            <Link href="/pilot">
-              <button type="button">Start Free Team Pilot</button>
-            </Link>
-            <Link href="/demo">
-              <button type="button" className="ghost">
+            <Link href="/pilot" className="btn">Start Free Team Pilot</Link>
+            <Link href="/demo" className="btn ghost">
                 View Demo Dashboard
-              </button>
-            </Link>
+              </Link>
           </div>
 
           <p className="muted landing-hero-reassurance">
@@ -349,6 +336,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      </main>
+
       <footer className="landing-footer">
         <p className="landing-footer-brand">
           <Brand size={28} />
@@ -356,7 +345,7 @@ export default function LandingPage() {
         <p className="muted landing-footer-contact">
           Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
         </p>
-        <nav className="landing-footer-links">
+        <nav className="landing-footer-links" aria-label="Footer">
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms of Service</Link>
         </nav>

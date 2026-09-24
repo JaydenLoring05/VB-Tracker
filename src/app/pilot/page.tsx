@@ -31,7 +31,7 @@ export default function PilotPage() {
     <div className="pilot-page">
       <LandingHeader />
 
-      <main className="pilot-main">
+      <main id="main-content" tabIndex={-1} className="pilot-main">
         <div className="pilot-intro">
           <h1>Try NextRep free with your team for 30 days</h1>
           <p className="pilot-lead muted">

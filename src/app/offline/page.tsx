@@ -78,6 +78,26 @@ const styles = `
   font-size: 15px;
   text-decoration: none;
 }
+/* Same skip link as the rest of the app, repeated here so it stays hidden even if no stylesheet loads. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: #e5ac4c;
+  color: #090704;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(calc(-100% - 16px));
+}
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid #f5f1e9;
+  outline-offset: 2px;
+}
 .offline-retry:focus-visible {
   outline: 2px solid #f5c66d;
   outline-offset: 3px;
@@ -89,7 +109,7 @@ const styles = `
 
 export default function OfflinePage() {
   return (
-    <main className="offline-shell">
+    <main id="main-content" className="offline-shell">
       <style>{styles}</style>
       <div className="offline-card">
         <div className="offline-mark" aria-hidden="true">
