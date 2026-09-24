@@ -1,0 +1,336 @@
+.pilot-page {
+  min-height: 100vh;
+}
+
+.pilot-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "intro"
+    "form"
+    "aside";
+  gap: var(--sp-6);
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-4) var(--sp-10);
+}
+
+.pilot-intro {
+  grid-area: intro;
+}
+
+.pilot-intro h1 {
+  margin: 0 0 var(--sp-3);
+  font-size: 28px;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.pilot-lead {
+  margin: 0;
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+.pilot-aside {
+  grid-area: aside;
+}
+
+.pilot-aside h2 {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-lg);
+}
+
+.pilot-points {
+  list-style: none;
+  margin: 0 0 var(--sp-5);
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.pilot-points li {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  line-height: 1.5;
+}
+
+.pilot-points svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--gold);
+}
+
+.pilot-login-note {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.pilot-login-note a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Form */
+
+.pilot-form {
+  grid-area: form;
+  display: grid;
+  gap: var(--sp-5);
+  align-content: start;
+}
+
+.pilot-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pilot-field label,
+.pilot-fieldset legend {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.pilot-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.pilot-fieldset legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+
+.pilot-field input[type="text"],
+.pilot-field input[type="email"],
+.pilot-field select,
+.pilot-field textarea {
+  width: 100%;
+  min-height: 48px;
+  font-size: 16px;
+}
+
+.pilot-field textarea {
+  resize: vertical;
+  min-height: 104px;
+  line-height: 1.5;
+}
+
+.pilot-field [aria-invalid="true"] {
+  border-color: var(--red);
+}
+
+.pilot-field [aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(255, 98, 98, 0.2);
+}
+
+.pilot-optional {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.pilot-hint {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.pilot-count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.pilot-count-over {
+  color: var(--red);
+}
+
+.pilot-error {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--red);
+  line-height: 1.4;
+}
+
+/* Level chips: native radios, visually replaced by their labels. */
+
+.pilot-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-2);
+}
+
+.pilot-choice {
+  position: relative;
+}
+
+.pilot-choice input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.pilot-choice label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-weight: 600;
+  text-align: center;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.pilot-choice input:hover + label {
+  border-color: rgba(255, 196, 0, 0.5);
+}
+
+.pilot-choice input:checked + label {
+  border-color: var(--gold);
+  background: rgba(255, 196, 0, 0.12);
+  color: var(--gold-2);
+}
+
+.pilot-choice input:focus-visible + label {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Honeypot: off-screen rather than display:none so naive bots still fill it. */
+
+.pilot-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.pilot-submit {
+  width: 100%;
+  min-height: 52px;
+  font-size: 16px;
+}
+
+.pilot-privacy {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.pilot-privacy a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Result states */
+
+.pilot-result {
+  grid-area: form;
+  display: grid;
+  gap: var(--sp-4);
+  align-content: start;
+  justify-items: start;
+}
+
+.pilot-result h2 {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.pilot-result h2:focus {
+  outline: none;
+}
+
+.pilot-result p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.pilot-result-icon {
+  color: var(--green);
+}
+
+.pilot-result[role="alert"] .pilot-result-icon {
+  color: var(--gold);
+}
+
+.pilot-result a:not(:has(button)) {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pilot-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.pilot-footer {
+  padding: var(--sp-6);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-4);
+  font-size: var(--fs-sm);
+}
+
+.pilot-footer a {
+  color: var(--muted);
+}
+
+.pilot-footer a:hover {
+  color: var(--gold);
+}
+
+@media (min-width: 900px) {
+  .pilot-main {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+    grid-template-areas:
+      "intro form"
+      "aside form";
+    grid-template-rows: auto 1fr;
+    column-gap: var(--sp-10);
+    align-items: start;
+    padding-top: var(--sp-10);
+  }
+
+  .pilot-intro h1 {
+    font-size: 40px;
+  }
+
+  .pilot-lead {
+    font-size: var(--fs-lg);
+  }
+
+  .pilot-choices {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .pilot-form {
+    padding: var(--sp-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pilot-choice label {
+    transition: none;
+  }
+}

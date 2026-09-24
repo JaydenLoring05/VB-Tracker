@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/login", "/auth/callback", "/privacy", "/terms"];
+const PUBLIC_PATHS = ["/", "/login", "/auth/callback", "/privacy", "/terms", "/pilot"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -47,5 +47,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
+  // Metadata files and the public pilot endpoint must stay reachable without a session.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|icon|apple-icon|opengraph-image|twitter-image|api/pilot).*)"
+  ]
 };
