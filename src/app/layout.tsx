@@ -49,7 +49,9 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }]
   },
-  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "black" }
+  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "black" },
+  // Next only emits the modern mobile-web-app-capable tag; older iOS still looks for this one.
+  other: { "apple-mobile-web-app-capable": "yes" }
 };
 
 export const viewport: Viewport = {

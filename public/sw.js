@@ -13,10 +13,21 @@
  * If you add a new cache rule, it must keep this property.
  */
 
-const CACHE_VERSION = "v1";
+/*
+ * UPDATING: a browser only installs a new worker when this file's bytes change, and only a new worker
+ * refreshes the cached /offline page. Bump CACHE_VERSION whenever the /offline page, the icons under
+ * /public/icons, or the brand colors change. The new worker installs, calls skipWaiting(), then on
+ * activate deletes every older nextrep-* cache and claims open pages, so nobody keeps a stale copy.
+ * (Hashed /_next/static files never need a bump: new builds use new file names.)
+ * v1: first release. v2: offline page rebuilt on the new design system, theme color aligned to
+ * the app background, cache size cap.
+ */
+const CACHE_VERSION = "v2";
 const CACHE_PREFIX = "nextrep-";
 const STATIC_CACHE = `${CACHE_PREFIX}static-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline";
+// Every deploy adds new hashed build files; keep the newest ones so the cache cannot grow forever.
+const MAX_STATIC_ENTRIES = 150;
 
 async function cacheOfflinePage() {
   const cache = await caches.open(STATIC_CACHE);
@@ -52,15 +63,33 @@ function isCacheableStaticPath(pathname) {
   return pathname.startsWith("/_next/static/") || pathname.startsWith("/icons/");
 }
 
-async function cacheFirst(request) {
+// cache.keys() lists oldest first, so the oldest files go first. The offline page is never evicted.
+async function trimStaticCache(cache) {
+  const keys = await cache.keys();
+  let excess = keys.length - MAX_STATIC_ENTRIES;
+  for (const key of keys) {
+    if (excess <= 0) break;
+    if (new URL(key.url).pathname === OFFLINE_URL) continue;
+    await cache.delete(key);
+    excess -= 1;
+  }
+}
+
+async function cacheFirst(event) {
+  const { request } = event;
   const cache = await caches.open(STATIC_CACHE);
   const cached = await cache.match(request);
   if (cached) return cached;
 
   const response = await fetch(request);
   if (response.ok && response.type === "basic") {
-    // Fire and forget: do not delay the response on the cache write.
-    cache.put(request, response.clone()).catch(() => undefined);
+    // Do not delay the response on the cache write; waitUntil keeps the worker alive to finish it.
+    event.waitUntil(
+      cache
+        .put(request, response.clone())
+        .then(() => trimStaticCache(cache))
+        .catch(() => undefined)
+    );
   }
   return response;
 }
@@ -92,6 +121,6 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (isCacheableStaticPath(url.pathname)) {
-    event.respondWith(cacheFirst(request));
+    event.respondWith(cacheFirst(event));
   }
 });
