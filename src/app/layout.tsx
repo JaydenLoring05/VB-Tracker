@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Manrope } from "next/font/google";
 
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { SkipLink } from "@/components/shared/SkipLink";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
@@ -13,11 +14,11 @@ const manrope = Manrope({
   display: "swap"
 });
 
-// Display face for headlines, card titles and big numbers. Only the two weights the
-// design uses, to keep the font payload small.
+// Display face for headlines, card titles and big numbers. The design only ever sets this face
+// at 700, so that is the only weight downloaded.
 const barlow = Barlow_Condensed({
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["700"],
   variable: "--font-barlow",
   display: "swap"
 });
@@ -48,12 +49,15 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }]
   },
-  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "black" }
+  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "black" },
+  // Next only emits the modern mobile-web-app-capable tag; older iOS still looks for this one.
+  other: { "apple-mobile-web-app-capable": "yes" }
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: "#070503"
 };
 
@@ -65,6 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${barlow.variable}`}>
       <body>
+        <SkipLink />
         {children}
         <ServiceWorkerRegister />
       </body>

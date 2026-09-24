@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { ModalDialog } from "@/components/shared/ModalDialog";
 
 export function ConfirmModal({
   title,
@@ -19,36 +19,20 @@ export function ConfirmModal({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onCancel();
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onCancel]);
-
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div
-        className="panel modal-card confirm-modal-card"
-        role="alertdialog"
-        aria-modal="true"
-        aria-label={title}
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2>{title}</h2>
-        <p className="muted">{message}</p>
+    <ModalDialog label={title} alert onClose={onCancel} cardClassName="confirm-modal-card">
+      <h2>{title}</h2>
+      <p className="muted">{message}</p>
 
-        <div className="button-row">
-          <button type="button" className={danger ? "ghost danger-button" : ""} onClick={onConfirm}>
-            {confirmLabel}
-          </button>
-          <button type="button" className="ghost" onClick={onCancel}>
-            {cancelLabel}
-          </button>
-        </div>
+      <div className="button-row">
+        <button type="button" className={danger ? "ghost danger-button" : ""} onClick={onConfirm}>
+          {confirmLabel}
+        </button>
+        {/* Focus starts on the safe choice, so a stray Enter never confirms a removal. */}
+        <button type="button" className="ghost" onClick={onCancel} data-autofocus>
+          {cancelLabel}
+        </button>
       </div>
-    </div>
+    </ModalDialog>
   );
 }

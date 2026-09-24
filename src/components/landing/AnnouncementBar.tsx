@@ -1,10 +1,10 @@
 export function AnnouncementBar() {
   return (
-    <div className="announcement-bar">
+    <aside className="announcement-bar" aria-label="Announcement">
       <p>
         Now accepting volleyball teams for our free 30-day founding-team pilot.{" "}
         <a href="/pilot">Apply for Pilot</a>
       </p>
-    </div>
+    </aside>
   );
 }

@@ -65,11 +65,15 @@
   background: var(--panel);
 }
 
-.streak-box h3 {
+.streak-box .streak-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
   margin: 0 0 var(--sp-2);
+  font-size: var(--fs-lg);
 }
 
-.streak-box h2 {
+.streak-box .streak-count {
   margin: 0 0 var(--sp-1);
   font-size: 34px;
   line-height: 1;
@@ -146,7 +150,8 @@
     z-index: var(--z-nav);
     width: 100%;
     height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
     border-right: none;
     border-top: 1px solid var(--border);
     background: color-mix(in oklch, var(--bg-deep) 90%, transparent);
@@ -210,6 +215,19 @@
   .avatar {
     width: 36px;
     height: 36px;
+  }
+}
+
+/* While a field is focused on a phone the on-screen keyboard owns the bottom of the screen; the
+   fixed bars would otherwise squeeze the visible area down to a sliver above it. */
+@media (max-width: 900px) and (pointer: coarse) {
+  body:has(
+      input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+      textarea:focus,
+      select:focus
+    )
+    :is(.sidebar, .workout-actions, .install-banner) {
+    display: none;
   }
 }
 

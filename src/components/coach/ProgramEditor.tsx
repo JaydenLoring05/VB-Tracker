@@ -94,7 +94,7 @@ function DayFullEditor({
       </ul>
 
       <div className="program-full-editor-add">
-        <select value={addChoice} onChange={(event) => setAddChoice(event.target.value)}>
+        <select aria-label="Add an exercise" value={addChoice} onChange={(event) => setAddChoice(event.target.value)}>
           <option value="">Add an exercise...</option>
           {exerciseCatalog
             .filter((exercise) => !draft.includes(exercise.name))
@@ -214,6 +214,7 @@ export function ProgramEditor({ team }: { team: Team }) {
                       <div className="program-exercise-row" key={exercise}>
                         <span className="program-exercise-original muted">{exercise}</span>
                         <select
+                          aria-label={`Default for ${exercise}`}
                           value={current}
                           onChange={(event) => {
                             const chosen = event.target.value;

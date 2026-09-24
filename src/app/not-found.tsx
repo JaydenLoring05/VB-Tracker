@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <div className="state-page">
+    <main id="main-content" tabIndex={-1} className="state-page">
       <StateCard
         icon={Compass}
         title="Page not found"
@@ -27,6 +27,6 @@ export default function NotFound() {
       >
         That link may be old or mistyped. Head back and pick up where you left off.
       </StateCard>
-    </div>
+    </main>
   );
 }

@@ -84,6 +84,10 @@
 }
 
 .landing-header-nav a:first-child {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
   color: var(--muted);
   font-size: var(--fs-sm);
   font-weight: 600;
@@ -94,7 +98,7 @@
   color: var(--text);
 }
 
-.landing-header-nav button {
+.landing-header-nav .btn {
   min-height: 38px;
   padding: 7px 16px;
   font-size: var(--fs-sm);
@@ -368,7 +372,7 @@
   line-height: 1.6;
 }
 
-.landing-weekly-report button {
+.landing-weekly-report .btn {
   margin-top: var(--sp-3);
 }
 
@@ -733,7 +737,7 @@
   color: var(--green);
 }
 
-.pricing-card button {
+.pricing-card .btn {
   margin-top: auto;
   width: 100%;
 }
@@ -862,6 +866,10 @@
 }
 
 .landing-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
   color: var(--muted);
   transition: color var(--transition);
 }
@@ -884,11 +892,7 @@
     align-items: stretch;
   }
 
-  .landing-hero-actions a {
-    display: block;
-  }
-
-  .landing-hero-actions button {
+  .landing-hero-actions .btn {
     width: 100%;
   }
 
@@ -901,7 +905,7 @@
     flex: 0 0 auto;
   }
 
-  .landing-header-nav button {
+  .landing-header-nav .btn {
     padding: 6px 12px;
     min-height: 40px;
     white-space: nowrap;

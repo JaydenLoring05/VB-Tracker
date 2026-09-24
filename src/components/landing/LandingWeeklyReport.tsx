@@ -38,11 +38,9 @@ export function LandingWeeklyReport() {
         Keep an eye on Maya and Priya&apos;s readiness before increasing load further.
       </p>
 
-      <Link href="/login?mode=sign-up">
-        <button type="button" className="secondary">
+      <Link href="/login?mode=sign-up" className="btn secondary">
           View Sample Report
-        </button>
-      </Link>
+        </Link>
     </div>
   );
 }

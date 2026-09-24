@@ -33,7 +33,7 @@ export default async function AppLayout({
       <div className="app-shell">
         <Sidebar />
 
-        <main className="main">
+        <main id="main-content" tabIndex={-1} className="main">
           <Topbar userEmail={user.email ?? "Athlete"} displayName={profile?.display_name} />
           <LoadErrorBanner />
           {children}

@@ -59,11 +59,9 @@ export function PricingSection() {
                 ))}
               </ul>
 
-              <Link href="/pilot">
-                <button type="button" className={tier.highlight ? "" : "secondary"}>
+              <Link href="/pilot" className={`btn ${tier.highlight ? "" : "secondary"}`}>
                   {tier.cta}
-                </button>
-              </Link>
+                </Link>
             </div>
           ))}
         </div>

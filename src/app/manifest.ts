@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 
-// Colors mirror --bg in src/styles/base.css so the splash screen and
-// browser chrome match the app's dark theme.
-const BRAND_BACKGROUND = "#05070a";
+// Mirrors --bg in src/styles/tokens.css (oklch(0.12 0.008 75) = #070503) and the theme-color in
+// layout.tsx, so the splash screen, title bar and app background are one color.
+const BRAND_BACKGROUND = "#070503";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -13,6 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
       "The athlete training and recovery operating system for volleyball teams.",
     start_url: "/",
     scope: "/",
+    lang: "en",
     display: "standalone",
     background_color: BRAND_BACKGROUND,
     theme_color: BRAND_BACKGROUND,

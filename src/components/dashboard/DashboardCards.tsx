@@ -43,11 +43,9 @@ export function DashboardCards() {
       <TeamNudge />
 
       {todayWorkout && !todayWorkout.rest && (
-        <Link href="/workout">
-          <button className="dashboard-hero-cta">
-            {openSession ? "Continue Workout" : "Start Today's Workout"}
-            <ArrowRight size={22} aria-hidden="true" />
-          </button>
+        <Link href="/workout" className="btn dashboard-hero-cta">
+          {openSession ? "Continue Workout" : "Start Today's Workout"}
+          <ArrowRight size={22} aria-hidden="true" />
         </Link>
       )}
 
@@ -56,8 +54,8 @@ export function DashboardCards() {
           <div className="dashboard-card-icon">
             <CalendarDays size={18} />
           </div>
-          <h3>Today</h3>
-          <h2>{today}</h2>
+          <h2 className="card-label">Today</h2>
+          <p className="display card-figure">{today}</p>
           <p className="muted">{todayWorkout?.title}</p>
 
           {workoutStreak > 0 && (
@@ -72,7 +70,7 @@ export function DashboardCards() {
           <div className="dashboard-card-icon">
             <HeartPulse size={18} />
           </div>
-          <h3>Recovery</h3>
+          <h2 className="card-label">Recovery</h2>
 
           {hasLoggedStats ? (
             <div className="dashboard-recovery-body">
@@ -86,7 +84,7 @@ export function DashboardCards() {
             </div>
           ) : (
             <>
-              <h2>--</h2>
+              <p className="display card-figure">--</p>
               <p className="muted">No check-in yet. Log sleep, energy and soreness to get today&apos;s recovery score.</p>
               <Link href="/stats" className="button-link dashboard-card-cta">
                 Log today&apos;s check-in
@@ -99,15 +97,15 @@ export function DashboardCards() {
           <div className="dashboard-card-icon">
             <BarChart3 size={18} />
           </div>
-          <h3>Weekly Progress</h3>
+          <h2 className="card-label">Weekly Progress</h2>
           <p className="muted dashboard-phase-label">
             Week {week} &middot; {phase.name}
           </p>
-          <h2>{progress}%</h2>
+          <p className="display card-figure">{progress}%</p>
           <p className="muted">
             {completedExercises} / {totalExercises} exercises completed
           </p>
-          <div className="progress-bar">
+          <div className="progress-bar" aria-hidden="true">
             <div className="progress-fill" style={{ width: `${progress}%` }} />
           </div>
         </div>
@@ -116,7 +114,7 @@ export function DashboardCards() {
           <div className="dashboard-card-icon">
             <Trophy size={18} />
           </div>
-          <h3>Recent PRs</h3>
+          <h2 className="card-label">Recent PRs</h2>
 
           {recentPRs.length > 0 ? (
             <ul className="dashboard-pr-list">
@@ -131,7 +129,7 @@ export function DashboardCards() {
             </ul>
           ) : (
             <>
-              <h2>0</h2>
+              <p className="display card-figure">0</p>
               <p className="muted">
                 No PRs yet. They&apos;re saved automatically when you beat a best in a workout, or add one on{" "}
                 <Link href="/stats" className="dashboard-inline-link">

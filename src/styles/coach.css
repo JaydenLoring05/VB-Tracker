@@ -108,23 +108,48 @@
 
 /* ---------- Modal ---------- */
 
+/* A native <dialog> (see ModalDialog): it sits in the top layer, so it needs no z-index. The
+   element itself is the full-screen dimmed backdrop; the card inside is the visible dialog. */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--z-modal);
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  color: inherit;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--sp-4);
+  padding: max(var(--sp-4), env(safe-area-inset-top)) max(var(--sp-4), env(safe-area-inset-right))
+    max(var(--sp-4), env(safe-area-inset-bottom)) max(var(--sp-4), env(safe-area-inset-left));
   background: color-mix(in oklch, var(--bg-deep) 74%, transparent);
   backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+.modal-overlay:not([open]) {
+  display: none;
+}
+
+.modal-overlay::backdrop {
+  background: transparent;
+}
+
+/* Stop the page behind a modal from scrolling under the finger. */
+html:has(dialog[open]) {
+  overflow: hidden;
 }
 
 .modal-card {
   width: 100%;
   max-width: 640px;
   max-height: calc(100vh - var(--sp-8));
+  max-height: calc(100dvh - var(--sp-8));
   overflow-y: auto;
+  overscroll-behavior: contain;
   box-shadow: var(--shadow-lg);
   animation: pop-in 0.2s var(--ease-out) both;
 }

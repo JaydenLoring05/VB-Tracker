@@ -90,8 +90,8 @@
 }
 
 .exercise-row input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   accent-color: var(--gold);
   flex: 0 0 auto;
   cursor: pointer;
@@ -142,7 +142,7 @@
   min-height: 40px;
   font-size: 13px;
   background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--control-border);
 }
 
 .day-notes {
@@ -161,15 +161,26 @@
   resize: vertical;
   background: var(--surface-2);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius-md);
   padding: 12px;
   font: inherit;
-  outline: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
 .day-notes textarea:focus {
   border-color: var(--gold);
+  outline-color: var(--gold);
+}
+
+/* iOS zooms into any focused field under 16px. */
+@media (pointer: coarse) {
+  .swap-picker select,
+  .exercise-log-input,
+  .day-notes textarea {
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -201,11 +212,6 @@
 
   .exercise-row {
     font-size: 14px;
-  }
-
-  .exercise-row input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
   }
 
   .exercise-log-input {

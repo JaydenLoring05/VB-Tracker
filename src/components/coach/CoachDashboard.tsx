@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertTriangle, Copy, RefreshCw, UserMinus, Users } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 import { useDemo } from "@/context/DemoContext";
@@ -17,7 +18,6 @@ import { Avatar } from "@/components/shared/Avatar";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusLabel } from "@/components/shared/StatusLabel";
 
-import { AthleteStatsModal } from "./AthleteStatsModal";
 import { AttentionCenter } from "./AttentionCenter";
 import { ProgramEditor } from "./ProgramEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
@@ -26,6 +26,12 @@ import { TeamReadyChecklist } from "./TeamReadyChecklist";
 import { TeamSwitcher } from "./TeamSwitcher";
 
 import "@/styles/roster.css";
+
+// The stats modal pulls in the whole charting library, which the roster itself never needs. Load it
+// as a separate chunk (fetched when the browser is idle, see below) to keep the dashboard's first
+// load small.
+const loadAthleteStatsModal = () => import("./AthleteStatsModal").then((module) => module.AthleteStatsModal);
+const AthleteStatsModal = dynamic(loadAthleteStatsModal, { ssr: false });
 
 export function CoachDashboard({
   teams,
@@ -61,6 +67,16 @@ export function CoachDashboard({
   const [pendingRemoval, setPendingRemoval] = useState<RosterAthlete | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [regeneratedCode, setRegeneratedCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Warm the modal's chunk once the page has settled so the first click opens it instantly.
+    const idle = window.requestIdleCallback ?? ((callback: () => void) => window.setTimeout(callback, 2000));
+    const handle = idle(() => void loadAthleteStatsModal());
+    return () => {
+      if (window.cancelIdleCallback) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
+  }, []);
 
   useEffect(() => {
     // The dashboard setup guide links here with #program.
@@ -255,22 +271,19 @@ export function CoachDashboard({
         ) : (
           <div className="roster-table">
             {roster.map((athlete) => (
-              <div
-                role="button"
-                tabIndex={0}
-                className="roster-row"
-                key={athlete.userId}
-                onClick={() => setSelectedAthlete(athlete)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    setSelectedAthlete(athlete);
-                  }
-                }}
-              >
+              <div className="roster-row" key={athlete.userId}>
                 <Avatar name={athlete.displayName} />
                 <div className="roster-athlete-name">
-                  <strong>{athlete.displayName}</strong>
+                  {/* The name is the row's real button; its ::after stretches over the whole row so
+                      the entire row still clicks, without nesting the Remove button inside a button. */}
+                  <button
+                    type="button"
+                    className="roster-open"
+                    aria-haspopup="dialog"
+                    onClick={() => setSelectedAthlete(athlete)}
+                  >
+                    {athlete.displayName}
+                  </button>
                   {athlete.needsCheckIn && athlete.lastCheckIn !== null && (
                     <span className="pill roster-flag">Needs check-in</span>
                   )}
@@ -292,13 +305,11 @@ export function CoachDashboard({
                 <button
                   type="button"
                   className="ghost danger-button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    requestRemove(athlete);
-                  }}
+                  onClick={() => requestRemove(athlete)}
                   disabled={removingId === athlete.userId}
+                  aria-label={`Remove ${athlete.displayName}`}
                 >
-                  <UserMinus size={14} /> Remove
+                  <UserMinus size={14} aria-hidden="true" /> Remove
                 </button>
               </div>
             ))}

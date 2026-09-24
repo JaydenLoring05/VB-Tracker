@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { Brand } from "@/components/shared/Brand";
@@ -25,6 +25,13 @@ export default function LoginPage() {
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [resendState, setResendState] = useState<ResendState>("idle");
   const [resetSent, setResetSent] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
+
+  // A form-level error (wrong password, unknown email, missing email) is announced by
+  // its role="alert"; moving focus to the first field puts the fix under the cursor.
+  useEffect(() => {
+    if (error) emailRef.current?.focus();
+  }, [error]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -150,9 +157,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth-shell">
+    <main id="main-content" tabIndex={-1} className="auth-shell">
       <Link href="/" className="auth-back-link">
-        ← Back to NextRep
+        <span aria-hidden="true">←</span> Back to NextRep
       </Link>
 
       <div className="panel auth-card">
@@ -162,39 +169,70 @@ export default function LoginPage() {
         <h1>{mode === "sign-in" ? "Welcome back" : "Create your account"}</h1>
         <p className="muted">NextRep: Athlete Operating System</p>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit} aria-busy={loading}>
           {mode === "sign-up" && (
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Name"
-              autoComplete="name"
-            />
+            <div className="auth-field">
+              <label htmlFor="auth-name">Name</label>
+              <input
+                id="auth-name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                autoCapitalize="words"
+              />
+            </div>
           )}
 
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            autoComplete="email"
-          />
+          <div className="auth-field">
+            <label htmlFor="auth-email">Email</label>
+            <input
+              id="auth-email"
+              ref={emailRef}
+              type="email"
+              inputMode="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "auth-error" : undefined}
+            />
+          </div>
 
-          <input
-            type="password"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
-          />
+          <div className="auth-field">
+            <label htmlFor="auth-password">Password</label>
+            <input
+              id="auth-password"
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "auth-error" : mode === "sign-up" ? "auth-password-hint" : undefined}
+            />
+            {mode === "sign-up" && !error && (
+              <p className="auth-hint" id="auth-password-hint">
+                At least 6 characters.
+              </p>
+            )}
+          </div>
 
-          {error && <p className="auth-error">{error}</p>}
-          {message && <p className="auth-success">{message}</p>}
+          {error && (
+            <p className="auth-error" id="auth-error" role="alert">
+              {error}
+            </p>
+          )}
+          {message && (
+            <p className="auth-success" role="status">
+              {message}
+            </p>
+          )}
 
           {needsConfirmation && (
             <button
@@ -255,6 +293,6 @@ export default function LoginPage() {
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

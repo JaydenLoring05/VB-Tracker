@@ -28,13 +28,10 @@ export function DemoBanner({ onStartTour }: { onStartTour: () => void }) {
             <span>Tour</span>
           </button>
 
-          <Link href="/login?mode=sign-up" className="demo-cta" aria-label="Start Free Team Pilot">
-            <span className="demo-cta-long" aria-hidden="true">
-              Start Free Team Pilot
-            </span>
-            <span className="demo-cta-short" aria-hidden="true">
-              Start Free Pilot
-            </span>
+          {/* Only one of the two spans is displayed (CSS), so the name always matches what is on screen. */}
+          <Link href="/login?mode=sign-up" className="demo-cta">
+            <span className="demo-cta-long">Start Free Team Pilot</span>
+            <span className="demo-cta-short">Start Free Pilot</span>
           </Link>
         </div>
       </div>

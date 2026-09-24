@@ -145,10 +145,8 @@ export function PilotForm() {
         <p className="muted">
           Nothing else to do for now. No credit card, and no account needed yet.
         </p>
-        <Link href="/">
-          <button type="button" className="secondary">
-            Back to NextRep
-          </button>
+        <Link href="/" className="btn secondary">
+          Back to NextRep
         </Link>
       </div>
     );
@@ -168,9 +166,7 @@ export function PilotForm() {
             : "It is our side, not yours. Email your details to Jayden instead and he will pick it up from there. We filled the message in for you."}
         </p>
         <div className="pilot-result-actions">
-          <a href={buildMailto(values)}>
-            <button type="button">Email my application</button>
-          </a>
+          <a href={buildMailto(values)} className="btn">Email my application</a>
           <button type="button" className="secondary" onClick={() => setStatus("idle")}>
             Back to the form
           </button>

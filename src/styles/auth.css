@@ -35,6 +35,22 @@
   margin-top: var(--sp-6);
 }
 
+.auth-field {
+  display: grid;
+  gap: 6px;
+}
+
+.auth-field label {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.auth-hint {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
 .auth-form input {
   width: 100%;
 }
@@ -61,7 +77,7 @@
   border-color: transparent;
   color: var(--gold);
   padding: 0;
-  min-height: auto;
+  min-height: 44px;
   font-weight: 700;
   font-size: var(--fs-sm);
   justify-self: start;
@@ -89,10 +105,11 @@
   background: transparent;
   border-color: transparent;
   color: var(--gold);
-  padding: 0;
-  min-height: auto;
+  padding: 0 4px;
+  min-height: 44px;
   font-weight: 800;
-  display: inline;
+  display: inline-flex;
+  align-items: center;
 }
 
 .auth-switch button:hover {
@@ -104,7 +121,8 @@
 }
 
 .auth-switch .auth-resend {
-  display: block;
+  display: flex;
+  justify-content: center;
   width: 100%;
   margin-top: var(--sp-2);
   text-align: center;
@@ -112,7 +130,10 @@
 }
 
 .auth-back-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
   max-width: 400px;
   width: 100%;
   margin: 0 auto var(--sp-4);

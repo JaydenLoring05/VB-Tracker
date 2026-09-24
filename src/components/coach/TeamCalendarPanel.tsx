@@ -95,8 +95,18 @@ export function TeamCalendarPanel({ team }: { team: Team }) {
 
       {showForm && (
         <form className="team-event-form" onSubmit={handleSubmit}>
-          <input type="date" value={date} onChange={(event) => setDate(event.target.value)} required />
-          <select value={type} onChange={(event) => setType(event.target.value as TeamCalendarEventType)}>
+          <input
+            type="date"
+            aria-label="Event date"
+            value={date}
+            onChange={(event) => setDate(event.target.value)}
+            required
+          />
+          <select
+            aria-label="Event type"
+            value={type}
+            onChange={(event) => setType(event.target.value as TeamCalendarEventType)}
+          >
             {EVENT_TYPES.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -104,6 +114,7 @@ export function TeamCalendarPanel({ team }: { team: Team }) {
             ))}
           </select>
           <input
+            aria-label="Event title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Event title, ex: Away match at Central"

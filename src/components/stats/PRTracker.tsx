@@ -35,7 +35,7 @@ export function PRTracker() {
       </h2>
 
       <div className="pr-form">
-        <select value={prExercise} onChange={(e) => setPrExercise(e.target.value)}>
+        <select aria-label="Exercise" value={prExercise} onChange={(e) => setPrExercise(e.target.value)}>
           <option value="">Select Exercise</option>
           {exercises.map((exercise) => (
             <option key={exercise.name} value={exercise.name}>
@@ -45,12 +45,14 @@ export function PRTracker() {
         </select>
 
         <input
+          aria-label="PR value"
+          autoComplete="off"
           value={prValue}
           onChange={(e) => setPrValue(e.target.value)}
           placeholder="PR value, ex: 225 x 5 or 34in"
         />
 
-        <select value={prUnit} onChange={(e) => setPrUnit(e.target.value)}>
+        <select aria-label="Unit" value={prUnit} onChange={(e) => setPrUnit(e.target.value)}>
           <option value="lbs">lbs</option>
           <option value="reps">reps</option>
           <option value="inches">inches</option>
@@ -60,6 +62,7 @@ export function PRTracker() {
         </select>
 
         <input
+          aria-label="Note, optional"
           value={prNote}
           onChange={(e) => setPrNote(e.target.value)}
           placeholder="Optional note"

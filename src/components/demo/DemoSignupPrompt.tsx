@@ -15,7 +15,11 @@ export function DemoSignupPrompt({ feature, onClose }: { feature: string | null;
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // React's autoFocus runs while the dialog is still closed, so move focus explicitly.
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
@@ -43,7 +47,7 @@ export function DemoSignupPrompt({ feature, onClose }: { feature: string | null;
           <Link href="/login?mode=sign-up" className="demo-cta">
             Start Free Team Pilot
           </Link>
-          <button type="button" className="ghost" onClick={onClose} autoFocus>
+          <button type="button" className="ghost" onClick={onClose} data-autofocus>
             Keep exploring
           </button>
         </div>

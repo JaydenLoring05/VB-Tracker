@@ -99,14 +99,15 @@ export function WorkoutSummary({
 
       {onRateRPE && (
         <div className="workout-rpe">
-          <h3>How hard did that feel?</h3>
+          <h3 id="rpe-heading">How hard did that feel?</h3>
           <p className="muted">1 = very easy, 10 = maximum effort.</p>
-          <div className="workout-rpe-scale">
+          <div className="workout-rpe-scale" role="group" aria-labelledby="rpe-heading">
             {RPE_SCALE.map((value) => (
               <button
                 key={value}
                 type="button"
                 className={rpe === value ? "" : "ghost"}
+                aria-pressed={rpe === value}
                 disabled={savingRPE}
                 onClick={() => handleRate(value)}
               >
@@ -114,7 +115,11 @@ export function WorkoutSummary({
               </button>
             ))}
           </div>
-          {rpe != null && <p className="muted">Saved: {rpe}/10.</p>}
+          {rpe != null && (
+            <p className="muted" role="status">
+              Saved: {rpe}/10.
+            </p>
+          )}
         </div>
       )}
 
