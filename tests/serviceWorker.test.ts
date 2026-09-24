@@ -9,6 +9,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const ORIGIN = "https://nextrep.test";
 const SOURCE = readFileSync(join(process.cwd(), "public", "sw.js"), "utf8");
+// Derive the current cache name and size cap from the worker itself, so a version bump
+// (which sw.js documents as routine) does not silently invalidate these tests.
+const CACHE_VERSION = /const CACHE_VERSION = "([^"]+)"/.exec(SOURCE)?.[1] ?? "";
+const MAX_ENTRIES = Number(/const MAX_STATIC_ENTRIES = (\d+)/.exec(SOURCE)?.[1] ?? "0");
+const STATIC_CACHE = `nextrep-static-${CACHE_VERSION}`;
 
 type Listener = (event: unknown) => void;
 type FakeResponse = {
@@ -49,6 +54,7 @@ function createHarness() {
   const stores = new Map<string, Map<string, FakeResponse>>();
   const puts: { cache: string; url: string }[] = [];
   const deleted: string[] = [];
+  const entryDeletions: string[] = [];
   const state = { failPuts: false };
 
   const openCache = (name: string) => {
@@ -61,6 +67,13 @@ function createHarness() {
         const key = urlOf(input).replace(ORIGIN, "");
         puts.push({ cache: name, url: key });
         store.set(key, value);
+      },
+      // Like the real Cache API, keys() lists entries oldest first.
+      keys: async () => [...store.keys()].map((key) => ({ url: `${ORIGIN}${key}` })),
+      delete: async (input: unknown) => {
+        const key = urlOf(input).replace(ORIGIN, "");
+        entryDeletions.push(key);
+        return store.delete(key);
       }
     };
   };
@@ -111,15 +124,20 @@ function createHarness() {
   /** Dispatches a fetch event. Resolves to the response, or "passthrough" if the worker did not respond. */
   async function request(url: string, { method = "GET", mode = "cors" }: { method?: string; mode?: string } = {}) {
     let responded: Promise<unknown> | null = null;
+    const background: Promise<unknown>[] = [];
     listeners.fetch({
       request: { method, mode, url: url.startsWith("http") ? url : `${ORIGIN}${url}` },
-      respondWith: (promise: Promise<unknown>) => (responded = promise)
+      respondWith: (promise: Promise<unknown>) => (responded = promise),
+      // The worker writes to the cache in the background via waitUntil; collect it so tests can await it.
+      waitUntil: (promise: Promise<unknown>) => background.push(promise)
     });
     if (!responded) return "passthrough" as const;
-    return (await responded) as FakeResponse | Response;
+    const result = (await responded) as FakeResponse | Response;
+    await Promise.all(background);
+    return result;
   }
 
-  return { lifecycle, request, fetch: fetchMock, stores, puts, deleted, claim, skipWaiting, state };
+  return { lifecycle, request, fetch: fetchMock, stores, puts, deleted, entryDeletions, claim, skipWaiting, state };
 }
 
 let sw: ReturnType<typeof createHarness>;
@@ -137,7 +155,7 @@ describe("service worker install", () => {
     const [requested] = sw.fetch.mock.calls[0] as [{ url: string; init: { cache: string } }];
     expect(requested.url).toBe("/offline");
     expect(requested.init).toEqual({ cache: "reload" });
-    expect(sw.puts).toEqual([{ cache: "nextrep-static-v1", url: "/offline" }]);
+    expect(sw.puts).toEqual([{ cache: STATIC_CACHE, url: "/offline" }]);
     expect(sw.skipWaiting).toHaveBeenCalled();
   });
 
@@ -167,15 +185,17 @@ describe("service worker install", () => {
 
 describe("service worker activate", () => {
   it("deletes stale NextRep caches, keeps the current one and unrelated ones, and claims clients", async () => {
+    // Phones that installed an earlier release still hold its cache; it must be removed.
     sw.stores.set("nextrep-static-v0", new Map());
-    sw.stores.set("nextrep-static-v1", new Map());
+    sw.stores.set("nextrep-static-legacy", new Map());
+    sw.stores.set(STATIC_CACHE, new Map());
     sw.stores.set("nextrep-other", new Map());
     sw.stores.set("someone-elses-cache", new Map());
 
     await sw.lifecycle("activate");
 
-    expect(sw.deleted.sort()).toEqual(["nextrep-other", "nextrep-static-v0"]);
-    expect([...sw.stores.keys()].sort()).toEqual(["nextrep-static-v1", "someone-elses-cache"]);
+    expect(sw.deleted.sort()).toEqual(["nextrep-other", "nextrep-static-legacy", "nextrep-static-v0"]);
+    expect([...sw.stores.keys()].sort()).toEqual([STATIC_CACHE, "someone-elses-cache"].sort());
     expect(sw.claim).toHaveBeenCalled();
   });
 });
@@ -249,7 +269,7 @@ describe("service worker fetch: navigations", () => {
   });
 
   it("never falls back to a cached copy of any page other than /offline", async () => {
-    sw.stores.set("nextrep-static-v1", new Map([["/dashboard", response({ body: "someone's dashboard" })]]));
+    sw.stores.set(STATIC_CACHE, new Map([["/dashboard", response({ body: "someone's dashboard" })]]));
     sw.fetch.mockRejectedValue(new TypeError("Failed to fetch"));
 
     const result = (await sw.request("/dashboard", { mode: "navigate" })) as Response;
@@ -265,13 +285,43 @@ describe("service worker fetch: static assets", () => {
       sw.fetch.mockResolvedValue(asset);
 
       expect(await sw.request(path)).toBe(asset);
-      expect(sw.puts).toEqual([{ cache: "nextrep-static-v1", url: path }]);
+      expect(sw.puts).toEqual([{ cache: STATIC_CACHE, url: path }]);
 
       sw.fetch.mockClear();
       expect(await sw.request(path)).toBe(asset);
       expect(sw.fetch).not.toHaveBeenCalled();
     }
   );
+
+  it("caps the static cache, evicting the oldest build files but never /offline or the icons", async () => {
+    // /offline and the icons are the oldest entries (stored first), then build files fill the cache to the cap.
+    const store = new Map<string, FakeResponse>([
+      ["/offline", response()],
+      ["/icons/icon-192.png", response()],
+      ["/icons/icon-512.png", response()]
+    ]);
+    for (let i = 0; store.size < MAX_ENTRIES; i += 1) store.set(`/_next/static/old-${i}.js`, response());
+    sw.stores.set(STATIC_CACHE, store);
+    expect(store.size).toBe(MAX_ENTRIES);
+
+    sw.fetch.mockResolvedValue(response({ contentType: "application/javascript" }));
+    await sw.request("/_next/static/new.js");
+
+    expect(store.size).toBe(MAX_ENTRIES);
+    expect(store.has("/_next/static/new.js")).toBe(true);
+    expect(sw.entryDeletions).toEqual(["/_next/static/old-0.js"]);
+    expect(store.has("/offline")).toBe(true);
+    expect(store.has("/icons/icon-192.png")).toBe(true);
+    expect(store.has("/icons/icon-512.png")).toBe(true);
+  });
+
+  it("does not evict anything while the cache is under the cap", async () => {
+    sw.fetch.mockResolvedValue(response({ contentType: "application/javascript" }));
+    await sw.request("/_next/static/a.js");
+    await sw.request("/_next/static/b.js");
+
+    expect(sw.entryDeletions).toEqual([]);
+  });
 
   it("does not cache failed, opaque or cross-origin-typed responses", async () => {
     sw.fetch.mockResolvedValue(response({ ok: false }));
