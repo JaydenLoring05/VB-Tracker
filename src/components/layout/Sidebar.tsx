@@ -36,7 +36,7 @@ export function Sidebar() {
         <Brand tagline="Athlete OS" />
       </div>
 
-      <nav className="nav">
+      <nav className="nav" aria-label="Main">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -48,6 +48,7 @@ export function Sidebar() {
               href={item.href}
               className={isActive ? "active" : ""}
               aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
             >
               <Icon size={20} aria-hidden="true" />
               <span className="nav-label">{item.label}</span>
@@ -57,12 +58,12 @@ export function Sidebar() {
       </nav>
 
       <div className="streak-box">
-        <h3>
-          <Flame size={18} /> Current Streak
-        </h3>
-        <h2>
+        <p className="display streak-title">
+          <Flame size={18} aria-hidden="true" /> Current Streak
+        </p>
+        <p className="display streak-count">
           {workoutStreak} day{workoutStreak === 1 ? "" : "s"}
-        </h2>
+        </p>
         <p className="muted">
           {workoutStreak > 0
             ? "Keep it going."

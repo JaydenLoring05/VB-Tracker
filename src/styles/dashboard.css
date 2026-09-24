@@ -106,11 +106,13 @@
   margin-bottom: var(--sp-4);
 }
 
-.dashboard-card h3 {
+.dashboard-card h3,
+.dashboard-card .card-label {
   margin-top: 0;
 }
 
-.dashboard-card h2 {
+.dashboard-card h2,
+.dashboard-card .card-figure {
   font-size: 40px;
 }
 
