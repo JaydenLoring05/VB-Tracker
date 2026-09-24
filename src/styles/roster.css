@@ -1,0 +1,294 @@
+/*
+ * Roster rows and the Attention Center. Imported by every component that renders
+ * them (coach dashboard, demo, landing sample) so they never depend on a page's
+ * stylesheet being loaded.
+ */
+
+/* ---------- Roster ---------- */
+
+.roster-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.roster-heading h2 {
+  margin: 0;
+}
+
+.roster-refresh {
+  min-height: 34px;
+  padding: 5px 12px;
+  font-size: var(--fs-sm);
+}
+
+.roster-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.roster-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+  grid-template-areas: "av name status score btn";
+  align-items: center;
+  column-gap: var(--sp-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    background-color var(--transition),
+    transform var(--transition);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .roster-row:hover {
+    background: var(--panel-2);
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+  }
+}
+
+.roster-row:focus-visible {
+  border-color: var(--gold);
+}
+
+.roster-row > .avatar-initials {
+  grid-area: av;
+}
+
+.roster-athlete-name {
+  grid-area: name;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px var(--sp-2);
+  min-width: 0;
+}
+
+.roster-athlete-name strong {
+  flex: 1 1 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-base);
+  font-weight: 700;
+}
+
+.roster-flag {
+  background: color-mix(in oklch, var(--red) 14%, transparent);
+  border-color: color-mix(in oklch, var(--red) 30%, transparent);
+  color: var(--red);
+  flex: 0 0 auto;
+  font-size: 11px;
+  padding: 1px 8px;
+}
+
+.roster-last-active {
+  flex: 0 1 auto;
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+.roster-status {
+  grid-area: status;
+  justify-self: end;
+}
+
+.roster-score {
+  grid-area: score;
+  min-width: 2ch;
+  text-align: right;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.roster-row > button {
+  grid-area: btn;
+  min-height: 34px;
+  padding: 5px 10px;
+  font-size: var(--fs-sm);
+}
+
+/* Legacy pill-style status, kept for empty-state previews and stat modals. */
+.roster-recovery {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.roster-recovery-elite,
+.roster-recovery-good {
+  color: var(--green);
+}
+
+.roster-recovery-caution {
+  color: var(--warn);
+}
+
+.roster-recovery-low {
+  color: var(--red);
+}
+
+.roster-recovery-none {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .roster-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "av name score"
+      "av name status"
+      ". btn btn";
+    row-gap: 2px;
+    padding: var(--sp-3);
+  }
+
+  .roster-row > button {
+    justify-self: start;
+    margin-top: var(--sp-2);
+  }
+
+  .roster-score {
+    font-size: 28px;
+  }
+
+  .roster-athlete-name strong {
+    white-space: normal;
+  }
+}
+
+/* Landing sample: no click affordance. */
+.landing-roster-mock {
+  grid-template-columns: 1fr;
+}
+
+.landing-roster-mock .roster-row {
+  grid-template-areas: "av name status score";
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+}
+
+@media (max-width: 600px) {
+  .landing-roster-mock .roster-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "av name score"
+      "av name status";
+  }
+}
+
+/* ---------- Attention Center ---------- */
+
+.attention-center .section-heading {
+  margin-bottom: var(--sp-1);
+}
+
+.attention-lead {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.attention-list {
+  counter-reset: attention;
+  list-style: none;
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.attention-row {
+  --attention-color: var(--muted);
+  counter-increment: attention;
+  display: grid;
+  grid-template-columns: 28px auto minmax(0, 1fr) auto auto;
+  grid-template-areas: "rank av body icon btn";
+  align-items: center;
+  column-gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in oklch, var(--attention-color) 28%, var(--border));
+  background: color-mix(in oklch, var(--attention-color) 5%, var(--surface-2));
+}
+
+.attention-row::before {
+  content: counter(attention, decimal-leading-zero);
+  grid-area: rank;
+  color: var(--attention-color);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.attention-row > .avatar-initials {
+  grid-area: av;
+}
+
+.attention-row > svg {
+  grid-area: icon;
+  color: var(--attention-color);
+}
+
+.attention-row > button {
+  grid-area: btn;
+  min-height: 34px;
+  padding: 5px 12px;
+  font-size: var(--fs-sm);
+}
+
+.attention-row-body {
+  grid-area: body;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.attention-row-body strong {
+  font-size: var(--fs-base);
+}
+
+.attention-row-body span {
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+
+.attention-high {
+  --attention-color: var(--red);
+}
+
+.attention-medium {
+  --attention-color: var(--warn);
+}
+
+.attention-positive {
+  --attention-color: var(--green);
+}
+
+@media (max-width: 700px) {
+  .attention-row {
+    grid-template-columns: 24px auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "rank av body icon"
+      ". btn btn btn";
+    row-gap: var(--sp-2);
+    padding: var(--sp-3);
+  }
+
+  .attention-row > button {
+    justify-self: start;
+  }
+}

@@ -1,0 +1,460 @@
+/*
+ * Shared primitives: card, stat tile, badge, status dot, avatar, section heading,
+ * progress bar and ring, empty state, toast, banner. Screens compose these.
+ */
+
+/* ---------- Card ---------- */
+
+.panel,
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6);
+  box-shadow: var(--shadow-md);
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+/* Card heading row: display title on the left, micro caption / action on the right. */
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-4);
+}
+
+.section-heading h2,
+.section-heading h3 {
+  margin: 0;
+}
+
+.section-caption {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Interactive card: lifts on hover where hover exists. */
+.card-interactive {
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    background-color var(--transition);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-interactive:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    background: var(--panel-2);
+  }
+}
+
+/* ---------- Stat tile ---------- */
+
+/* The generic .card used as a stat: micro label over a big display number. */
+.card h3 {
+  margin: 0 0 var(--sp-3);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--tracking-micro);
+  line-height: 1.3;
+}
+
+.card h2 {
+  margin: 0 0 var(--sp-1);
+  font-size: 44px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.card p {
+  font-size: var(--fs-sm);
+}
+
+.stat-tile {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+}
+
+.stat-tile p {
+  margin: 0;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--tracking-micro);
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  margin-top: var(--sp-2);
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-value small {
+  margin-left: 2px;
+  color: var(--muted);
+  font-size: 0.55em;
+  font-weight: 600;
+}
+
+.stat-delta {
+  margin-top: var(--sp-1);
+  color: var(--muted);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.stat-delta.is-up {
+  color: var(--green);
+}
+
+.stat-delta.is-warn {
+  color: var(--warn);
+}
+
+.stat-delta.is-alert {
+  color: var(--red);
+}
+
+/* Solid gold tile: the one hero number on a screen. */
+.stat-tile-accent {
+  border-color: transparent;
+  background: var(--gold);
+  color: var(--on-gold);
+}
+
+.stat-tile-accent .stat-label,
+.stat-tile-accent .stat-value small,
+.stat-tile-accent .stat-delta {
+  color: color-mix(in oklch, var(--on-gold) 78%, transparent);
+}
+
+/* ---------- Badge, pill, tag ---------- */
+
+.pill,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--green) 14%, transparent);
+  border: 1px solid color-mix(in oklch, var(--green) 30%, transparent);
+  color: var(--green);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.badge-neutral {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.badge-gold {
+  background: color-mix(in oklch, var(--gold) 14%, transparent);
+  border-color: color-mix(in oklch, var(--gold) 32%, transparent);
+  color: var(--gold);
+}
+
+.badge-alert {
+  background: color-mix(in oklch, var(--red) 13%, transparent);
+  border-color: color-mix(in oklch, var(--red) 32%, transparent);
+  color: var(--red);
+}
+
+/* ---------- Status: dot + label. ready / monitor / limited ---------- */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--status-color, var(--muted));
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status::before,
+.status-dot {
+  content: "";
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px color-mix(in oklch, currentColor 18%, transparent);
+}
+
+.status-dot {
+  display: inline-block;
+}
+
+.status-ready,
+.status-dot.status-ready {
+  --status-color: var(--green);
+}
+
+.status-monitor,
+.status-dot.status-monitor {
+  --status-color: var(--warn);
+}
+
+.status-limited,
+.status-dot.status-limited {
+  --status-color: var(--red);
+}
+
+.status-dot {
+  color: var(--status-color, var(--muted));
+}
+
+/* ---------- Avatar (initials) ---------- */
+
+.avatar-initials {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  user-select: none;
+}
+
+.avatar-initials-sm {
+  width: 30px;
+  height: 30px;
+  font-size: 13px;
+}
+
+/* ---------- Progress bar ---------- */
+
+.progress-bar {
+  height: 6px;
+  margin-top: var(--sp-4);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  transform-origin: left center;
+  transition: width 0.4s var(--ease-out);
+  animation: bar-grow 700ms var(--ease-out) both;
+}
+
+/* ---------- Empty state (in-panel, simple) ---------- */
+
+.empty-state {
+  margin: var(--sp-4) 0;
+  padding: var(--sp-5);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklch, var(--gold) 4%, transparent);
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+/* ---------- Toast + banner ---------- */
+
+.sync-toast {
+  position: fixed;
+  top: calc(var(--sp-4) + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  max-width: min(480px, calc(100vw - 32px));
+  background: var(--panel-2);
+  border: 1px solid color-mix(in oklch, var(--red) 40%, transparent);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--fs-sm);
+}
+
+.sync-toast svg:first-child {
+  flex: 0 0 auto;
+  color: var(--red);
+}
+
+.sync-toast-dismiss {
+  flex: 0 0 auto;
+  background: transparent;
+  color: var(--muted);
+  padding: 4px;
+  min-height: auto;
+  border-radius: var(--radius-pill);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sync-toast-dismiss:hover:not(:disabled) {
+    background: rgb(255 255 255 / 0.08);
+    color: var(--text);
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+.sync-toast-retry {
+  flex: 0 0 auto;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid color-mix(in oklch, var(--gold) 40%, transparent);
+  padding: 4px 10px;
+  min-height: auto;
+  font-size: var(--fs-xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sync-toast-retry:hover:not(:disabled) {
+    background: color-mix(in oklch, var(--gold) 9%, transparent);
+    color: var(--gold);
+    box-shadow: none;
+  }
+}
+
+.load-error-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--panel-2);
+  border: 1px solid color-mix(in oklch, var(--red) 40%, transparent);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+}
+
+.load-error-banner svg:first-child {
+  flex: 0 0 auto;
+  color: var(--red);
+}
+
+.load-error-banner p {
+  margin: 0;
+  flex: 1;
+}
+
+.load-error-banner .sync-toast-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: 36px;
+}
+
+/* ---------- Brand lockup ---------- */
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-mark {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--gold);
+  color: var(--on-gold);
+}
+
+.brand-text {
+  display: grid;
+  min-width: 0;
+  line-height: 1;
+}
+
+.brand-wordmark {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.brand-wordmark span {
+  color: var(--gold);
+}
+
+.brand-tagline {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---------- Mobile card sizing ---------- */
+
+@media (max-width: 900px) {
+  .card,
+  .panel {
+    padding: var(--sp-5) var(--sp-4);
+  }
+
+  .card h2 {
+    font-size: 38px;
+  }
+
+  .stat-value {
+    font-size: 38px;
+  }
+
+  .stat-tile {
+    padding: var(--sp-3) var(--sp-4);
+  }
+
+  .pill,
+  .badge {
+    font-size: var(--fs-xs);
+    padding: 3px 9px;
+  }
+}
