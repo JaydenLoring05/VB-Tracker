@@ -3,16 +3,17 @@ import Link from "next/link";
 
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { CONTACT_EMAIL } from "@/lib/contact";
+import { pageMetadata } from "@/lib/site";
 
 import "@/styles/landing.css";
 import "@/styles/legal.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Terms of Service",
   description:
     "The plain-language terms for using NextRep during its founding team pilot: accounts, pricing, acceptable use, and what we do and do not promise.",
-  alternates: { canonical: "/terms" }
-};
+  path: "/terms"
+});
 
 export default function TermsPage() {
   return (

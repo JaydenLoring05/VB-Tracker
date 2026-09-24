@@ -2,16 +2,17 @@ import type { Metadata } from "next";
 
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { CONTACT_EMAIL } from "@/lib/contact";
+import { pageMetadata } from "@/lib/site";
 
 import "@/styles/landing.css";
 import "@/styles/legal.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
   description:
     "What NextRep collects, who can see athlete and coach data, and how to ask for your data to be deleted. Written in plain language.",
-  alternates: { canonical: "/privacy" }
-};
+  path: "/privacy"
+});
 
 export default function PrivacyPage() {
   return (

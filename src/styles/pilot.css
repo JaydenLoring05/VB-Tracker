@@ -253,6 +253,10 @@
   text-wrap: balance;
 }
 
+.pilot-result h2 {
+  scroll-margin-top: 96px;
+}
+
 .pilot-result h2:focus {
   outline: none;
 }

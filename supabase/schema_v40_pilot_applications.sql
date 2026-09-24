@@ -37,9 +37,13 @@ create index if not exists pilot_applications_created_at_idx
 
 alter table public.pilot_applications enable row level security;
 
--- Lock the table down at the privilege level too, then grant INSERT only.
+-- Lock the table down at the privilege level too, then grant INSERT on the
+-- applicant-supplied columns only. id, created_at, and status always take their
+-- defaults, so a caller using the public anon key directly (bypassing the
+-- website) cannot forge timestamps or set a triage status.
 revoke all on public.pilot_applications from anon, authenticated;
-grant insert on public.pilot_applications to anon, authenticated;
+grant insert (coach_name, email, team_name, level, roster_size, tracking_method, notes)
+  on public.pilot_applications to anon, authenticated;
 
 drop policy if exists "anyone can apply" on public.pilot_applications;
 create policy "anyone can apply" on public.pilot_applications

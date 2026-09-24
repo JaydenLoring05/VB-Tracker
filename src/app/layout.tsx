@@ -23,8 +23,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: SITE_NAME,
     title: `${SITE_NAME}: ${SITE_TAGLINE}`,
-    description: SITE_DESCRIPTION,
-    url: "/"
+    description: SITE_DESCRIPTION
   },
   twitter: {
     card: "summary_large_image",

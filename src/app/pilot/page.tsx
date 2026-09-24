@@ -4,27 +4,20 @@ import Link from "next/link";
 
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { PilotForm } from "@/components/pilot/PilotForm";
+import { pageMetadata } from "@/lib/site";
 
 import "@/styles/landing.css";
 import "@/styles/pilot.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Apply for the Founding Team Pilot",
   description:
     "Apply to use NextRep free for 30 days with your volleyball team. No credit card, personal onboarding, and direct support from the founder.",
-  alternates: { canonical: "/pilot" },
-  openGraph: {
-    title: "Apply for the NextRep Founding Team Pilot",
-    description:
-      "Use NextRep free for 30 days with your volleyball team. Three founding programs, personal onboarding, no credit card.",
-    url: "/pilot"
-  },
-  twitter: {
-    title: "Apply for the NextRep Founding Team Pilot",
-    description:
-      "Use NextRep free for 30 days with your volleyball team. Three founding programs, personal onboarding, no credit card."
-  }
-};
+  path: "/pilot",
+  shareTitle: "Apply for the NextRep Founding Team Pilot",
+  shareDescription:
+    "Use NextRep free for 30 days with your volleyball team. Three founding programs, personal onboarding, no credit card."
+});
 
 const POINTS = [
   "30 days free, no credit card required",
