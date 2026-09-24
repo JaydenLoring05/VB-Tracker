@@ -194,6 +194,22 @@
   right: var(--sp-3);
 }
 
+/* Keep the label clear of the ring, and shrink the ring on narrow tiles. */
+.demo-snapshot-tile:has(.demo-snapshot-ring) .stat-label {
+  padding-right: 56px;
+}
+
+@media (max-width: 640px) {
+  .demo-snapshot-tile:has(.demo-snapshot-ring) .stat-label {
+    padding-right: 34px;
+  }
+
+  .demo-snapshot-ring {
+    transform: scale(0.62);
+    transform-origin: top right;
+  }
+}
+
 /* Closing panel ------------------------------------------------------ */
 
 .demo-closing {
