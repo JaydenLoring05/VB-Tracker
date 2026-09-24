@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { TeamReadyChecklist } from "@/components/coach/TeamReadyChecklist";
+import { useDemo } from "@/context/DemoContext";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { useProfile } from "@/hooks/useProfile";
 import { useTeam } from "@/hooks/useTeam";
@@ -80,6 +81,12 @@ function JoinTeamNudge() {
  * Athletes already on a team see nothing.
  */
 export function TeamNudge() {
+  // The public demo has no account or team to nudge about, and useTeam reads Supabase.
+  if (useDemo()) return null;
+  return <TeamNudgeContent />;
+}
+
+function TeamNudgeContent() {
   const { loading, teams, activeTeam, role } = useTeam();
 
   if (loading) return null;

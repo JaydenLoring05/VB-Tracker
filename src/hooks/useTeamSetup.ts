@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { createClient } from "@/lib/supabase/client";
+import { useDemo } from "@/context/DemoContext";
+import { useSupabase } from "@/hooks/useSupabase";
 import { computeSetupProgress } from "@/lib/teamSetup";
 import { RosterAthlete, Team } from "@/types";
 
@@ -31,7 +32,8 @@ function writeFlag(key: string, value: boolean) {
  * preferences (dismissed, program reviewed) live in this browser.
  */
 export function useTeamSetup(team: Team, roster: RosterAthlete[], rosterLoading: boolean) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useSupabase();
+  const demo = useDemo();
   const dismissedKey = `${KEY_PREFIX}:${team.id}:dismissed`;
   const reviewedKey = `${KEY_PREFIX}:${team.id}:program-reviewed`;
   const finishedKey = `${KEY_PREFIX}:${team.id}:finished`;
@@ -50,6 +52,12 @@ export function useTeamSetup(team: Team, roster: RosterAthlete[], rosterLoading:
   }, [dismissedKey, finishedKey, reviewedKey]);
 
   const refreshProgram = useCallback(async () => {
+    if (demo) {
+      // The public demo has no Supabase client; the sample team counts as set up.
+      setProgramCustomized(true);
+      return;
+    }
+
     const [overrides, defaults] = await Promise.all([
       supabase.from("team_day_overrides").select("team_id", { count: "exact", head: true }).eq("team_id", team.id),
       supabase
@@ -65,7 +73,7 @@ export function useTeamSetup(team: Team, roster: RosterAthlete[], rosterLoading:
     }
 
     setProgramCustomized((overrides.count ?? 0) + (defaults.count ?? 0) > 0);
-  }, [supabase, team.id]);
+  }, [supabase, demo, team.id]);
 
   useEffect(() => {
     setProgramCustomized(null);

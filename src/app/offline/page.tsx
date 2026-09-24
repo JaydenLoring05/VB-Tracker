@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // data, no data fetching, and inline styles so it renders even if no stylesheet is cached.
 
 export const metadata: Metadata = {
-  title: "Offline | NextRep",
+  title: "Offline",
   robots: { index: false, follow: false }
 };
 

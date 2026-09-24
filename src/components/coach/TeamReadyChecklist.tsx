@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { CopyButton } from "@/components/shared/CopyButton";
+import { useDemo } from "@/context/DemoContext";
 import { useTeamSetup } from "@/hooks/useTeamSetup";
 import { buildCheckInReminder, buildInviteMessage, SetupStep } from "@/lib/teamSetup";
 import { RosterAthlete, Team } from "@/types";
@@ -21,7 +22,13 @@ type Props = {
   onOpenProgram?: () => void;
 };
 
-export function TeamReadyChecklist({ team, roster, rosterLoading, programTabActive, onOpenProgram }: Props) {
+export function TeamReadyChecklist(props: Props) {
+  // The demo's sample team is already set up; the guide is for real first-run coaches.
+  if (useDemo()) return null;
+  return <TeamReadyChecklistContent {...props} />;
+}
+
+function TeamReadyChecklistContent({ team, roster, rosterLoading, programTabActive, onOpenProgram }: Props) {
   const { ready, progress, dismissed, finished, dismiss, restore, markProgramReviewed, refreshProgram } = useTeamSetup(
     team,
     roster,
