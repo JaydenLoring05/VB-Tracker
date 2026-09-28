@@ -3,12 +3,15 @@ import { PerformanceProfileForm } from "@/components/stats/PerformanceProfileFor
 import { PRTracker } from "@/components/stats/PRTracker";
 import { ProgressCharts } from "@/components/stats/ProgressCharts";
 import { StatsForm } from "@/components/stats/StatsForm";
+import { StatsHeadline } from "@/components/stats/StatsHeadline";
 
 import "@/styles/stats.css";
 
 export default function StatsPage() {
   return (
     <>
+      <StatsHeadline />
+
       <section id="stats" className="lower-grid">
         <StatsForm />
         <ProgressCharts />
