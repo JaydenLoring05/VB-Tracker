@@ -2,6 +2,7 @@
 
 import { Copy, RefreshCw, UserMinus, Users } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useDemo } from "@/context/DemoContext";
@@ -51,6 +52,7 @@ export function CoachDashboard({
 }) {
   const team = activeTeam;
   const demo = useDemo();
+  const router = useRouter();
   const { loading, roster, error, removeAthlete, refresh } = useCoachRoster(team);
   const {
     loading: attentionLoading,
@@ -63,7 +65,10 @@ export function CoachDashboard({
   // A failed roster load leaves the roster empty; a failed removal leaves it
   // populated. Only the first should replace the roster with an error state.
   const rosterLoadFailed = Boolean(error) && roster.length === 0;
+  // The program and team calendar live on /plan. The demo can't open that page (it needs a login),
+  // so only the demo keeps a Roster | Plan switch here.
   const [activeTab, setActiveTab] = useState<"roster" | "program">("roster");
+  const showPlan = Boolean(demo) && activeTab === "program";
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedAthlete, setSelectedAthlete] = useState<RosterAthlete | null>(null);
@@ -82,9 +87,11 @@ export function CoachDashboard({
   }, []);
 
   useEffect(() => {
-    // The dashboard setup guide links here with #program.
-    if (window.location.hash === "#program") setActiveTab("program");
-  }, []);
+    // Old links to /coach#program still land on the program.
+    if (window.location.hash !== "#program") return;
+    if (demo) setActiveTab("program");
+    else router.replace("/plan");
+  }, [demo, router]);
 
   async function handleCopyCode() {
     try {
@@ -150,14 +157,9 @@ export function CoachDashboard({
         }}
       />
 
-      <TeamReadyChecklist
-        team={team}
-        roster={roster}
-        rosterLoading={loading}
-        programTabActive={activeTab === "program"}
-        onOpenProgram={() => setActiveTab("program")}
-      />
+      <TeamReadyChecklist team={team} roster={roster} rosterLoading={loading} />
 
+      {demo && (
       <div className="tabs">
         <button
           type="button"
@@ -174,15 +176,16 @@ export function CoachDashboard({
           Plan
         </button>
       </div>
+      )}
 
-      {activeTab === "program" && (
+      {showPlan && (
         <>
           <ProgramEditor team={team} />
           <TeamCalendarPanel team={team} />
         </>
       )}
 
-      {activeTab === "roster" && (
+      {!showPlan && (
       <>
       <div className="panel team-header">
         <div>
