@@ -13,6 +13,16 @@ describe("navItemsFor", () => {
     expect(labels(navItemsFor("coach").primary)).toEqual(["Team", "Plan", "Film", "Progress"]);
   });
 
+  it("sends coaches' Progress to team progress and keeps their own stats under More", () => {
+    const { primary, more } = navItemsFor("coach");
+    expect(primary.find((link) => link.label === "Progress")?.href).toBe("/team-progress");
+    expect(more.find((link) => link.label === "My Stats")?.href).toBe("/stats");
+  });
+
+  it("keeps athletes' Progress on their own stats", () => {
+    expect(navItemsFor("athlete").primary.find((link) => link.label === "Progress")?.href).toBe("/stats");
+  });
+
   it("falls back to the athlete nav when there is no team or the role is still loading", () => {
     expect(navItemsFor(null)).toBe(navItemsFor("athlete"));
     expect(navItemsFor(undefined)).toBe(navItemsFor("athlete"));

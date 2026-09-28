@@ -1,4 +1,5 @@
 import {
+  Activity,
   BarChart3,
   BookOpen,
   CalendarDays,
@@ -29,19 +30,30 @@ export type NavConfig = {
 };
 
 /** Every page reachable from the app nav. Each role must reach all of them. */
-export const NAV_ROUTES = ["/dashboard", "/workouts", "/workout", "/stats", "/calendar", "/film", "/library", "/coach", "/plan"];
+export const NAV_ROUTES = [
+  "/dashboard",
+  "/workouts",
+  "/workout",
+  "/stats",
+  "/calendar",
+  "/film",
+  "/library",
+  "/coach",
+  "/plan",
+  "/team-progress"
+];
 
 const startWorkout: NavLink = { href: "/workout", label: "Start Workout", icon: Play };
 const calendar: NavLink = { href: "/calendar", label: "Calendar", icon: CalendarDays };
 const library: NavLink = { href: "/library", label: "Exercise Library", icon: BookOpen };
 const film: NavLink = { href: "/film", label: "Film", icon: Clapperboard };
-const progress: NavLink = { href: "/stats", label: "Progress", icon: BarChart3 };
 
 const athleteNav: NavConfig = {
   primary: [
     { href: "/dashboard", label: "Today", icon: Home, alsoMatches: ["/workout"] },
     { href: "/workouts", label: "Plan", icon: Dumbbell, alsoMatches: ["/calendar", "/plan"] },
-    progress,
+    // Coach-only pages redirect athletes to their own version.
+    { href: "/stats", label: "Progress", icon: BarChart3, alsoMatches: ["/team-progress"] },
     film
   ],
   more: [startWorkout, calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }]
@@ -52,13 +64,14 @@ const coachNav: NavConfig = {
     { href: "/coach", label: "Team", icon: GraduationCap },
     { href: "/plan", label: "Plan", icon: ClipboardList },
     film,
-    progress
+    { href: "/team-progress", label: "Progress", icon: BarChart3 }
   ],
   more: [
     { href: "/dashboard", label: "My Training", icon: Home },
     { href: "/workouts", label: "Workouts", icon: Dumbbell },
     startWorkout,
     calendar,
+    { href: "/stats", label: "My Stats", icon: Activity },
     library
   ]
 };
