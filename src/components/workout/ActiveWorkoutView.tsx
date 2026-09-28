@@ -12,10 +12,11 @@ import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
 import { formatDuration } from "@/lib/time";
 
 import { DiscomfortSuggestion } from "./DiscomfortSuggestion";
-import { RestTimer } from "./RestTimer";
+import { RestOverBanner, RestTimer } from "./RestTimer";
 import { WorkoutSummary } from "./WorkoutSummary";
 
 const REST_DURATION = 90;
@@ -25,33 +26,6 @@ const REPS_INCREMENTS = [1, 5];
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
     navigator.vibrate(pattern);
-  }
-}
-
-function playRestCompleteTone() {
-  if (typeof window === "undefined") return;
-  const AudioContextClass =
-    window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AudioContextClass) return;
-
-  try {
-    const ctx = new AudioContextClass();
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    oscillator.type = "sine";
-    oscillator.frequency.value = 880;
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
-
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.45);
-    oscillator.onended = () => ctx.close();
-  } catch {
-    // Audio isn't critical to the workout flow; fail silently.
   }
 }
 
@@ -83,7 +57,9 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const [isFinishing, setIsFinishing] = useState(false);
   const [showWarmUp, setShowWarmUp] = useState(false);
   const [showCues, setShowCues] = useState(false);
+  const [restOver, setRestOver] = useState(false);
   const restCompleteFiredRef = useRef(false);
+  const currentExerciseRef = useRef<string | null>(null);
   const isLoggingRef = useRef(false);
   const isFinishingRef = useRef(false);
 
@@ -139,9 +115,12 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
       setRestSecondsLeft(secondsLeft);
 
       if (secondsLeft <= 0 && !restCompleteFiredRef.current) {
+        // Rest is done: alert, close the timer and bring the set form
+        // straight back, instead of sitting on 0:00 until Skip is tapped.
         restCompleteFiredRef.current = true;
-        vibrate(200);
-        playRestCompleteTone();
+        fireRestAlert(currentExerciseRef.current);
+        setRestEndsAt(null);
+        setRestOver(true);
       }
     }
 
@@ -235,12 +214,14 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
   const lastTime = previousSets[exercise];
   const cues = getExercise(originalExercise)?.cues ?? [];
+  currentExerciseRef.current = exercise ?? null;
 
   function goToExercise(nextIndex: number) {
     setExerciseIndex(Math.max(0, Math.min(resolvedExercises.length - 1, nextIndex)));
     setWeight("");
     setReps("");
     setRestEndsAt(null);
+    setRestOver(false);
     setShowCues(false);
   }
 
@@ -260,6 +241,9 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     event.preventDefault();
     if (!canLogSet) return;
 
+    // This tap is the user gesture that lets the end-of-rest beeps play on phones.
+    primeRestAlert();
+    setRestOver(false);
     setIsLogging(true);
     try {
       const result = await logSet(exercise, weight.trim() === "" ? null : Number(weight), Number(reps));
@@ -413,6 +397,8 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
             onSkip={() => setRestEndsAt(null)}
           />
         ) : (
+          <>
+          {restOver && <RestOverBanner onDismiss={() => setRestOver(false)} />}
           <form className="log-set-form" onSubmit={handleLogSet}>
             <div className="weight-input-group">
               <input
@@ -465,6 +451,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
               <CheckCircle2 size={16} /> {isLogging ? "Saving…" : "Log Set"}
             </button>
           </form>
+          </>
         )}
       </div>
 
