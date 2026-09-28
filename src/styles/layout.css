@@ -30,31 +30,66 @@
   gap: 2px;
 }
 
-.nav a {
+/* The More toggle is a <button>; these reset the global button look so it matches the links. */
+.nav a,
+.nav .nav-more-toggle {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 0;
   gap: var(--sp-3);
   padding: 11px var(--sp-3);
+  border: none;
   border-radius: var(--radius-sm);
+  background: transparent;
   color: var(--muted);
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.2;
   transition:
     background-color var(--transition),
     color var(--transition);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .nav a:hover {
+  .nav a:hover,
+  .nav .nav-more-toggle:hover {
     background: var(--panel);
     color: var(--text);
+    transform: none;
+    box-shadow: none;
   }
 }
 
-.nav a.active {
+.nav .nav-more-toggle:active {
+  transform: none;
+}
+
+.nav a.active,
+.nav .nav-more-toggle.active {
   background: color-mix(in oklch, var(--gold) 12%, transparent);
   color: var(--gold);
   box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--gold) 22%, transparent);
+}
+
+.nav .nav-more-toggle[aria-expanded="true"]:not(.active) {
+  color: var(--text);
+}
+
+/* "More": an indented list under the toggle on desktop, a sheet above the tab bar on mobile. */
+.nav-more-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 0 var(--sp-5);
+  padding-left: var(--sp-2);
+  border-left: 1px solid var(--border);
+}
+
+.nav-more-menu[hidden] {
+  display: none;
 }
 
 .streak-box {
@@ -164,29 +199,61 @@
     display: none;
   }
 
+  /* One column per item, however many the role has, so the bar never wraps. */
   .nav {
     height: 100%;
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     gap: 4px;
   }
 
-  .nav a {
-    padding: 8px 2px;
+  .nav > a,
+  .nav .nav-more-toggle {
+    height: 100%;
+    min-height: 52px;
+    padding: 6px 2px;
     border-radius: var(--radius-md);
     flex-direction: column;
     justify-content: center;
-    gap: 2px;
-    min-height: 52px;
+    gap: 3px;
+    font-size: var(--fs-micro);
   }
 
   .nav-label {
-    display: none;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .nav a.active {
+  .nav > a.active,
+  .nav .nav-more-toggle.active {
     box-shadow: none;
     background: color-mix(in oklch, var(--gold) 14%, transparent);
+  }
+
+  .nav-more {
+    min-width: 0;
+    height: 100%;
+  }
+
+  .nav-more-menu {
+    position: fixed;
+    right: max(8px, env(safe-area-inset-right));
+    bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--sp-2));
+    width: min(260px, calc(100vw - 16px));
+    margin: 0;
+    padding: var(--sp-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--panel-2);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .nav-more-menu a {
+    min-height: 48px;
+    font-size: var(--fs-base);
   }
 
   .main {

@@ -16,10 +16,6 @@ type Props = {
   team: Team;
   roster: RosterAthlete[];
   rosterLoading: boolean;
-  /** True while the Program tab is open. Viewing it counts as reviewing the plan. */
-  programTabActive?: boolean;
-  /** Opens the Program tab in place. Without it, the step links to the Team page instead. */
-  onOpenProgram?: () => void;
 };
 
 export function TeamReadyChecklist(props: Props) {
@@ -28,26 +24,14 @@ export function TeamReadyChecklist(props: Props) {
   return <TeamReadyChecklistContent {...props} />;
 }
 
-function TeamReadyChecklistContent({ team, roster, rosterLoading, programTabActive, onOpenProgram }: Props) {
-  const { ready, progress, dismissed, finished, dismiss, restore, markProgramReviewed, refreshProgram } = useTeamSetup(
+function TeamReadyChecklistContent({ team, roster, rosterLoading }: Props) {
+  const { ready, progress, dismissed, finished, dismiss, restore, markProgramReviewed } = useTeamSetup(
     team,
     roster,
     rosterLoading
   );
   const restoreRef = useRef<HTMLButtonElement>(null);
   const [justDismissed, setJustDismissed] = useState(false);
-  const wasProgramTab = useRef(false);
-
-  useEffect(() => {
-    if (programTabActive) {
-      markProgramReviewed();
-    } else if (wasProgramTab.current) {
-      // Back from the Program tab: pick up any changes the coach just made.
-      refreshProgram();
-    }
-    wasProgramTab.current = !!programTabActive;
-  }, [programTabActive, markProgramReviewed, refreshProgram]);
-
   useEffect(() => {
     if (justDismissed && dismissed) restoreRef.current?.focus();
   }, [justDismissed, dismissed]);
@@ -94,15 +78,11 @@ function TeamReadyChecklistContent({ team, roster, rosterLoading, programTabActi
     if (step.id === "program") {
       return (
         <div className="setup-actions">
-          {onOpenProgram ? (
-            <button type="button" onClick={onOpenProgram}>
-              Open program
-            </button>
-          ) : (
-            <Link href="/coach#program" className="button-link">
-              Open program
-            </Link>
-          )}
+          {/* The program lives on the Plan page; opening it counts as reviewing it. Coming back
+              to /coach remounts the guide, so any changes made there are picked up. */}
+          <Link href="/plan" className="button-link" onClick={markProgramReviewed}>
+            Open program
+          </Link>
         </div>
       );
     }

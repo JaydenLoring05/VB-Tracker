@@ -1,35 +1,19 @@
 "use client";
 
-import {
-  BarChart3,
-  BookOpen,
-  CalendarDays,
-  Clapperboard,
-  Dumbbell,
-  Flame,
-  GraduationCap,
-  Home,
-  Play
-} from "lucide-react";
+import { Flame, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { Brand } from "@/components/shared/Brand";
 import { useTrackerContext } from "@/context/TrackerContext";
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/workouts", label: "Workouts", icon: Dumbbell },
-  { href: "/workout", label: "Start Workout", icon: Play },
-  { href: "/stats", label: "Stats", icon: BarChart3 },
-  { href: "/calendar", label: "Calendar", icon: CalendarDays },
-  { href: "/film", label: "Film", icon: Clapperboard },
-  { href: "/library", label: "Exercise Library", icon: BookOpen },
-  { href: "/coach", label: "Team", icon: GraduationCap }
-];
+import { useNavRole } from "@/hooks/useNavRole";
+import { activePrimaryHref, isNavLinkActive, navItemsFor, type NavLink } from "@/lib/navItems";
+import { TeamRole } from "@/types";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const role = useNavRole();
   const { workoutStreak } = useTrackerContext();
 
   return (
@@ -38,26 +22,7 @@ export function Sidebar() {
         <Brand tagline="Athlete OS" />
       </div>
 
-      <nav className="nav" aria-label="Main">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={isActive ? "active" : ""}
-              aria-label={item.label}
-              aria-current={isActive ? "page" : undefined}
-            >
-              <Icon size={20} aria-hidden="true" />
-              <span className="nav-label">{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      <MainNav role={role} pathname={pathname} />
 
       <div className="streak-box">
         <p className="display streak-title">
@@ -73,5 +38,91 @@ export function Sidebar() {
         </p>
       </div>
     </aside>
+  );
+}
+
+function NavItem({ item, active, onNavigate }: { item: NavLink; active: boolean; onNavigate?: () => void }) {
+  const Icon = item.icon;
+
+  return (
+    <Link
+      href={item.href}
+      className={active ? "active" : ""}
+      aria-current={active ? "page" : undefined}
+      onClick={onNavigate}
+    >
+      <Icon size={20} aria-hidden="true" />
+      <span className="nav-label">{item.label}</span>
+    </Link>
+  );
+}
+
+/** Four primary destinations for the role, plus "More" for everything else. */
+export function MainNav({ role, pathname }: { role: TeamRole | null; pathname: string }) {
+  const config = navItemsFor(role);
+  const primaryHref = activePrimaryHref(config, pathname);
+  const activeMore = primaryHref ? null : (config.more.find((item) => isNavLinkActive(item, pathname)) ?? null);
+
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreId = useId();
+  const moreRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!moreOpen) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setMoreOpen(false);
+      toggleRef.current?.focus();
+    }
+
+    function onPointerDown(event: PointerEvent) {
+      if (!moreRef.current?.contains(event.target as Node)) setMoreOpen(false);
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [moreOpen]);
+
+  return (
+    <nav className="nav" aria-label="Main">
+      {config.primary.map((item) => (
+        <NavItem key={item.href} item={item} active={item.href === primaryHref} />
+      ))}
+
+      <div className="nav-more" ref={moreRef}>
+        <button
+          ref={toggleRef}
+          type="button"
+          className={`nav-more-toggle${activeMore ? " active" : ""}`}
+          aria-expanded={moreOpen}
+          aria-controls={moreId}
+          onClick={() => setMoreOpen((open) => !open)}
+        >
+          <MoreHorizontal size={20} aria-hidden="true" />
+          <span className="nav-label">More</span>
+        </button>
+
+        <div id={moreId} className="nav-more-menu" hidden={!moreOpen}>
+          {config.more.map((item) => (
+            <NavItem
+              key={item.href}
+              item={item}
+              active={item === activeMore}
+              onNavigate={() => setMoreOpen(false)}
+            />
+          ))}
+        </div>
+      </div>
+    </nav>
   );
 }
