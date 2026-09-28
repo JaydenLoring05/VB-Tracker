@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Copy, RefreshCw, UserMinus, Users } from "lucide-react";
+import { AlertTriangle, Copy, Pencil, RefreshCw, UserMinus, Users } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
@@ -20,6 +20,7 @@ import { StatusLabel } from "@/components/shared/StatusLabel";
 
 import { AttentionCenter } from "./AttentionCenter";
 import { ProgramEditor } from "./ProgramEditor";
+import { RosterNameEditor } from "./RosterNameEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
 import { TeamStatStrip } from "./TeamStatStrip";
 import { TeamReadyChecklist } from "./TeamReadyChecklist";
@@ -50,7 +51,7 @@ export function CoachDashboard({
 }) {
   const team = activeTeam;
   const demo = useDemo();
-  const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
+  const { loading, roster, flagged, error, removeAthlete, renameAthlete, refresh } = useCoachRoster(team);
   const {
     loading: attentionLoading,
     items: attentionItems,
@@ -65,6 +66,7 @@ export function CoachDashboard({
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedAthlete, setSelectedAthlete] = useState<RosterAthlete | null>(null);
   const [pendingRemoval, setPendingRemoval] = useState<RosterAthlete | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [regeneratedCode, setRegeneratedCode] = useState<string | null>(null);
 
@@ -274,16 +276,28 @@ export function CoachDashboard({
               <div className="roster-row" key={athlete.userId}>
                 <Avatar name={athlete.displayName} />
                 <div className="roster-athlete-name">
-                  {/* The name is the row's real button; its ::after stretches over the whole row so
-                      the entire row still clicks, without nesting the Remove button inside a button. */}
-                  <button
-                    type="button"
-                    className="roster-open"
-                    aria-haspopup="dialog"
-                    onClick={() => setSelectedAthlete(athlete)}
-                  >
-                    {athlete.displayName}
-                  </button>
+                  {renamingId === athlete.userId ? (
+                    <RosterNameEditor
+                      initialName={athlete.displayName}
+                      onCancel={() => setRenamingId(null)}
+                      onSave={async (name) => {
+                        const message = await renameAthlete(athlete.userId, name);
+                        if (!message) setRenamingId(null);
+                        return message;
+                      }}
+                    />
+                  ) : (
+                    /* The name is the row's real button; its ::after stretches over the whole row so
+                       the entire row still clicks, without nesting the Remove button inside a button. */
+                    <button
+                      type="button"
+                      className="roster-open"
+                      aria-haspopup="dialog"
+                      onClick={() => setSelectedAthlete(athlete)}
+                    >
+                      {athlete.displayName}
+                    </button>
+                  )}
                   {athlete.needsCheckIn && athlete.lastCheckIn !== null && (
                     <span className="pill roster-flag">Needs check-in</span>
                   )}
@@ -301,6 +315,22 @@ export function CoachDashboard({
                     </span>
                   </>
                 )}
+
+                <button
+                  type="button"
+                  className="ghost roster-rename"
+                  onClick={() => {
+                    if (demo) {
+                      demo.requestSignup("Managing your roster");
+                      return;
+                    }
+                    setRenamingId(athlete.userId);
+                  }}
+                  disabled={renamingId === athlete.userId}
+                  aria-label={`Rename ${athlete.displayName}`}
+                >
+                  <Pencil size={14} aria-hidden="true" /> Rename
+                </button>
 
                 <button
                   type="button"

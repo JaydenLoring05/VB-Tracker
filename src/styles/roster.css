@@ -33,8 +33,8 @@
 .roster-row {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
-  grid-template-areas: "av name status score btn";
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto auto;
+  grid-template-areas: "av name status score rename btn";
   align-items: center;
   column-gap: var(--sp-3);
   background: var(--surface-2);
@@ -189,7 +189,7 @@
     grid-template-areas:
       "av name score"
       "av name status"
-      ". btn btn";
+      ". rename btn";
     row-gap: 2px;
     padding: var(--sp-3);
   }
@@ -331,4 +331,35 @@
   .attention-row > button {
     justify-self: start;
   }
+}
+
+/* Coach renames an athlete inline (schema_v41 set_team_member_name). */
+.roster-row > .roster-rename {
+  grid-area: rename;
+}
+
+.roster-name-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+}
+
+.roster-name-editor input {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.roster-name-editor button {
+  min-height: 34px;
+  padding: 5px 12px;
+  font-size: var(--fs-sm);
+}
+
+.roster-name-error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--red);
+  font-size: var(--fs-sm);
 }
