@@ -13,6 +13,7 @@ import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { useTeam } from "@/hooks/useTeam";
 import { useTeamCalendar } from "@/hooks/useTeamCalendar";
 import { useTeamFilm } from "@/hooks/useTeamFilm";
+import { useTeamMemberNames } from "@/hooks/useTeamMemberNames";
 import { FilmTag, TeamFilm } from "@/types";
 
 import "@/styles/film.css";
@@ -41,15 +42,20 @@ export default function FilmPage() {
   const isCoach = role === "coach";
 
   // Coaches pick from the full roster (the same hook the coach dashboard
-  // uses). Athletes can only read their own team_members row under RLS,
-  // so they see their own tags as "You" and everyone else's as "Teammate".
+  // uses). Athletes get just the team's names; their own tags read "You".
+  // Until schema_v41 lets athletes read teammates' rows, other names fall
+  // back to "Teammate".
   const { roster } = useCoachRoster(isCoach ? activeTeam : null);
+  const teamNames = useTeamMemberNames(isCoach ? null : activeTeam);
   const athletes = useMemo<FilmAthlete[]>(
     () =>
       isCoach
         ? roster.map((athlete) => ({ userId: athlete.userId, displayName: athlete.displayName }))
-        : [{ userId, displayName: "You" }],
-    [isCoach, roster, userId]
+        : [
+            { userId, displayName: "You" },
+            ...teamNames.filter((member) => member.userId !== userId)
+          ],
+    [isCoach, roster, teamNames, userId]
   );
   const athleteName = useCallback(
     (athleteId: string | null) => {
