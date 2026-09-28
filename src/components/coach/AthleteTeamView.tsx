@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Users } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import Link from "next/link";
 
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -28,7 +28,7 @@ export function AthleteTeamView({ team }: { team: Team }) {
     <div className="athlete-team">
       <div className="panel">
         <h2>
-          <Users size={22} /> {team.name}
+          {team.name}
         </h2>
         <p className="muted">
           You&apos;re on this team as an athlete. Your coach can see your recovery stats and training history to
@@ -55,7 +55,7 @@ export function AthleteTeamView({ team }: { team: Team }) {
 
       <div className="panel">
         <h2>
-          <CalendarDays size={22} /> Team schedule
+          Team schedule
         </h2>
 
         {error ? (

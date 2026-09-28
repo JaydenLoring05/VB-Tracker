@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ClipboardList, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -61,7 +61,7 @@ function TeamReadyChecklistContent({ team, roster, rosterLoading, programTabActi
     return (
       <div className="setup-restore">
         <button ref={restoreRef} type="button" className="setup-link" onClick={restore}>
-          <ClipboardList size={14} aria-hidden="true" /> Show setup guide ({progress.completed} of {progress.total} done)
+          Show setup guide ({progress.completed} of {progress.total} done)
         </button>
       </div>
     );

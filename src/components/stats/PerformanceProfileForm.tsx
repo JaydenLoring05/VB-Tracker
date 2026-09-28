@@ -1,6 +1,5 @@
 "use client";
 
-import { Ruler } from "lucide-react";
 
 import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
@@ -46,7 +45,7 @@ export function PerformanceProfileForm() {
   return (
     <div className="panel">
       <h2>
-        <Ruler size={22} /> Performance Profile
+        Performance Profile
       </h2>
 
       <div className="stats-grid">

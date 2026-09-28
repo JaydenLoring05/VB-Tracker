@@ -1,4 +1,4 @@
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 /**
  * In-panel error with a retry, for a section whose data failed to load. Use
@@ -18,7 +18,7 @@ export function InlineError({
       <p>{message}</p>
       {onRetry && (
         <button type="button" className="ghost" onClick={onRetry}>
-          <RefreshCw size={14} aria-hidden="true" /> Try again
+          Try again
         </button>
       )}
     </div>

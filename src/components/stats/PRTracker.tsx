@@ -1,6 +1,5 @@
 "use client";
 
-import { Trophy } from "lucide-react";
 import { useState } from "react";
 
 import { exercises } from "@/data/exercises";
@@ -31,7 +30,7 @@ export function PRTracker() {
   return (
     <div className="panel">
       <h2>
-        <Trophy size={22} /> PR Tracker
+        PR Tracker
       </h2>
 
       <div className="pr-form">

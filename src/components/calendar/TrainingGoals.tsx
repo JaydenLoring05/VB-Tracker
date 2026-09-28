@@ -1,6 +1,5 @@
 "use client";
 
-import { Target } from "lucide-react";
 
 import { useProfile } from "@/hooks/useProfile";
 
@@ -20,7 +19,7 @@ export function TrainingGoals() {
   return (
     <div className="panel">
       <h2>
-        <Target size={22} /> Training Goals
+        Training Goals
       </h2>
 
       {loading ? (
