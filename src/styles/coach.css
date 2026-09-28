@@ -63,47 +63,29 @@
   white-space: nowrap;
 }
 
-/* ---------- Team stat strip ---------- */
+/* ---------- Team summary line (under the Attention Center heading) ---------- */
 
-.team-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-3);
-}
-
-.team-stats .stat-tile:first-child {
-  grid-column: 1 / -1;
-}
-
-@media (min-width: 720px) {
-  .team-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .team-stats .stat-tile:first-child {
-    grid-column: auto;
-  }
-}
-
-/* ---------- Needs a check-in ---------- */
-
-.checkin-alert {
-  border-color: color-mix(in oklch, var(--warn) 35%, var(--border));
-}
-
-.checkin-alert h3 {
-  color: var(--warn);
-  margin: 0 0 var(--sp-1);
-}
-
-.checkin-alert p {
+.team-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
   margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-sm);
 }
 
-.checkin-alert ul {
-  margin: var(--sp-3) 0 0;
-  padding-left: 18px;
+.team-summary strong {
   color: var(--text);
+  font-weight: 800;
+}
+
+.team-summary-alert,
+.team-summary-alert strong {
+  color: var(--warn);
+}
+
+.team-summary-clear {
+  color: var(--green);
 }
 
 /* ---------- Modal ---------- */

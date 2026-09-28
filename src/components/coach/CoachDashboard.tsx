@@ -1,12 +1,14 @@
 "use client";
 
-import { AlertTriangle, Copy, RefreshCw, UserMinus, Users } from "lucide-react";
+import { Copy, RefreshCw, UserMinus, Users } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useDemo } from "@/context/DemoContext";
 import { useAttentionCenter } from "@/hooks/useAttentionCenter";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
+import { withCheckInItems } from "@/lib/attentionCenter";
 import { buildInviteMessage } from "@/lib/teamSetup";
 import { formatLastActive } from "@/lib/time";
 import { RosterAthlete, Team } from "@/types";
@@ -21,8 +23,8 @@ import { StatusLabel } from "@/components/shared/StatusLabel";
 import { AttentionCenter } from "./AttentionCenter";
 import { ProgramEditor } from "./ProgramEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
-import { TeamStatStrip } from "./TeamStatStrip";
 import { TeamReadyChecklist } from "./TeamReadyChecklist";
+import { TeamSummaryLine } from "./TeamSummaryLine";
 import { TeamSwitcher } from "./TeamSwitcher";
 
 import "@/styles/roster.css";
@@ -50,17 +52,23 @@ export function CoachDashboard({
 }) {
   const team = activeTeam;
   const demo = useDemo();
-  const { loading, roster, flagged, error, removeAthlete, refresh } = useCoachRoster(team);
+  const router = useRouter();
+  const { loading, roster, error, removeAthlete, refresh } = useCoachRoster(team);
   const {
     loading: attentionLoading,
     items: attentionItems,
     error: attentionError,
     retry: retryAttention
   } = useAttentionCenter(team, roster);
+  // Athletes overdue for a check-in join the same ranked list instead of a separate panel.
+  const attentionList = withCheckInItems(attentionItems, roster);
   // A failed roster load leaves the roster empty; a failed removal leaves it
   // populated. Only the first should replace the roster with an error state.
   const rosterLoadFailed = Boolean(error) && roster.length === 0;
+  // The program and team calendar live on /plan. The demo can't open that page (it needs a login),
+  // so only the demo keeps a Roster | Plan switch here.
   const [activeTab, setActiveTab] = useState<"roster" | "program">("roster");
+  const showPlan = Boolean(demo) && activeTab === "program";
   const [copied, setCopied] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedAthlete, setSelectedAthlete] = useState<RosterAthlete | null>(null);
@@ -79,9 +87,11 @@ export function CoachDashboard({
   }, []);
 
   useEffect(() => {
-    // The dashboard setup guide links here with #program.
-    if (window.location.hash === "#program") setActiveTab("program");
-  }, []);
+    // Old links to /coach#program still land on the program.
+    if (window.location.hash !== "#program") return;
+    if (demo) setActiveTab("program");
+    else router.replace("/plan");
+  }, [demo, router]);
 
   async function handleCopyCode() {
     try {
@@ -128,16 +138,13 @@ export function CoachDashboard({
     <div className="coach-dashboard">
       <TeamSwitcher teams={teams} activeTeamId={team.id} onSelect={onSelectTeam} onCreateTeam={onCreateTeam} />
 
-      <TeamReadyChecklist
-        team={team}
-        roster={roster}
-        rosterLoading={loading}
-        programTabActive={activeTab === "program"}
-        onOpenProgram={() => setActiveTab("program")}
-      />
-
       <AttentionCenter
-        items={attentionItems}
+        items={attentionList}
+        summary={
+          !loading && !rosterLoadFailed && roster.length > 0 ? (
+            <TeamSummaryLine roster={roster} attentionItems={attentionList} />
+          ) : undefined
+        }
         // While the roster is still loading (or failed), the attention hook sees
         // an empty roster; without this it would briefly report "All caught up".
         loading={attentionLoading || loading}
@@ -150,6 +157,9 @@ export function CoachDashboard({
         }}
       />
 
+      <TeamReadyChecklist team={team} roster={roster} rosterLoading={loading} />
+
+      {demo && (
       <div className="tabs">
         <button
           type="button"
@@ -163,13 +173,19 @@ export function CoachDashboard({
           className={activeTab === "program" ? "" : "ghost"}
           onClick={() => setActiveTab("program")}
         >
-          Program
+          Plan
         </button>
       </div>
+      )}
 
-      {activeTab === "program" && <ProgramEditor team={team} />}
+      {showPlan && (
+        <>
+          <ProgramEditor team={team} />
+          <TeamCalendarPanel team={team} />
+        </>
+      )}
 
-      {activeTab === "roster" && (
+      {!showPlan && (
       <>
       <div className="panel team-header">
         <div>
@@ -196,24 +212,6 @@ export function CoachDashboard({
           {regeneratedCode && <span className="muted regenerate-code-status">{regeneratedCode}</span>}
         </div>
       </div>
-
-      {!demo && !loading && !rosterLoadFailed && <TeamStatStrip roster={roster} attentionItems={attentionItems} />}
-
-      <TeamCalendarPanel team={team} />
-
-      {flagged.length > 0 && (
-        <div className="panel checkin-alert">
-          <h3>
-            <AlertTriangle size={18} /> Needs a Check-In
-          </h3>
-          <p className="muted">No stats logged in the last 3+ days.</p>
-          <ul>
-            {flagged.map((athlete) => (
-              <li key={athlete.userId}>{athlete.displayName}</li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <div className="panel">
         <div className="roster-heading">
