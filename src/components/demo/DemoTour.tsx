@@ -9,9 +9,9 @@ type TourStep = { selector: string; title: string; body: string };
 // wraps the production components.
 const STEPS: TourStep[] = [
   {
-    selector: ".demo-snapshot",
+    selector: ".team-summary",
     title: "Your team at a glance",
-    body: "Readiness, jump numbers and workout completion for the whole roster, updated as athletes check in."
+    body: "Readiness, check-ins and who needs attention across the whole roster, updated as athletes check in."
   },
   {
     selector: ".attention-center",

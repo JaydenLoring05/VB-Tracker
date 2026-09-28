@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle, PartyPopper, ShieldAlert } from "lucide-react";
-import { ComponentType } from "react";
+import { ComponentType, ReactNode } from "react";
 
 import { InlineError } from "@/components/shared/InlineError";
 import { SkeletonRegion, SkeletonRow } from "@/components/shared/Skeleton";
@@ -24,6 +24,7 @@ export function AttentionCenter({
   error,
   onRetry,
   hasAthletes = true,
+  summary,
   onSelectAthlete
 }: {
   items: AttentionItem[];
@@ -32,6 +33,8 @@ export function AttentionCenter({
   onRetry?: () => void;
   /** False when the roster is empty, so "all caught up" isn't claimed about nobody. */
   hasAthletes?: boolean;
+  /** A one-line team summary shown under the heading in place of the generic lead. */
+  summary?: ReactNode;
   onSelectAthlete: (userId: string, displayName: string) => void;
 }) {
   return (
@@ -40,7 +43,7 @@ export function AttentionCenter({
         <h2>Attention Center</h2>
         <p className="section-caption">Ranked by priority</p>
       </div>
-      <p className="muted attention-lead">What needs your attention today.</p>
+      {summary ?? <p className="muted attention-lead">What needs your attention today.</p>}
 
       {loading ? (
         <SkeletonRegion label="Loading attention items">

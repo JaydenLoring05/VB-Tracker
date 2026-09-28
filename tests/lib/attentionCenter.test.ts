@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { computeAttentionItems } from "@/lib/attentionCenter";
+import { computeAttentionItems, summarizeTeam, withCheckInItems, type AttentionItem } from "@/lib/attentionCenter";
 import type { RosterAthlete, StatEntry } from "@/types";
 
 // "Today" for every test. Entry dates are offsets from this.
@@ -292,5 +292,81 @@ describe("computeAttentionItems: ranking", () => {
       { a: [{ exercise: "Broad Jump", date: "2026-07-20T00:00:00Z" }] }
     );
     expect(items.map((item) => item.id)).toEqual(["a-pain", "a-missed-workouts", "a-new-pr"]);
+  });
+});
+
+function item(userId: string, priority: AttentionItem["priority"], signalDate = isoDaysAgo(0)): AttentionItem {
+  return { id: `${userId}-${priority}`, userId, displayName: userId, priority, reason: "", action: "", signalDate };
+}
+
+describe("withCheckInItems", () => {
+  const overdue = (userId: string, lastCheckIn: string | null): RosterAthlete => ({
+    ...athlete(userId),
+    lastCheckIn,
+    needsCheckIn: true
+  });
+
+  it("adds one medium-priority item per athlete overdue for a check-in", () => {
+    const merged = withCheckInItems([], [athlete("ok"), overdue("late", `${isoDaysAgo(4)}T08:00:00Z`)]);
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0]).toMatchObject({
+      id: "late-needs-check-in",
+      userId: "late",
+      priority: "medium",
+      reason: "No check-in in the last 3+ days",
+      signalDate: isoDaysAgo(4)
+    });
+  });
+
+  it("says so when an athlete has never checked in", () => {
+    const [merged] = withCheckInItems([], [overdue("new", null)]);
+    expect(merged.reason).toBe("Hasn't logged a check-in yet");
+  });
+
+  it("keeps the list ranked: high first, check-ins with the other medium items, wins last", () => {
+    const merged = withCheckInItems(
+      [item("pr", "positive"), item("pain", "high"), item("missed", "medium", isoDaysAgo(1))],
+      [overdue("late", `${isoDaysAgo(5)}T08:00:00Z`)]
+    );
+
+    expect(merged.map((entry) => entry.id)).toEqual([
+      "pain-high",
+      "missed-medium",
+      "late-needs-check-in",
+      "pr-positive"
+    ]);
+  });
+
+  it("does not mutate the list it was given", () => {
+    const items = [item("pain", "high")];
+    withCheckInItems(items, [overdue("late", null)]);
+    expect(items).toHaveLength(1);
+  });
+});
+
+describe("summarizeTeam", () => {
+  it("averages readiness over athletes who have checked in", () => {
+    const roster = [
+      { ...athlete("a"), recovery: 90, lastCheckIn: "2026-07-20T08:00:00Z" },
+      { ...athlete("b"), recovery: 71, lastCheckIn: "2026-07-19T08:00:00Z" },
+      { ...athlete("new"), recovery: 0 }
+    ];
+
+    expect(summarizeTeam(roster, [])).toMatchObject({ readiness: 81, scoredCount: 2, checkedIn: 2, rosterSize: 3 });
+  });
+
+  it("has no readiness until someone checks in", () => {
+    expect(summarizeTeam([athlete("new")], []).readiness).toBeNull();
+  });
+
+  it("does not count overdue athletes as checked in", () => {
+    const roster = [{ ...athlete("late"), lastCheckIn: "2026-07-10T08:00:00Z", needsCheckIn: true }];
+    expect(summarizeTeam(roster, []).checkedIn).toBe(0);
+  });
+
+  it("counts athletes needing attention once each, and never for a PR", () => {
+    const items = [item("a", "high"), { ...item("a", "medium"), id: "a-2" }, item("b", "medium"), item("c", "positive")];
+    expect(summarizeTeam([], items).needAttention).toBe(2);
   });
 });
