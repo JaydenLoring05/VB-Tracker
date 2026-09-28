@@ -1,3 +1,64 @@
+/* Headline numbers: the first thing on the Stats page. */
+.stats-headline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.stats-headline .stat-value {
+  font-size: 36px;
+}
+
+/* Full charts sit one tap below the headline numbers. */
+.stats-disclosure summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-3);
+  min-height: 44px;
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+  transition: border-color var(--transition);
+}
+
+.stats-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.stats-disclosure summary .muted {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.stats-disclosure summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--gold);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.stats-disclosure[open] summary {
+  margin-bottom: var(--sp-4);
+}
+
+.stats-disclosure[open] summary::after {
+  transform: rotate(45deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stats-disclosure summary:hover {
+    border-color: var(--border-strong);
+  }
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -76,6 +137,18 @@
 }
 
 @media (max-width: 900px) {
+  .stats-headline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-headline .stat-tile {
+    padding: var(--sp-3) var(--sp-4);
+  }
+
+  .stats-headline .stat-value {
+    font-size: var(--fs-2xl);
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 12px;
