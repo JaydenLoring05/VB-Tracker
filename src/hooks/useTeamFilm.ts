@@ -2,9 +2,19 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { detailsForTag, TagDetailFields } from "@/components/film/tagMeta";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { createClient } from "@/lib/supabase/client";
 import { FilmTag, FilmTagType, Team, TeamFilm } from "@/types";
+
+export type NewFilmTag = {
+  filmId: string;
+  seconds: number;
+  tag: FilmTagType;
+  note?: string;
+  athleteId?: string | null;
+  details?: Partial<TagDetailFields>;
+};
 
 /**
  * Shared by both the coach (full read/write for their active team) and
@@ -144,27 +154,34 @@ export function useTeamFilm(team: Team | null) {
     return true;
   }
 
-  async function addTag(input: { filmId: string; seconds: number; tag: FilmTagType; note?: string }) {
-    if (!team) return false;
+  /** Returns the saved tag (so the caller can offer Undo), or null on failure. */
+  async function addTag(input: NewFilmTag): Promise<FilmTag | null> {
+    if (!team) return null;
     setError(null);
 
-    const { error: insertError } = await supabase.from("film_tags").insert({
-      film_id: input.filmId,
-      team_id: team.id,
-      seconds: input.seconds,
-      tag: input.tag,
-      note: input.note || null,
-      created_by: userId
-    });
+    const { data, error: insertError } = await supabase
+      .from("film_tags")
+      .insert({
+        film_id: input.filmId,
+        team_id: team.id,
+        seconds: input.seconds,
+        tag: input.tag,
+        note: input.note || null,
+        athlete_id: input.athleteId ?? null,
+        ...detailsForTag(input.tag, input.details ?? {}),
+        created_by: userId
+      })
+      .select()
+      .single();
 
     if (insertError) {
       console.error("Failed to add film tag", insertError);
       setError("Couldn't add that tag. Try again.");
-      return false;
+      return null;
     }
 
     await loadTags(input.filmId);
-    return true;
+    return data as FilmTag;
   }
 
   async function deleteTag(id: string) {
