@@ -1,6 +1,5 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
 
 /**
@@ -40,7 +39,6 @@ export function CopyButton({
   return (
     <>
       <button type="button" className={className} onClick={handleCopy}>
-        {status === "copied" ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
         {status === "copied" ? copiedLabel : children}
       </button>
       <span className="sr-only" role="status" aria-live="polite">

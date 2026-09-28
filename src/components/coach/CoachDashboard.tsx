@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, RefreshCw, UserMinus, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -202,11 +202,11 @@ export function CoachDashboard({
 
         <div className="team-header-actions">
           <button className="secondary invite-code-button" onClick={handleCopyCode} type="button">
-            <Copy size={16} /> {copied ? "Copied!" : `Invite code: ${team.invite_code}`}
+            {copied ? "Copied!" : `Invite code: ${team.invite_code}`}
           </button>
 
           <button className="ghost" onClick={handleRegenerateCode} disabled={regenerating} type="button">
-            <RefreshCw size={16} /> {regenerating ? "Regenerating..." : "Regenerate code"}
+            {regenerating ? "Regenerating..." : "Regenerate code"}
           </button>
 
           {regeneratedCode && <span className="muted regenerate-code-status">{regeneratedCode}</span>}
@@ -217,7 +217,7 @@ export function CoachDashboard({
         <div className="roster-heading">
           <h2>Roster</h2>
           <button type="button" className="ghost roster-refresh" onClick={refresh} disabled={loading}>
-            <RefreshCw size={14} /> Refresh
+            Refresh
           </button>
         </div>
 
@@ -307,7 +307,7 @@ export function CoachDashboard({
                   disabled={removingId === athlete.userId}
                   aria-label={`Remove ${athlete.displayName}`}
                 >
-                  <UserMinus size={14} aria-hidden="true" /> Remove
+                  Remove
                 </button>
               </div>
             ))}

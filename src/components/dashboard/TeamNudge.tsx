@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -53,7 +53,7 @@ function JoinTeamNudge() {
       <div className="nudge-row">
         <div>
           <h2 id="join-team-title">
-            <Users size={20} aria-hidden="true" /> {onboarded ? "Train with a team" : "Finish setting up"}
+            {onboarded ? "Train with a team" : "Finish setting up"}
           </h2>
           <p className="muted">
             {onboarded

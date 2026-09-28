@@ -1,6 +1,5 @@
 "use client";
 
-import { Plus } from "lucide-react";
 import { FormEvent, useState } from "react";
 
 import { Team } from "@/types";
@@ -57,7 +56,7 @@ export function TeamSwitcher({
         onClick={() => setShowNewTeamForm((current) => !current)}
         aria-expanded={showNewTeamForm}
       >
-        <Plus size={14} /> New Team
+        New Team
       </button>
 
       {showNewTeamForm && (

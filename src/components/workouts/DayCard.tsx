@@ -105,7 +105,7 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
                   aria-label={`Swap ${originalExercise}`}
                   onClick={() => setSwapOpenFor(swapOpen ? null : originalExercise)}
                 >
-                  <Repeat size={14} />
+                  <Repeat size={14} aria-hidden="true" />
                 </button>
               )}
             </label>

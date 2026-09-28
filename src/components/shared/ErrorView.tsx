@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useEffect } from "react";
@@ -56,7 +56,7 @@ export function ErrorView({
         actions={
           <>
             <button type="button" onClick={retry}>
-              <RefreshCw size={16} aria-hidden="true" /> Try again
+              Try again
             </button>
             <Link href={homeHref} className="state-link">
               {homeLabel}
