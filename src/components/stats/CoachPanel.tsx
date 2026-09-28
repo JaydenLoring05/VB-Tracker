@@ -11,7 +11,7 @@ export function CoachPanel() {
   return (
     <div className="panel">
       <h2>
-        <HeartPulse size={22} /> Recovery Coach
+        Recovery Coach
       </h2>
 
       {hasLoggedStats ? (

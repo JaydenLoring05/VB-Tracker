@@ -11,6 +11,7 @@ import {
 } from "recharts";
 
 import { LineChart as LineChartIcon } from "lucide-react";
+import { useState } from "react";
 
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
@@ -24,6 +25,7 @@ const charts: [string, string, string][] = [
 
 export function ProgressCharts() {
   const { history } = useRecoveryStats();
+  const [open, setOpen] = useState(false);
 
   if (history.length === 0) {
     return (
@@ -56,31 +58,43 @@ export function ProgressCharts() {
     <div className="panel">
       <h2>Progress Graphs</h2>
 
-      <div className="chart-grid">
-        {charts.map(([key, label, color]) => (
-          <div className="chart-card" key={key}>
-            <h3>{label}</h3>
+      <details className="stats-disclosure" onToggle={(e) => setOpen(e.currentTarget.open)}>
+        <summary>
+          Show full charts
+          <span className="muted">
+            {charts.length} charts · {history.length} {history.length === 1 ? "entry" : "entries"}
+          </span>
+        </summary>
 
-            <ResponsiveContainer width="100%" height={180}>
-              <LineChart data={history}>
-                <CartesianGrid stroke="var(--border)" />
-                <XAxis dataKey="date" stroke="var(--muted)" tick={{ fontSize: 12 }} />
-                <YAxis stroke="var(--muted)" tick={{ fontSize: 12 }} />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--panel-2)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius-sm)"
-                  }}
-                  labelStyle={{ color: "var(--muted)" }}
-                  itemStyle={{ color: "var(--text)" }}
-                />
-                <Line type="monotone" dataKey={key} stroke={color} strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+        {/* Mount the charts only once opened: recharts can't measure a closed <details>. */}
+        {open && (
+          <div className="chart-grid">
+            {charts.map(([key, label, color]) => (
+              <div className="chart-card" key={key}>
+                <h3>{label}</h3>
+
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={history}>
+                    <CartesianGrid stroke="var(--border)" />
+                    <XAxis dataKey="date" stroke="var(--muted)" tick={{ fontSize: 12 }} />
+                    <YAxis stroke="var(--muted)" tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "var(--panel-2)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "var(--radius-sm)"
+                      }}
+                      labelStyle={{ color: "var(--muted)" }}
+                      itemStyle={{ color: "var(--text)" }}
+                    />
+                    <Line type="monotone" dataKey={key} stroke={color} strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        )}
+      </details>
     </div>
   );
 }

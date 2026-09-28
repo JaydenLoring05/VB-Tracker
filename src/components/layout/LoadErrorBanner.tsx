@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
 
@@ -21,7 +21,7 @@ export function LoadErrorBanner() {
         data is safe.
       </p>
       <button type="button" className="sync-toast-retry" onClick={reloadData}>
-        <RefreshCw size={14} aria-hidden="true" /> Try again
+        Try again
       </button>
     </div>
   );

@@ -63,47 +63,29 @@
   white-space: nowrap;
 }
 
-/* ---------- Team stat strip ---------- */
+/* ---------- Team summary line (under the Attention Center heading) ---------- */
 
-.team-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-3);
-}
-
-.team-stats .stat-tile:first-child {
-  grid-column: 1 / -1;
-}
-
-@media (min-width: 720px) {
-  .team-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .team-stats .stat-tile:first-child {
-    grid-column: auto;
-  }
-}
-
-/* ---------- Needs a check-in ---------- */
-
-.checkin-alert {
-  border-color: color-mix(in oklch, var(--warn) 35%, var(--border));
-}
-
-.checkin-alert h3 {
-  color: var(--warn);
-  margin: 0 0 var(--sp-1);
-}
-
-.checkin-alert p {
+.team-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
   margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-sm);
 }
 
-.checkin-alert ul {
-  margin: var(--sp-3) 0 0;
-  padding-left: 18px;
+.team-summary strong {
   color: var(--text);
+  font-weight: 800;
+}
+
+.team-summary-alert,
+.team-summary-alert strong {
+  color: var(--warn);
+}
+
+.team-summary-clear {
+  color: var(--green);
 }
 
 /* ---------- Modal ---------- */
@@ -508,5 +490,128 @@ html:has(dialog[open]) {
   .team-event-row strong {
     flex-basis: 100%;
     order: 3;
+  }
+}
+
+/* ---------- Team progress (coach Progress tab) ---------- */
+
+.team-progress .section-heading h2 {
+  margin: 0;
+}
+
+.team-progress .micro {
+  margin: 0 0 var(--sp-1);
+}
+
+.progress-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
+  margin: 0 0 var(--sp-4);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.progress-summary strong {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.progress-list {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.progress-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1.4fr) repeat(4, minmax(0, 1fr));
+  align-items: center;
+  column-gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    background-color var(--transition);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .progress-row:hover {
+    background: var(--panel-2);
+    border-color: var(--border-strong);
+  }
+}
+
+.progress-row:has(.roster-open:focus-visible) {
+  border-color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.progress-name {
+  min-width: 0;
+}
+
+.progress-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--sp-2);
+  min-width: 0;
+  font-size: var(--fs-sm);
+}
+
+.progress-cell strong {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  line-height: 1.1;
+}
+
+.progress-cell-label {
+  flex: 1 0 100%;
+  color: var(--faint);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+}
+
+.progress-up {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.progress-down {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.progress-pr-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+@media (max-width: 700px) {
+  .progress-row {
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: var(--sp-3);
+  }
+
+  /* Avatar holds the left column; the name spans the top and the four cells fill a 2x2 grid. */
+  .progress-row > .avatar-initials {
+    grid-row: 1 / span 3;
+    align-self: start;
+  }
+
+  .progress-name {
+    grid-column: 2 / -1;
   }
 }

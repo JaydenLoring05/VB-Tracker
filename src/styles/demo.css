@@ -175,44 +175,6 @@
   animation: demo-fade-in 0.28s var(--ease-out) backwards;
 }
 
-/* Team snapshot ------------------------------------------------------ */
-
-.demo-snapshot {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-3);
-}
-
-.demo-snapshot-tile {
-  position: relative;
-}
-
-.demo-snapshot-tile .stat-value {
-  font-size: 40px;
-}
-
-.demo-snapshot-ring {
-  position: absolute;
-  top: var(--sp-3);
-  right: var(--sp-3);
-}
-
-/* Keep the label clear of the ring, and shrink the ring on narrow tiles. */
-.demo-snapshot-tile:has(.demo-snapshot-ring) .stat-label {
-  padding-right: 56px;
-}
-
-@media (max-width: 640px) {
-  .demo-snapshot-tile:has(.demo-snapshot-ring) .stat-label {
-    padding-right: 34px;
-  }
-
-  .demo-snapshot-ring {
-    transform: scale(0.62);
-    transform-origin: top right;
-  }
-}
-
 /* Closing panel ------------------------------------------------------ */
 
 .demo-closing {
@@ -447,10 +409,6 @@
 
   .demo-intro h1 {
     font-size: 52px;
-  }
-
-  .demo-snapshot {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .demo-tour {

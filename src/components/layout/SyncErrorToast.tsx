@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, RefreshCw, X } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
 import { useEffect } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
@@ -25,7 +25,7 @@ export function SyncErrorToast() {
       <span>{syncError}</span>
       {syncRetry && (
         <button type="button" className="sync-toast-retry" onClick={retrySyncError} aria-label="Retry">
-          <RefreshCw size={14} /> Retry
+          Retry
         </button>
       )}
       <button

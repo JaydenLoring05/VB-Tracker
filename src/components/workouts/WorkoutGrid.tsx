@@ -1,6 +1,5 @@
 "use client";
 
-import { Dumbbell } from "lucide-react";
 
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
 import { todayName } from "@/lib/storage";
@@ -14,7 +13,7 @@ export function WorkoutGrid() {
   return (
     <section id="workouts">
       <h2>
-        <Dumbbell size={22} /> Weekly Workouts
+        Weekly Workouts
       </h2>
 
       <p className="muted">

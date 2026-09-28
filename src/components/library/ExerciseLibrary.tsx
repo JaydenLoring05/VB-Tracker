@@ -1,6 +1,6 @@
 "use client";
 
-import { Library, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { exercises } from "@/data/exercises";
 import { useExerciseLibrary } from "@/hooks/useExerciseLibrary";
@@ -42,7 +42,7 @@ export function ExerciseLibrary() {
       <div className="library-header">
         <div>
           <h2>
-            <Library size={22} /> Exercise Library
+            Exercise Library
           </h2>
           <p className="muted">
             {filteredExercises.length} of {exercises.length} exercises shown

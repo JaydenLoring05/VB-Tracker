@@ -156,7 +156,7 @@ export function TeamCalendarPanel({ team }: { team: Team }) {
                 aria-label={`Remove ${event.title}`}
                 onClick={() => deleteEvent(event.id)}
               >
-                <Trash2 size={14} />
+                <Trash2 size={14} aria-hidden="true" />
               </button>
             </li>
           ))}

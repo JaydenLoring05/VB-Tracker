@@ -1,6 +1,5 @@
 "use client";
 
-import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -20,7 +19,7 @@ export function LogoutButton() {
 
   return (
     <button className="ghost" onClick={handleLogout} disabled={loading}>
-      <LogOut size={16} /> {loading ? "Logging out..." : "Log out"}
+      {loading ? "Logging out..." : "Log out"}
     </button>
   );
 }

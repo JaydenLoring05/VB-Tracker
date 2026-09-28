@@ -1,6 +1,5 @@
 "use client";
 
-import { KeyRound, Users } from "lucide-react";
 import { FormEvent, useState } from "react";
 
 import "@/styles/first-run.css";
@@ -67,7 +66,7 @@ export function TeamSetup({
 
       <div className="panel">
         <h2>
-          <Users size={22} /> I coach a team
+          I coach a team
         </h2>
         <p className="muted">
           Create a team to get an invite code for your athletes. This takes about 10 seconds.
@@ -88,7 +87,7 @@ export function TeamSetup({
 
       <div className="panel">
         <h2>
-          <KeyRound size={22} /> I have an invite code
+          I have an invite code
         </h2>
         <p className="muted">Your coach gives you a 6-character code. Enter it to join their team.</p>
 

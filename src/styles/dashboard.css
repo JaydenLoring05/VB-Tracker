@@ -1,9 +1,34 @@
-/* Athlete dashboard cards. Also used by the demo's athlete view. */
+/* Athlete home. Also used by the demo's athlete view. */
 
 .grid-4 {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--sp-4);
+}
+
+/* ---------- Today: the one job ---------- */
+
+.today-hero {
+  animation: fade-up 0.42s var(--ease-out) backwards;
+}
+
+.today-hero .micro {
+  margin: 0 0 var(--sp-2);
+}
+
+.today-title {
+  margin: 0;
+  font-size: var(--fs-display);
+  line-height: 1.05;
+}
+
+.today-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  margin: var(--sp-2) 0 var(--sp-5);
+  font-size: var(--fs-sm);
 }
 
 .dashboard-hero-cta {
@@ -13,7 +38,6 @@
   gap: var(--sp-3);
   width: 100%;
   min-height: 60px;
-  margin-bottom: var(--sp-5);
   padding: 16px;
   font-family: var(--font-display);
   font-size: 24px;
@@ -21,14 +45,138 @@
   text-transform: uppercase;
 }
 
+.dashboard-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--gold) 14%, transparent);
+  color: var(--gold);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+}
+
+/* ---------- Summary lines that expand on tap ---------- */
+
+.today-lines {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.today-line {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+}
+
+.today-line summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 52px;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  list-style: none;
+  transition: background-color var(--transition);
+}
+
+.today-line summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Disclosure chevron: points down when closed, up when open. */
+.today-line summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-left: var(--sp-1);
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--transition);
+}
+
+.today-line[open] summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .today-line summary:hover {
+    background: var(--panel-2);
+  }
+}
+
+.today-line-label {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.today-line-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  text-align: right;
+}
+
+.today-line-value strong {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  line-height: 1;
+}
+
+.today-line-value .muted {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.today-line-body {
+  padding: 0 var(--sp-4) var(--sp-4);
+}
+
+.today-line-body > p:first-child {
+  margin-top: 0;
+}
+
 .dashboard-phase-label {
   margin: 0 0 var(--sp-2);
   font-size: var(--fs-xs);
 }
 
+.today-line .progress-fill {
+  background: var(--green);
+}
+
+.dashboard-recovery-body {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.dashboard-recovery-body p {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+.dashboard-card-cta {
+  margin-top: var(--sp-3);
+  width: 100%;
+}
+
 .dashboard-pr-list {
   list-style: none;
-  margin: var(--sp-2) 0 0;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: var(--sp-2);
@@ -51,110 +199,6 @@
   line-height: 1.1;
 }
 
-.dashboard-card {
-  position: relative;
-  transition:
-    transform var(--transition),
-    border-color var(--transition),
-    background-color var(--transition);
-  animation: fade-up 0.42s var(--ease-out) backwards;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .dashboard-card:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in oklch, var(--dashboard-accent, var(--gold)) 40%, var(--border));
-  }
-}
-
-.dashboard-card-today {
-  --dashboard-accent: var(--gold);
-}
-
-.dashboard-card-recovery {
-  --dashboard-accent: var(--blue);
-}
-
-.dashboard-card-progress {
-  --dashboard-accent: var(--green);
-}
-
-.dashboard-card-pr {
-  --dashboard-accent: var(--purple);
-}
-
-.dashboard-card:nth-child(2) {
-  animation-delay: 60ms;
-}
-
-.dashboard-card:nth-child(3) {
-  animation-delay: 120ms;
-}
-
-.dashboard-card:nth-child(4) {
-  animation-delay: 180ms;
-}
-
-.dashboard-card-icon {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-sm);
-  background: color-mix(in oklch, var(--dashboard-accent, var(--gold)) 15%, transparent);
-  color: var(--dashboard-accent, var(--gold));
-  margin-bottom: var(--sp-4);
-}
-
-.dashboard-card h3,
-.dashboard-card .card-label {
-  margin-top: 0;
-}
-
-.dashboard-card h2,
-.dashboard-card .card-figure {
-  font-size: 40px;
-}
-
-.dashboard-card-cta {
-  margin-top: var(--sp-4);
-  width: 100%;
-}
-
-.dashboard-streak {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: var(--sp-3);
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  background: color-mix(in oklch, var(--gold) 14%, transparent);
-  color: var(--gold);
-  font-size: var(--fs-xs);
-  font-weight: 800;
-}
-
-.dashboard-recovery-body {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  margin-top: var(--sp-2);
-}
-
-.dashboard-recovery-body .status {
-  margin-bottom: 4px;
-}
-
-.dashboard-recovery-body p {
-  margin: 0;
-  font-size: var(--fs-sm);
-  line-height: 1.45;
-}
-
-.dashboard-card-progress .progress-fill {
-  background: var(--green);
-}
-
 .dashboard-inline-link {
   color: var(--gold);
   font-weight: 600;
@@ -162,8 +206,16 @@
   text-underline-offset: 3px;
 }
 
+/* Wide screens have room for the three lines side by side; opening one doesn't stretch the others. */
+@media (min-width: 1100px) {
+  .today-lines {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .dashboard-card {
+  .today-hero {
     animation: none;
   }
 }
@@ -181,6 +233,10 @@
 
   .dashboard-hero-cta {
     font-size: 22px;
+  }
+
+  .today-title {
+    font-size: var(--fs-2xl);
   }
 }
 

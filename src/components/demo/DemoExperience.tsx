@@ -10,7 +10,6 @@ import { buildDemoData, type DemoData } from "@/data/demoData";
 
 import { DemoBanner } from "./DemoBanner";
 import { DemoSignupPrompt } from "./DemoSignupPrompt";
-import { DemoSnapshot } from "./DemoSnapshot";
 import { DemoTour } from "./DemoTour";
 import { DemoTrackerProvider } from "./DemoTrackerProvider";
 
@@ -132,22 +131,19 @@ export function DemoExperience() {
 
               <div className="demo-view" key={view}>
                 {view === "coach" ? (
-                  <>
-                    <DemoSnapshot data={data} />
-                    <CoachDashboard
-                      teams={[data.team]}
-                      activeTeam={data.team}
-                      onSelectTeam={() => {}}
-                      onCreateTeam={async () => {
-                        requestSignup("Creating more teams");
-                        return false;
-                      }}
-                      regenerateInviteCode={async () => {
-                        requestSignup("Regenerating invite codes");
-                        return false;
-                      }}
-                    />
-                  </>
+                  <CoachDashboard
+                    teams={[data.team]}
+                    activeTeam={data.team}
+                    onSelectTeam={() => {}}
+                    onCreateTeam={async () => {
+                      requestSignup("Creating more teams");
+                      return false;
+                    }}
+                    regenerateInviteCode={async () => {
+                      requestSignup("Regenerating invite codes");
+                      return false;
+                    }}
+                  />
                 ) : (
                   <DashboardCards />
                 )}

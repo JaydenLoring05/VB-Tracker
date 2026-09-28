@@ -1,6 +1,5 @@
 "use client";
 
-import { Activity } from "lucide-react";
 
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { StatEntry } from "@/types";
@@ -27,7 +26,7 @@ export function StatsForm() {
   return (
     <div className="panel">
       <h2>
-        <Activity size={22} /> Performance Stats
+        Performance Stats
       </h2>
 
       <div className="stats-grid">

@@ -1,6 +1,5 @@
 "use client";
 
-import { Play, RotateCcw } from "lucide-react";
 import { useState } from "react";
 
 import { getPrescription, getWorkoutDays } from "@/data/workoutPlan";
@@ -28,7 +27,7 @@ export function StartWorkoutScreen() {
             </p>
           </div>
           <button onClick={resumeWorkout}>
-            <RotateCcw size={16} /> Resume
+            Resume
           </button>
         </div>
       )}
@@ -63,7 +62,7 @@ export function StartWorkoutScreen() {
         </div>
 
         <button disabled={loading || starting} onClick={() => startWorkout(selectedDay)}>
-          <Play size={16} /> {starting ? "Starting…" : "Start Workout"}
+          {starting ? "Starting…" : "Start Workout"}
         </button>
       </div>
     </div>

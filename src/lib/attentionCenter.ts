@@ -157,11 +157,63 @@ export function computeAttentionItems(
     }
   });
 
-  const priorityRank: Record<AttentionPriority, number> = { high: 0, medium: 1, positive: 2 };
+  return sortAttentionItems(items);
+}
+
+const PRIORITY_RANK: Record<AttentionPriority, number> = { high: 0, medium: 1, positive: 2 };
+
+function sortAttentionItems(items: AttentionItem[]): AttentionItem[] {
   return items.sort((a, b) => {
-    if (priorityRank[a.priority] !== priorityRank[b.priority]) {
-      return priorityRank[a.priority] - priorityRank[b.priority];
+    if (PRIORITY_RANK[a.priority] !== PRIORITY_RANK[b.priority]) {
+      return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
     }
     return (b.signalDate || "").localeCompare(a.signalDate || "");
   });
+}
+
+/**
+ * Folds athletes who are overdue for a check-in (the roster's needsCheckIn
+ * flag) into the attention list, so the coach has one list to work through
+ * instead of a separate "Needs a Check-In" panel. Doesn't mutate its inputs.
+ */
+export function withCheckInItems(items: AttentionItem[], roster: RosterAthlete[]): AttentionItem[] {
+  const checkInItems: AttentionItem[] = roster
+    .filter((athlete) => athlete.needsCheckIn)
+    .map((athlete) => ({
+      id: `${athlete.userId}-needs-check-in`,
+      userId: athlete.userId,
+      displayName: athlete.displayName,
+      priority: "medium",
+      reason: athlete.lastCheckIn === null ? "Hasn't logged a check-in yet" : "No check-in in the last 3+ days",
+      action: "Check in",
+      signalDate: athlete.lastCheckIn?.slice(0, 10) ?? ""
+    }));
+
+  return sortAttentionItems([...items, ...checkInItems]);
+}
+
+export type TeamSummary = {
+  /** Average readiness of athletes who have checked in at least once; null if nobody has. */
+  readiness: number | null;
+  scoredCount: number;
+  /** Checked in within the stale window. */
+  checkedIn: number;
+  rosterSize: number;
+  /** Items that need action (everything except celebrations). */
+  needAttention: number;
+};
+
+/** The numbers behind the one-line team summary on the coach home screen. */
+export function summarizeTeam(roster: RosterAthlete[], items: AttentionItem[]): TeamSummary {
+  const scored = roster.filter((athlete) => athlete.lastCheckIn !== null);
+
+  return {
+    readiness: scored.length
+      ? Math.round(scored.reduce((sum, athlete) => sum + athlete.recovery, 0) / scored.length)
+      : null,
+    scoredCount: scored.length,
+    checkedIn: scored.filter((athlete) => !athlete.needsCheckIn).length,
+    rosterSize: roster.length,
+    needAttention: new Set(items.filter((item) => item.priority !== "positive").map((item) => item.userId)).size
+  };
 }
