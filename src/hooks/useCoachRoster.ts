@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDemo } from "@/context/DemoContext";
 import { fromStatsRow, StatsRow } from "@/context/TrackerContext";
 import { useSupabase } from "@/hooks/useSupabase";
+import { displayMemberName, normalizeMemberName } from "@/lib/memberName";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
 import { RosterAthlete, Team } from "@/types";
 
@@ -100,7 +101,7 @@ export function useCoachRoster(team: Team | null) {
 
       return {
         userId: member.user_id,
-        displayName: member.display_name || "Athlete",
+        displayName: displayMemberName(member.display_name),
         joinedAt: member.joined_at,
         recovery,
         recoveryLabel: recoveryStatus(recovery).label,
@@ -146,6 +147,38 @@ export function useCoachRoster(team: Team | null) {
     return true;
   }
 
+  /** Returns null on success, or a message to show next to the name field. */
+  async function renameAthlete(userId: string, input: string): Promise<string | null> {
+    if (demo) {
+      demo.requestSignup("Managing your roster");
+      return null;
+    }
+
+    if (!team) return "No team selected.";
+
+    const normalized = normalizeMemberName(input);
+    if (!normalized.ok) return normalized.error;
+
+    const previous = roster;
+    setRoster((current) =>
+      current.map((athlete) => (athlete.userId === userId ? { ...athlete, displayName: normalized.name } : athlete))
+    );
+
+    const { error: renameError } = await supabase.rpc("set_team_member_name", {
+      p_team_id: team.id,
+      p_user_id: userId,
+      p_name: normalized.name
+    });
+
+    if (renameError) {
+      console.error("Failed to rename athlete", renameError);
+      setRoster(previous);
+      return "Couldn't save that name. Try again.";
+    }
+
+    return null;
+  }
+
   const flagged = roster.filter((athlete) => athlete.needsCheckIn);
 
   return {
@@ -154,6 +187,7 @@ export function useCoachRoster(team: Team | null) {
     flagged,
     error,
     removeAthlete,
+    renameAthlete,
     refresh: loadRoster
   };
 }
