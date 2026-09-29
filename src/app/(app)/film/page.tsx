@@ -1,6 +1,5 @@
 "use client";
 
-import { Clapperboard } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
 import { AddFilmForm } from "@/components/film/AddFilmForm";
@@ -79,7 +78,7 @@ export default function FilmPage() {
     return (
       <div className="panel">
         <h2>
-          <Clapperboard size={22} /> Film
+          Film
         </h2>
         <p className="muted">Join or create a team to start reviewing film.</p>
       </div>
@@ -90,7 +89,7 @@ export default function FilmPage() {
     <section className="lower-grid film-page" style={{ marginTop: 0 }}>
       <div className="panel film-library-panel">
         <h2>
-          <Clapperboard size={22} /> Film
+          Film
         </h2>
 
         {error && (

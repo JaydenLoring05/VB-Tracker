@@ -17,7 +17,7 @@ export function HotkeyOverlay({ onClose }: { onClose: () => void }) {
         <div className="hotkey-overlay-head">
           <h3>Keyboard shortcuts</h3>
           <button type="button" className="ghost film-tag-delete" aria-label="Close shortcuts" onClick={onClose}>
-            <X size={16} />
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
         <div className="hotkey-overlay-grid">

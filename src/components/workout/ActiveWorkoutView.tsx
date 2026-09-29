@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { Celebrate } from "@/components/shared/Celebrate";
@@ -55,8 +55,6 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const [prSetIds, setPrSetIds] = useState<Record<string, boolean>>({});
   const [isLogging, setIsLogging] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
-  const [showWarmUp, setShowWarmUp] = useState(false);
-  const [showCues, setShowCues] = useState(false);
   const [restOver, setRestOver] = useState(false);
   const restCompleteFiredRef = useRef(false);
   const currentExerciseRef = useRef<string | null>(null);
@@ -222,7 +220,6 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     setReps("");
     setRestEndsAt(null);
     setRestOver(false);
-    setShowCues(false);
   }
 
   function bumpWeight(amount: number) {
@@ -296,20 +293,6 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
         <div className="workout-elapsed">{formatDuration(elapsedSeconds)}</div>
       </div>
 
-      <div className="panel workout-warm-up">
-        <button type="button" className="ghost warm-up-toggle" onClick={() => setShowWarmUp((current) => !current)}>
-          {showWarmUp ? "Hide warm-up" : "Show warm-up"}
-        </button>
-
-        {showWarmUp && (
-          <ul className="warm-up-list">
-            {STANDARD_WARM_UP.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ul>
-        )}
-      </div>
-
       <div className="exercise-dots">
         {resolvedExercises.map((name, index) => (
           <button
@@ -335,60 +318,12 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
           </p>
         )}
 
-        {cues.length > 0 && (
-          <div className="exercise-cues">
-            <button type="button" className="ghost cues-toggle" onClick={() => setShowCues((current) => !current)}>
-              {showCues ? "Hide coaching cues" : "Show coaching cues"}
-            </button>
-            {showCues && (
-              <ul>
-                {cues.map((cue) => (
-                  <li key={cue}>{cue}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
         <DiscomfortSuggestion
           key={originalExercise}
           originalExercise={originalExercise}
           stats={stats}
           onSwap={(chosen) => setSubstitution(originalExercise, chosen)}
         />
-
-        {/* Always mounted so a screen reader announces each newly logged set. */}
-        <p className="sr-only" role="status">
-          {exerciseSets.length > 0
-            ? `${exerciseSets.length} set${exerciseSets.length === 1 ? "" : "s"} logged for ${exercise}`
-            : ""}
-        </p>
-
-        {exerciseSets.length > 0 && (
-          <div className="logged-sets">
-            {exerciseSets.map((set) => (
-              <div className={`logged-set${prSetIds[set.id] ? " logged-set-pr" : ""}`} key={set.id}>
-                <span>
-                  Set {set.set_number}: {set.weight ?? "-"} x {set.reps ?? "-"}
-                  {prSetIds[set.id] && (
-                    <span className="pr-badge">
-                      <Trophy size={12} /> New PR
-                      <Celebrate />
-                    </span>
-                  )}
-                </span>
-                <button
-                  type="button"
-                  className="ghost danger-button"
-                  onClick={() => deleteSet(set.id)}
-                  aria-label={`Remove set ${set.set_number}`}
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
 
         {restSecondsLeft !== null ? (
           <RestTimer
@@ -448,11 +383,68 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
               </div>
             </div>
             <button type="submit" disabled={!canLogSet}>
-              <CheckCircle2 size={16} /> {isLogging ? "Saving…" : "Log Set"}
+              {isLogging ? "Saving…" : "Log Set"}
             </button>
           </form>
           </>
         )}
+
+        {/* Always mounted so a screen reader announces each newly logged set. */}
+        <p className="sr-only" role="status">
+          {exerciseSets.length > 0
+            ? `${exerciseSets.length} set${exerciseSets.length === 1 ? "" : "s"} logged for ${exercise}`
+            : ""}
+        </p>
+
+        {exerciseSets.length > 0 && (
+          <div className="logged-sets">
+            {exerciseSets.map((set) => (
+              <div className={`logged-set${prSetIds[set.id] ? " logged-set-pr" : ""}`} key={set.id}>
+                <span>
+                  Set {set.set_number}: {set.weight ?? "-"} x {set.reps ?? "-"}
+                  {prSetIds[set.id] && (
+                    <span className="pr-badge">
+                      <Trophy size={12} /> New PR
+                      <Celebrate />
+                    </span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  className="ghost danger-button"
+                  onClick={() => deleteSet(set.id)}
+                  aria-label={`Remove set ${set.set_number}`}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Everything beyond "log this set" is one tap away. Keyed by exercise so it closes on the next one. */}
+        <details className="workout-more" key={exercise}>
+          <summary>More options</summary>
+          <div className="workout-more-body">
+            <h4>Warm-up</h4>
+            <ul className="warm-up-list">
+              {STANDARD_WARM_UP.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ul>
+
+            {cues.length > 0 && (
+              <>
+                <h4>Coaching cues</h4>
+                <ul className="exercise-cues">
+                  {cues.map((cue) => (
+                    <li key={cue}>{cue}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </details>
       </div>
 
       <div className="workout-actions">

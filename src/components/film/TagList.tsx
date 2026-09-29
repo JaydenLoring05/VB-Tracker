@@ -45,7 +45,7 @@ export function TagList({
               aria-label="Delete tag"
               onClick={() => onDelete(tag)}
             >
-              <Trash2 size={14} />
+              <Trash2 size={14} aria-hidden="true" />
             </button>
           )}
         </li>

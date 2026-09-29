@@ -354,30 +354,70 @@
   font-size: var(--fs-sm);
 }
 
-.workout-warm-up {
-  padding: var(--sp-3) var(--sp-4);
+/* "More options": warm-up and coaching cues, one tap below the set logger. */
+.workout-more {
+  margin-top: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
 }
 
-.warm-up-toggle,
-.cues-toggle {
-  font-size: var(--fs-sm);
-  padding: 6px 10px;
-  min-height: 34px;
-}
-
-.warm-up-list {
-  margin: var(--sp-3) 0 0;
-  padding-left: 18px;
+.workout-more summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  min-height: 48px;
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-md);
   color: var(--muted);
-  line-height: 1.7;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
 }
 
+.workout-more summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Disclosure chevron: points down when closed, up when open. */
+.workout-more summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--transition);
+}
+
+.workout-more[open] summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workout-more summary:hover {
+    color: var(--text);
+  }
+}
+
+.workout-more-body {
+  padding: 0 var(--sp-4) var(--sp-3);
+}
+
+.workout-more-body h4 {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.warm-up-list,
 .exercise-cues {
-  margin: var(--sp-3) 0;
-}
-
-.exercise-cues ul {
-  margin: var(--sp-3) 0 0;
+  margin: var(--sp-2) 0 var(--sp-3);
   padding-left: 18px;
   color: var(--muted);
   line-height: 1.7;

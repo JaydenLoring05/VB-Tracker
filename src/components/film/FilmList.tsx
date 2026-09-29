@@ -39,7 +39,7 @@ export function FilmList({
               aria-label={`Delete ${film.title}`}
               onClick={() => onDelete(film)}
             >
-              <Trash2 size={16} />
+              <Trash2 size={16} aria-hidden="true" />
             </button>
           )}
         </li>

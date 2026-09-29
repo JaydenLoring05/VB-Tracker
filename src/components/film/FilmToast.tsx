@@ -1,6 +1,6 @@
 "use client";
 
-import { Undo2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useEffect } from "react";
 
 export const TOAST_MS = 5000;
@@ -31,11 +31,11 @@ export function FilmToast({ toast, onDismiss }: { toast: FilmToastMessage; onDis
             onDismiss();
           }}
         >
-          <Undo2 size={14} /> Undo
+          Undo
         </button>
       )}
       <button type="button" className="ghost film-toast-dismiss" aria-label="Dismiss" onClick={onDismiss}>
-        <X size={14} />
+        <X size={14} aria-hidden="true" />
       </button>
     </div>
   );
