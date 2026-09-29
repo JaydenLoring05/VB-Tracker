@@ -5,16 +5,19 @@ import { Trash2 } from "lucide-react";
 import { formatTimestamp } from "@/lib/film";
 import { FilmTag } from "@/types";
 
-import { TAG_LABELS } from "./tagMeta";
+import { describeTag } from "./tagMeta";
 
 export function TagList({
   tags,
   isCoach,
+  athleteName,
   onSeek,
   onDelete
 }: {
   tags: FilmTag[];
   isCoach: boolean;
+  /** Display name for a tag's athlete, or null when it has none / isn't visible. */
+  athleteName: (athleteId: string | null) => string | null;
   onSeek: (seconds: number) => void;
   onDelete: (tag: FilmTag) => void;
 }) {
@@ -33,7 +36,7 @@ export function TagList({
           <button type="button" className="ghost film-tag-timestamp" onClick={() => onSeek(tag.seconds)}>
             {formatTimestamp(tag.seconds)}
           </button>
-          <span className="film-tag-type">{TAG_LABELS[tag.tag]}</span>
+          <span className="film-tag-type">{describeTag(tag, athleteName(tag.athlete_id))}</span>
           {tag.note && <span className="muted film-tag-note">{tag.note}</span>}
           {isCoach && (
             <button

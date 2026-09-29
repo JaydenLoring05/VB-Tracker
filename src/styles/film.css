@@ -148,3 +148,226 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Film tags v2: detail panel, hotkeys, voice */
+
+.film-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.film-panel-head h3 {
+  margin: 0;
+}
+
+.film-panel-tools {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.film-panel-tools button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  min-height: auto;
+}
+
+.film-mic.active {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.film-voice-interim {
+  margin: 0;
+  font-style: italic;
+}
+
+.tag-detail-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  padding: var(--sp-4);
+}
+
+.tag-detail-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.tag-detail-hint {
+  font-size: var(--fs-sm);
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.tag-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tag-detail-label {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-micro);
+  color: var(--muted);
+}
+
+.tag-detail-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.tag-detail-choices .tag-chip {
+  min-width: 44px;
+}
+
+.tag-detail-panel select,
+.film-athlete-filter select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.film-athlete-current {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.film-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.film-filter-bar .tag-filter-row {
+  flex: 1 1 auto;
+}
+
+.hotkey-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--sp-4);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.hotkey-overlay-card {
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--sp-5);
+}
+
+.hotkey-overlay-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hotkey-overlay-head h3 {
+  margin: 0;
+}
+
+.hotkey-overlay-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sp-4) var(--sp-6);
+  margin-top: var(--sp-4);
+}
+
+.hotkey-overlay-grid h4 {
+  margin: 0 0 var(--sp-2);
+  color: var(--gold);
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-micro);
+}
+
+.hotkey-overlay-grid dl {
+  margin: 0;
+}
+
+.hotkey-row {
+  display: flex;
+  gap: var(--sp-3);
+  padding: 4px 0;
+  font-size: var(--fs-sm);
+}
+
+.hotkey-row dt {
+  flex: 0 0 120px;
+}
+
+.hotkey-row dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+.hotkey-row kbd {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-xs);
+  padding: 1px 6px;
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+
+.hotkey-overlay-foot {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-sm);
+}
+
+.film-toast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--sp-6);
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  max-width: calc(100vw - 32px);
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+  background: var(--panel-2);
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-weight: 600;
+}
+
+.film-toast-error {
+  border-left-color: var(--red);
+}
+
+.film-toast-undo,
+.film-toast-dismiss {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  min-height: auto;
+}

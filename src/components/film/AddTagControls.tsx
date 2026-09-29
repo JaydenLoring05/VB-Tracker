@@ -10,18 +10,18 @@ import { TAG_LABELS, TAG_TYPES } from "./tagMeta";
 export function AddTagControls({
   isYouTube,
   getCurrentTime,
-  onAddTag
+  onStartTag
 }: {
   isYouTube: boolean;
   getCurrentTime: () => number;
-  onAddTag: (input: { seconds: number; tag: FilmTagType }) => void;
+  onStartTag: (input: { seconds: number; tag: FilmTagType }) => void;
 }) {
   const [manualTime, setManualTime] = useState("");
   const [timeError, setTimeError] = useState<string | null>(null);
 
   function handleTag(tag: FilmTagType) {
     if (isYouTube) {
-      onAddTag({ seconds: Math.floor(getCurrentTime()), tag });
+      onStartTag({ seconds: Math.floor(getCurrentTime()), tag });
       return;
     }
 
@@ -32,7 +32,7 @@ export function AddTagControls({
     }
 
     setTimeError(null);
-    onAddTag({ seconds, tag });
+    onStartTag({ seconds, tag });
   }
 
   return (

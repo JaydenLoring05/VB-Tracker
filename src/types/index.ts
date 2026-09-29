@@ -113,7 +113,23 @@ export type TeamMember = {
   joined_at: string;
 };
 
-export type FilmTagType = "kill" | "error" | "block" | "dig" | "ace" | "serve_error" | "set" | "note";
+export type FilmTagType = "kill" | "error" | "block" | "dig" | "ace" | "serve_error" | "set" | "note" | "pass";
+
+export type PassRating = 0 | 1 | 2 | 3;
+export type SetZone = "1" | "2" | "3" | "4" | "5" | "6";
+export type SetType = "4" | "5" | "slide" | "pipe" | "back_row" | "quick" | "dump";
+export type BlockOutcome = "stuff" | "touch" | "tooled" | "missed";
+export type AttackDirection = "line" | "cross" | "seam" | "tip" | "roll";
+
+/** The optional "who made the play and how good was it" fields from schema_v36. */
+export type FilmTagDetails = {
+  athlete_id: string | null;
+  pass_rating: PassRating | null;
+  set_zone: SetZone | null;
+  set_type: SetType | null;
+  block_outcome: BlockOutcome | null;
+  attack_direction: AttackDirection | null;
+};
 
 export type TeamFilm = {
   id: string;
@@ -134,7 +150,7 @@ export type FilmTag = {
   note: string | null;
   created_by: string;
   created_at: string;
-};
+} & FilmTagDetails;
 
 export type RosterAthlete = {
   userId: string;
