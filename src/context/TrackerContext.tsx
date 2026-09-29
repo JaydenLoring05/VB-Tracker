@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import { requestNotionSync } from "@/lib/notionSyncTrigger";
 import { createClient } from "@/lib/supabase/client";
 import { todayISO } from "@/lib/storage";
 import { TeamOverrideData } from "@/lib/programResolution";
@@ -575,7 +576,9 @@ export function TrackerProvider({
         if (error) {
           console.error("Failed to save stats history", error);
           rollbackOnce("Couldn't save your stats. Check your connection and try again.");
+          return;
         }
+        requestNotionSync();
       });
   }
 

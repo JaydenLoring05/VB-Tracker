@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
+import { requestNotionSync } from "@/lib/notionSyncTrigger";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { createClient } from "@/lib/supabase/client";
 import { WorkoutSession, WorkoutSet } from "@/types";
@@ -304,6 +305,7 @@ export function useActiveWorkoutSession(sessionId: string) {
         : current
     );
 
+    requestNotionSync();
     return { durationSeconds };
   }
 
@@ -320,6 +322,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     }
 
     setSession((current) => (current ? { ...current, rpe } : current));
+    requestNotionSync();
     return true;
   }
 
