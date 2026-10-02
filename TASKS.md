@@ -1,54 +1,29 @@
 # Tasks
 
-What's still open after the October 2026 pass. Everything in "Ready for
-review" is an open PR to `main`. Each one passed `npx tsc --noEmit`,
-`npm test` and `npm run build` before it was opened.
+What's still open after the October 2026 pass. Every PR from the pass
+(#20–#36, #38, #39) and the skill radar (#40) is merged, and schema
+v44–v48 has been run on the production Supabase project.
 
-## Ready for review (merge in this order)
+## Needs you (accounts and secrets)
 
-Part 1:
-- [ ] #20 `docs/readme-accuracy`
-- [ ] #21 `chore/eslint-flat-config`
-- [ ] #22 `refactor/personal-record-lib`
-- [ ] #23 `test/demo-smoke-playwright`
-- [ ] #24 `docs/architecture`
-- [ ] #25 `chore/package-metadata`
-- [ ] #26 `docs/readme-screenshots`: includes Workout Mode and film room shots from #39
+- [ ] **Google sign-in (#34).** Create the OAuth client in Google Cloud,
+      enter its client ID and secret in Supabase → Authentication →
+      Providers → Google, add the redirect URLs, then set
+      `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` in Vercel and redeploy. Full
+      steps are in #34's description.
+- [ ] **Daily coach summary email (#35).** Pick a `CRON_SECRET`, store its
+      SHA-256 hash with the `insert into private.cron_secrets ...`
+      statement at the top of `schema_v47_daily_coach_summary.sql`, verify
+      a sending domain in Resend, then set `RESEND_API_KEY`,
+      `DAILY_SUMMARY_FROM` and `CRON_SECRET` in Vercel and redeploy. Full
+      steps are in #35's description.
+- [ ] **Test account deletion once (#33)** with a throwaway account:
+      Settings → type the phrase → Delete my account.
 
-Part 2:
-- [ ] #27 `fix/workout-timer-keepalive`
-- [ ] #28 `feat/training-load-team-events`
-- [ ] #29 `feat/coach-roster-limit`
-- [ ] #30 `fix/substitution-references`
-- [ ] #31 `feat/missed-assigned-days`: **run `schema_v44_program_start_date.sql` first**
-- [ ] #32 `feat/position-starting-programs`: **run `schema_v45_starting_program.sql` first**
-- [ ] #33 `feat/data-export-account-deletion`: **run `schema_v46_delete_my_account.sql` first**
-- [ ] #34 `feat/google-sign-in`: Google Cloud, Supabase and Vercel steps in the PR
-- [ ] #35 `feat/daily-coach-summary-email`: **run `schema_v47_daily_coach_summary.sql` first**, then the cron secret and Resend steps in the PR
-- [ ] #36 `feat/landing-product-screenshots`
+## Open PRs not from this pass
 
-Follow-ups:
-- [ ] #39 `feat/demo-workout-and-film`: merge before #26 and #36 so the live demo matches their screenshots
-
-Part 3:
-- [ ] #38 `docs/refresh-suggestions-tasks` (this file and SUGGESTIONS.md)
-
-## Merge notes
-
-Checked by merging every open PR (#20–#36, #38, #39) into `main` in the
-order above on a throwaway branch. All code merges cleanly, and the
-combined result passes `tsc`, lint, 562 unit tests, the build and all three
-Playwright tests (the `/demo` smoke test plus #39's Workout Mode and film
-room tests). #26's screenshot script also regenerates all five images on
-that build.
-The only conflicts are in docs, and both are "keep both sides":
-
-- **README.md setup list.** Several branches add their schema file right
-  after v35, because `main` still ends there. Merge #20 (`docs/readme-accuracy`)
-  first; each later conflict then becomes "append the new file after
-  `schema_v43_team_programs.sql`", in order v44 to v47.
-- **TESTING.md coverage table.** Each feature branch adds one row in the
-  same place. Keep every row.
+- [ ] #16 `simplify-workout-film` ("Simplify 5: workout logger up front,
+      film icon cleanup").
 
 ## Next up
 
