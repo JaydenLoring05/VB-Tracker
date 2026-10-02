@@ -23,6 +23,7 @@ one, run its check query; it should return the value shown.
 | v50 | `schema_v50_checkin_reminders.sql` | #45 | `select to_regprocedure('public.checkin_reminder_recipients(text,timestamptz)') is not null;` | `true` |
 | v51 | `schema_v51_feedback.sql` | #48 | `select to_regclass('public.feedback') is not null;` | `true` |
 | v52 | `schema_v52_guardian_info.sql` | #49 | `select count(*) from information_schema.columns where table_name = 'profiles' and column_name = 'is_adult';` | `1` |
+| v53 | `schema_v53_film_quick_tags.sql` | F-02 | `select count(*) from information_schema.columns where table_name = 'film_tags' and column_name = 'result';` | `1` |
 
 **Already applied in production (October 2, 2026):** v44 to v47, and v48's
 statement (it ran as `schema_v44_skill_ratings.sql` before #41 renamed it). The

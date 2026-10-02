@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Keyboard, Mic, MicOff } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink, Keyboard, Mic, MicOff } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { NewFilmTag } from "@/hooks/useTeamFilm";
@@ -8,11 +8,13 @@ import { useVoiceTagging } from "@/hooks/useVoiceTagging";
 import { formatTimestamp, parseYouTubeId } from "@/lib/film";
 import { handleHotkey, isTypingTarget, pendingHint, TagDraft } from "@/lib/filmHotkeys";
 import { parseVoiceCommand } from "@/lib/filmVoice";
-import { FilmTag, FilmTagType, TeamFilm } from "@/types";
+import { FilmResult, FilmTag, FilmTagType, TeamFilm } from "@/types";
 
 import { AddTagControls } from "./AddTagControls";
+import { CommentBox } from "./CommentBox";
 import { FilmToast, FilmToastMessage } from "./FilmToast";
 import { HotkeyOverlay } from "./HotkeyOverlay";
+import { QuickTagger } from "./QuickTagger";
 import { FilmAthlete, TagDetailPanel } from "./TagDetailPanel";
 import { TagFilterChips } from "./TagFilterChips";
 import { TagList } from "./TagList";
@@ -29,7 +31,8 @@ export function FilmPanel({
   athleteName,
   onAddTag,
   onDeleteTag,
-  onUndoTag
+  onUndoTag,
+  seekRequest
 }: {
   film: TeamFilm;
   tags: FilmTag[];
@@ -42,6 +45,8 @@ export function FilmPanel({
   onDeleteTag: (tag: FilmTag) => void;
   /** Removes immediately, for Undo. */
   onUndoTag: (id: string) => void;
+  /** Jump the player to a time, e.g. when an athlete opens one of their clips. A new id seeks again. */
+  seekRequest?: { seconds: number; id: number } | null;
 }) {
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const noteRef = useRef<HTMLInputElement>(null);
@@ -52,6 +57,7 @@ export function FilmPanel({
   const [note, setNote] = useState("");
   const [selectedAthleteId, setSelectedAthleteId] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showDetailed, setShowDetailed] = useState(false);
   const [toast, setToast] = useState<FilmToastMessage | null>(null);
 
   // Tags saved in this session, newest last, for Ctrl+Z.
@@ -73,6 +79,10 @@ export function FilmPanel({
   }, [film.id]);
 
   const getCurrentTime = useCallback(() => playerRef.current?.getCurrentTime() ?? 0, []);
+
+  useEffect(() => {
+    if (seekRequest) playerRef.current?.seekTo(seekRequest.seconds);
+  }, [seekRequest]);
   const dismissToast = useCallback(() => setToast(null), []);
 
   const showToast = useCallback((text: string, tone: FilmToastMessage["tone"], onUndo?: () => void) => {
@@ -94,18 +104,20 @@ export function FilmPanel({
       details: Partial<TagDetailFields>;
       athleteId: string | null;
       note?: string;
+      result?: FilmResult;
     }) => {
       const saved = await onAddTag({ filmId: film.id, ...input });
       if (!saved) {
         showToast("Couldn't save that tag. Try again.", "error");
-        return;
+        return false;
       }
       undoStackRef.current.push(saved.id);
       const label = describeTag(
-        { tag: input.tag, ...detailsForTag(input.tag, input.details) },
+        { tag: input.tag, result: input.result, ...detailsForTag(input.tag, input.details) },
         athleteName(input.athleteId)
       );
       showToast(`${label} @ ${formatTimestamp(input.seconds)}`, "saved", () => undoTag(saved.id));
+      return true;
     },
     [film.id, onAddTag, athleteName, showToast, undoTag]
   );
@@ -313,9 +325,42 @@ export function FilmPanel({
         </p>
       )}
 
+      {isCoach && youTubeId && (
+        <>
+          <QuickTagger
+            athletes={athletes}
+            getCurrentTime={getCurrentTime}
+            onSave={({ seconds, athleteId, row }) =>
+              saveTag({
+                tag: row.tag,
+                seconds,
+                details: { pass_rating: row.pass_rating, block_outcome: row.block_outcome },
+                athleteId,
+                result: row.result
+              })
+            }
+          />
+          <CommentBox
+            athletes={athletes}
+            getCurrentTime={getCurrentTime}
+            onSave={({ seconds, athleteId, text }) => saveTag({ tag: "note", seconds, details: {}, athleteId, note: text })}
+          />
+          <button
+            type="button"
+            className="ghost film-detailed-toggle"
+            aria-expanded={showDetailed}
+            onClick={() => setShowDetailed((open) => !open)}
+          >
+            {showDetailed ? <ChevronDown size={16} /> : <ChevronRight size={16} />} Detailed tags
+          </button>
+        </>
+      )}
+
       {isCoach && (
         <>
-          <AddTagControls isYouTube={Boolean(youTubeId)} getCurrentTime={getCurrentTime} onStartTag={startDraft} />
+          {(showDetailed || !youTubeId) && (
+            <AddTagControls isYouTube={Boolean(youTubeId)} getCurrentTime={getCurrentTime} onStartTag={startDraft} />
+          )}
 
           {draft ? (
             <TagDetailPanel
@@ -334,6 +379,7 @@ export function FilmPanel({
               onCancel={cancelDraft}
             />
           ) : (
+            (showDetailed || !youTubeId) &&
             athletes.length > 0 && (
               <p className="muted film-athlete-current">
                 Tagging for{" "}

@@ -35,7 +35,6 @@ Rules for automated runs:
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
 | B-03 | Athlete stats table overflows at modal width | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
-| F-02 | Film made simple: tag a play in three taps, timestamp comments, "my clips" for athletes | new | me | L |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
@@ -86,17 +85,6 @@ Rules for automated runs:
 
   Show them on the film page and in the athlete drill-down. This is the
   payoff for the time coaches spend tagging.
-- **F-02. Film made simple.** Jayden's words: the film feature is hard to
-  use and should be the thing that sets NextRep apart for teams. Target:
-  - a coach pastes a link and tags a play in three taps or fewer (athlete,
-    skill, result);
-  - a coach leaves a comment at a timestamp;
-  - each athlete sees their own clips with the feedback.
-
-  Not approved to build: Jayden picks the flow first. Start by counting the
-  taps each action takes today in `src/components/film`. Decide at the same
-  time whether anything from the separate Film Room app (`volley-viz-studio`:
-  frame stepping, drawn angles) belongs here.
 - **F-03. Film links that aren't YouTube.** `parseYouTubeId` in
   `src/lib/film.ts` only recognises YouTube hosts. For any other link,
   `FilmPanel` shows an "Open video" link that opens in a new tab in place of
@@ -228,6 +216,7 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Film made simple: three-tap tags, timed comments, "My clips" (F-02) | me | #58 |
 | Team streak in the coach's sidebar | not recorded | #56 |
 | Attention Center items can be cleared; Send reminder and Recognize achievement send a message | bug | #55 |
 | Pilot-ending banner, optional payment link, roster warning past 16 | not recorded | #52 |

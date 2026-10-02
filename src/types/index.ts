@@ -121,7 +121,35 @@ export type TeamMember = {
   joined_at: string;
 };
 
-export type FilmTagType = "kill" | "error" | "block" | "dig" | "ace" | "serve_error" | "set" | "note" | "pass";
+export type FilmTagType =
+  | "kill"
+  | "error"
+  | "block"
+  | "dig"
+  | "ace"
+  | "serve_error"
+  | "set"
+  | "note"
+  | "pass"
+  | "serve"
+  | "attack";
+
+/** The result of a three-tap tag (schema_v53). Which values apply depends on the skill. */
+export type FilmResult =
+  | "ace"
+  | "in"
+  | "error"
+  | "3"
+  | "2"
+  | "1"
+  | "0"
+  | "good"
+  | "ok"
+  | "kill"
+  | "in_play"
+  | "stuff"
+  | "touch"
+  | "up";
 
 export type PassRating = 0 | 1 | 2 | 3;
 export type SetZone = "1" | "2" | "3" | "4" | "5" | "6";
@@ -156,6 +184,8 @@ export type FilmTag = {
   seconds: number;
   tag: FilmTagType;
   note: string | null;
+  /** Set by the three-tap flow; absent on older tags and before schema_v53 runs. */
+  result?: FilmResult | null;
   created_by: string;
   created_at: string;
 } & FilmTagDetails;

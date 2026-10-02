@@ -2,7 +2,7 @@
 
 import { FilmTag, FilmTagType } from "@/types";
 
-import { TAG_LABELS, TAG_TYPES } from "./tagMeta";
+import { FILTER_TAG_TYPES, TAG_LABELS } from "./tagMeta";
 
 export function TagFilterChips({
   tags,
@@ -13,14 +13,14 @@ export function TagFilterChips({
   activeFilter: FilmTagType | null;
   onChange: (tag: FilmTagType | null) => void;
 }) {
-  const counts = TAG_TYPES.reduce<Record<FilmTagType, number>>((acc, tag) => {
+  const counts = FILTER_TAG_TYPES.reduce<Record<FilmTagType, number>>((acc, tag) => {
     acc[tag] = tags.filter((t) => t.tag === tag).length;
     return acc;
   }, {} as Record<FilmTagType, number>);
 
   return (
     <div className="filter-row tag-filter-row">
-      {TAG_TYPES.map((tag) => {
+      {FILTER_TAG_TYPES.map((tag) => {
         const count = counts[tag];
         const isActive = activeFilter === tag;
         return (

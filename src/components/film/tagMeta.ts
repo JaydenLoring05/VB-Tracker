@@ -1,6 +1,10 @@
-import { AttackDirection, BlockOutcome, FilmTagDetails, FilmTagType, SetType, SetZone } from "@/types";
+import { resultLabel } from "@/lib/filmQuickTag";
+import { AttackDirection, BlockOutcome, FilmResult, FilmTagDetails, FilmTagType, SetType, SetZone } from "@/types";
 
 export const TAG_TYPES: FilmTagType[] = ["pass", "set", "kill", "ace", "block", "dig", "error", "serve_error", "note"];
+
+/** Every tag type, including the skill-only ones the three-tap flow saves. For filtering. */
+export const FILTER_TAG_TYPES: FilmTagType[] = ["serve", "pass", "set", "attack", ...TAG_TYPES.filter((tag) => tag !== "pass" && tag !== "set")];
 
 export const TAG_LABELS: Record<FilmTagType, string> = {
   pass: "Pass",
@@ -11,7 +15,9 @@ export const TAG_LABELS: Record<FilmTagType, string> = {
   ace: "Ace",
   serve_error: "Serve Error",
   set: "Set",
-  note: "Note"
+  note: "Comment",
+  serve: "Serve",
+  attack: "Attack"
 };
 
 export const PASS_RATINGS = [0, 1, 2, 3] as const;
@@ -92,10 +98,19 @@ export function detailsForTag(tag: FilmTagType, details: Partial<TagDetailFields
  * The athlete name goes last and is omitted when unknown.
  */
 export function describeTag(
-  tag: { tag: FilmTagType } & Partial<TagDetailFields>,
+  tag: { tag: FilmTagType; result?: FilmResult | null } & Partial<TagDetailFields>,
   athleteName?: string | null
 ): string {
   const parts: string[] = [TAG_LABELS[tag.tag]];
+
+  // Three-tap tags: the result says it all ("Attack · Kill").
+  const result = resultLabel(tag.tag, tag.result);
+  if (result) {
+    parts.push(result);
+    if (athleteName) parts.push(athleteName);
+    return parts.join(" · ");
+  }
+
   const kind = detailKindFor(tag.tag);
 
   if (kind === "pass" && tag.pass_rating != null) parts.push(String(tag.pass_rating));

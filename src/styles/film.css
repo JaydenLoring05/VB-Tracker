@@ -371,3 +371,137 @@
   padding: 4px 10px;
   min-height: auto;
 }
+
+/* F-02: three-tap tagging, comments, and "My clips" */
+
+.quick-tagger,
+.film-comment-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.quick-tagger-head,
+.film-comment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.quick-tagger-step,
+.film-comment-time {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.quick-tagger-step strong {
+  color: var(--gold);
+}
+
+.quick-tagger-nav {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.quick-tagger-nav button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 6px 10px;
+}
+
+.quick-tagger-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: var(--sp-2);
+}
+
+.quick-choice {
+  min-height: 48px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.quick-choice:hover {
+  border-color: var(--gold);
+}
+
+.quick-choice-good {
+  border-color: var(--green);
+}
+
+.quick-choice-bad {
+  border-color: var(--red);
+}
+
+.film-comment-box textarea {
+  width: 100%;
+  resize: vertical;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.film-comment-restamp {
+  min-height: auto;
+  padding: 4px 8px;
+  font-size: var(--fs-sm);
+}
+
+.film-comment-for select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.film-detailed-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+}
+
+.film-library-tabs {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.my-clips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.my-clips-film h3 {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-base);
+}
+
+.my-clip-item {
+  flex-wrap: wrap;
+}
+
+.my-clip-item .film-tag-timestamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.my-clip-item .film-tag-note {
+  flex-basis: 100%;
+}
