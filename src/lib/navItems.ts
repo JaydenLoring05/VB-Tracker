@@ -9,6 +9,7 @@ import {
   GraduationCap,
   Home,
   Play,
+  Settings,
   type LucideIcon
 } from "lucide-react";
 
@@ -40,13 +41,15 @@ export const NAV_ROUTES = [
   "/library",
   "/coach",
   "/plan",
-  "/team-progress"
+  "/team-progress",
+  "/settings"
 ];
 
 const startWorkout: NavLink = { href: "/workout", label: "Start Workout", icon: Play };
 const calendar: NavLink = { href: "/calendar", label: "Calendar", icon: CalendarDays };
 const library: NavLink = { href: "/library", label: "Exercise Library", icon: BookOpen };
 const film: NavLink = { href: "/film", label: "Film", icon: Clapperboard };
+const settings: NavLink = { href: "/settings", label: "Settings", icon: Settings };
 
 const athleteNav: NavConfig = {
   primary: [
@@ -56,7 +59,7 @@ const athleteNav: NavConfig = {
     { href: "/stats", label: "Progress", icon: BarChart3, alsoMatches: ["/team-progress"] },
     film
   ],
-  more: [startWorkout, calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }]
+  more: [startWorkout, calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }, settings]
 };
 
 const coachNav: NavConfig = {
@@ -72,7 +75,8 @@ const coachNav: NavConfig = {
     startWorkout,
     calendar,
     { href: "/stats", label: "My Stats", icon: Activity },
-    library
+    library,
+    settings
   ]
 };
 
