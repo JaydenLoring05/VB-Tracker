@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { startTransition, useEffect } from "react";
 
 import { StateCard } from "@/components/shared/StateCard";
+import { reportError } from "@/lib/reportError";
 
 /**
  * Body for Next.js error boundaries (error.tsx). Deliberately ignores
@@ -30,6 +31,7 @@ export function ErrorView({
 
   useEffect(() => {
     console.error("Route error boundary caught:", error);
+    reportError(error);
   }, [error]);
 
   function retry() {

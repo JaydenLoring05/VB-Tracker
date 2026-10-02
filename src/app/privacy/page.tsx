@@ -109,7 +109,10 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Service providers.</strong> NextRep runs on Supabase (database and sign-in) and
-            Vercel (hosting). They process data on our behalf to keep the service running.
+            Vercel (hosting). They process data on our behalf to keep the service running. If we
+            turn them on, we also use Sentry to see app crashes and errors (error details only, with
+            check-in and health values removed before they&apos;re sent) and Vercel Analytics to count
+            page views (cookieless, without query strings, invite codes or record IDs).
           </li>
           <li>We don&apos;t sell your data or share it with anyone else.</li>
         </ul>

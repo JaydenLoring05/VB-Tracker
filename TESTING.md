@@ -54,6 +54,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Daily coach summary | `tests/lib/dailySummary.test.ts` | Config gating, cron auth, time zone date, numbers match the Attention Center, pain alerts, today's workout, HTML escaping, Resend call |
 | `GET /api/daily-summary` | `tests/api/dailySummaryRoute.test.ts` | Off without env vars, rejects a missing or wrong cron secret, sends one email per opted-in coach, data and send failures |
 | Position starting programs | `tests/data/positionPrograms.test.ts`, `tests/lib/positionProgram.test.ts` | Templates pass the builder's validation, use library exercises with the right measure; position mapping; coach program and plan edits win over the template |
+| Monitoring and analytics | `tests/lib/monitoring.test.ts` | Off without a DSN or flag, Sentry events lose identity, cookies, bodies and query strings, health fields redacted anywhere, typed-input breadcrumbs dropped, page-view URLs without codes or ids |
 | Guardian step | `tests/lib/guardian.test.ts` | Answer required, adults need nothing else, under 18 needs name, valid email and confirmation, saved fields, roster "missing" status |
 | Feedback | `tests/lib/feedback.test.ts` | Message validation and control characters, same-site page only, short device label, app version, escaped notification email |
 | `POST /api/feedback` | `tests/api/feedbackRoute.test.ts` | Signed in only, same-origin, empty rejected, role and team from the database (not the browser), emails only when Resend is set, save failure sends nothing |
