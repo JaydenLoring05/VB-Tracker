@@ -35,9 +35,12 @@ Part 3:
 
 ## Merge notes
 
-Checked by merging every branch into `main` in the order above on a
-throwaway branch. All code merges cleanly, and the combined result passes
-`tsc`, lint, 557 unit tests, the build and the `/demo` Playwright test.
+Checked by merging every open PR (#20–#36, #38, #39) into `main` in the
+order above on a throwaway branch. All code merges cleanly, and the
+combined result passes `tsc`, lint, 562 unit tests, the build and all three
+Playwright tests (the `/demo` smoke test plus #39's Workout Mode and film
+room tests). #26's screenshot script also regenerates all five images on
+that build.
 The only conflicts are in docs, and both are "keep both sides":
 
 - **README.md setup list.** Several branches add their schema file right
