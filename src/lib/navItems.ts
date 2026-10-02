@@ -8,6 +8,7 @@ import {
   Dumbbell,
   GraduationCap,
   Home,
+  MessageSquare,
   Play,
   Settings,
   type LucideIcon
@@ -42,7 +43,8 @@ export const NAV_ROUTES = [
   "/coach",
   "/plan",
   "/team-progress",
-  "/settings"
+  "/settings",
+  "/feedback"
 ];
 
 const startWorkout: NavLink = { href: "/workout", label: "Start Workout", icon: Play };
@@ -50,6 +52,7 @@ const calendar: NavLink = { href: "/calendar", label: "Calendar", icon: Calendar
 const library: NavLink = { href: "/library", label: "Exercise Library", icon: BookOpen };
 const film: NavLink = { href: "/film", label: "Film", icon: Clapperboard };
 const settings: NavLink = { href: "/settings", label: "Settings", icon: Settings };
+const feedback: NavLink = { href: "/feedback", label: "Send feedback", icon: MessageSquare };
 
 const athleteNav: NavConfig = {
   primary: [
@@ -59,7 +62,7 @@ const athleteNav: NavConfig = {
     { href: "/stats", label: "Progress", icon: BarChart3, alsoMatches: ["/team-progress"] },
     film
   ],
-  more: [startWorkout, calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }, settings]
+  more: [startWorkout, calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }, settings, feedback]
 };
 
 const coachNav: NavConfig = {
@@ -76,7 +79,8 @@ const coachNav: NavConfig = {
     calendar,
     { href: "/stats", label: "My Stats", icon: Activity },
     library,
-    settings
+    settings,
+    feedback
   ]
 };
 
