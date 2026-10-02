@@ -26,6 +26,23 @@ describe("20-week plan", () => {
     }
   });
 
+  it("resolves every substitution hint to an exercise in the library", () => {
+    const unresolved: string[] = [];
+    for (const exercise of exercises) {
+      for (const substitution of exercise.substitutions) {
+        if (!getExercise(substitution)) unresolved.push(`${exercise.name} -> ${substitution}`);
+      }
+    }
+    expect(unresolved).toEqual([]);
+  });
+
+  it("never lists an exercise as its own substitution or lists a substitution twice", () => {
+    for (const exercise of exercises) {
+      expect(exercise.substitutions, exercise.name).not.toContain(exercise.name);
+      expect(new Set(exercise.substitutions).size, exercise.name).toBe(exercise.substitutions.length);
+    }
+  });
+
   it("only schedules exercises that exist in the exercise library", () => {
     const missing = new Set<string>();
     for (const week of WEEKS) {

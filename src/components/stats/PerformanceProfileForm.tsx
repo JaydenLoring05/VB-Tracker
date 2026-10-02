@@ -117,7 +117,7 @@ export function PerformanceProfileForm() {
       </div>
 
       {approachVertical != null && (
-        <p className="muted">Approach vertical: {approachVertical.toFixed(1)}"</p>
+        <p className="muted">Approach vertical: {approachVertical.toFixed(1)}&quot;</p>
       )}
 
       <div className="button-row">

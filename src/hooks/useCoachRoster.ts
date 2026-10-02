@@ -6,6 +6,7 @@ import { useDemo } from "@/context/DemoContext";
 import { fromStatsRow, StatsRow } from "@/context/TrackerContext";
 import { useSupabase } from "@/hooks/useSupabase";
 import { displayMemberName, normalizeMemberName } from "@/lib/memberName";
+import { rosterPageRange, splitRosterPage } from "@/lib/rosterPaging";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
 import { RosterAthlete, Team } from "@/types";
 
@@ -25,15 +26,99 @@ export function useCoachRoster(team: Team | null) {
   const [roster, setRoster] = useState<RosterAthlete[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // One page of athletes, starting at `offset`, with their latest stats and
+  // last-active time. Returns an error message instead of throwing.
+  const fetchPage = useCallback(
+    async (
+      teamId: string,
+      offset: number
+    ): Promise<{ athletes: RosterAthlete[]; hasMore: boolean } | { error: string }> => {
+      const { from, to } = rosterPageRange(offset);
+      const { data: members, error: membersError } = await supabase
+        .from("team_members")
+        .select("user_id, display_name, joined_at")
+        .eq("team_id", teamId)
+        .eq("role", "athlete")
+        .order("joined_at", { ascending: true })
+        // Tie-breaker so pages never overlap or skip when two athletes joined in the same instant.
+        .order("user_id", { ascending: true })
+        .range(from, to);
+
+      if (membersError) {
+        console.error("Failed to load roster", membersError);
+        return { error: "Couldn't load your roster. Try again." };
+      }
+
+      const page = splitRosterPage((members ?? []) as MemberRow[]);
+      const athletes = page.rows;
+
+      if (athletes.length === 0) return { athletes: [], hasMore: false };
+
+      const athleteIds = athletes.map((athlete) => athlete.user_id);
+
+      const [{ data: statsRows, error: statsError }, { data: profileRows, error: profilesError }] =
+        await Promise.all([
+          supabase.from("latest_stats").select("*").in("user_id", athleteIds),
+          supabase.from("profiles").select("user_id, last_active_at").in("user_id", athleteIds)
+        ]);
+
+      if (statsError) {
+        console.error("Failed to load roster stats", statsError);
+        return { error: "Couldn't load athlete stats. Try again." };
+      }
+
+      if (profilesError) {
+        console.error("Failed to load roster activity", profilesError);
+      }
+
+      const statsByUser = new Map<string, StatsRow & { updated_at: string }>(
+        (statsRows ?? []).map((row) => [row.user_id as string, row])
+      );
+      const lastActiveByUser = new Map<string, string>(
+        (profileRows ?? []).map((row) => [row.user_id as string, row.last_active_at as string])
+      );
+      const now = Date.now();
+
+      return {
+        hasMore: page.hasMore,
+        athletes: athletes.map((member) => {
+          const row = statsByUser.get(member.user_id);
+          const recovery = calculateRecovery(row ? fromStatsRow(row) : null);
+          const lastCheckIn = row?.updated_at ?? null;
+          const daysSinceCheckIn = lastCheckIn
+            ? (now - new Date(lastCheckIn).getTime()) / (1000 * 60 * 60 * 24)
+            : Infinity;
+
+          return {
+            userId: member.user_id,
+            displayName: displayMemberName(member.display_name),
+            joinedAt: member.joined_at,
+            recovery,
+            recoveryLabel: recoveryStatus(recovery).label,
+            lastCheckIn,
+            needsCheckIn: daysSinceCheckIn >= STALE_DAYS,
+            lastActiveAt: lastActiveByUser.get(member.user_id) ?? null
+          };
+        })
+      };
+    },
+    [supabase]
+  );
+
   const loadRoster = useCallback(async () => {
     if (!team) {
       setRoster([]);
+      setHasMore(false);
       setLoading(false);
       return;
     }
 
     if (demo) {
       setRoster(demo.data.roster);
+      setHasMore(false);
       setError(null);
       setLoading(false);
       return;
@@ -42,78 +127,37 @@ export function useCoachRoster(team: Team | null) {
     setLoading(true);
     setError(null);
 
-    const { data: members, error: membersError } = await supabase
-      .from("team_members")
-      .select("user_id, display_name, joined_at")
-      .eq("team_id", team.id)
-      .eq("role", "athlete")
-      .order("joined_at", { ascending: true });
-
-    if (membersError) {
-      console.error("Failed to load roster", membersError);
-      setError("Couldn't load your roster. Try again.");
+    const result = await fetchPage(team.id, 0);
+    if ("error" in result) {
+      setError(result.error);
       setLoading(false);
       return;
     }
 
-    const athletes = (members ?? []) as MemberRow[];
-
-    if (athletes.length === 0) {
-      setRoster([]);
-      setLoading(false);
-      return;
-    }
-
-    const athleteIds = athletes.map((athlete) => athlete.user_id);
-
-    const [{ data: statsRows, error: statsError }, { data: profileRows, error: profilesError }] =
-      await Promise.all([
-        supabase.from("latest_stats").select("*").in("user_id", athleteIds),
-        supabase.from("profiles").select("user_id, last_active_at").in("user_id", athleteIds)
-      ]);
-
-    if (statsError) {
-      console.error("Failed to load roster stats", statsError);
-      setError("Couldn't load athlete stats. Try again.");
-      setLoading(false);
-      return;
-    }
-
-    if (profilesError) {
-      console.error("Failed to load roster activity", profilesError);
-    }
-
-    const statsByUser = new Map<string, StatsRow & { updated_at: string }>(
-      (statsRows ?? []).map((row) => [row.user_id as string, row])
-    );
-    const lastActiveByUser = new Map<string, string>(
-      (profileRows ?? []).map((row) => [row.user_id as string, row.last_active_at as string])
-    );
-    const now = Date.now();
-
-    const nextRoster: RosterAthlete[] = athletes.map((member) => {
-      const row = statsByUser.get(member.user_id);
-      const recovery = calculateRecovery(row ? fromStatsRow(row) : null);
-      const lastCheckIn = row?.updated_at ?? null;
-      const daysSinceCheckIn = lastCheckIn
-        ? (now - new Date(lastCheckIn).getTime()) / (1000 * 60 * 60 * 24)
-        : Infinity;
-
-      return {
-        userId: member.user_id,
-        displayName: displayMemberName(member.display_name),
-        joinedAt: member.joined_at,
-        recovery,
-        recoveryLabel: recoveryStatus(recovery).label,
-        lastCheckIn,
-        needsCheckIn: daysSinceCheckIn >= STALE_DAYS,
-        lastActiveAt: lastActiveByUser.get(member.user_id) ?? null
-      };
-    });
-
-    setRoster(nextRoster);
+    setRoster(result.athletes);
+    setHasMore(result.hasMore);
     setLoading(false);
-  }, [supabase, demo, team]);
+  }, [demo, team, fetchPage]);
+
+  /** Appends the next page of athletes. Only needed for rosters past ROSTER_PAGE_SIZE. */
+  async function loadMore() {
+    if (!team || demo || !hasMore || loadingMore) return;
+
+    setLoadingMore(true);
+    const result = await fetchPage(team.id, roster.length);
+    setLoadingMore(false);
+
+    if ("error" in result) {
+      setError(result.error);
+      return;
+    }
+
+    setRoster((current) => {
+      const seen = new Set(current.map((athlete) => athlete.userId));
+      return [...current, ...result.athletes.filter((athlete) => !seen.has(athlete.userId))];
+    });
+    setHasMore(result.hasMore);
+  }
 
   useEffect(() => {
     loadRoster();
@@ -186,6 +230,9 @@ export function useCoachRoster(team: Team | null) {
     roster,
     flagged,
     error,
+    hasMore,
+    loadingMore,
+    loadMore,
     removeAthlete,
     renameAthlete,
     refresh: loadRoster

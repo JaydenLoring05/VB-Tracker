@@ -74,7 +74,7 @@ export const exercises: Exercise[] = [
     "Builds quad, core, and full-body strength for jumping.",
     ["Elbows high.", "Brace hard.", "Stay upright.", "Drive out of the bottom."],
     ["Dropping elbows.", "Folding forward.", "Going too heavy too soon."],
-    ["Goblet Squat", "Safety Bar Squat", "Heel-Elevated Squat"]
+    ["Goblet Squat", "Heel-Elevated Goblet Squat", "Bulgarian Split Squat"]
   ),
   ex(
     "Step-Ups",
@@ -104,7 +104,7 @@ export const exercises: Exercise[] = [
     "Strengthens hamstrings for sprinting, jumping, and knee protection.",
     ["Curl smoothly.", "Pause at the top.", "Control the lowering.", "Keep hips stable."],
     ["Rushing reps.", "Using momentum.", "Arching lower back."],
-    ["Nordic Curl", "Swiss Ball Curl", "RDL"]
+    ["Nordic Hamstring Curl", "Swiss Ball Curl", "RDL"]
   ),
   ex(
     "Nordic Hamstring Curl",
@@ -134,7 +134,7 @@ export const exercises: Exercise[] = [
     "Builds bent-knee calf strength for landing, acceleration, and knee support.",
     ["Keep knee bent.", "Raise heel high.", "Control down.", "Use slow reps."],
     ["Straightening the knee.", "Bouncing.", "Going too heavy too soon."],
-    ["Seated Calf Raise", "Wall Soleus Raise", "Single-Leg Soleus Raise"]
+    ["Seated Calf Raise", "Single-Leg Calf Raise", "Calf Raises"]
   ),
 
   // JUMP DEVELOPMENT / LANDING MECHANICS / SPEED & AGILITY / VOLLEYBALL CONDITIONING
@@ -166,7 +166,7 @@ export const exercises: Exercise[] = [
     "Builds horizontal power for approach speed and explosiveness.",
     ["Load hips back.", "Swing arms hard.", "Jump forward.", "Stick landing."],
     ["Landing stiff.", "Knees caving.", "Rushing reps."],
-    ["Standing Long Jump", "Bounds", "Box Jumps"]
+    ["Squat Jumps", "Bounds", "Box Jumps"]
   ),
   ex(
     "Lateral Bounds",
@@ -176,7 +176,7 @@ export const exercises: Exercise[] = [
     "Builds side-to-side power for defense and court movement.",
     ["Push off hard.", "Stick the landing.", "Keep hips level.", "Control the knee."],
     ["Rushing.", "Landing sloppy.", "Knee collapsing."],
-    ["Skater Jumps", "Lateral Lunges", "Side Hops"]
+    ["Skater Jumps", "Lateral Lunges", "Line Hops"]
   ),
   ex(
     "Landing Mechanics Drill",
@@ -226,7 +226,7 @@ export const exercises: Exercise[] = [
     "Builds acceleration for approaches and defensive reactions.",
     ["Lean forward.", "Push the ground back.", "Explode first 3 steps.", "Stay low early."],
     ["Standing up too soon.", "Weak first step.", "Running tired reps."],
-    ["Falling Starts", "Court Sprints", "Hill Sprints"]
+    ["Falling Starts", "Court Sprints", "Shuttle Runs"]
   ),
   ex(
     "Court Sprints",
@@ -278,7 +278,7 @@ export const exercises: Exercise[] = [
     "Builds lats, biceps, and pulling strength.",
     ["Use full range.", "Pull elbows down.", "Keep ribs controlled.", "Lower slowly."],
     ["Half reps.", "Swinging.", "Neck reaching for bar."],
-    ["Pull-Ups", "Lat Pulldown", "Assisted Chin-Up"]
+    ["Pull-Ups", "Lat Pulldown", "Band-Assisted Pull-Up"]
   ),
   ex(
     "DB Bench Press",
@@ -288,7 +288,7 @@ export const exercises: Exercise[] = [
     "Builds pressing strength with shoulder-friendly movement.",
     ["Shoulder blades back.", "Lower controlled.", "Press strong.", "Keep wrists stacked."],
     ["Flaring elbows.", "Bouncing.", "Shoulders rolling forward."],
-    ["Push-Ups", "Machine Chest Press", "Floor Press"]
+    ["Push-Ups", "Incline Push-Up", "Floor Press"]
   ),
   ex(
     "Push-Ups",
@@ -308,7 +308,7 @@ export const exercises: Exercise[] = [
     "The entry point into pressing strength: hands elevated on a bench or box reduce the load until a full push-up is ready.",
     ["Hands on a sturdy elevated surface.", "Body straight from head to heel.", "Chest lowers first.", "Lower the surface height as you get stronger."],
     ["Sagging hips.", "Surface too low too soon.", "Flaring elbows."],
-    ["Push-Ups", "DB Bench Press", "Wall Push-Up"]
+    ["Push-Ups", "DB Bench Press", "Bench Dips"]
   ),
   ex(
     "Dips",
@@ -318,7 +318,7 @@ export const exercises: Exercise[] = [
     "Builds chest, triceps, and calisthenics pressing strength.",
     ["Shoulders down.", "Control depth.", "Press strong.", "Use pain-free range."],
     ["Going too deep.", "Shrugging.", "Bouncing reps."],
-    ["Push-Ups", "Bench Dips", "Assisted Dips"]
+    ["Push-Ups", "Bench Dips", "Incline Push-Up"]
   ),
   ex(
     "Single-Arm Row",
@@ -338,7 +338,7 @@ export const exercises: Exercise[] = [
     "Builds pulling endurance and shoulder balance.",
     ["Body straight.", "Pull chest to bar.", "Squeeze shoulder blades.", "Control down."],
     ["Sagging hips.", "Half reps.", "Shrugging."],
-    ["Ring Rows", "TRX Rows", "Cable Row"]
+    ["Chest-Supported Row", "Single-Arm Row", "Cable Row"]
   ),
   ex(
     "Landmine Press or DB Shoulder Press",
@@ -348,7 +348,7 @@ export const exercises: Exercise[] = [
     "Builds shoulder pressing power for hitting.",
     ["Brace core.", "Press up strong.", "Keep ribs down.", "Control lowering."],
     ["Arching lower back.", "Shrugging.", "Pressing through pain."],
-    ["Half-Kneeling Landmine Press", "Seated DB Press", "Push Press"]
+    ["Half-Kneeling Landmine Press", "Pike Push-Ups", "Push Press"]
   ),
   ex(
     "Push Press",
@@ -358,7 +358,7 @@ export const exercises: Exercise[] = [
     "Builds explosive pressing power and full-body force transfer.",
     ["Dip straight down.", "Drive with legs.", "Punch overhead.", "Brace hard."],
     ["Turning it into strict press.", "Arching lower back.", "Pressing through pain."],
-    ["DB Push Press", "Landmine Press", "Med Ball Chest Pass"]
+    ["Half-Kneeling Landmine Press", "Landmine Press or DB Shoulder Press", "Med Ball Chest Pass"]
   ),
   ex(
     "Pike Push-Ups",
@@ -368,7 +368,7 @@ export const exercises: Exercise[] = [
     "Builds shoulder strength for calisthenics and overhead power.",
     ["Hips high.", "Head moves forward.", "Elbows controlled.", "Press through shoulders."],
     ["Turning into regular push-up.", "Flaring elbows.", "Rushing."],
-    ["DB Shoulder Press", "Handstand Progression", "Incline Pike Push-Up"]
+    ["Landmine Press or DB Shoulder Press", "Handstand Practice", "Push-Ups"]
   ),
   ex(
     "Handstand Practice",
@@ -378,7 +378,7 @@ export const exercises: Exercise[] = [
     "Builds shoulder stability, body control, and calisthenics skill.",
     ["Push tall.", "Squeeze glutes.", "Ribs tucked.", "Use fingers for balance."],
     ["Banana back.", "Soft shoulders.", "Kicking up with no control."],
-    ["Wall Handstand Hold", "Pike Hold", "Bear Crawl"]
+    ["Pike Push-Ups", "Scap Push-Ups", "Bear Crawl"]
   ),
 
   // ROTATIONAL CORE
@@ -390,7 +390,7 @@ export const exercises: Exercise[] = [
     "Builds anti-rotation core strength for hitting stability.",
     ["Brace hard.", "Press straight out.", "Do not rotate.", "Move slow."],
     ["Twisting with band.", "Shrugging.", "Too much weight."],
-    ["Dead Bugs", "Side Planks", "Cable Anti-Rotation Hold"]
+    ["Dead Bugs", "Side Planks", "Suitcase Carry"]
   ),
   ex(
     "Med Ball Rotational Throws",
@@ -410,7 +410,7 @@ export const exercises: Exercise[] = [
     "Builds rotational strength and control for hitting.",
     ["Rotate through hips and ribs.", "Keep arms long.", "Control back.", "Brace core."],
     ["Only pulling with arms.", "Using too much weight.", "Twisting knees awkwardly."],
-    ["Band Woodchoppers", "Med Ball Rotational Throws", "Landmine Rotations"]
+    ["Band Rotations", "Med Ball Rotational Throws", "Landmine Rotations"]
   ),
   ex(
     "Landmine Rotations",
@@ -420,7 +420,7 @@ export const exercises: Exercise[] = [
     "Builds rotational trunk strength and power transfer.",
     ["Rotate hips.", "Keep arms strong.", "Brace at finish.", "Move explosively but controlled."],
     ["Only using arms.", "Over-rotating low back.", "Going too heavy."],
-    ["Cable Woodchoppers", "Med Ball Throws", "Band Rotations"]
+    ["Cable Woodchoppers", "Med Ball Rotational Throws", "Band Rotations"]
   ),
   ex(
     "Hanging Leg Raises",
@@ -430,7 +430,7 @@ export const exercises: Exercise[] = [
     "Builds core strength, hip flexor strength, and control.",
     ["Control swing.", "Tuck pelvis.", "Raise with abs.", "Lower slowly."],
     ["Swinging wildly.", "Using momentum.", "Arching lower back."],
-    ["Hanging Knee Raises", "Reverse Crunch", "Dead Bugs"]
+    ["Hanging Knee Raises", "Hollow Hold", "Dead Bugs"]
   ),
   ex(
     "L-Sit Practice",
@@ -440,7 +440,7 @@ export const exercises: Exercise[] = [
     "Builds core compression, hip flexors, and calisthenics control.",
     ["Push shoulders down.", "Lock elbows.", "Point toes.", "Keep chest tall."],
     ["Bent arms.", "Collapsed shoulders.", "Holding breath."],
-    ["Tuck L-Sit", "Seated Leg Lifts", "Hanging Knee Raises"]
+    ["Hollow Hold", "Dead Bugs", "Hanging Knee Raises"]
   ),
   ex(
     "Dead Bugs",
@@ -460,7 +460,7 @@ export const exercises: Exercise[] = [
     "Builds lateral core strength for hitting and landing control.",
     ["Stack shoulders and hips.", "Push floor away.", "Squeeze glutes.", "Stay long."],
     ["Sagging hips.", "Rotating forward.", "Holding breath."],
-    ["Side Plank From Knees", "Copenhagen Plank", "Suitcase Carry"]
+    ["Pallof Press", "Copenhagen Plank", "Suitcase Carry"]
   ),
   ex(
     "Planks",
@@ -470,7 +470,7 @@ export const exercises: Exercise[] = [
     "Builds basic trunk stiffness and core endurance.",
     ["Ribs down.", "Squeeze glutes.", "Push floor away.", "Breathe slowly."],
     ["Sagging hips.", "Butt too high.", "Holding breath."],
-    ["Dead Bugs", "Hollow Hold", "Stir-the-Pot"]
+    ["Dead Bugs", "Hollow Hold", "Stability Ball Rollout"]
   ),
   ex(
     "Ab Wheel Rollout",
@@ -500,7 +500,7 @@ export const exercises: Exercise[] = [
     "Builds grip, traps, core stiffness, and durability.",
     ["Stand tall.", "Brace core.", "Walk controlled.", "Do not lean."],
     ["Letting weights swing.", "Shrugging hard.", "Walking sloppy."],
-    ["Suitcase Carry", "Trap Bar Carry", "KB Carries"]
+    ["Suitcase Carry", "Side Planks", "Planks"]
   ),
 
   // KNEE STRENGTH / SHOULDER HEALTH
@@ -522,7 +522,7 @@ export const exercises: Exercise[] = [
     "Isolates the glute medius to build hip control that keeps the knee tracking properly on landing and cutting.",
     ["Lie on your side, knees bent, feet together.", "Keep hips stacked, don't roll back.", "Lift the top knee using the glute, not momentum.", "Lower with control."],
     ["Rolling the hips backward to fake more range.", "Using momentum instead of the muscle.", "Going too fast."],
-    ["Lateral Band Walks", "Side-Lying Hip Abduction", "Monster Walks"]
+    ["Lateral Band Walks", "Glute Bridge", "Monster Walks"]
   ),
   ex(
     "Spanish Squat",
@@ -542,7 +542,7 @@ export const exercises: Exercise[] = [
     "Builds single-leg stability and proprioception, most useful as a supporting piece of ACL-injury-risk-reduction work alongside real strength and plyometric training, not as a stand-alone fix.",
     ["Stand tall on one leg, soft knee.", "Reach the free foot forward, side, and back under control.", "Keep the standing knee tracking over the toes.", "Return to a stable center each rep."],
     ["Standing knee caving in on the reach.", "Rushing through reaches without control.", "Letting the hips drop on the standing side."],
-    ["Lateral Band Walks", "Single-Leg RDL", "Bosu Balance Hold"]
+    ["Lateral Band Walks", "Single-Leg RDL", "Patrick Step"]
   ),
   ex(
     "Tibialis Raises",
@@ -552,7 +552,7 @@ export const exercises: Exercise[] = [
     "Strengthens the front of the shin for knee and ankle durability.",
     ["Heels planted.", "Pull toes up hard.", "Control down.", "Use full range."],
     ["Using momentum.", "Tiny reps.", "Rocking hips."],
-    ["Tib Bar Raises", "Wall Toe Raises", "Band Dorsiflexion"]
+    ["Patrick Step", "Wall Toe Raises", "Ankle Rocks"]
   ),
   ex(
     "Patrick Step",
@@ -582,7 +582,7 @@ export const exercises: Exercise[] = [
     "Builds quad strength and knee blood flow with low joint stress.",
     ["Stay low.", "Push through toes.", "Keep constant steps.", "Do not rush."],
     ["Standing too tall.", "Taking huge steps.", "Going too heavy."],
-    ["Backward Treadmill Walk", "Spanish Squat", "Wall Sit"]
+    ["Poliquin Step-Down", "Spanish Squat", "Wall Sit"]
   ),
   ex(
     "Face Pulls",
@@ -592,7 +592,7 @@ export const exercises: Exercise[] = [
     "Builds rear delts and rotator cuff support.",
     ["Pull toward forehead.", "Elbows high.", "Squeeze shoulder blades.", "Control return."],
     ["Too much weight.", "Turning it into a row.", "Arching back."],
-    ["Band Pull-Aparts", "Rear Delt Fly", "Cable External Rotation"]
+    ["Band Pull-Aparts", "Rear Delt Fly", "External Rotations"]
   ),
   ex(
     "Band Pull-Aparts",
@@ -612,7 +612,7 @@ export const exercises: Exercise[] = [
     "Strengthens the rotator cuff to protect your shoulder during hitting.",
     ["Elbow tucked.", "Move slowly.", "Use light resistance.", "Stop before pain."],
     ["Too heavy.", "Elbow drifting.", "Twisting torso."],
-    ["Cable External Rotation", "Side-Lying External Rotation", "Face Pulls"]
+    ["Cuban Rotations", "Light Shoulder Band Work", "Face Pulls"]
   ),
   ex(
     "Scap Push-Ups",
@@ -622,7 +622,7 @@ export const exercises: Exercise[] = [
     "Builds serratus and scapular control for healthier shoulders.",
     ["Arms straight.", "Push floor away.", "Let shoulder blades move.", "Control reps."],
     ["Bending elbows.", "Rushing.", "Sagging hips."],
-    ["Wall Scap Push-Ups", "Serratus Wall Slides", "Bear Crawl Hold"]
+    ["Push-Ups", "Wall Slides", "Bear Crawl"]
   ),
   ex(
     "Y-T-W Raises",
@@ -632,7 +632,7 @@ export const exercises: Exercise[] = [
     "Strengthens lower traps, rear delts, and shoulder stabilizers.",
     ["Move slow.", "Thumbs up.", "Squeeze gently.", "Use light weight."],
     ["Going too heavy.", "Shrugging.", "Rushing reps."],
-    ["Prone Y Raises", "Band Pull-Aparts", "Wall Slides"]
+    ["Rear Delt Fly", "Band Pull-Aparts", "Wall Slides"]
   ),
   ex(
     "Cuban Rotations",
@@ -664,7 +664,7 @@ export const exercises: Exercise[] = [
     "Improves movement quality, recovery, and joint range.",
     ["Move slowly.", "Breathe.", "Do not force range.", "Stay relaxed."],
     ["Rushing.", "Forcing pain.", "Holding breath."],
-    ["Yoga Flow", "Dynamic Stretching", "Joint CARs"]
+    ["Light Stretching", "Hip CARs", "Shoulder CARs"]
   ),
   ex(
     "Deep Squat Holds",
@@ -674,7 +674,7 @@ export const exercises: Exercise[] = [
     "Improves ankle, hip, and squat mobility.",
     ["Heels down if possible.", "Breathe.", "Push knees out gently.", "Relax."],
     ["Forcing painful depth.", "Rounding hard.", "Holding tension."],
-    ["Goblet Squat Hold", "Supported Squat Hold", "Ankle Rocks"]
+    ["Goblet Squat", "Wall Sit", "Ankle Rocks"]
   ),
   ex(
     "Couch Stretch",
@@ -684,7 +684,7 @@ export const exercises: Exercise[] = [
     "Opens hip flexors and quads for better jumping posture.",
     ["Squeeze back-leg glute.", "Ribs down.", "Breathe slowly.", "Avoid low-back arch."],
     ["Overarching.", "Forcing knee pain.", "Holding breath."],
-    ["Half-Kneeling Hip Flexor Stretch", "Quad Stretch", "Lunge Stretch"]
+    ["Half-Kneeling Hip Flexor Stretch", "Light Stretching", "Hip CARs"]
   ),
   ex(
     "Shoulder CARs",
@@ -694,7 +694,7 @@ export const exercises: Exercise[] = [
     "Improves shoulder control and range.",
     ["Move slowly.", "Ribs down.", "Pain-free range.", "Control every angle."],
     ["Rushing.", "Arching back.", "Forcing pinching pain."],
-    ["Arm Circles", "Wall Slides", "Band Dislocates"]
+    ["Light Shoulder Band Work", "Wall Slides", "Thoracic Rotations"]
   ),
   ex(
     "Hip CARs",
@@ -704,7 +704,7 @@ export const exercises: Exercise[] = [
     "Improves hip control, range, and movement quality.",
     ["Move slow.", "Torso still.", "Pain-free range.", "Control the circle."],
     ["Twisting torso.", "Rushing.", "Forcing pinchy range."],
-    ["90/90 Hip Switches", "Hip Circles", "Lunge Mobility"]
+    ["90/90 Hip Switches", "Half-Kneeling Hip Flexor Stretch", "Deep Squat Holds"]
   ),
   ex(
     "90/90 Hip Switches",
@@ -714,7 +714,7 @@ export const exercises: Exercise[] = [
     "Improves hip rotation for smoother movement and lower-body mechanics.",
     ["Sit tall.", "Rotate slowly.", "Use hands if needed.", "Stay controlled."],
     ["Rushing.", "Forcing knees down.", "Slumping hard."],
-    ["Hip CARs", "Pigeon Stretch", "Lunge Mobility"]
+    ["Hip CARs", "Half-Kneeling Hip Flexor Stretch", "Deep Squat Holds"]
   ),
   ex(
     "Ankle Rocks",
@@ -724,7 +724,7 @@ export const exercises: Exercise[] = [
     "Improves ankle dorsiflexion for squats, landings, and knee tracking.",
     ["Keep heel down.", "Drive knee forward.", "Move slow.", "Use pain-free range."],
     ["Heel lifting.", "Bouncing hard.", "Forcing pain."],
-    ["Knee-to-Wall Drill", "Deep Squat Holds", "Calf Stretch"]
+    ["Wall Toe Raises", "Deep Squat Holds", "Light Stretching"]
   ),
   ex(
     "Thoracic Rotations",
@@ -734,7 +734,7 @@ export const exercises: Exercise[] = [
     "Improves upper-back rotation for hitting mechanics.",
     ["Rotate through upper back.", "Breathe out.", "Move slow.", "Keep hips stable."],
     ["Twisting low back.", "Rushing.", "Holding breath."],
-    ["Open Books", "Thread the Needle", "Quadruped Rotations"]
+    ["Open Books", "Full-Body Mobility Flow", "Shoulder CARs"]
   ),
   ex(
     "Walk 20-30 minutes",
@@ -744,7 +744,7 @@ export const exercises: Exercise[] = [
     "Improves recovery and blood flow without beating up your joints.",
     ["Easy pace.", "Relax shoulders.", "Breathe steadily.", "Keep it easy."],
     ["Turning it into conditioning.", "Skipping it because it feels too easy.", "Bad posture."],
-    ["Easy Bike", "Light Swim", "Incline Walk"]
+    ["Easy Bike", "Light Stretching", "Foam Roll"]
   ),
   ex(
     "Light Stretching",
@@ -754,7 +754,7 @@ export const exercises: Exercise[] = [
     "Helps recovery and keeps joints moving on rest days.",
     ["Stay gentle.", "Breathe slowly.", "Avoid sharp pain.", "Relax into positions."],
     ["Forcing range.", "Stretching aggressively sore muscles.", "Holding breath."],
-    ["Mobility Flow", "Yoga", "Foam Rolling"]
+    ["Full-Body Mobility Flow", "Walk 20-30 minutes", "Foam Roll"]
   ),
   ex(
     "Foam Roll",
@@ -764,7 +764,7 @@ export const exercises: Exercise[] = [
     "Helps reduce tightness and improve recovery before or after training.",
     ["Roll slowly.", "Pause on tight spots.", "Breathe.", "Keep pressure tolerable."],
     ["Rolling too fast.", "Crushing painful spots.", "Expecting it to replace strength work."],
-    ["Lacrosse Ball", "Massage Gun", "Light Mobility Flow"]
+    ["Light Stretching", "Easy Bike", "Full-Body Mobility Flow"]
   ),
 
   // NEW CATALOG ENTRIES (Task 15)
@@ -937,7 +937,7 @@ export const exercises: Exercise[] = [
     "Low-impact cardio that raises blood flow for recovery without adding joint stress on rest or light days.",
     ["Keep the resistance light.", "Hold an easy, conversational pace.", "Relax your shoulders and grip.", "Stop before you feel fatigued, not after."],
     ["Turning it into a hard workout.", "Gripping the bars too tight.", "Skipping it because it feels too easy: that's the point."],
-    ["Walk 20-30 minutes", "Light Swim", "Incline Walk"]
+    ["Walk 20-30 minutes", "Light Stretching", "Foam Roll"]
   ),
   ex(
     "Band Rotations",
@@ -948,6 +948,289 @@ export const exercises: Exercise[] = [
     ["Anchor the band at chest height to your side.", "Rotate through the hips and ribs together.", "Keep arms long, don't just pull with the hands.", "Control the return, don't let the band snap you back."],
     ["Only rotating the arms, not the torso.", "Using too much band tension.", "Rushing the return."],
     ["Med Ball Rotational Throws", "Cable Woodchoppers", "Landmine Rotations"]
+  ),
+  // Added so every substitution hint resolves to a real entry (see
+  // tests/data/workoutPlan.test.ts). Each one is a distinct, commonly picked
+  // swap rather than a renamed duplicate of an existing exercise.
+  ex(
+    "Kettlebell Deadlift",
+    "Jump Development",
+    "Beginner",
+    "🏋️",
+    "Teaches the hip hinge with a light, easy-to-hold load before moving to a trap bar or barbell.",
+    ["Set the bell between your feet.", "Push hips back, shins stay nearly vertical.", "Brace, then stand up by driving the floor away.", "Lower with control, same path down."],
+    ["Squatting the weight instead of hinging.", "Rounding the back to reach the bell.", "Leaning back at the top."],
+    ["Romanian Deadlift", "Glute Bridge", "Hip Thrust"]
+  ),
+  ex(
+    "Single-Leg RDL",
+    "Jump Development",
+    "Intermediate",
+    "🦩",
+    "Builds hamstring strength and single-leg hip control, the same balance a one-foot takeoff and landing need.",
+    ["Soft knee on the standing leg.", "Reach the free leg straight back as the chest lowers.", "Keep hips square to the floor.", "Stand up by squeezing the standing glute."],
+    ["Opening the hip toward the ceiling.", "Rounding the back to reach lower.", "Rushing the balance."],
+    ["Romanian Deadlift", "Single-Leg Balance Reach", "Single-Leg Hip Thrust"]
+  ),
+  ex(
+    "Squat Jumps",
+    "Jump Development",
+    "Beginner",
+    "⬆️",
+    "Trains vertical power from a squat with no equipment, a simple way to add jump volume anywhere.",
+    ["Sit to a quarter-to-half squat.", "Swing the arms and explode up.", "Land soft, hips back, knees over toes.", "Reset fully between reps."],
+    ["Landing stiff-legged.", "Knees caving on the landing.", "Chaining reps so fast they get sloppy."],
+    ["Box Jumps", "Approach Jumps", "Pogo Hops"]
+  ),
+  ex(
+    "Standing Vertical Jumps",
+    "Jump Development",
+    "Beginner",
+    "🏐",
+    "Max-effort jumps with no approach, the same jump used for blocking at the net.",
+    ["Start feet hip-width, arms ready.", "Quick dip, then swing the arms up hard.", "Reach as high as you can at the top.", "Land soft and balanced, then reset."],
+    ["Taking a step before jumping.", "Dipping too deep and too slow.", "Landing on the heels."],
+    ["Squat Jumps", "Box Jumps", "Approach Jumps"]
+  ),
+  ex(
+    "Bounds",
+    "Speed & Agility",
+    "Intermediate",
+    "🦘",
+    "Long, powerful strides that build horizontal power and hip extension for faster first steps and approaches.",
+    ["Drive the knee up and forward.", "Push the ground back hard on each stride.", "Hang in the air, then land under the hips.", "Use the arms in rhythm with the legs."],
+    ["Short, choppy strides.", "Landing far in front of the body.", "Collapsing on each contact."],
+    ["Broad Jumps", "Lateral Bounds", "Sprint Starts"]
+  ),
+  ex(
+    "Skater Jumps",
+    "Speed & Agility",
+    "Beginner",
+    "⛸️",
+    "Side-to-side single-leg jumps that build lateral power and landing control for defensive and blocking footwork.",
+    ["Push off the outside foot.", "Land on the opposite foot, knee soft.", "Stick each landing for a beat at first.", "Keep the chest up and hips back."],
+    ["Knee caving on the landing leg.", "Bouncing straight out without control.", "Landing on a straight leg."],
+    ["Lateral Bounds", "Lateral Lunges", "Line Hops"]
+  ),
+  ex(
+    "Lateral Lunges",
+    "Knee Strength",
+    "Beginner",
+    "↔️",
+    "Builds strength and control moving side to side, including the adductors that protect the knee on lateral cuts.",
+    ["Step wide and sit back into one hip.", "Keep the other leg straight and the foot flat.", "Knee tracks over the toes.", "Push back to the start through the bent leg."],
+    ["Letting the knee drift past the toes or cave in.", "Rounding the back to get lower.", "Stepping too short to load the hip."],
+    ["Reverse Lunges", "Lateral Band Walks", "Split Squat"]
+  ),
+  ex(
+    "Snap Downs",
+    "Landing Mechanics",
+    "Beginner",
+    "⬇️",
+    "Rises onto the toes, then snaps down into an athletic landing position. Teaches fast, stable force absorption with no box.",
+    ["Rise tall on your toes with arms up.", "Snap the arms down and drop into a quarter squat.", "Land flat-footed, hips back, knees soft.", "Freeze the landing for two seconds."],
+    ["Landing on the toes only.", "Knees collapsing in.", "Wobbling instead of sticking it."],
+    ["Drop Squat", "Landing Mechanics Drill", "Box Step-Offs"]
+  ),
+  ex(
+    "Falling Starts",
+    "Speed & Agility",
+    "Beginner",
+    "🏃",
+    "Lean forward until you have to step, then sprint. Teaches a fast first step and a good acceleration angle.",
+    ["Stand tall and lean from the ankles.", "Let yourself fall until you must step.", "Drive the first step hard under the hips.", "Sprint 5-10 m, then walk back."],
+    ["Bending at the waist instead of leaning tall.", "Taking a small, choppy first step.", "Standing up too early."],
+    ["Sprint Starts", "Court Sprints", "Bounds"]
+  ),
+  ex(
+    "Shuttle Runs",
+    "Volleyball Conditioning",
+    "Beginner",
+    "🔁",
+    "Short sprints with change of direction that match the stop-and-go demands of a rally.",
+    ["Sprint to the line and touch it.", "Plant on the outside foot, hips low.", "Push off hard back the other way.", "Rest fully so every rep stays fast."],
+    ["Rounding the turn instead of planting.", "Standing up tall on the change of direction.", "Cutting rest so reps get slow."],
+    ["Court Sprints", "Sprint Starts", "Lateral Bounds"]
+  ),
+  ex(
+    "Wall Sit",
+    "Knee Strength",
+    "Beginner",
+    "🧱",
+    "An isometric quad hold that loads the knee with no impact. Often tolerated well by sore or irritated knees.",
+    ["Back flat on the wall, feet out in front.", "Slide down until knees are near 90 degrees, or higher if it hurts.", "Knees over the ankles, weight in the heels.", "Breathe and hold."],
+    ["Feet too close so the knees go past the toes.", "Pushing hands on the thighs.", "Going deeper than pain allows."],
+    ["Spanish Squat", "Deep Squat Holds", "Poliquin Step-Down"]
+  ),
+  ex(
+    "Copenhagen Plank",
+    "Rotational Core",
+    "Intermediate",
+    "🛡️",
+    "A side plank with the top leg on a bench. Builds the adductors and lateral core, linked to fewer groin strains.",
+    ["Top leg on the bench, inside of the knee or ankle on it.", "Lift the hips into a straight line.", "Keep the bottom leg off the floor if you can.", "Start with the knee on the bench, short holds."],
+    ["Hips sagging toward the floor.", "Rolling the chest forward.", "Starting with the ankle version too soon."],
+    ["Side Planks", "Lateral Lunges", "Clamshells"]
+  ),
+  ex(
+    "Suitcase Carry",
+    "Rotational Core",
+    "Beginner",
+    "🧳",
+    "Carrying weight in one hand trains the core to resist leaning, the same lateral stability that keeps you upright in the air.",
+    ["Hold one heavy weight at your side.", "Stand tall, shoulders level.", "Walk slowly with short, controlled steps.", "Switch hands every set."],
+    ["Leaning toward or away from the weight.", "Shrugging the loaded shoulder.", "Rushing the steps."],
+    ["Farmer Carries", "Side Planks", "Pallof Press"]
+  ),
+  ex(
+    "Stability Ball Rollout",
+    "Rotational Core",
+    "Beginner",
+    "⚪",
+    "An easier version of the ab wheel. Trains the core to resist the lower back arching.",
+    ["Kneel with forearms on the ball.", "Ribs down, glutes tight.", "Roll the ball out only as far as you can keep a flat back.", "Pull back with the core, not the hips."],
+    ["Letting the lower back sag.", "Pushing the hips back to return.", "Rolling out too far too soon."],
+    ["Ab Wheel Rollout", "Planks", "Dead Bugs"]
+  ),
+  ex(
+    "Hanging Knee Raises",
+    "Rotational Core",
+    "Beginner",
+    "🔼",
+    "A lower-abs exercise from a hang. The step before straight-leg raises.",
+    ["Hang with shoulders active, not shrugged.", "Curl the knees toward the chest.", "Tilt the pelvis up at the top.", "Lower slowly without swinging."],
+    ["Swinging to get the knees up.", "Only lifting the knees to hip height.", "Dropping fast out of the top."],
+    ["Hanging Leg Raises", "Dead Bugs", "Hollow Hold"]
+  ),
+  ex(
+    "Bench Dips",
+    "Hitting Power",
+    "Beginner",
+    "🪑",
+    "A triceps and chest exercise using a bench. The easier step before full parallel-bar dips.",
+    ["Hands on the bench edge, fingers forward.", "Keep the hips close to the bench.", "Lower until elbows are near 90 degrees.", "Press back up without shrugging."],
+    ["Going so deep the shoulder hurts.", "Flaring the elbows wide.", "Letting the shoulders roll forward."],
+    ["Push-Ups", "Incline Push-Up", "DB Bench Press"]
+  ),
+  ex(
+    "Chest-Supported Row",
+    "Shoulder Health",
+    "Beginner",
+    "🚣",
+    "A row with the chest on an incline bench, so the back does the work without the lower back holding position.",
+    ["Chest on the pad, feet planted.", "Pull the elbows back toward the hips.", "Squeeze the shoulder blades together at the top.", "Lower slowly to a full stretch."],
+    ["Lifting the chest off the pad.", "Shrugging toward the ears.", "Using momentum."],
+    ["Single-Arm Row", "Cable Row", "Bodyweight Rows"]
+  ),
+  ex(
+    "Floor Press",
+    "Hitting Power",
+    "Beginner",
+    "🏋️",
+    "A dumbbell press lying on the floor. The floor limits the range, which is easier on the shoulders than a full bench press.",
+    ["Lie with knees bent, dumbbells over the chest.", "Lower until the upper arms touch the floor.", "Elbows about 45 degrees from the body.", "Press straight up."],
+    ["Bouncing the elbows off the floor.", "Flaring the elbows to 90 degrees.", "Arching the back off the floor."],
+    ["DB Bench Press", "Push-Ups", "Incline Push-Up"]
+  ),
+  ex(
+    "Med Ball Chest Pass",
+    "Hitting Power",
+    "Beginner",
+    "🏀",
+    "An explosive two-hand throw from the chest. Trains upper-body power without loading a heavy bar.",
+    ["Athletic stance, ball at the chest.", "Step and push the ball out as fast as you can.", "Finish with arms fully extended.", "Throw against a wall or to a partner."],
+    ["Pushing slowly, like a press.", "Using only the arms with no leg drive.", "A ball so heavy the throw gets slow."],
+    ["Push Press", "Push-Ups", "Med Ball Rotational Throws"]
+  ),
+  ex(
+    "Half-Kneeling Landmine Press",
+    "Hitting Power",
+    "Beginner",
+    "🗡️",
+    "A one-arm press on an angle from a half-kneeling stance. Shoulder-friendly overhead work that also trains the core.",
+    ["Down knee under the hip, glute squeezed.", "Hold the bar end at the shoulder.", "Press up and slightly forward.", "Keep ribs down; don't lean back."],
+    ["Arching the lower back to finish the press.", "Letting the hips shift.", "Shrugging at the top."],
+    ["Landmine Press or DB Shoulder Press", "Pike Push-Ups", "Push Press"]
+  ),
+  ex(
+    "Bear Crawl",
+    "Shoulder Health",
+    "Beginner",
+    "🐻",
+    "Crawling on hands and feet with the knees just off the floor. Builds shoulder stability and core control.",
+    ["Hands under shoulders, knees under hips.", "Lift the knees an inch off the floor.", "Move opposite hand and foot together.", "Keep the back flat and hips low."],
+    ["Hips rising into the air.", "Big, sloppy steps.", "Letting the knees touch down."],
+    ["Scap Push-Ups", "Planks", "Pike Push-Ups"]
+  ),
+  ex(
+    "Wall Slides",
+    "Shoulder Health",
+    "Beginner",
+    "🧱",
+    "Sliding the arms up a wall trains the shoulder blades to move well overhead, which hitting and serving need.",
+    ["Back and forearms against the wall.", "Ribs down, lower back flat.", "Slide the arms up while keeping contact.", "Slide down and pull the elbows into the sides."],
+    ["Arching the back to get the arms higher.", "Shrugging as the arms go up.", "Losing wall contact."],
+    ["Y-T-W Raises", "Scap Push-Ups", "Shoulder CARs"]
+  ),
+  ex(
+    "Rear Delt Fly",
+    "Shoulder Health",
+    "Beginner",
+    "🦅",
+    "Strengthens the back of the shoulder and the upper back to balance all the pressing and hitting.",
+    ["Hinge forward with a flat back.", "Light dumbbells, slight bend in the elbows.", "Raise the arms out to the sides.", "Squeeze, then lower slowly."],
+    ["Going too heavy and swinging.", "Shrugging the shoulders.", "Rounding the back."],
+    ["Face Pulls", "Band Pull-Aparts", "Y-T-W Raises"]
+  ),
+  ex(
+    "Monster Walks",
+    "Knee Strength",
+    "Beginner",
+    "👣",
+    "Walking forward and back with a band around the legs. Builds the hip muscles that keep the knees from caving in.",
+    ["Band around the knees or ankles.", "Quarter squat, chest up.", "Step diagonally forward, keeping tension on the band.", "Don't let the feet come together."],
+    ["Standing up tall.", "Feet snapping together.", "Knees caving in."],
+    ["Lateral Band Walks", "Clamshells", "Glute Bridge"]
+  ),
+  ex(
+    "Single-Leg Calf Raise",
+    "Jump Development",
+    "Beginner",
+    "🦶",
+    "Builds calf and Achilles strength one leg at a time, which matters for one-foot takeoffs and landings.",
+    ["Stand on one foot on a step edge.", "Rise as high as you can.", "Pause at the top.", "Lower slowly below the step."],
+    ["Bouncing out of the bottom.", "Rolling onto the outside of the foot.", "Rushing reps."],
+    ["Calf Raises", "Seated Calf Raise", "Soleus Raises"]
+  ),
+  ex(
+    "Wall Toe Raises",
+    "Knee Strength",
+    "Beginner",
+    "🦶",
+    "Lifting the toes with your back against a wall. Builds the shin muscles that help absorb landings, with no equipment.",
+    ["Back against a wall, heels a foot away.", "Lift the toes as high as you can.", "Pause at the top.", "Lower slowly."],
+    ["Bending at the knees or hips.", "Rocking instead of lifting the toes.", "Rushing reps."],
+    ["Tibialis Raises", "Ankle Rocks", "Calf Raises"]
+  ),
+  ex(
+    "Half-Kneeling Hip Flexor Stretch",
+    "Mobility",
+    "Beginner",
+    "🧘",
+    "Stretches the front of the hip, which gets tight from sitting and from repeated jumping.",
+    ["Half-kneel with the back knee under the hip.", "Squeeze the glute on the kneeling side.", "Shift forward slightly without arching.", "Reach the same-side arm up for more stretch."],
+    ["Arching the lower back instead of stretching the hip.", "Lunging too far forward.", "Relaxing the glute."],
+    ["Couch Stretch", "Hip CARs", "90/90 Hip Switches"]
+  ),
+  ex(
+    "Open Books",
+    "Mobility",
+    "Beginner",
+    "📖",
+    "A side-lying upper-back rotation. Improves the thoracic rotation behind a full arm swing.",
+    ["Lie on your side, knees bent and stacked.", "Arms straight out in front, palms together.", "Open the top arm across to the other side.", "Follow the hand with your eyes; keep the knees together."],
+    ["Knees coming apart as you rotate.", "Forcing the arm to the floor.", "Holding your breath."],
+    ["Thoracic Rotations", "Shoulder CARs", "Full-Body Mobility Flow"]
   )
 ];
 
