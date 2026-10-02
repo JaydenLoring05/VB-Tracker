@@ -37,6 +37,25 @@ try {
   await page.getByRole("button", { name: "Athlete view" }).click();
   await page.getByRole("heading", { level: 1, name: "Athlete view" }).waitFor();
   await shot("athlete-view");
+
+  // The Workout Mode and Film room demo tabs need #39 (feat/demo-workout-and-film).
+  await page.getByRole("button", { name: "Workout Mode" }).click();
+  await page.getByPlaceholder("Weight").fill("160");
+  await page.getByPlaceholder("Reps").fill("5");
+  await page.getByRole("button", { name: /Log Set/ }).click();
+  await page.waitForTimeout(3000); // PR badge pops and the rest timer starts
+  await shot("workout-mode");
+
+  await page.getByRole("button", { name: "Film room" }).click();
+  await page.locator('iframe[src*="youtube"]').waitFor();
+  await page.waitForTimeout(2500); // let the embed finish loading
+  await page.getByRole("button", { name: "Pass", exact: true }).first().click();
+  // Scroll the tag panel into view, just below the video.
+  await page.evaluate(() => {
+    const iframe = document.querySelector(".film-viewer-panel iframe");
+    window.scrollBy(0, iframe.getBoundingClientRect().bottom + 12);
+  });
+  await shot("film-room", { clip: { x: 548, y: 64, width: 656, height: 796 } });
 } finally {
   await browser.close();
 }
