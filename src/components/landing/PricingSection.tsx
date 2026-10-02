@@ -39,7 +39,7 @@ export function PricingSection() {
         <p className="landing-section-lead">
           Free for the first 30 days for each of our first 3 founding teams, no credit card
           required. After that (or for any team beyond the first 3), plans start at $29/month.
-          NextRep is a year-round training tool, so there's no seasonal billing pause.
+          NextRep is a year-round training tool, so there&apos;s no seasonal billing pause.
         </p>
 
         <div className="pricing-grid pricing-grid-3">
