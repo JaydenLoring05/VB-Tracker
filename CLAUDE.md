@@ -9,6 +9,15 @@ Rules for autonomous work on VB-Tracker (NextRep).
   `is_team_coach(team_id)` (see `supabase/schema_v20_teams.sql`), database
   changes are numbered `supabase/schema_vNN_*.sql` files.
 
+## Backlog
+
+- `SUGGESTIONS.md` is the single backlog. Don't build a feature that has no
+  row there.
+- Build only rows marked `planned`. New ideas go in as `new`; only Jayden
+  moves a row to `planned`.
+- When a PR for a row opens, mark the row `building`. When it merges, move
+  it to "Shipped" with the PR number.
+
 ## Workflow
 
 - One feature = one branch = one PR to `main`. Never push to or merge into
