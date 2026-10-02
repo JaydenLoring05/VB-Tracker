@@ -45,6 +45,7 @@ Rules for automated runs:
 | F-09 | Morning email at each coach's local time | new | your idea | M |
 | F-10 | Notion settings screen (status and "Sync now") | new | your idea | S |
 | F-11 | Beach-specific starting program | new | your idea | M |
+| F-12 | AI film: find plays and make clips from game video automatically | new | me | L |
 | R-01 | Database sets `latest_stats.updated_at` itself (needs SQL) | new | your idea | S |
 | R-02 | Coaches can read a guardian's email, not just the flag (needs SQL) | new | your idea | S |
 | R-03 | Automated tests for row-level security | new | your idea | M |
@@ -103,6 +104,14 @@ Rules for automated runs:
   the player, so tags can't be read off the video's own clock. Find out what
   Hudl allows before sizing this: if it can't be embedded, the honest
   version is typed timestamps next to the external link.
+- **F-12. AI film.** Jayden plans AI film analysis. Competitors already
+  sell it: Balltime (Hudl) charges athletes $20/month for automatic downtime
+  removal, play filters, highlight reels, serve and attack speed, and jump
+  detection. A first version could find rallies and cut downtime from a
+  YouTube link, then suggest tags for a coach to confirm in the F-02 flow.
+  It also sets the price of the solo plan (F-06): launch Athlete Pro at
+  $7.99/month or $59/year, and raise new signups to about $14.99/month or
+  $99/year once AI film ships. Split into smaller rows before building.
 
 ### Coach experience
 
@@ -147,9 +156,13 @@ Rules for automated runs:
   describes what an athlete without a team gets. Decide in the pricing work
   first: free, a cheap solo plan, or nothing yet. Check what a team-less
   account can do today before deciding. For athletes under 18 the guardian
-  step from #49 already exists; who pays is the open question. Earlier
-  decision on record: an individual tier was parked as a future free tier,
-  not a paid track.
+  step from #49 already exists; who pays is the open question.
+  Decision (Jayden, 2026-10-02): solo accounts stay free, and a paid
+  "Athlete Pro" plan is added at $7.99/month or $59/year. Pro adds full
+  history and graphs, a self-built program, "My clips" for the athlete's own
+  film, and stats export. Athletes on a paying team get Pro free, and Pro
+  shows an "Invite your coach" button. Jayden revisits this the week of
+  2026-10-05 before marking it planned. See F-12 for the price step-up.
 - **F-08. The skill radar only keeps the latest ratings.** #40 stores one
   `performance_profiles.skill_ratings` value per athlete (schema v48), so
   each new self-rating overwrites the last. Keeping dated ratings (a small
