@@ -224,7 +224,14 @@ ${rows
   return { subject, html, text };
 }
 
-export type SummaryMessage = { to: string; subject: string; html: string; text: string };
+export type SummaryMessage = {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  /** Extra email headers, e.g. List-Unsubscribe on reminders. */
+  headers?: Record<string, string>;
+};
 
 /** Sends one email through Resend. Resolves false on any failure; never throws. */
 export async function sendSummaryEmail(
@@ -241,7 +248,8 @@ export async function sendSummaryEmail(
         to: [message.to],
         subject: message.subject,
         html: message.html,
-        text: message.text
+        text: message.text,
+        ...(message.headers ? { headers: message.headers } : {})
       })
     });
     return response.ok;

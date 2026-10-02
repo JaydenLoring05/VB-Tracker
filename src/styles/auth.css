@@ -229,4 +229,14 @@
   display: block;
   margin-top: var(--sp-3);
   text-align: center;
+
+/* /unsubscribe (check-in reminder emails) */
+.unsubscribe-card h1 {
+  margin: var(--sp-2) 0;
+}
+
+.unsubscribe-primary {
+  width: 100%;
+  min-height: 52px;
+  margin-top: var(--sp-4);
 }
