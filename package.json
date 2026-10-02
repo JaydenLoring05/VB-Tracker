@@ -1,6 +1,6 @@
 {
-  "name": "volleyball-tracker-v15-nextjs",
-  "version": "15.0.0",
+  "name": "nextrep",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
