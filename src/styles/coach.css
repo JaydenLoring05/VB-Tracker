@@ -615,3 +615,165 @@ html:has(dialog[open]) {
     grid-column: 2 / -1;
   }
 }
+
+/* Coach-built programs (CustomProgramPanel). */
+.custom-program-panel h4 {
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+
+.custom-program-new,
+.custom-program-new-group,
+.custom-program-row-controls {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.custom-program-new button,
+.custom-program-row-controls button {
+  width: auto;
+}
+
+.custom-program-list,
+.custom-program-athletes,
+.custom-program-exercises {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-3) 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.custom-program-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+}
+
+.custom-program-list p {
+  margin: 4px 0 0;
+}
+
+.custom-program-assign-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.custom-program-assign-row select {
+  max-width: 260px;
+}
+
+.custom-program-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+.custom-program-group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.custom-program-group-header select {
+  flex: 1;
+  min-width: 160px;
+}
+
+.custom-program-group-header button {
+  width: auto;
+}
+
+.custom-program-group-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  margin-top: var(--sp-2);
+}
+
+.custom-program-group-members label,
+.custom-program-rest-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.custom-program-name {
+  display: grid;
+  gap: 4px;
+  margin-bottom: var(--sp-2);
+}
+
+.custom-program-day {
+  margin-top: var(--sp-3);
+}
+
+.custom-program-day.is-rest {
+  opacity: 0.75;
+}
+
+.custom-program-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.custom-program-day-header h4 {
+  margin: 0;
+}
+
+.custom-program-day-fields {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0;
+}
+
+.custom-program-day textarea {
+  width: 100%;
+}
+
+.custom-program-exercise {
+  display: grid;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: var(--sp-2);
+}
+
+.custom-program-target {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.custom-program-target input {
+  width: 72px;
+}
+
+.custom-program-measure {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.custom-program-measure button {
+  width: auto;
+  padding: 4px 10px;
+  min-height: 32px;
+}
+
+@media (max-width: 520px) {
+  .custom-program-day-fields {
+    grid-template-columns: 1fr;
+  }
+}
