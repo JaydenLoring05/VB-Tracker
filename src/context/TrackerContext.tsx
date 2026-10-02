@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import { parseProgramDays, pickAssignedProgramId } from "@/lib/customProgram";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
 import { createClient } from "@/lib/supabase/client";
 import { todayISO } from "@/lib/storage";
@@ -412,14 +413,51 @@ export function TrackerProvider({
 
       const teamId = teamMemberRes.data?.team_id ?? null;
       if (teamId) {
-        const [teamRes, defaultsRes, overridesRes] = await Promise.all([
+        const [teamRes, defaultsRes, overridesRes, assignmentsRes, groupsRes] = await Promise.all([
           supabase.from("teams").select("plan_tier").eq("id", teamId).maybeSingle(),
           supabase
             .from("team_exercise_defaults")
             .select("original_exercise, chosen_exercise")
             .eq("team_id", teamId),
-          supabase.from("team_day_overrides").select("phase, day, exercises").eq("team_id", teamId)
+          supabase.from("team_day_overrides").select("phase, day, exercises").eq("team_id", teamId),
+          supabase
+            .from("team_program_assignments")
+            .select("program_id, scope, group_id, user_id, updated_at")
+            .eq("team_id", teamId),
+          supabase.from("team_group_members").select("group_id").eq("user_id", userId)
         ]);
+
+        // Coach-built program (schema_v43). Any error here (including the
+        // tables not existing yet) just means the athlete stays on the
+        // recommended plan.
+        let customProgram: TeamOverrideData["customProgram"] = null;
+        if (!assignmentsRes.error && !groupsRes.error) {
+          const programId = pickAssignedProgramId(
+            (assignmentsRes.data ?? []).map((row) => ({
+              programId: row.program_id,
+              scope: row.scope,
+              groupId: row.group_id,
+              userId: row.user_id,
+              updatedAt: row.updated_at
+            })),
+            userId,
+            (groupsRes.data ?? []).map((row) => row.group_id)
+          );
+          if (programId) {
+            const programRes = await supabase
+              .from("team_programs")
+              .select("id, name, days")
+              .eq("id", programId)
+              .maybeSingle();
+            if (!programRes.error && programRes.data) {
+              customProgram = {
+                id: programRes.data.id,
+                name: programRes.data.name,
+                days: parseProgramDays(programRes.data.days)
+              };
+            }
+          }
+        }
 
         if (!cancelled) {
           const exerciseDefaults: Record<string, string> = {};
@@ -435,7 +473,8 @@ export function TrackerProvider({
           setTeamOverride({
             planTier: (teamRes.data?.plan_tier as "pilot" | "paid") ?? "pilot",
             exerciseDefaults,
-            dayOverrides
+            dayOverrides,
+            customProgram
           });
         }
       } else if (!cancelled) {
