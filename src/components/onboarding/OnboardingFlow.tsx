@@ -4,6 +4,9 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
+import { GuardianFields } from "@/components/guardian/GuardianFields";
+import { validateGuardianAnswer, type GuardianAnswer } from "@/lib/guardian";
+import { createClient as createGuardianClient } from "@/lib/supabase/client";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
 import { useTeam } from "@/hooks/useTeam";
@@ -52,6 +55,8 @@ export function OnboardingFlow() {
   const [seasonEnd, setSeasonEnd] = useState("");
   const [athletesExpected, setAthletesExpected] = useState("");
   const [trainingDays, setTrainingDays] = useState("");
+  const [guardian, setGuardian] = useState<GuardianAnswer>({ isAdult: null, name: "", email: "", acknowledged: false });
+  const [guardianError, setGuardianError] = useState<string | null>(null);
 
   const [position, setPosition] = useState(POSITIONS[0]);
   const [goals, setGoals] = useState<string[]>(POSITION_DEFAULT_GOALS[POSITIONS[0]] ?? []);
@@ -132,6 +137,14 @@ export function OnboardingFlow() {
   async function handleRoleDetailsSubmit(event: FormEvent) {
     event.preventDefault();
     if (saving) return;
+
+    // Athletes answer the age question; under 18 needs guardian details.
+    const guardianResult = role === "athlete" ? validateGuardianAnswer(guardian) : null;
+    if (guardianResult && !guardianResult.ok) {
+      setGuardianError(guardianResult.error);
+      return;
+    }
+    setGuardianError(null);
     setSaving(true);
 
     if (role === "coach") {
@@ -147,6 +160,17 @@ export function OnboardingFlow() {
       // Saved separately so a missing column (before schema_v45) can't block
       // the position and goals above. A coach program still replaces it.
       await setStartingProgram(startingProgramKeyForPosition(position));
+      if (guardianResult?.ok) {
+        // Separate write: before schema_v52 these columns don't exist, and
+        // that mustn't block onboarding. The athlete is asked again on Today.
+        const { data } = await createGuardianClient().auth.getUser();
+        if (data.user) {
+          const { error } = await createGuardianClient()
+            .from("profiles")
+            .upsert({ user_id: data.user.id, ...guardianResult.fields }, { onConflict: "user_id" });
+          if (error) console.error("Failed to save guardian info", error);
+        }
+      }
     }
 
     setSaving(false);
@@ -278,6 +302,13 @@ export function OnboardingFlow() {
               </label>
             ))}
           </fieldset>
+
+          <GuardianFields value={guardian} onChange={setGuardian} idPrefix="onboarding-guardian" />
+          {guardianError && (
+            <p className="guardian-error" role="alert">
+              {guardianError}
+            </p>
+          )}
 
           <button type="submit" disabled={saving}>
             {saving ? "Saving..." : "Continue"}

@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 
 import { useAccountData } from "@/hooks/useAccountData";
 import { DELETE_CONFIRMATION_PHRASE, isDeleteConfirmed } from "@/lib/accountData";
+import { GuardianPrompt } from "@/components/guardian/GuardianPrompt";
 
 import { ReminderPreference } from "./ReminderPreference";
 
@@ -24,6 +25,7 @@ export function AccountSettings() {
       <h1>Settings</h1>
 
       <ReminderPreference />
+      <GuardianPrompt always />
 
       <section className="panel">
         <h2>Download your data</h2>

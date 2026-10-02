@@ -169,4 +169,6 @@ export type RosterAthlete = {
   lastCheckIn: string | null;
   needsCheckIn: boolean;
   lastActiveAt: string | null;
+  /** Hasn't answered the 18+ question, or is under 18 without guardian info (schema_v52). */
+  guardianInfoMissing?: boolean;
 };

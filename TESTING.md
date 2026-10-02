@@ -54,6 +54,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Daily coach summary | `tests/lib/dailySummary.test.ts` | Config gating, cron auth, time zone date, numbers match the Attention Center, pain alerts, today's workout, HTML escaping, Resend call |
 | `GET /api/daily-summary` | `tests/api/dailySummaryRoute.test.ts` | Off without env vars, rejects a missing or wrong cron secret, sends one email per opted-in coach, data and send failures |
 | Position starting programs | `tests/data/positionPrograms.test.ts`, `tests/lib/positionProgram.test.ts` | Templates pass the builder's validation, use library exercises with the right measure; position mapping; coach program and plan edits win over the template |
+| Guardian step | `tests/lib/guardian.test.ts` | Answer required, adults need nothing else, under 18 needs name, valid email and confirmation, saved fields, roster "missing" status |
 | Feedback | `tests/lib/feedback.test.ts` | Message validation and control characters, same-site page only, short device label, app version, escaped notification email |
 | `POST /api/feedback` | `tests/api/feedbackRoute.test.ts` | Signed in only, same-origin, empty rejected, role and team from the database (not the browser), emails only when Resend is set, save failure sends nothing |
 | Check-in reminders | `tests/lib/checkInReminders.test.ts` | Email content (first name, escaped team, check-in link, unsubscribe link and one-click headers, no health data), token validation, hour and time-zone options, headers passed to Resend |
