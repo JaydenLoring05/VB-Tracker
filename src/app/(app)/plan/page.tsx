@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
+import { CustomProgramPanel } from "@/components/coach/CustomProgramPanel";
 import { ProgramEditor } from "@/components/coach/ProgramEditor";
 import { TeamCalendarPanel } from "@/components/coach/TeamCalendarPanel";
 import { InlineError } from "@/components/shared/InlineError";
@@ -60,6 +61,7 @@ export default function PlanPage() {
         </div>
       </div>
 
+      <CustomProgramPanel team={activeTeam} />
       <ProgramEditor team={activeTeam} />
       <TeamCalendarPanel team={activeTeam} />
     </div>
