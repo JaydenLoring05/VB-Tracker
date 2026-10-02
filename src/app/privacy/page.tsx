@@ -21,7 +21,7 @@ export default function PrivacyPage() {
 
       <main id="main-content" tabIndex={-1} className="legal-content">
         <h1>Privacy Policy</h1>
-        <p className="muted">Last updated October 1, 2026.</p>
+        <p className="muted">Last updated October 2, 2026.</p>
 
         <p>
           NextRep is a training and recovery tracker for volleyball teams. This page explains
@@ -109,7 +109,10 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Service providers.</strong> NextRep runs on Supabase (database and sign-in) and
-            Vercel (hosting). They process data on our behalf to keep the service running.
+            Vercel (hosting). They process data on our behalf to keep the service running. If we
+            turn them on, we also use Sentry to see app crashes and errors (error details only, with
+            check-in and health values removed before they&apos;re sent) and Vercel Analytics to count
+            page views (cookieless, without query strings, invite codes or record IDs).
           </li>
           <li>We don&apos;t sell your data or share it with anyone else.</li>
         </ul>
@@ -165,10 +168,33 @@ export default function PrivacyPage() {
 
         <h2>Athletes under 18</h2>
         <p>
-          If you&apos;re a minor using NextRep as part of a team, a parent or guardian should be
-          aware that you&apos;re logging training and recovery data, including soreness and pain
-          check-ins, that your coach can view. Coaches who invite athletes under 18 are
-          responsible for having any permission their school or club requires.
+          When an athlete sets up NextRep, we ask whether they are 18 or older. We don&apos;t ask
+          for a date of birth. If they are under 18, we ask for a parent or guardian&apos;s name
+          and email, and for the athlete to confirm that their parent or guardian knows they are
+          using NextRep and that their coach can see their check-ins, including soreness and pain.
+        </p>
+        <ul>
+          <li>
+            We store that answer, the parent or guardian&apos;s name and email, and when it was
+            confirmed, on the athlete&apos;s profile.
+          </li>
+          <li>
+            The athlete&apos;s coach can see whether this information has been given, and can see the
+            parent or guardian&apos;s name and email so they can reach them. Nobody else can.
+          </li>
+          <li>
+            We don&apos;t email or contact the parent or guardian, and we don&apos;t use their details for
+            anything else. A parent or guardian can ask us to see, correct, or delete the
+            athlete&apos;s data at the contact address below.
+          </li>
+          <li>
+            Athletes who joined before we asked will be asked the next time they open the app.
+            Until they answer, their coach sees &quot;Guardian info missing&quot; next to their name.
+          </li>
+        </ul>
+        <p>
+          Coaches who invite athletes under 18 are still responsible for having any permission
+          their school or club requires.
         </p>
 
         <h2>Changes</h2>

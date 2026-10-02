@@ -23,6 +23,7 @@ Each was finished in its own PR.
 | Public demo team/dashboard | Already shipped as `/demo`; verified, no change needed (below) |
 | Real visual identity (volleyball only) | Decided to keep the current logo (the gold pulse mark and app icons); the monogram in #37 was closed without merging |
 | Demo versions of Workout Mode and the film room | #39 (`feat/demo-workout-and-film`) |
+| Skills radar chart from self-ratings | #40 (`skill-radar`, schema v48) |
 
 The public demo was checked end to end on a production build, and it covers
 what the suggestion asked for:
@@ -138,12 +139,12 @@ and `robots.ts`.
   - chart spike height and set peak height across the season;
   - let a new best feed the PR board and the Attention Center's "new PR"
     item.
-- **Skills radar chart from self-ratings.** Athletes can't rate their own
-  skills (serve, pass, set, attack, block, defense). A short monthly 1–5
-  self-rating, stored per athlete, would drive a Recharts `RadarChart`
-  (Recharts is already a dependency) on the athlete's stats page.
-  Overlaying the previous month shows growth, and the coach could see the
-  same chart on the athlete overview.
+- **The skill radar only keeps the latest ratings.** #40 stores one
+  `performance_profiles.skill_ratings` value per athlete (schema v48), so
+  each new self-rating overwrites the last. Keeping dated ratings (a small
+  history table, or one row per month) would let the radar overlay last
+  month on this month to show growth, and the coach could see the same
+  chart on the athlete overview.
 - **Only the athlete can set their program start date.**
   `profiles.program_start_date` (schema v44) is set on an athlete's first
   workout or from the week selector. A coach starting a new block for the

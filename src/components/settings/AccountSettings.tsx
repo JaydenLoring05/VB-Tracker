@@ -5,6 +5,9 @@ import { FormEvent, useState } from "react";
 
 import { useAccountData } from "@/hooks/useAccountData";
 import { DELETE_CONFIRMATION_PHRASE, isDeleteConfirmed } from "@/lib/accountData";
+import { GuardianPrompt } from "@/components/guardian/GuardianPrompt";
+
+import { ReminderPreference } from "./ReminderPreference";
 
 export function AccountSettings() {
   const { ownedTeams, exporting, deleting, error, exportData, deleteAccount } = useAccountData();
@@ -20,6 +23,9 @@ export function AccountSettings() {
   return (
     <div className="settings-page">
       <h1>Settings</h1>
+
+      <ReminderPreference />
+      <GuardianPrompt always />
 
       <section className="panel">
         <h2>Download your data</h2>
@@ -75,6 +81,14 @@ export function AccountSettings() {
             {error}
           </p>
         )}
+      </section>
+
+      <section className="panel">
+        <h2>Feedback</h2>
+        <p className="muted">Something broken, confusing, or missing? Tell us from inside the app.</p>
+        <Link href="/feedback?from=%2Fsettings" className="button-link">
+          Send feedback
+        </Link>
       </section>
 
       <p className="muted">

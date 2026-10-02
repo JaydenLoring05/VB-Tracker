@@ -8,6 +8,7 @@ import {
   type SyncCheckIn,
   type SyncSession
 } from "@/lib/notionSync";
+import { latestEntryPerDay } from "@/lib/statsHistory";
 import { createClient } from "@/lib/supabase/server";
 
 // Optional personal sync into one Notion Training Log. Off unless all three
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
       .order("ended_at", { ascending: true }),
     supabase
       .from("stats_history")
-      .select("id, created_at, vertical, approach, sleep, knee_pain")
+      .select("id, date, created_at, vertical, approach, sleep, knee_pain")
       .eq("user_id", user.id)
       .gte("created_at", sinceISO)
       .order("created_at", { ascending: true })
@@ -77,7 +78,8 @@ export async function POST(request: NextRequest) {
     const result = await syncTrainingLog({
       config,
       sessions: (sessionsResult.data ?? []) as SyncSession[],
-      checkIns: (checkInsResult.data ?? []) as SyncCheckIn[],
+      // One check-in per day (the latest save), so a re-save doesn't add a second Notion row.
+      checkIns: latestEntryPerDay((checkInsResult.data ?? []) as (SyncCheckIn & { date: string | null })[]),
       since
     });
     return json({ ok: true, ...result });

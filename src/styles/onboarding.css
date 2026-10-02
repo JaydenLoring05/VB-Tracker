@@ -47,3 +47,64 @@
   gap: 8px;
   color: var(--text) !important;
 }
+
+/* Parent or guardian step (athletes under 18) */
+.guardian-fields {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.guardian-fields legend {
+  font-weight: 600;
+  margin-bottom: var(--sp-2);
+}
+
+.guardian-choice {
+  display: flex;
+  gap: var(--sp-4);
+}
+
+.guardian-choice label,
+.guardian-ack {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+}
+
+.guardian-ack {
+  align-items: flex-start;
+  line-height: 1.45;
+}
+
+.guardian-ack input {
+  margin-top: 4px;
+  flex: 0 0 auto;
+}
+
+.guardian-details {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.guardian-details p {
+  margin: 0;
+}
+
+.guardian-prompt {
+  display: grid;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.guardian-prompt h2 {
+  margin: 0;
+}
+
+.guardian-error {
+  margin: 0;
+  color: var(--red);
+}

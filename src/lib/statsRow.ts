@@ -37,3 +37,18 @@ export function fromStatsRow(row: StatsRow): StatEntry {
     motivation: row.motivation ?? ""
   };
 }
+
+/**
+ * The latest_stats upsert for a save. latest_stats.updated_at has only a
+ * column default (set on insert), and nothing refreshed it on update, so it
+ * stayed at the athlete's first check-in forever. The coach roster reads it
+ * as "last check-in", so every athlete looked overdue after three days.
+ * Stamping it on each save fixes that.
+ */
+export function latestStatsUpsert<T extends object>(
+  userId: string,
+  row: T,
+  now: Date = new Date()
+): T & { user_id: string; updated_at: string } {
+  return { user_id: userId, ...row, updated_at: now.toISOString() };
+}
