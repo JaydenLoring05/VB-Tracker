@@ -229,6 +229,7 @@
   display: block;
   margin-top: var(--sp-3);
   text-align: center;
+}
 
 /* /unsubscribe (check-in reminder emails) */
 .unsubscribe-card h1 {
