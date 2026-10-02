@@ -34,6 +34,8 @@ Tests live under `tests/`, mirroring `src/`.
 | Readiness scoring | `tests/lib/recovery.test.ts` | Score weights, status thresholds, severe-pain guardrail, recommendations |
 | Program resolution | `tests/lib/programResolution.test.ts` | Phase boundaries, pilot vs paid overrides, substitutions |
 | Auth, DB error and date helpers | `tests/lib/smallHelpers.test.ts` | Dead-session detection, user-facing errors, `todayISO`, `formatLastActive` |
+| Daily coach summary | `tests/lib/dailySummary.test.ts` | Config gating, cron auth, time zone date, numbers match the Attention Center, pain alerts, today's workout, HTML escaping, Resend call |
+| `GET /api/daily-summary` | `tests/api/dailySummaryRoute.test.ts` | Off without env vars, rejects a missing or wrong cron secret, sends one email per opted-in coach, data and send failures |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |

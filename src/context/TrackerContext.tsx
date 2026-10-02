@@ -7,7 +7,11 @@ import { requestNotionSync } from "@/lib/notionSyncTrigger";
 import { createClient } from "@/lib/supabase/client";
 import { todayISO } from "@/lib/storage";
 import { TeamOverrideData } from "@/lib/programResolution";
+import { fromStatsRow, type StatsRow } from "@/lib/statsRow";
 import { CalendarEvent, StatEntry } from "@/types";
+
+// Moved to src/lib/statsRow.ts so server code can use them; re-exported for existing imports.
+export { fromStatsRow, type StatsRow };
 
 export const emptyStats: StatEntry = {
   date: "",
@@ -39,23 +43,6 @@ export type WorkoutLogs = Record<string, string>;
 export type WorkoutNotes = Record<string, string>;
 export type ExerciseSubstitutions = Record<string, string>;
 
-export type StatsRow = {
-  date: string | null;
-  vertical: number | null;
-  approach: number | null;
-  weight: number | null;
-  pullups: number | null;
-  sleep: number | null;
-  knee_pain: number | null;
-  shoulder_pain: number | null;
-  soreness: number | null;
-  energy: number | null;
-  stress: number | null;
-  lower_back_pain: number | null;
-  ankle_pain: number | null;
-  motivation: number | null;
-};
-
 function numOrNull(value: number | "") {
   return value === "" ? null : value;
 }
@@ -76,25 +63,6 @@ function toStatsRow(entry: StatEntry): StatsRow {
     lower_back_pain: numOrNull(entry.lowerBackPain),
     ankle_pain: numOrNull(entry.anklePain),
     motivation: numOrNull(entry.motivation)
-  };
-}
-
-export function fromStatsRow(row: StatsRow): StatEntry {
-  return {
-    date: row.date ?? "",
-    vertical: row.vertical ?? "",
-    approach: row.approach ?? "",
-    weight: row.weight ?? "",
-    pullups: row.pullups ?? "",
-    sleep: row.sleep ?? "",
-    kneePain: row.knee_pain ?? "",
-    shoulderPain: row.shoulder_pain ?? "",
-    soreness: row.soreness ?? "",
-    energy: row.energy ?? "",
-    stress: row.stress ?? "",
-    lowerBackPain: row.lower_back_pain ?? "",
-    anklePain: row.ankle_pain ?? "",
-    motivation: row.motivation ?? ""
   };
 }
 
