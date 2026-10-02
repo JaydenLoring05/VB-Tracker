@@ -6,23 +6,22 @@ codebase, not generic advice.
 
 ## Closed in the October 2026 pass
 
-Each was finished on its own branch. PR numbers get filled in once the
-branches are pushed (see TASKS.md).
+Each was finished in its own PR.
 
 | Suggestion | Closed by |
 | --- | --- |
-| Workout-timer active-time flush lost on tab close or hard reload | `fix/workout-timer-keepalive` |
-| Training load ignores `team_calendar_events` | `feat/training-load-team-events` |
-| `useCoachRoster` has no pagination | `feat/coach-roster-limit` |
-| Substitution hints that don't resolve to a catalog entry | `fix/substitution-references` |
-| Attention Center "missed workouts" is a proxy | `feat/missed-assigned-days` (schema v44) |
-| Position-based starting program templates (indoor) | `feat/position-starting-programs` (schema v45) |
-| Self-serve data export and account deletion | `feat/data-export-account-deletion` (schema v46) |
-| Google sign-in | `feat/google-sign-in` |
-| Daily coach summary email | `feat/daily-coach-summary-email` (schema v47) |
-| Homepage product-demo section | `feat/landing-product-screenshots` |
+| Workout-timer active-time flush lost on tab close or hard reload | #27 (`fix/workout-timer-keepalive`) |
+| Training load ignores `team_calendar_events` | #28 (`feat/training-load-team-events`) |
+| `useCoachRoster` has no pagination | #29 (`feat/coach-roster-limit`) |
+| Substitution hints that don't resolve to a catalog entry | #30 (`fix/substitution-references`) |
+| Attention Center "missed workouts" is a proxy | #31 (`feat/missed-assigned-days`) (schema v44) |
+| Position-based starting program templates (indoor) | #32 (`feat/position-starting-programs`) (schema v45) |
+| Self-serve data export and account deletion | #33 (`feat/data-export-account-deletion`) (schema v46) |
+| Google sign-in | #34 (`feat/google-sign-in`) |
+| Daily coach summary email | #35 (`feat/daily-coach-summary-email`) (schema v47) |
+| Homepage product-demo section | #36 (`feat/landing-product-screenshots`) |
 | Public demo team/dashboard | Already shipped as `/demo`; verified, no change needed (below) |
-| Real visual identity (volleyball only) | `feat/brand-monogram` (pick option A, B or C in that PR) |
+| Real visual identity (volleyball only) | #37 (`feat/brand-monogram`) (pick option A, B or C in that PR) |
 
 The public demo was checked end to end on a production build, and it covers
 what the suggestion asked for:
