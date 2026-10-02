@@ -210,3 +210,23 @@
   margin-top: var(--sp-2);
   font-size: 13px;
 }
+
+/* /join/<code> */
+.join-card h1 {
+  margin: var(--sp-2) 0;
+}
+
+.join-primary {
+  width: 100%;
+  min-height: 52px;
+  margin-top: var(--sp-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.join-secondary {
+  display: block;
+  margin-top: var(--sp-3);
+  text-align: center;
+}
