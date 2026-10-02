@@ -54,6 +54,8 @@ https://vercel.com/loringjayden-coders-projects/volleyball-tracker
 
 Run the unit tests with `npm test`; see [TESTING.md](TESTING.md) for what is covered.
 
+For how the app is put together (data model, row-level security, program resolution and the main tradeoffs), see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ## Purpose
 
 This project was built to help track volleyball performance, jump training, recovery, and consistency while also serving as a full-stack-ready portfolio project.
