@@ -1,4 +1,5 @@
 import { Activity, ArrowRight, Bone, Calendar, Check, HeartPulse, Link2, Trophy, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { CONTACT_EMAIL } from "@/lib/contact";
@@ -111,6 +112,29 @@ const FOUNDER_CREDENTIALS = [
   "Top-5 National Statistical Leader, Men's High School Volleyball (2023)"
 ];
 
+// Real screenshots of /demo (sample team only), regenerated with
+// scripts/capture-readme-screenshots.mjs.
+const PRODUCT_SHOTS = [
+  {
+    src: "/screenshots/coach-dashboard.jpg",
+    title: "Coach dashboard.",
+    caption: "Readiness, check-ins and a ranked Attention Center: pain streaks, readiness drops, missed workouts, new PRs.",
+    alt: "NextRep coach dashboard with the Attention Center ranking athletes who need a look today"
+  },
+  {
+    src: "/screenshots/athlete-drilldown.jpg",
+    title: "Athlete trends.",
+    caption: "Tap any athlete for their readiness history, check-ins, PRs and adherence.",
+    alt: "One athlete's readiness chart over two weeks above a table of daily check-ins"
+  },
+  {
+    src: "/screenshots/athlete-view.jpg",
+    title: "Athlete home.",
+    caption: "Today's workout, recovery score, weekly progress and recent PRs on one screen.",
+    alt: "Athlete home screen with today's workout button, recovery score, weekly progress and a recent PR"
+  }
+];
+
 export default function LandingPage() {
   return (
     <div className="landing-page">
@@ -188,6 +212,37 @@ export default function LandingPage() {
                 </a>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section id="real-product" className="landing-section">
+        <div className="landing-section-inner">
+          <h2 className="landing-section-title">The real app, not a mockup</h2>
+          <p className="landing-section-lead">
+            These are screenshots of NextRep running on our sample team. Open the demo to click around the same
+            screens yourself, no sign-up needed.
+          </p>
+
+          <div className="landing-shots">
+            {PRODUCT_SHOTS.map((shot, index) => (
+              <figure key={shot.src} className={index === 0 ? "landing-shot landing-shot-main" : "landing-shot"}>
+                <Image
+                  src={shot.src}
+                  alt={shot.alt}
+                  width={1280}
+                  height={860}
+                  sizes={index === 0 ? "(min-width: 1160px) 1160px, 100vw" : "(min-width: 900px) 580px, 100vw"}
+                />
+                <figcaption>
+                  <strong>{shot.title}</strong> {shot.caption}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+
+          <Link href="/demo" className="btn secondary landing-shots-cta">
+            Open the interactive demo <ArrowRight size={16} aria-hidden="true" />
+          </Link>
         </div>
       </section>
 
