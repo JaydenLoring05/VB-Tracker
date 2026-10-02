@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 
+import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { StatEntry } from "@/types";
 
@@ -22,6 +24,7 @@ const fields: [keyof StatEntry, string, number?][] = [
 
 export function StatsForm() {
   const { stats, setStats, saveStats, clearStats } = useRecoveryStats();
+  const [confirmingClear, setConfirmingClear] = useState(false);
 
   return (
     <div className="panel">
@@ -58,10 +61,24 @@ export function StatsForm() {
 
       <div className="button-row">
         <button onClick={saveStats}>Save Stats Entry</button>
-        <button className="ghost" onClick={clearStats}>
+        <button className="ghost" onClick={() => setConfirmingClear(true)}>
           Clear History
         </button>
       </div>
+
+      {confirmingClear && (
+        <ConfirmModal
+          title="Clear all stats history?"
+          message="This permanently deletes every check-in and test result you've saved, and your coach loses your readiness history too. It can't be undone."
+          confirmLabel="Clear history"
+          danger
+          onConfirm={() => {
+            setConfirmingClear(false);
+            clearStats();
+          }}
+          onCancel={() => setConfirmingClear(false)}
+        />
+      )}
     </div>
   );
 }

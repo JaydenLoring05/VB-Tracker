@@ -258,3 +258,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+.pr-form-error {
+  margin: var(--sp-2) 0 0;
+  color: var(--red);
+  font-size: var(--fs-sm);
+}
