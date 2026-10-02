@@ -96,6 +96,7 @@ stays off until its variables are set.
 | `NOTION_TOKEN` | Notion integration token for the personal Training Log sync (`/api/notion-sync`). Server-only. |
 | `NOTION_TRAINING_LOG_DATA_SOURCE_ID` | The Notion data source that finished workouts and check-ins are written to. |
 | `NOTION_SYNC_USER_ID` | The one Supabase user ID whose data is synced. The sync is a no-op for every other user. |
+| `NEXT_PUBLIC_PAYMENT_LINK` | Optional `https://` payment link (for example a Stripe Payment Link for $29/month). From day 25 of a team's pilot, the coach's banner shows a "Continue for $29/month" button that opens it. Without it, the banner shows with no button. See [docs/BILLING.md](docs/BILLING.md) for moving a team to paid. |
 
 The Notion sync only runs when all three `NOTION_*` variables are set.
 

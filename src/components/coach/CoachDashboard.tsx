@@ -23,6 +23,7 @@ import { StatusLabel } from "@/components/shared/StatusLabel";
 import { AttentionCenter } from "./AttentionCenter";
 import { CustomProgramPanel } from "./CustomProgramPanel";
 import { DailySummaryToggle } from "./DailySummaryToggle";
+import { PilotNotices } from "./PilotNotices";
 import { ProgramEditor } from "./ProgramEditor";
 import { RosterNameEditor } from "./RosterNameEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
@@ -142,6 +143,8 @@ export function CoachDashboard({
   return (
     <div className="coach-dashboard">
       <TeamSwitcher teams={teams} activeTeamId={team.id} onSelect={onSelectTeam} onCreateTeam={onCreateTeam} />
+
+      <PilotNotices team={team} athleteCount={roster.length} />
 
       <AttentionCenter
         items={attentionList}

@@ -777,3 +777,42 @@ html:has(dialog[open]) {
     grid-template-columns: 1fr;
   }
 }
+
+/* Pilot ending banner and roster warning (coach only) */
+.pilot-notices {
+  display: grid;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.pilot-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  border-color: color-mix(in oklch, var(--gold) 45%, transparent);
+}
+
+.pilot-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.pilot-dismiss {
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.pilot-roster-warning {
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 10px;
+  background: color-mix(in oklch, var(--warn) 12%, transparent);
+  color: var(--text);
+  font-size: var(--fs-sm);
+}
