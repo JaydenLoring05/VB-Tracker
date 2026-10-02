@@ -25,6 +25,7 @@ import { CheckInReminderSettings } from "./CheckInReminderSettings";
 import { CustomProgramPanel } from "./CustomProgramPanel";
 import { DailySummaryToggle } from "./DailySummaryToggle";
 import { InviteShare } from "./InviteShare";
+import { PilotNotices } from "./PilotNotices";
 import { ProgramEditor } from "./ProgramEditor";
 import { RosterNameEditor } from "./RosterNameEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
@@ -144,6 +145,8 @@ export function CoachDashboard({
   return (
     <div className="coach-dashboard">
       <TeamSwitcher teams={teams} activeTeamId={team.id} onSelect={onSelectTeam} onCreateTeam={onCreateTeam} />
+
+      <PilotNotices team={team} athleteCount={roster.length} />
 
       <AttentionCenter
         items={attentionList}

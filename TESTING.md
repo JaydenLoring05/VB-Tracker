@@ -54,6 +54,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Daily coach summary | `tests/lib/dailySummary.test.ts` | Config gating, cron auth, time zone date, numbers match the Attention Center, pain alerts, today's workout, HTML escaping, Resend call |
 | `GET /api/daily-summary` | `tests/api/dailySummaryRoute.test.ts` | Off without env vars, rejects a missing or wrong cron secret, sends one email per opted-in coach, data and send failures |
 | Position starting programs | `tests/data/positionPrograms.test.ts`, `tests/lib/positionProgram.test.ts` | Templates pass the builder's validation, use library exercises with the right measure; position mapping; coach program and plan edits win over the template |
+| Pilot end | `tests/lib/pilot.test.ts` | Banner from day 25 with end date and days left, "ended" after day 30, never for paid teams, https-only payment link, roster warning past 16 on the pilot only |
 | Notion sync flag | `tests/lib/notionSyncFlag.test.ts` | Off by default, on for a deployment already set up, explicit flag wins, no Notion values exposed, the trigger stays silent while off |
 | Monitoring and analytics | `tests/lib/monitoring.test.ts` | Off without a DSN or flag, Sentry events lose identity, cookies, bodies and query strings, health fields redacted anywhere, typed-input breadcrumbs dropped, page-view URLs without codes or ids |
 | Guardian step | `tests/lib/guardian.test.ts` | Answer required, adults need nothing else, under 18 needs name, valid email and confirmation, saved fields, roster "missing" status |
