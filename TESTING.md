@@ -30,10 +30,11 @@ Tests live under `tests/`, mirroring `src/`.
 | Pilot form validation | `tests/lib/pilotApplication.test.ts` | Field rules, normalization, control characters |
 | `POST /api/pilot` | `tests/api/pilotRoute.test.ts` | Valid input, bad email, honeypot, oversize body, cross-origin, duplicate email, missing table, DB flood guard, per-IP rate limit |
 | Team setup checklist | `tests/lib/teamSetup.test.ts` | `computeSetupProgress` combinations, share messages |
-| Attention Center | `tests/lib/attentionCenter.test.ts` | Pain streaks, readiness drop, missed workouts, PRs, ranking |
+| Attention Center | `tests/lib/attentionCenter.test.ts` | Pain streaks, readiness drop, missed assigned days (and the session-count fallback), PRs, ranking |
 | Readiness scoring | `tests/lib/recovery.test.ts` | Score weights, status thresholds, severe-pain guardrail, recommendations |
 | Program resolution | `tests/lib/programResolution.test.ts` | Phase boundaries, pilot vs paid overrides, substitutions |
 | Auth, DB error and date helpers | `tests/lib/smallHelpers.test.ts` | Dead-session detection, user-facing errors, `todayISO`, `formatLastActive` |
+| Program schedule | `tests/lib/programSchedule.test.ts`, `tests/lib/missedWorkouts.test.ts` | Monday-aligned program weeks, start date for a chosen week, assigned days in the 7-day window, missed vs. completed (week, day), coach program vs. recommended plan |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |
