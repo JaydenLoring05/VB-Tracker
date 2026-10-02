@@ -31,6 +31,8 @@ export type WorkoutDay = {
   notes: string;
   rest?: boolean;
   exercises: string[];
+  /** Coach-set targets per exercise ("3x8", "3x45 sec"). Only on coach-built programs. */
+  targets?: Record<string, string>;
 };
 
 export type StatEntry = {
