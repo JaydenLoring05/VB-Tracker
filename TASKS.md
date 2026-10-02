@@ -27,7 +27,6 @@ Part 2:
 - [ ] #34 `feat/google-sign-in`: Google Cloud, Supabase and Vercel steps in the PR
 - [ ] #35 `feat/daily-coach-summary-email`: **run `schema_v47_daily_coach_summary.sql` first**, then the cron secret and Resend steps in the PR
 - [ ] #36 `feat/landing-product-screenshots`
-- [ ] #37 `feat/brand-monogram`: pick option A, B or C
 
 Part 3:
 - [ ] #38 `docs/refresh-suggestions-tasks` (this file and SUGGESTIONS.md)

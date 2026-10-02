@@ -21,7 +21,7 @@ Each was finished in its own PR.
 | Daily coach summary email | #35 (`feat/daily-coach-summary-email`) (schema v47) |
 | Homepage product-demo section | #36 (`feat/landing-product-screenshots`) |
 | Public demo team/dashboard | Already shipped as `/demo`; verified, no change needed (below) |
-| Real visual identity (volleyball only) | #37 (`feat/brand-monogram`) (pick option A, B or C in that PR) |
+| Real visual identity (volleyball only) | Decided to keep the current logo (the gold pulse mark and app icons); the monogram in #37 was closed without merging |
 
 The public demo was checked end to end on a production build, and it covers
 what the suggestion asked for:
