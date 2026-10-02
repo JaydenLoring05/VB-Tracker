@@ -6,6 +6,7 @@ import { getWorkoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
+import { bestMarksByExercise, detectPersonalRecord, personalRecordEntry } from "@/lib/personalRecord";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { createClient } from "@/lib/supabase/client";
 import { WorkoutSession, WorkoutSet } from "@/types";
@@ -111,22 +112,14 @@ export function useActiveWorkoutSession(sessionId: string) {
       .then(({ data, error }) => {
         if (cancelled || error || !data) return;
 
+        const rows = data as WorkoutSet[];
         const lastSeen: Record<string, PreviousSet> = {};
-        const maxWeight: Record<string, number> = {};
-        const maxSeconds: Record<string, number> = {};
-
-        (data as WorkoutSet[]).forEach((row) => {
-          const seconds = row.seconds ?? null;
+        rows.forEach((row) => {
           if (!(row.exercise in lastSeen)) {
-            lastSeen[row.exercise] = { weight: row.weight, reps: row.reps, seconds };
-          }
-          if (row.weight != null && row.weight > (maxWeight[row.exercise] ?? 0)) {
-            maxWeight[row.exercise] = row.weight;
-          }
-          if (seconds != null && seconds > (maxSeconds[row.exercise] ?? 0)) {
-            maxSeconds[row.exercise] = seconds;
+            lastSeen[row.exercise] = { weight: row.weight, reps: row.reps, seconds: row.seconds ?? null };
           }
         });
+        const { maxWeight, maxSeconds } = bestMarksByExercise(rows);
 
         setPreviousSets(lastSeen);
         setMaxWeightByExercise(maxWeight);
@@ -207,11 +200,13 @@ export function useActiveWorkoutSession(sessionId: string) {
 
   async function logSet(exercise: string, weight: number | null, reps: number | null, seconds: number | null = null) {
     const setNumber = sets.filter((s) => s.exercise === exercise).length + 1;
-    // Weighted sets PR on weight; unweighted timed sets (planks, holds) PR on
-    // the longest hold.
-    const isWeightPR = weight != null && weight > (maxWeightByExercise[exercise] ?? 0);
-    const isHoldPR = weight == null && seconds != null && seconds > (maxSecondsByExercise[exercise] ?? 0);
-    const isNewPR = isWeightPR || isHoldPR;
+    const prKind = detectPersonalRecord({
+      weight,
+      seconds,
+      previousMaxWeight: maxWeightByExercise[exercise],
+      previousMaxSeconds: maxSecondsByExercise[exercise]
+    });
+    const isNewPR = prKind !== null;
 
     const { data, error } = await supabase
       .from("workout_sets")
@@ -240,22 +235,12 @@ export function useActiveWorkoutSession(sessionId: string) {
     const newSet = data as WorkoutSet;
     setSets((current) => [...current, newSet]);
 
-    if (isWeightPR && weight != null) {
+    if (prKind === "weight" && weight != null) {
       setMaxWeightByExercise((current) => ({ ...current, [exercise]: weight }));
-      addPR({
-        exercise,
-        value: reps != null ? `${weight} x ${reps}` : String(weight),
-        unit: "lbs",
-        note: "Set during Workout Mode"
-      });
-    } else if (isHoldPR && seconds != null) {
+      addPR(personalRecordEntry(prKind, { exercise, weight, reps, seconds }));
+    } else if (prKind === "hold" && seconds != null) {
       setMaxSecondsByExercise((current) => ({ ...current, [exercise]: seconds }));
-      addPR({
-        exercise,
-        value: String(seconds),
-        unit: "sec",
-        note: "Longest hold, set during Workout Mode"
-      });
+      addPR(personalRecordEntry(prKind, { exercise, weight, reps, seconds }));
     }
 
     return { set: newSet, isNewPR };

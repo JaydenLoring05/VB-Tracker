@@ -1,12 +1,12 @@
 {
-  "name": "volleyball-tracker-v15-nextjs",
-  "version": "15.0.0",
+  "name": "nextrep",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
@@ -25,6 +25,8 @@
     "@types/node": "26.0.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.9",
     "typescript": "6.0.3",
     "vitest": "^5.0.1"
   }
