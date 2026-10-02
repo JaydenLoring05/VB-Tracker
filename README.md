@@ -8,6 +8,20 @@ NextRep is a Next.js and TypeScript athlete training-and-recovery operating syst
 - Try it without an account: https://volleyball-tracker-beta.vercel.app/demo
   (a sample team with a roster, readiness, the Attention Center and an athlete view; nothing is saved)
 
+## Screenshots
+
+From the public demo at `/demo` (sample team, no real athletes):
+
+| Coach dashboard and Attention Center | Athlete drill-down | Athlete home |
+| --- | --- | --- |
+| ![Coach dashboard with the Attention Center ranking who needs a look today](docs/screenshots/coach-dashboard.jpg) | ![One athlete's readiness history chart and daily check-ins](docs/screenshots/athlete-drilldown.jpg) | ![Athlete home screen with today's workout, recovery, weekly progress and recent PRs](docs/screenshots/athlete-view.jpg) |
+| **Workout Mode** | **Film room** | |
+| ![Workout Mode logging a set, with a new PR badge and the rest timer running](docs/screenshots/workout-mode.jpg) | ![Film room tag panel with a pass being tagged and a list of tagged plays by athlete](docs/screenshots/film-room.jpg) | |
+
+The Workout Mode and film room demo tabs come from #39.
+
+Regenerate them with `node scripts/capture-readme-screenshots.mjs` against a running build.
+
 ## Features
 
 - 20-week volleyball workout tracker
