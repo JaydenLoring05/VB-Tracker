@@ -370,3 +370,41 @@ describe("summarizeTeam", () => {
     expect(summarizeTeam([], items).needAttention).toBe(2);
   });
 });
+
+describe("computeAttentionItems: missed assigned days", () => {
+  it("flags missed assigned days for an athlete with a program start date", () => {
+    const [item] = computeAttentionItems([athlete("a", "Ava")], {}, { a: 0 }, {}, { a: { assigned: 4, missed: 3 } });
+    expect(item).toMatchObject({
+      id: "a-missed-workouts",
+      priority: "medium",
+      reason: "Missed 3 of 4 assigned workouts in the last 7 days",
+      action: "Send reminder"
+    });
+  });
+
+  it("does not flag a single missed day", () => {
+    expect(computeAttentionItems([athlete("a")], {}, { a: 0 }, {}, { a: { assigned: 3, missed: 1 } })).toEqual([]);
+  });
+
+  it("flags one missed day when it was the only assigned day", () => {
+    const [item] = computeAttentionItems([athlete("a")], {}, { a: 0 }, {}, { a: { assigned: 1, missed: 1 } });
+    expect(item.reason).toBe("Missed their only assigned workout in the last 7 days");
+  });
+
+  it("does not use the session-count proxy when the schedule says nothing was missed", () => {
+    // Zero sessions would trip the proxy, but nothing was assigned (a rest week).
+    expect(computeAttentionItems([athlete("a")], {}, { a: 0 }, {}, { a: { assigned: 0, missed: 0 } })).toEqual([]);
+  });
+
+  it("falls back to the session-count proxy for athletes with no start date", () => {
+    const items = computeAttentionItems(
+      [athlete("a"), athlete("b")],
+      {},
+      { a: 0, b: 0 },
+      {},
+      { a: { assigned: 3, missed: 0 } }
+    );
+    expect(items.map((item) => item.id)).toEqual(["b-missed-workouts"]);
+    expect(items[0].reason).toBe("No completed workouts in the last 7 days");
+  });
+});
