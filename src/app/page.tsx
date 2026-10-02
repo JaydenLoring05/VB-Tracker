@@ -119,19 +119,41 @@ const PRODUCT_SHOTS = [
     src: "/screenshots/coach-dashboard.jpg",
     title: "Coach dashboard.",
     caption: "Readiness, check-ins and a ranked Attention Center: pain streaks, readiness drops, missed workouts, new PRs.",
-    alt: "NextRep coach dashboard with the Attention Center ranking athletes who need a look today"
+    alt: "NextRep coach dashboard with the Attention Center ranking athletes who need a look today",
+    width: 1280,
+    height: 860
   },
   {
     src: "/screenshots/athlete-drilldown.jpg",
     title: "Athlete trends.",
     caption: "Tap any athlete for their readiness history, check-ins, PRs and adherence.",
-    alt: "One athlete's readiness chart over two weeks above a table of daily check-ins"
+    alt: "One athlete's readiness chart over two weeks above a table of daily check-ins",
+    width: 1280,
+    height: 860
   },
   {
     src: "/screenshots/athlete-view.jpg",
     title: "Athlete home.",
     caption: "Today's workout, recovery score, weekly progress and recent PRs on one screen.",
-    alt: "Athlete home screen with today's workout button, recovery score, weekly progress and a recent PR"
+    alt: "Athlete home screen with today's workout button, recovery score, weekly progress and a recent PR",
+    width: 1280,
+    height: 860
+  },
+  {
+    src: "/screenshots/workout-mode.jpg",
+    title: "Workout Mode.",
+    caption: "Last week's numbers next to every lift, a rest timer, and a PR badge the moment you beat them.",
+    alt: "Workout Mode logging a 160 x 5 set with a new PR badge and the rest timer running",
+    width: 1280,
+    height: 860
+  },
+  {
+    src: "/screenshots/film-room.jpg",
+    title: "Film room.",
+    caption: "Tag plays by athlete with the mouse, keyboard shortcuts or your voice: pass ratings, set zones, block outcomes.",
+    alt: "Film room tag panel with a pass being tagged and a list of tagged plays by athlete",
+    width: 656,
+    height: 796
   }
 ];
 
@@ -229,8 +251,8 @@ export default function LandingPage() {
                 <Image
                   src={shot.src}
                   alt={shot.alt}
-                  width={1280}
-                  height={860}
+                  width={shot.width}
+                  height={shot.height}
                   sizes={index === 0 ? "(min-width: 1160px) 1160px, 100vw" : "(min-width: 900px) 580px, 100vw"}
                 />
                 <figcaption>

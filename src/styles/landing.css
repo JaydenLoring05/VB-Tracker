@@ -964,6 +964,14 @@
 @media (min-width: 900px) {
   .landing-shots {
     grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+  }
+
+  /* Paired shots share one frame size; taller crops (film room) letterbox instead of stretching the row. */
+  .landing-shot:not(.landing-shot-main) img {
+    aspect-ratio: 1280 / 860;
+    object-fit: contain;
+    background: var(--surface-2);
   }
 
   .landing-shot-main {
