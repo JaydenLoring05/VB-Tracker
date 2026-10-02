@@ -21,8 +21,10 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusLabel } from "@/components/shared/StatusLabel";
 
 import { AttentionCenter } from "./AttentionCenter";
+import { CheckInReminderSettings } from "./CheckInReminderSettings";
 import { CustomProgramPanel } from "./CustomProgramPanel";
 import { DailySummaryToggle } from "./DailySummaryToggle";
+import { InviteShare } from "./InviteShare";
 import { PilotNotices } from "./PilotNotices";
 import { ProgramEditor } from "./ProgramEditor";
 import { RosterNameEditor } from "./RosterNameEditor";
@@ -134,7 +136,7 @@ export function CoachDashboard({
     const ok = await regenerateInviteCode(team.id);
     setRegenerating(false);
     if (ok) {
-      setRegeneratedCode("Invite code regenerated.");
+      setRegeneratedCode("Invite code regenerated. Old invite links and QR codes no longer work.");
       onTeamChange?.();
     }
     setTimeout(() => setRegeneratedCode(null), 3000);
@@ -218,10 +220,13 @@ export function CoachDashboard({
             {regenerating ? "Regenerating..." : "Regenerate code"}
           </button>
 
+          <InviteShare team={team} compact />
+
           {regeneratedCode && <span className="muted regenerate-code-status">{regeneratedCode}</span>}
         </div>
 
         <DailySummaryToggle />
+        <CheckInReminderSettings team={team} />
       </div>
 
       <div className="panel">
@@ -307,6 +312,11 @@ export function CoachDashboard({
                   )}
                   {athlete.needsCheckIn && athlete.lastCheckIn !== null && (
                     <span className="pill roster-flag">Needs check-in</span>
+                  )}
+                  {athlete.guardianInfoMissing && (
+                    <span className="pill roster-flag roster-flag-guardian" title="Under 18 or hasn't answered: no parent or guardian info yet">
+                      Guardian info missing
+                    </span>
                   )}
                   <span className="muted roster-last-active">{formatLastActive(athlete.lastActiveAt)}</span>
                 </div>
