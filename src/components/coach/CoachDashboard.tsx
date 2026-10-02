@@ -21,6 +21,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusLabel } from "@/components/shared/StatusLabel";
 
 import { AttentionCenter } from "./AttentionCenter";
+import { CustomProgramPanel } from "./CustomProgramPanel";
 import { ProgramEditor } from "./ProgramEditor";
 import { RosterNameEditor } from "./RosterNameEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
@@ -182,6 +183,7 @@ export function CoachDashboard({
 
       {showPlan && (
         <>
+          <CustomProgramPanel team={team} />
           <ProgramEditor team={team} />
           <TeamCalendarPanel team={team} />
         </>
