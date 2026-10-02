@@ -8,13 +8,16 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Brand } from "@/components/shared/Brand";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useNavRole } from "@/hooks/useNavRole";
+import { useTeamStreak } from "@/hooks/useTeamStreak";
 import { activePrimaryHref, isNavLinkActive, navItemsFor, type NavLink } from "@/lib/navItems";
+import { TeamStreak } from "@/lib/teamStreak";
 import { TeamRole } from "@/types";
 
 export function Sidebar() {
   const pathname = usePathname();
   const role = useNavRole();
   const { workoutStreak } = useTrackerContext();
+  const teamStreak = useTeamStreak(role === "coach");
 
   return (
     <aside className="sidebar">
@@ -24,21 +27,40 @@ export function Sidebar() {
 
       <MainNav role={role} pathname={pathname} />
 
-      <div className="streak-box">
-        <p className="display streak-title">
-          <Flame size={18} aria-hidden="true" /> Current Streak
-        </p>
-        <p className="display streak-count">
-          {workoutStreak} day{workoutStreak === 1 ? "" : "s"}
-        </p>
-        <p className="muted">
-          {workoutStreak > 0
-            ? "Keep it going."
-            : "Log a workout today to start a streak."}
-        </p>
-      </div>
+      {role === "coach" ? (
+        <div className="streak-box">
+          <p className="display streak-title">
+            <Flame size={18} aria-hidden="true" /> Team Streak
+          </p>
+          <p className="display streak-count">
+            {teamStreak ? `${teamStreak.days} day${teamStreak.days === 1 ? "" : "s"}` : "–"}
+          </p>
+          <p className="muted">{teamStreakCaption(teamStreak)}</p>
+        </div>
+      ) : (
+        <div className="streak-box">
+          <p className="display streak-title">
+            <Flame size={18} aria-hidden="true" /> Current Streak
+          </p>
+          <p className="display streak-count">
+            {workoutStreak} day{workoutStreak === 1 ? "" : "s"}
+          </p>
+          <p className="muted">
+            {workoutStreak > 0
+              ? "Keep it going."
+              : "Log a workout today to start a streak."}
+          </p>
+        </div>
+      )}
     </aside>
   );
+}
+
+function teamStreakCaption(streak: TeamStreak | null): string {
+  if (!streak) return "Days in a row at least half the team checks in.";
+  if (streak.athleteCount === 0) return "Starts once athletes join and check in.";
+  const today = `Today: ${streak.today} of ${streak.athleteCount} checked in`;
+  return streak.today >= streak.needed ? `${today}. Day counted.` : `${today}, ${streak.needed} needed.`;
 }
 
 function NavItem({ item, active, onNavigate }: { item: NavLink; active: boolean; onNavigate?: () => void }) {

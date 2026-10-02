@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { userFacingMessage } from "@/lib/supabaseErrors";
 import { Team, TeamRole } from "@/types";
 
-const ACTIVE_TEAM_KEY = "elevateos:activeTeamId";
+export const ACTIVE_TEAM_KEY = "elevateos:activeTeamId";
 
 export function useTeam() {
   const { userId } = useTrackerContext();
