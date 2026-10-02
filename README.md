@@ -96,8 +96,9 @@ stays off until its variables are set.
 | `NOTION_TOKEN` | Notion integration token for the personal Training Log sync (`/api/notion-sync`). Server-only. |
 | `NOTION_TRAINING_LOG_DATA_SOURCE_ID` | The Notion data source that finished workouts and check-ins are written to. |
 | `NOTION_SYNC_USER_ID` | The one Supabase user ID whose data is synced. The sync is a no-op for every other user. |
+| `NEXT_PUBLIC_NOTION_SYNC_ENABLED` | Founder-only Notion sync switch (`true` or `false`). Defaults to on only when all three `NOTION_*` variables are set; read at build time, so redeploy after changing it. |
 
-The Notion sync only runs when all three `NOTION_*` variables are set.
+The Notion sync only runs when all three `NOTION_*` variables are set. It is a founder feature: the app only asks for a sync when `NEXT_PUBLIC_NOTION_SYNC_ENABLED` is `true`. If you don't set that flag, it turns on by itself when all three `NOTION_*` variables are present at build time, and stays off otherwise; set it to `false` to turn the sync off without removing the Notion variables.
 
 Run the unit tests with `npm test`; see [TESTING.md](TESTING.md) for what is covered.
 
