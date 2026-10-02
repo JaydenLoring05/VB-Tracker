@@ -4,6 +4,7 @@ import { Check, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { InviteShare } from "@/components/coach/InviteShare";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { useDemo } from "@/context/DemoContext";
 import { useTeamSetup } from "@/hooks/useTeamSetup";
@@ -68,6 +69,7 @@ function TeamReadyChecklistContent({ team, roster, rosterLoading }: Props) {
           >
             Copy invite message
           </CopyButton>
+          <InviteShare team={team} compact />
           <span className="muted setup-code">
             Code <strong>{team.invite_code}</strong>
           </span>

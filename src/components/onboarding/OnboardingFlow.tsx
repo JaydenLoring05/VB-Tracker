@@ -7,7 +7,9 @@ import { useTrackerContext } from "@/context/TrackerContext";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
 import { useTeam } from "@/hooks/useTeam";
+import { pendingInviteFrom, PENDING_INVITE_KEY } from "@/lib/invite";
 import { startingProgramKeyForPosition } from "@/lib/positionProgram";
+import { createClient } from "@/lib/supabase/client";
 
 type Role = "coach" | "athlete";
 
@@ -54,8 +56,50 @@ export function OnboardingFlow() {
   const [position, setPosition] = useState(POSITIONS[0]);
   const [goals, setGoals] = useState<string[]>(POSITION_DEFAULT_GOALS[POSITIONS[0]] ?? []);
   const [inviteCode, setInviteCode] = useState("");
+  // From an invite link (/join/<code>): this browser's saved code, else the
+  // one stored on the account at sign-up.
+  const [pendingInvite, setPendingInvite] = useState<string | null>(null);
+  const autoJoinTried = useRef(false);
 
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem(PENDING_INVITE_KEY);
+    } catch {
+      // Storage blocked; the account copy below still works.
+    }
+    createClient()
+      .auth.getUser()
+      .then(({ data }) => setPendingInvite(pendingInviteFrom(stored, data.user?.user_metadata)));
+  }, []);
+
+  async function clearPendingInvite() {
+    setPendingInvite(null);
+    try {
+      window.localStorage.removeItem(PENDING_INVITE_KEY);
+    } catch {
+      // Nothing to clear.
+    }
+    await createClient().auth.updateUser({ data: { pending_invite: null } });
+  }
+
+  // Athletes who came from an invite link join automatically at the team step.
+  useEffect(() => {
+    if (step !== 3 || role !== "athlete" || !pendingInvite || autoJoinTried.current) return;
+    autoJoinTried.current = true;
+    setInviteCode(pendingInvite);
+    setSaving(true);
+    joinTeam(pendingInvite).then(async (ok) => {
+      setSaving(false);
+      if (ok) {
+        await clearPendingInvite();
+        setStep(4);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, role, pendingInvite]);
 
   // Each step replaces the last one in place, so move focus to the new step's heading:
   // keyboard and screen reader users would otherwise be left on a control that vanished.
@@ -117,6 +161,7 @@ export function OnboardingFlow() {
     const ok = role === "coach" ? await createTeam(teamName.trim()) : await joinTeam(inviteCode.trim());
 
     setSaving(false);
+    if (ok && role === "athlete" && pendingInvite) await clearPendingInvite();
     if (ok) setStep(4);
   }
 
@@ -133,6 +178,12 @@ export function OnboardingFlow() {
       {step === 1 && (
         <div className="onboarding-step">
           <h2>Welcome! Are you a coach or an athlete?</h2>
+          {pendingInvite && (
+            <p className="muted onboarding-invite-note">
+              You&apos;re joining a team from an invite link. Choose &quot;I&apos;m an Athlete&quot; and you&apos;ll be added
+              at the end.
+            </p>
+          )}
           <div className="onboarding-role-choice">
             <button type="button" onClick={() => selectRole("coach")}>
               I&apos;m a Coach
@@ -260,6 +311,7 @@ export function OnboardingFlow() {
       {step === 3 && role === "athlete" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleTeamStep}>
           <h2>Join your team</h2>
+          {pendingInvite && saving && <p className="muted">Joining your team from the invite link…</p>}
           <label>
             Invite code from your coach
             <input

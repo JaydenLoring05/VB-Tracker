@@ -23,6 +23,7 @@ import { StatusLabel } from "@/components/shared/StatusLabel";
 import { AttentionCenter } from "./AttentionCenter";
 import { CustomProgramPanel } from "./CustomProgramPanel";
 import { DailySummaryToggle } from "./DailySummaryToggle";
+import { InviteShare } from "./InviteShare";
 import { ProgramEditor } from "./ProgramEditor";
 import { RosterNameEditor } from "./RosterNameEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
@@ -133,7 +134,7 @@ export function CoachDashboard({
     const ok = await regenerateInviteCode(team.id);
     setRegenerating(false);
     if (ok) {
-      setRegeneratedCode("Invite code regenerated.");
+      setRegeneratedCode("Invite code regenerated. Old invite links and QR codes no longer work.");
       onTeamChange?.();
     }
     setTimeout(() => setRegeneratedCode(null), 3000);
@@ -214,6 +215,8 @@ export function CoachDashboard({
           <button className="ghost" onClick={handleRegenerateCode} disabled={regenerating} type="button">
             {regenerating ? "Regenerating..." : "Regenerate code"}
           </button>
+
+          <InviteShare team={team} compact />
 
           {regeneratedCode && <span className="muted regenerate-code-status">{regeneratedCode}</span>}
         </div>
