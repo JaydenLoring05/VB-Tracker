@@ -47,6 +47,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Program resolution | `tests/lib/programResolution.test.ts` | Phase boundaries, pilot vs paid overrides, substitutions |
 | Auth, DB error and date helpers | `tests/lib/smallHelpers.test.ts` | Dead-session detection, user-facing errors, `todayISO`, `formatLastActive` |
 | Personal records | `tests/lib/personalRecord.test.ts` | First-ever set, ties, heavier set, longer hold, weighted timed sets, null inputs, PR board labels |
+| Training load | `tests/lib/trainingLoad.test.ts` | Personal and team event weights, 7-day window edges, no double count when a session is on both calendars |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |
