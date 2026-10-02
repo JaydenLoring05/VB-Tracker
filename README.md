@@ -99,8 +99,9 @@ stays off until its variables are set.
 | `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | `true` shows "Continue with Google" on `/login`. Needs the Google Cloud and Supabase setup described in PR #34. Read at build time, so redeploy after changing it. |
 | `NEXT_PUBLIC_SENTRY_DSN` | Turns on Sentry error monitoring (browser, server and edge). The DSN from your Sentry project's Client Keys page. Without it, Sentry isn't loaded at all. Errors are sent without user info, cookies, headers (except user-agent), request bodies or query strings, and check-in/health fields are redacted (`scrubEvent` in `src/lib/monitoring.ts`). |
 | `NEXT_PUBLIC_ANALYTICS_ENABLED` | `true` turns on Vercel Analytics page views (also enable Analytics for the project in the Vercel dashboard). Cookieless; URLs are sent without query strings, invite codes or record IDs. |
+| `NEXT_PUBLIC_NOTION_SYNC_ENABLED` | Founder-only Notion sync switch (`true` or `false`). Defaults to on only when all three `NOTION_*` variables are set; read at build time, so redeploy after changing it. |
 
-The Notion sync only runs when all three `NOTION_*` variables are set.
+The Notion sync only runs when all three `NOTION_*` variables are set. It is a founder feature: the app only asks for a sync when `NEXT_PUBLIC_NOTION_SYNC_ENABLED` is `true`. If you don't set that flag, it turns on by itself when all three `NOTION_*` variables are present at build time, and stays off otherwise; set it to `false` to turn the sync off without removing the Notion variables.
 
 ### Optional: daily coach summary email
 
