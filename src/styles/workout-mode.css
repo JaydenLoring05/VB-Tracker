@@ -508,3 +508,20 @@
     animation: none;
   }
 }
+
+/* Hold timer for timed sets (planks, holds, stretches). */
+.hold-timer {
+  margin-bottom: 12px;
+}
+
+.hold-timer .hold-timer-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hold-timer .hold-timer-controls button {
+  width: auto;
+}
