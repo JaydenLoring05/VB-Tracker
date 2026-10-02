@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { useDemo } from "@/context/DemoContext";
 import { useAttentionCenter } from "@/hooks/useAttentionCenter";
+import { useAttentionDismissals } from "@/hooks/useAttentionDismissals";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { withCheckInItems } from "@/lib/attentionCenter";
 import { buildInviteMessage } from "@/lib/teamSetup";
@@ -68,7 +69,11 @@ export function CoachDashboard({
     retry: retryAttention
   } = useAttentionCenter(team, roster);
   // Athletes overdue for a check-in join the same ranked list instead of a separate panel.
-  const attentionList = withCheckInItems(attentionItems, roster);
+  const {
+    visible: attentionList,
+    dismiss: dismissAttention,
+    restore: restoreAttention
+  } = useAttentionDismissals(team.id, withCheckInItems(attentionItems, roster));
   // A failed roster load leaves the roster empty; a failed removal leaves it
   // populated. Only the first should replace the roster with an error state.
   const rosterLoadFailed = Boolean(error) && roster.length === 0;
@@ -165,6 +170,9 @@ export function CoachDashboard({
           const athlete = roster.find((candidate) => candidate.userId === userId);
           if (athlete) setSelectedAthlete(athlete);
         }}
+        messageActions
+        onDismiss={dismissAttention}
+        onRestore={restoreAttention}
       />
 
       <TeamReadyChecklist team={team} roster={roster} rosterLoading={loading} />

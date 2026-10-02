@@ -258,8 +258,8 @@
   --attention-color: var(--muted);
   counter-increment: attention;
   display: grid;
-  grid-template-columns: 28px auto minmax(0, 1fr) auto auto;
-  grid-template-areas: "rank av body icon btn";
+  grid-template-columns: 28px auto minmax(0, 1fr) auto auto auto;
+  grid-template-areas: "rank av body icon btn x";
   align-items: center;
   column-gap: var(--sp-3);
   padding: var(--sp-3);
@@ -288,7 +288,7 @@
   color: var(--attention-color);
 }
 
-.attention-row > button {
+.attention-row > .attention-action {
   grid-area: btn;
   min-height: 34px;
   padding: 5px 12px;
@@ -303,8 +303,50 @@
   min-width: 0;
 }
 
-.attention-row-body strong {
+.attention-name {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
   font-size: var(--fs-base);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.attention-name:hover {
+  text-decoration: underline;
+}
+
+.attention-row > .attention-dismiss {
+  grid-area: x;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--muted);
+}
+
+.attention-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+}
+
+.attention-notice:not(:empty) {
+  margin-bottom: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 10px;
+  background: color-mix(in oklch, var(--green) 12%, transparent);
+}
+
+.attention-notice button {
+  min-height: 44px;
 }
 
 .attention-row-body span {
@@ -326,16 +368,17 @@
 
 @media (max-width: 700px) {
   .attention-row {
-    grid-template-columns: 24px auto minmax(0, 1fr) auto;
+    grid-template-columns: 24px auto minmax(0, 1fr) auto auto;
     grid-template-areas:
-      "rank av body icon"
-      ". btn btn btn";
+      "rank av body icon x"
+      ". btn btn btn btn";
     row-gap: var(--sp-2);
     padding: var(--sp-3);
   }
 
-  .attention-row > button {
+  .attention-row > .attention-action {
     justify-self: start;
+    min-height: 44px;
   }
 }
 
