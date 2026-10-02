@@ -1,110 +1,59 @@
 # Tasks
 
-- [ ] **Film tags v2**
+What's still open after the October 2026 pass. Everything in "Ready for
+review" is finished, committed and checked locally (`npx tsc --noEmit`,
+`npm test`, `npm run build`). It just needs to reach GitHub.
 
-  > **Depends on:** film-v1 (branch `film-v1`, PR "feat: film room v1")
-  > merging into `main` first. That PR adds `supabase/schema_v35_team_film.sql`,
-  > the `film_tags` table, `useTeamFilm`, `tagMeta.ts`, and the base tagging
-  > UI with 8 tag types (set, kill, ace, block, dig, error, serve_error,
-  > note) that this task's schema_v36 and UI changes build on. Do not start
-  > this task until film-v1 is merged.
+## Blocked: get the branches onto GitHub
 
-  Build "film tags v2" on a new branch `film-tags-v2` off latest `main`.
-  Follow existing patterns from the film feature (`useTeamFilm`,
-  `tagMeta.ts`, `schema_v35_team_film.sql`, `is_team_coach` RLS).
+- [ ] **Fix GitHub push access.** `git push` returned `403: Your account is
+      suspended`, and `gh` isn't installed, so no branch was pushed and no PR
+      was opened. Every branch below exists locally in this repo. Once
+      access works, push each one and open a PR to `main`. The PR text is in
+      the PR notes folder next to the repo, one file per branch, in order.
 
-  GOAL: every film tag records WHO made the play and HOW GOOD it was, and
-  tagging is fast enough to do a full match in about 15 minutes.
+## Ready for review (one branch = one PR, in this order)
 
-  1. `supabase/schema_v36_film_tag_details.sql` (safe to re-run):
-     - Add to `film_tags`:
-       - `athlete_id` uuid, nullable, referencing `auth.users`, on delete
-         set null
-       - `pass_rating` smallint, nullable, 0-3
-       - `set_zone` text, nullable, in `('1','2','3','4','5','6')`
-       - `set_type` text, nullable, in
-         `('4','5','slide','pipe','back_row','quick','dump')`
-       - `block_outcome` text, nullable, in
-         `('stuff','touch','tooled','missed')`
-       - `attack_direction` text, nullable, in
-         `('line','cross','seam','tip','roll')`
-     - Replace the tag check constraint so it also allows `'pass'` (keep
-       all 8 existing values).
-     - Enforce that `athlete_id`, if set, is a member of
-       `film_tags.team_id` (a trigger using `team_members`).
-     - Add index on `film_tags (team_id, athlete_id)`.
+Part 1:
+- [ ] `docs/readme-accuracy`
+- [ ] `chore/eslint-flat-config`
+- [ ] `refactor/personal-record-lib`
+- [ ] `test/demo-smoke-playwright`
+- [ ] `docs/architecture`
+- [ ] `chore/package-metadata`
+- [ ] `docs/readme-screenshots`: has a question for you at the top
+      (`/demo` has no Workout Mode or film room to screenshot)
 
-  2. Types: update `FilmTag` and `FilmTagType`. Add `'pass'` to
-     `TAG_TYPES` and `TAG_LABELS`.
+Part 2:
+- [ ] `fix/workout-timer-keepalive`
+- [ ] `feat/training-load-team-events`
+- [ ] `feat/coach-roster-limit`
+- [ ] `fix/substitution-references`
+- [ ] `feat/missed-assigned-days`: **run `schema_v44_program_start_date.sql` first**
+- [ ] `feat/position-starting-programs`: **run `schema_v45_starting_program.sql` first**
+- [ ] `feat/data-export-account-deletion`: **run `schema_v46_delete_my_account.sql` first**
+- [ ] `feat/google-sign-in`: Google Cloud, Supabase and Vercel steps in the PR
+- [ ] `feat/daily-coach-summary-email`: **run `schema_v47_daily_coach_summary.sql` first**, then the cron secret and Resend steps in the PR
+- [ ] `feat/landing-product-screenshots`
+- [ ] `feat/brand-monogram`: pick option A, B or C
 
-  3. Tagging UI (coach only):
-     - Clicking a tag button opens an inline detail panel instead of
-       saving immediately. It holds:
-       - Athlete picker from the team roster. Reuse the hook the coach
-         dashboard uses to list athletes.
-       - Contextual fields: pass → 0/1/2/3. set → zone 1-6 plus set type.
-         block → outcome. kill/error/ace → attack direction.
-       - The note field and a Save button.
-     - The athlete selection persists between tags.
-     - The timestamp is captured the moment the tag button is pressed,
-       not at save.
+Part 3:
+- [ ] `docs/refresh-suggestions-tasks` (this file and SUGGESTIONS.md)
 
-  4. KEYBOARD TAGGING (`src/lib/filmHotkeys.ts`, pure logic, unit tested):
-     - Tag keys: P pass, S set, K kill, A ace, B block, D dig, E error, V
-       serve error, N note.
-     - Detail keys after a tag key:
-       - Pass: 0/1/2/3 = rating, then auto-save.
-       - Set: 1-6 = zone, then optional set type (Q quick, F four, I
-         pipe, L slide).
-       - Block: 1 stuff, 2 touch, 3 tooled, 4 missed.
-       - Kill/error/ace: L line, C cross, M seam, T tip, R roll.
-       - Enter saves early. Esc cancels.
-     - Athlete: `[` and `]` cycle through the roster, or type a jersey
-       number if the roster has one (otherwise use roster order 1-9 with
-       Alt+number).
-     - Video: Space play/pause, ←/→ seek 5s, Shift+←/→ seek 1s, Ctrl+Z
-       undo the last tag.
-     - Ignore hotkeys while typing in an input or textarea.
-     - The YouTube iframe steals keyboard focus when clicked. Add a
-       transparent focus-catcher or return focus to the page after
-       player clicks so hotkeys keep working.
-     - Show a "?" overlay listing all shortcuts, and a small on-screen
-       hint showing the pending key sequence (e.g. "Pass → rating?").
+## Merge notes
 
-  5. VOICE TAGGING (`src/lib/filmVoice.ts` parser, unit tested):
-     - Use the browser Web Speech API (SpeechRecognition/
-       webkitSpeechRecognition). Hide the mic button in unsupported
-       browsers.
-     - A mic toggle button, plus hold Backquote (`` ` ``) as push-to-talk
-       (not V — that's serve error).
-     - Capture the video time when speech STARTS, not when it ends.
-     - A deterministic parser, no AI. It fuzzy-matches athlete first
-       names from the roster and understands phrases like: "Jayden kill
-       cross", "Maya pass two", "pass three", "set zone four slide",
-       "block stuff", "Chris ace", "serve error", "dig", "note bad
-       transition".
-     - Number words and digits both work.
-     - If no athlete is said, use the currently selected athlete.
-     - After parsing, show a toast like "Kill · Cross · Jayden @ 3:42"
-       with Undo (5s). If it can't parse, show what it heard and save
-       nothing.
-     - Write unit tests for at least 15 phrases, including misheard
-       names and missing details.
+Checked by merging every branch into `main` in the order above on a
+throwaway branch. All code merges cleanly, and the combined result passes
+`tsc`, lint, 557 unit tests, the build and the `/demo` Playwright test.
+The only conflicts are in docs, and both are "keep both sides":
 
-  6. Tag list: show the athlete and details (e.g. "Pass · 3 · Jayden",
-     "Set · Zone 4 · Slide"). Add an athlete filter dropdown next to the
-     tag filter chips.
+- **README.md setup list.** Several branches add their schema file right
+  after v35, because `main` still ends there. Merge `docs/readme-accuracy`
+  first; each later conflict then becomes "append the new file after
+  `schema_v43_team_programs.sql`", in order v44 to v47.
+- **TESTING.md coverage table.** Each feature branch adds one row in the
+  same place. Keep every row.
 
-  7. Athletes stay read-only: no hotkeys, no mic, no tag panel. Verify
-     RLS still blocks athlete writes.
+## Next up
 
-  8. Run the unit tests, `npx tsc --noEmit`, and `npm run build`. Fix
-     only what you introduced.
-
-  9. Print `schema_v36_film_tag_details.sql` and stop. Tell the user to
-     run it, and wait.
-
-  10. After confirmation: run `npm run dev` and give a test checklist
-      covering mouse tagging, every hotkey path, voice tagging (5
-      phrases), undo, athlete filter, and athlete read-only view. Wait
-      for results, then push and open a PR to `main`. Don't merge.
+See SUGGESTIONS.md.
