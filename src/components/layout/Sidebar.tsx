@@ -116,7 +116,8 @@ export function MainNav({ role, pathname }: { role: TeamRole | null; pathname: s
           {config.more.map((item) => (
             <NavItem
               key={item.href}
-              item={item}
+              // Feedback records which page it's about.
+              item={item.href === "/feedback" ? { ...item, href: `/feedback?from=${encodeURIComponent(pathname)}` } : item}
               active={item === activeMore}
               onNavigate={() => setMoreOpen(false)}
             />

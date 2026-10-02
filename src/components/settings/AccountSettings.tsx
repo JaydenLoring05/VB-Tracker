@@ -81,6 +81,14 @@ export function AccountSettings() {
         )}
       </section>
 
+      <section className="panel">
+        <h2>Feedback</h2>
+        <p className="muted">Something broken, confusing, or missing? Tell us from inside the app.</p>
+        <Link href="/feedback?from=%2Fsettings" className="button-link">
+          Send feedback
+        </Link>
+      </section>
+
       <p className="muted">
         See the <Link href="/privacy">Privacy Policy</Link> for what we collect and who can see it.
       </p>
