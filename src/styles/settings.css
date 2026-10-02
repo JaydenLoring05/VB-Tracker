@@ -26,6 +26,7 @@
   align-items: center;
   gap: var(--sp-2);
   min-height: 44px;
+}
 
 /* Send feedback */
 .feedback-panel {
