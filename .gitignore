@@ -11,3 +11,5 @@ tsconfig.tsbuildinfo
 scripts/playwright-verify/env.mjs
 scripts/playwright-verify/screenshots/
 .worktrees/
+test-results/
+playwright-report/

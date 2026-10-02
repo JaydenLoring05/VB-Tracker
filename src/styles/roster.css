@@ -30,6 +30,12 @@
   margin-top: var(--sp-4);
 }
 
+/* Spans the whole grid so it sits under the last row, not in a column. */
+.roster-load-more {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
 .roster-row {
   position: relative;
   display: grid;

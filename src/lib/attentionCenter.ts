@@ -28,6 +28,8 @@ const PAIN_FIELDS: { key: "kneePain" | "shoulderPain" | "lowerBackPain" | "ankle
 const ATTENTION_PAIN_THRESHOLD = 4;
 const READINESS_DROP_THRESHOLD = 20;
 const MIN_WEEKLY_WORKOUTS = 2;
+// Missing one scheduled day is normal; two in a week is a pattern.
+const MISSED_ASSIGNED_THRESHOLD = 2;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function joinWithAnd(items: string[]): string {
@@ -90,12 +92,18 @@ function readinessDrop(history: StatEntry[]): number | null {
  * readiness trend, workout_sessions completion counts, recent PRs) -- no
  * new tracked fields. Sorted high -> medium -> positive, most recent signal
  * first within a tier.
+ *
+ * Missed workouts: athletes with a program start date (schema_v44) are judged
+ * on the days their program actually assigned (`missedAssignedByUser`, see
+ * src/lib/programSchedule.ts). Athletes without one fall back to the proxy of
+ * fewer than MIN_WEEKLY_WORKOUTS completed sessions in 7 days.
  */
 export function computeAttentionItems(
   roster: RosterAthlete[],
   statsHistoryByUser: Record<string, StatEntry[]>,
   completedSessionsLast7ByUser: Record<string, number>,
-  recentPRsByUser: Record<string, { exercise: string; date: string }[]>
+  recentPRsByUser: Record<string, { exercise: string; date: string }[]>,
+  missedAssignedByUser: Record<string, { assigned: number; missed: number }> = {}
 ): AttentionItem[] {
   const items: AttentionItem[] = [];
 
@@ -129,8 +137,26 @@ export function computeAttentionItems(
       });
     }
 
+    const schedule = missedAssignedByUser[athlete.userId];
+    if (schedule) {
+      const onlyDayMissed = schedule.assigned === 1 && schedule.missed === 1;
+      if (schedule.missed >= MISSED_ASSIGNED_THRESHOLD || onlyDayMissed) {
+        items.push({
+          id: `${athlete.userId}-missed-workouts`,
+          userId: athlete.userId,
+          displayName: athlete.displayName,
+          priority: "medium",
+          reason: onlyDayMissed
+            ? "Missed their only assigned workout in the last 7 days"
+            : `Missed ${schedule.missed} of ${schedule.assigned} assigned workouts in the last 7 days`,
+          action: "Send reminder",
+          signalDate: latestDate
+        });
+      }
+    }
+
     const completed = completedSessionsLast7ByUser[athlete.userId] ?? 0;
-    if (completed < MIN_WEEKLY_WORKOUTS) {
+    if (!schedule && completed < MIN_WEEKLY_WORKOUTS) {
       items.push({
         id: `${athlete.userId}-missed-workouts`,
         userId: athlete.userId,

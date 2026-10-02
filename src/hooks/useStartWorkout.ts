@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 import { useDemo } from "@/context/DemoContext";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useSupabase } from "@/hooks/useSupabase";
+import { startDateForWeek } from "@/lib/programSchedule";
+import { todayISO } from "@/lib/storage";
 import { WorkoutSession } from "@/types";
 
 export function useStartWorkout() {
   const router = useRouter();
-  const { userId, week, reportSyncError } = useTrackerContext();
+  const { userId, week, reportSyncError, programStartDate, setProgramStartDate } = useTrackerContext();
   const supabase = useSupabase();
   const demo = useDemo();
 
@@ -73,6 +75,13 @@ export function useStartWorkout() {
       );
       setStarting(false);
       return;
+    }
+
+    // The first workout pins the athlete's program calendar: the week they
+    // started it in becomes "this week". Lets their coach see missed
+    // assigned days. Best effort; the workout itself already started.
+    if (!programStartDate) {
+      void setProgramStartDate(startDateForWeek(week, todayISO()));
     }
 
     router.push(`/workout/${data.id}`);

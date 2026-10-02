@@ -17,7 +17,8 @@ export function useAttentionCenter(team: Team | null, roster: RosterAthlete[]) {
             roster,
             activity.statsHistoryByUser,
             activity.completedLast7ByUser,
-            activity.recentPRsByUser
+            activity.recentPRsByUser,
+            activity.missedAssignedByUser
           ),
     [loading, error, roster, activity]
   );

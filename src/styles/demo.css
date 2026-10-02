@@ -159,12 +159,9 @@
 }
 
 .demo-view-switch {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--sp-2);
-}
-
-.demo-view-switch button {
-  flex: 1 1 0;
 }
 
 .demo-view {
@@ -389,6 +386,10 @@
 
   .demo-banner-inner {
     padding: var(--sp-2) var(--sp-6);
+  }
+
+  .demo-view-switch {
+    display: flex;
   }
 
   .demo-view-switch button {
