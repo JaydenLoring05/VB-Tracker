@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Flame } from "lucide-react";
+import { ArrowRight, ClipboardCheck, Flame } from "lucide-react";
 import Link from "next/link";
 
 import { TeamNudge } from "@/components/dashboard/TeamNudge";
@@ -13,6 +13,7 @@ import { usePRs } from "@/hooks/usePRs";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
+import { checkedInToday } from "@/lib/dailyCheckIn";
 import { todayName } from "@/lib/storage";
 
 const RECOVERY_COLOR: Record<string, string> = {
@@ -30,7 +31,8 @@ export function DashboardCards() {
   const today = todayName();
   const { workoutStreak, teamOverride, substitutions } = useTrackerContext();
 
-  const { recovery, status, hasLoggedStats, readinessExplanation } = useRecoveryStats();
+  const { recovery, status, hasLoggedStats, readinessExplanation, history } = useRecoveryStats();
+  const needsCheckIn = !checkedInToday(history);
   const { week, completedExercises, totalExercises, progress } = useWorkoutProgress();
   const { prs } = usePRs();
   const { openSession } = useStartWorkout();
@@ -46,6 +48,17 @@ export function DashboardCards() {
   return (
     <>
       <TeamNudge />
+
+      {needsCheckIn && (
+        <Link href="/check-in" className="panel today-checkin">
+          <ClipboardCheck size={26} aria-hidden="true" />
+          <span>
+            <strong>Daily check-in</strong>
+            <span className="muted">30 seconds. Sleep, energy, soreness, anything hurting.</span>
+          </span>
+          <ArrowRight size={20} aria-hidden="true" />
+        </Link>
+      )}
 
       <section id="dashboard" className="panel today-hero" aria-labelledby="today-title">
         <p className="micro micro-gold">Today &middot; {today}</p>
@@ -101,7 +114,7 @@ export function DashboardCards() {
             ) : (
               <>
                 <p className="muted">Log sleep, energy and soreness to get today&apos;s recovery score.</p>
-                <Link href="/stats" className="button-link dashboard-card-cta">
+                <Link href="/check-in" className="button-link dashboard-card-cta">
                   Log today&apos;s check-in
                 </Link>
               </>
