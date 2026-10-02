@@ -45,7 +45,6 @@ Rules for automated runs:
 | F-09 | Morning email at each coach's local time | new | your idea | M |
 | F-10 | Notion settings screen (status and "Sync now") | new | your idea | S |
 | F-11 | Beach-specific starting program | new | your idea | M |
-| F-12 | AI film: find plays and make clips from game video automatically | new | me | L |
 | R-01 | Database sets `latest_stats.updated_at` itself (needs SQL) | new | your idea | S |
 | R-02 | Coaches can read a guardian's email, not just the flag (needs SQL) | new | your idea | S |
 | R-03 | Automated tests for row-level security | new | your idea | M |
@@ -53,6 +52,7 @@ Rules for automated runs:
 | R-05 | Reminder timing depends on GitHub's scheduler | new | your idea | S |
 | A-01 | Split `TrackerContext.tsx` into smaller providers | new | your idea | L |
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
+| F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
 
 ## Details
 
@@ -104,7 +104,7 @@ Rules for automated runs:
   the player, so tags can't be read off the video's own clock. Find out what
   Hudl allows before sizing this: if it can't be embedded, the honest
   version is typed timestamps next to the external link.
-- **F-12. AI film.** Jayden plans AI film analysis. Competitors already
+- **F-14. AI film.** Jayden plans AI film analysis. Competitors already
   sell it: Balltime (Hudl) charges athletes $20/month for automatic downtime
   removal, play filters, highlight reels, serve and attack speed, and jump
   detection. A first version could find rallies and cut downtime from a
@@ -162,7 +162,7 @@ Rules for automated runs:
   history and graphs, a self-built program, "My clips" for the athlete's own
   film, and stats export. Athletes on a paying team get Pro free, and Pro
   shows an "Invite your coach" button. Jayden revisits this the week of
-  2026-10-05 before marking it planned. See F-12 for the price step-up.
+  2026-10-05 before marking it planned. See F-14 for the price step-up.
 - **F-08. The skill radar only keeps the latest ratings.** #40 stores one
   `performance_profiles.skill_ratings` value per athlete (schema v48), so
   each new self-rating overwrites the last. Keeping dated ratings (a small
