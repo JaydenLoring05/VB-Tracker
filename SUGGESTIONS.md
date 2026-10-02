@@ -151,3 +151,29 @@ and `robots.ts`.
   whole team has to ask every athlete to reset their week. A coach action
   that sets the start date for the team or a group would keep everyone on
   the same week and make the missed-day signal accurate from day one.
+
+## Noticed during the launch-readiness pass
+
+- **The copied check-in reminder still points at `/stats`.**
+  `buildCheckInReminder` in `src/lib/teamSetup.ts` (the coach's "Copy
+  check-in reminder" text) sends athletes to `/stats`. After #43 the faster
+  path is `/check-in`. It's a one-line change to make once #43 is merged.
+- **`latest_stats.updated_at` should also be set by the database.** #46 fixes
+  it in the app's save. A `before update` trigger on `latest_stats` would
+  protect any future writer (an import, an admin fix) from bringing back the
+  "everyone looks overdue" bug.
+- **Coaches can read a guardian's email, not just the flag.** The roster's
+  "Guardian info missing" flag (#49) uses the existing "coach can view roster
+  profiles" policy, which exposes every profile column to the coach. If
+  coaches should only see the flag, expose it through a function and narrow
+  what the policy returns.
+- **Reminder timing depends on GitHub's scheduler.** #45 triggers reminders
+  from a scheduled GitHub workflow because Vercel's Hobby plan only allows
+  daily crons. GitHub can run late at busy times. Moving the trigger to an
+  hourly Vercel cron (Pro) or Supabase `pg_cron` + `pg_net` would make the
+  timing exact.
+- **No Notion settings screen exists.** #51 gates the background sync request
+  behind a flag, but the founder still sets the sync up through server
+  variables. A small Settings section (status and "Sync now") behind the same
+  flag would make it self-serve.
+
