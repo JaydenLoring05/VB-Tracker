@@ -5,6 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { parseProgramDays, pickAssignedProgramId } from "@/lib/customProgram";
 import { RECOMMENDED_PLAN_WEEKS } from "@/lib/missedWorkouts";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
+import { latestStatsUpsert } from "@/lib/statsRow";
 import { programWeekOn } from "@/lib/programSchedule";
 import { createClient } from "@/lib/supabase/client";
 import type { StartingProgramKey } from "@/data/positionPrograms";
@@ -656,7 +657,7 @@ export function TrackerProvider({
 
     supabase
       .from("latest_stats")
-      .upsert({ user_id: userId, ...row }, { onConflict: "user_id" })
+      .upsert(latestStatsUpsert(userId, row), { onConflict: "user_id" })
       .then(({ error }) => {
         if (error) {
           console.error("Failed to save latest stats", error);
