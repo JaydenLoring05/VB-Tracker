@@ -258,3 +258,166 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Daily check-in ---------- */
+
+.daily-checkin {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.daily-checkin h2 {
+  margin: 0;
+}
+
+.checkin-sleep label,
+.checkin-slider-head label {
+  font-weight: 600;
+}
+
+.checkin-stepper {
+  display: grid;
+  grid-template-columns: 56px 1fr 56px;
+  gap: var(--sp-2);
+  align-items: center;
+  margin-top: var(--sp-2);
+}
+
+.checkin-stepper button {
+  min-height: 56px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.checkin-sleep-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--sp-1);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.checkin-sleep-value input {
+  width: 3.4em;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  -moz-appearance: textfield;
+}
+
+.checkin-sleep-value input::-webkit-inner-spin-button,
+.checkin-sleep-value input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.checkin-slider-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.checkin-slider-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  min-width: 2ch;
+  text-align: right;
+}
+
+/* A big thumb and a tall hit area: thumbs drag easily, and a tap anywhere on
+   the track jumps straight to that value. */
+.checkin-slider input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 44px;
+  margin: var(--sp-1) 0 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  accent-color: var(--gold);
+}
+
+.checkin-slider input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+.checkin-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 32px;
+  height: 32px;
+  margin-top: -12px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 3px solid var(--bg);
+}
+
+.checkin-slider input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+.checkin-slider input[type="range"]::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 3px solid var(--bg);
+}
+
+.checkin-slider-scale {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.checkin-pain-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 52px;
+  width: 100%;
+}
+
+.checkin-chevron-open {
+  transform: rotate(180deg);
+}
+
+.checkin-pain {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.checkin-pain > p {
+  margin: 0;
+}
+
+.checkin-save {
+  min-height: 56px;
+  font-size: 18px;
+}
+
+.checkin-saved {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  color: var(--green);
+}
+
+.pr-form-error {
+  margin: var(--sp-2) 0 0;
+  color: var(--red);
+  font-size: var(--fs-sm);
+}

@@ -1,0 +1,39 @@
+name: Check-in reminders
+
+# Calls /api/checkin-reminders once an hour. The route sends each team's
+# reminder at the hour the coach picked (in the team's time zone) to athletes
+# who haven't checked in yet that day. An hourly Vercel cron isn't available
+# on the Hobby plan, so GitHub's scheduler triggers it instead.
+#
+# Off until the repository secret CRON_SECRET is set (Settings → Secrets and
+# variables → Actions). It must match the CRON_SECRET in Vercel. Optional
+# repository variable SITE_URL; defaults to the production URL.
+
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: checkin-reminders
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call the reminder endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://volleyball-tracker-beta.vercel.app' }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "CRON_SECRET is not set; check-in reminders are off."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --max-time 60 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$SITE_URL/api/checkin-reminders"

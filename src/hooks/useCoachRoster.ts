@@ -6,6 +6,7 @@ import { useDemo } from "@/context/DemoContext";
 import { fromStatsRow, StatsRow } from "@/context/TrackerContext";
 import { useSupabase } from "@/hooks/useSupabase";
 import { displayMemberName, normalizeMemberName } from "@/lib/memberName";
+import { guardianStatus } from "@/lib/guardian";
 import { rosterPageRange, splitRosterPage } from "@/lib/rosterPaging";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
 import { RosterAthlete, Team } from "@/types";
@@ -74,6 +75,20 @@ export function useCoachRoster(team: Team | null) {
         console.error("Failed to load roster activity", profilesError);
       }
 
+      // Guardian status, read separately: before schema_v52 these columns
+      // don't exist, and that must not hide the roster. On error, no flags.
+      const { data: guardianRows, error: guardianError } = await supabase
+        .from("profiles")
+        .select("user_id, is_adult, guardian_name, guardian_email, guardian_acknowledged_at")
+        .in("user_id", athleteIds);
+      const guardianMissing = new Set(
+        guardianError
+          ? []
+          : (guardianRows ?? []).filter((row) => guardianStatus(row) === "missing").map((row) => row.user_id as string)
+      );
+      // An athlete with no profile row at all hasn't answered either.
+      const withProfile = new Set((guardianRows ?? []).map((row) => row.user_id as string));
+
       const statsByUser = new Map<string, StatsRow & { updated_at: string }>(
         (statsRows ?? []).map((row) => [row.user_id as string, row])
       );
@@ -100,7 +115,8 @@ export function useCoachRoster(team: Team | null) {
             recoveryLabel: recoveryStatus(recovery).label,
             lastCheckIn,
             needsCheckIn: daysSinceCheckIn >= STALE_DAYS,
-            lastActiveAt: lastActiveByUser.get(member.user_id) ?? null
+            lastActiveAt: lastActiveByUser.get(member.user_id) ?? null,
+            guardianInfoMissing: !guardianError && (guardianMissing.has(member.user_id) || !withProfile.has(member.user_id))
           };
         })
       };

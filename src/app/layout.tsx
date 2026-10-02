@@ -3,6 +3,7 @@ import { Barlow_Condensed, Manrope } from "next/font/google";
 
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { SkipLink } from "@/components/shared/SkipLink";
+import { AnalyticsGate } from "@/components/monitoring/AnalyticsGate";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
@@ -72,6 +73,7 @@ export default function RootLayout({
         <SkipLink />
         {children}
         <ServiceWorkerRegister />
+        <AnalyticsGate />
       </body>
     </html>
   );

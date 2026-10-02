@@ -20,3 +20,41 @@
   padding-left: var(--sp-3);
   margin: var(--sp-3) 0;
 }
+
+.settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+
+/* Send feedback */
+.feedback-panel {
+  display: grid;
+  gap: var(--sp-3);
+  max-width: 640px;
+}
+
+.feedback-panel h1,
+.feedback-panel p {
+  margin: 0;
+}
+
+.feedback-panel textarea {
+  width: 100%;
+  min-height: 140px;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.feedback-meta {
+  font-size: var(--fs-sm);
+}
+
+.feedback-error {
+  margin: 0;
+  color: var(--red);
+}
+
+.feedback-panel button[type="submit"] {
+  min-height: 48px;
+}

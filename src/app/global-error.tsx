@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { reportError } from "@/lib/reportError";
+
 // Last-resort boundary: it replaces the root layout, so globals.css and the
 // font are not loaded. Everything here is self-contained inline styling that
 // mirrors the NextRep dark theme.
@@ -14,6 +16,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error("Global error boundary caught:", error);
+    reportError(error);
   }, [error]);
 
   return (
