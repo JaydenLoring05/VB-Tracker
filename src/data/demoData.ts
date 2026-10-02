@@ -3,7 +3,15 @@ import { getWorkoutDays } from "@/data/workoutPlan";
 import type { CompletedSession } from "@/hooks/useAthleteAdherence";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
 import { todayISO } from "@/lib/storage";
-import type { RosterAthlete, StatEntry, Team, TeamCalendarEvent, TeamCalendarEventType } from "@/types";
+import type {
+  FilmTag,
+  RosterAthlete,
+  StatEntry,
+  Team,
+  TeamCalendarEvent,
+  TeamCalendarEventType,
+  TeamFilm
+} from "@/types";
 
 /**
  * Static, deterministic sample data for the public /demo experience.
@@ -38,6 +46,15 @@ export type DemoSpotlight = {
   workoutStreak: number;
 };
 
+export type DemoPreviousSet = { weight: number | null; reps: number | null; seconds: number | null };
+
+/** The session the demo's Workout Mode opens on, and Ava's last numbers for each exercise. */
+export type DemoWorkout = {
+  week: number;
+  day: string;
+  previousSets: Record<string, DemoPreviousSet>;
+};
+
 export type DemoData = {
   team: Team;
   athletes: DemoAthlete[];
@@ -50,6 +67,9 @@ export type DemoData = {
   recentPRs: Record<string, { exercise: string; date: string }[]>;
   calendarEvents: TeamCalendarEvent[];
   spotlight: DemoSpotlight;
+  films: TeamFilm[];
+  filmTags: FilmTag[];
+  workout: DemoWorkout;
 };
 
 /* ------------------------------------------------------------------ */
@@ -465,6 +485,106 @@ function buildCalendar(teamId: string, anchor: Date): TeamCalendarEvent[] {
   });
 }
 
+/* ------------------------------------------------------------------ */
+/* Film room                                                           */
+/* ------------------------------------------------------------------ */
+
+// Public highlight reels from Volleyball World's official YouTube channel,
+// checked to allow embedding. The tags below are sample tags on our demo
+// roster, so they show how tagging works rather than describe these plays.
+const DEMO_FILMS: { id: string; title: string; videoId: string; daysAgo: number }[] = [
+  { id: "demo-film-1", title: "Film study: CHN vs. TUR, VNL final highlights", videoId: "t3MFjt2U9SY", daysAgo: 2 },
+  { id: "demo-film-2", title: "Film study: ITA vs. BRA, VNL final highlights", videoId: "H37Lfp_Tm64", daysAgo: 9 }
+];
+
+type ScriptedTag = Partial<Omit<FilmTag, "id" | "film_id" | "team_id" | "created_by" | "created_at">> &
+  Pick<FilmTag, "seconds" | "tag">;
+
+const NO_DETAILS = {
+  athlete_id: null,
+  pass_rating: null,
+  set_zone: null,
+  set_type: null,
+  block_outcome: null,
+  attack_direction: null,
+  note: null
+} as const;
+
+const DEMO_TAG_SCRIPT: Record<string, ScriptedTag[]> = {
+  "demo-film-1": [
+    { seconds: 18, tag: "pass", athlete_id: "demo-chloe", pass_rating: 3 },
+    { seconds: 21, tag: "set", athlete_id: "demo-maya", set_zone: "4", set_type: "4" },
+    { seconds: 24, tag: "kill", athlete_id: "demo-ava", attack_direction: "cross" },
+    { seconds: 47, tag: "ace", athlete_id: "demo-jordan", attack_direction: "line" },
+    { seconds: 71, tag: "pass", athlete_id: "demo-sofia", pass_rating: 1 },
+    { seconds: 74, tag: "set", athlete_id: "demo-maya", set_zone: "3", set_type: "quick" },
+    { seconds: 76, tag: "block", athlete_id: "demo-emma", block_outcome: "touch" },
+    { seconds: 79, tag: "dig", athlete_id: "demo-chloe" },
+    { seconds: 103, tag: "kill", athlete_id: "demo-kayla", attack_direction: "seam" },
+    { seconds: 131, tag: "block", athlete_id: "demo-emma", block_outcome: "stuff" },
+    { seconds: 158, tag: "serve_error", athlete_id: "demo-lily" },
+    { seconds: 186, tag: "pass", athlete_id: "demo-chloe", pass_rating: 2 },
+    { seconds: 189, tag: "set", athlete_id: "demo-maya", set_zone: "6", set_type: "pipe" },
+    { seconds: 192, tag: "error", athlete_id: "demo-harper", attack_direction: "line" },
+    { seconds: 214, tag: "note", note: "Transition is slow after the dig. Talk about it Monday." }
+  ],
+  "demo-film-2": [
+    { seconds: 15, tag: "pass", athlete_id: "demo-sofia", pass_rating: 2 },
+    { seconds: 19, tag: "kill", athlete_id: "demo-ava", attack_direction: "tip" },
+    { seconds: 52, tag: "block", athlete_id: "demo-zoe", block_outcome: "tooled" },
+    { seconds: 88, tag: "dig", athlete_id: "demo-chloe" },
+    { seconds: 91, tag: "kill", athlete_id: "demo-kayla", attack_direction: "cross" },
+    { seconds: 140, tag: "note", note: "Great example of a high ball swing to copy." }
+  ]
+};
+
+function buildFilms(teamId: string, anchor: Date): { films: TeamFilm[]; filmTags: FilmTag[] } {
+  const films = DEMO_FILMS.map((film) => ({
+    id: film.id,
+    team_id: teamId,
+    event_id: null,
+    title: film.title,
+    video_url: `https://www.youtube.com/watch?v=${film.videoId}`,
+    created_by: "demo-coach",
+    created_at: daysAgoDate(anchor, film.daysAgo).toISOString()
+  }));
+
+  const filmTags = films.flatMap((film) =>
+    (DEMO_TAG_SCRIPT[film.id] ?? []).map((tag, index) => ({
+      ...NO_DETAILS,
+      ...tag,
+      id: `${film.id}-tag-${index}`,
+      film_id: film.id,
+      team_id: teamId,
+      created_by: "demo-coach",
+      created_at: film.created_at
+    }))
+  );
+
+  return { films, filmTags };
+}
+
+/* ------------------------------------------------------------------ */
+/* Workout Mode                                                        */
+/* ------------------------------------------------------------------ */
+
+// Workout Mode in the demo always opens on week 14's Monday lower-body
+// session: it has weighted lifts, a timed hold and bodyweight reps, so it
+// shows every kind of set. These are Ava's numbers from last week.
+const DEMO_WORKOUT_DAY = "Monday";
+const DEMO_PREVIOUS_SETS: Record<string, DemoPreviousSet> = {
+  "Trap Bar Deadlift or RDL": { weight: 155, reps: 5, seconds: null },
+  "Bulgarian Split Squat": { weight: 30, reps: 8, seconds: null },
+  "Front Squat": { weight: 95, reps: 5, seconds: null },
+  "Spanish Squat": { weight: null, reps: null, seconds: 40 },
+  "Nordic Hamstring Curl": { weight: null, reps: 5, seconds: null },
+  "Tibialis Raises": { weight: null, reps: 15, seconds: null }
+};
+
+function buildDemoWorkout(): DemoWorkout {
+  return { week: SEASON_WEEK, day: DEMO_WORKOUT_DAY, previousSets: { ...DEMO_PREVIOUS_SETS } };
+}
+
 function buildSpotlight(userId: string, sessions: CompletedSession[], anchor: Date): DemoSpotlight {
   const thisMonday = mondayOf(anchor).getTime();
   const checked: Record<string, boolean> = {};
@@ -558,6 +678,8 @@ export function buildDemoData(now: Date = new Date()): DemoData {
     prs,
     recentPRs,
     calendarEvents: buildCalendar(team.id, anchor),
-    spotlight: buildSpotlight("demo-ava", completedSessions["demo-ava"], anchor)
+    spotlight: buildSpotlight("demo-ava", completedSessions["demo-ava"], anchor),
+    ...buildFilms(team.id, anchor),
+    workout: buildDemoWorkout()
   };
 }

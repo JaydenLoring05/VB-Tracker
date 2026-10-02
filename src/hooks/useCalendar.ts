@@ -4,8 +4,7 @@ import { useTrackerContext } from "@/context/TrackerContext";
 import { useTeam } from "@/hooks/useTeam";
 import { useTeamCalendar } from "@/hooks/useTeamCalendar";
 import { todayISO } from "@/lib/storage";
-
-const TRAINING_LOAD_WINDOW_DAYS = 7;
+import { computeTrainingLoad } from "@/lib/trainingLoad";
 
 export type CalendarPreviewEvent = {
   id: string;
@@ -50,26 +49,12 @@ export function useCalendar() {
     return days;
   }, [calendarEvents, teamEvents]);
 
-  const trainingLoad = useMemo(() => {
-    const windowStart = new Date();
-    windowStart.setDate(windowStart.getDate() - TRAINING_LOAD_WINDOW_DAYS);
-    const windowStartIso = todayISO(windowStart);
-    const todayIso = todayISO();
-
-    return calendarEvents.reduce((sum, event) => {
-      if (event.date < windowStartIso || event.date > todayIso) return sum;
-
-      const weights = {
-        workout: 3,
-        practice: 4,
-        game: 5,
-        recovery: 1,
-        rest: 0
-      };
-
-      return sum + weights[event.type];
-    }, 0);
-  }, [calendarEvents]);
+  // Personal events plus the team calendar; see src/lib/trainingLoad.ts for
+  // the weights and how a session on both calendars is counted once.
+  const trainingLoad = useMemo(
+    () => computeTrainingLoad({ personal: calendarEvents, team: teamEvents, today: todayISO() }),
+    [calendarEvents, teamEvents]
+  );
 
   return {
     calendarEvents,

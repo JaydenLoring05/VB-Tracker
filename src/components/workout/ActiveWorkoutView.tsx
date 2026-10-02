@@ -34,7 +34,24 @@ function vibrate(pattern: number | number[]) {
   }
 }
 
+/** Everything Workout Mode needs from a session: the real Supabase one, or the demo's in-memory one. */
+export type WorkoutSessionController = ReturnType<typeof useActiveWorkoutSession>;
+
 export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
+  return <WorkoutModeView controller={useActiveWorkoutSession(sessionId)} />;
+}
+
+/**
+ * The Workout Mode screen. `onExit` replaces the summary's "Back to
+ * Dashboard" navigation (the demo uses it to stay on /demo).
+ */
+export function WorkoutModeView({
+  controller,
+  onExit
+}: {
+  controller: WorkoutSessionController;
+  onExit?: () => void;
+}) {
   const {
     loading,
     notFound,
@@ -47,7 +64,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     deleteSet,
     finishWorkout,
     updateSessionRPE
-  } = useActiveWorkoutSession(sessionId);
+  } = controller;
 
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [weight, setWeight] = useState("");
@@ -212,6 +229,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
         sets={sets}
         rpe={session.rpe}
         onRateRPE={updateSessionRPE}
+        onDone={onExit}
       />
     );
   }
