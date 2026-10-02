@@ -175,3 +175,86 @@
     width: 100%;
   }
 }
+
+/* Skill radar: chart on the left, one row of 1-5 taps per skill on the right. */
+.skill-radar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-4);
+  align-items: center;
+  margin-top: var(--sp-3);
+}
+
+.skill-radar-chart {
+  min-width: 0;
+}
+
+.skill-radar-summary {
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-sm);
+}
+
+.skill-radar-summary strong {
+  color: var(--gold);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.skill-radar-inputs {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.skill-rating {
+  display: grid;
+  gap: 6px;
+}
+
+.skill-rating-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px var(--sp-2);
+  font-weight: 700;
+}
+
+.skill-rating-hint {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.skill-rating-scale {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.skill-step {
+  min-height: 44px;
+  padding: 0;
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.skill-step.is-active {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--on-gold);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .skill-step:not(.is-active):hover {
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .skill-radar {
+    grid-template-columns: 1fr;
+  }
+}

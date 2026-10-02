@@ -29,6 +29,11 @@ export function DemoTrackerProvider({
 
       week: spotlight.week,
       setWeek: blocked("Changing weeks"),
+      programStartDate: null,
+      setProgramStartDate: async () => {
+        requestSignup("Setting your program week");
+        return false;
+      },
 
       checked: spotlight.checked,
       toggleExercise: blocked("Checking off exercises"),

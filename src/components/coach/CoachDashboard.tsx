@@ -56,7 +56,8 @@ export function CoachDashboard({
   const team = activeTeam;
   const demo = useDemo();
   const router = useRouter();
-  const { loading, roster, error, removeAthlete, renameAthlete, refresh } = useCoachRoster(team);
+  const { loading, roster, error, hasMore, loadingMore, loadMore, removeAthlete, renameAthlete, refresh } =
+    useCoachRoster(team);
   const {
     loading: attentionLoading,
     items: attentionItems,
@@ -201,7 +202,7 @@ export function CoachDashboard({
               ? "Loading roster..."
               : rosterLoadFailed
                 ? "Roster unavailable"
-                : `${roster.length} athlete${roster.length === 1 ? "" : "s"} on your roster`}
+                : `${roster.length}${hasMore ? "+" : ""} athlete${roster.length === 1 && !hasMore ? "" : "s"} on your roster`}
           </p>
         </div>
 
@@ -346,6 +347,11 @@ export function CoachDashboard({
                 </button>
               </div>
             ))}
+            {hasMore && (
+              <button type="button" className="ghost roster-load-more" onClick={loadMore} disabled={loadingMore}>
+                {loadingMore ? "Loading..." : "Load more athletes"}
+              </button>
+            )}
           </div>
         )}
       </div>

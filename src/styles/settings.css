@@ -1,0 +1,22 @@
+.settings-page {
+  display: grid;
+  gap: var(--sp-4);
+  max-width: 720px;
+}
+
+.settings-page form {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.settings-page label {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.settings-warning {
+  border-left: 3px solid var(--red);
+  padding-left: var(--sp-3);
+  margin: var(--sp-3) 0;
+}

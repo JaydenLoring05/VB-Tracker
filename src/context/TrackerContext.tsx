@@ -3,7 +3,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { parseProgramDays, pickAssignedProgramId } from "@/lib/customProgram";
+import { RECOMMENDED_PLAN_WEEKS } from "@/lib/missedWorkouts";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
+import { programWeekOn } from "@/lib/programSchedule";
 import { createClient } from "@/lib/supabase/client";
 import { todayISO } from "@/lib/storage";
 import { TeamOverrideData } from "@/lib/programResolution";
@@ -113,6 +115,10 @@ export type TrackerContextValue = {
 
   week: number;
   setWeek: (week: number) => void;
+  /** Monday of program week 1 (profiles.program_start_date), or null if never set. */
+  programStartDate: string | null;
+  /** Saves a new program start date. Resolves false if it didn't save. */
+  setProgramStartDate: (date: string) => Promise<boolean>;
 
   checked: Record<string, boolean>;
   toggleExercise: (day: string, exercise: string) => void;
@@ -176,6 +182,7 @@ export function TrackerProvider({
   const supabase = useMemo(() => createClient(), []);
 
   const [week, setWeek] = useState(1);
+  const [programStartDate, setProgramStartDateState] = useState<string | null>(null);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [stats, setStats] = useState<StatEntry>(emptyStats);
   const [history, setHistory] = useState<StatEntry[]>([]);
@@ -239,6 +246,42 @@ export function TrackerProvider({
         if (error) console.error("Failed to update last-active timestamp", error);
       });
   }, [supabase, userId]);
+
+  useEffect(() => {
+    // Open on the athlete's current program week instead of week 1. Before
+    // schema_v44 the column doesn't exist; the error just leaves week 1.
+    let cancelled = false;
+    supabase
+      .from("profiles")
+      .select("program_start_date")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled || error || !data?.program_start_date) return;
+        const startDate = data.program_start_date as string;
+        setProgramStartDateState(startDate);
+        const current = programWeekOn(startDate, todayISO());
+        if (current != null) setWeek(Math.min(Math.max(current, 1), RECOMMENDED_PLAN_WEEKS));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, userId]);
+
+  const setProgramStartDate = useCallback(
+    async (date: string) => {
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({ user_id: userId, program_start_date: date }, { onConflict: "user_id" });
+      if (error) {
+        console.error("Failed to save program start date", error);
+        return false;
+      }
+      setProgramStartDateState(date);
+      return true;
+    },
+    [supabase, userId]
+  );
 
   useEffect(() => {
     function handleOnline() {
@@ -728,6 +771,8 @@ export function TrackerProvider({
     userId,
     week,
     setWeek,
+    programStartDate,
+    setProgramStartDate,
     checked,
     toggleExercise,
     setExerciseChecked,

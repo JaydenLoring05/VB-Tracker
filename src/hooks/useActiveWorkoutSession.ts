@@ -5,7 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
+import { activeSecondsAfterWindow, buildActiveTimeFlushRequest } from "@/lib/activeTimeFlush";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
+import { bestMarksByExercise, detectPersonalRecord, personalRecordEntry } from "@/lib/personalRecord";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { createClient } from "@/lib/supabase/client";
 import { WorkoutSession, WorkoutSet } from "@/types";
@@ -31,6 +33,20 @@ export function useActiveWorkoutSession(sessionId: string) {
   useEffect(() => {
     sessionRef.current = session;
   }, [session]);
+
+  // The user's current access token, kept in a ref so the unload flush can
+  // send its keepalive request synchronously (there is no time to await
+  // getSession() once the page is going away).
+  const accessTokenRef = useRef<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      accessTokenRef.current = data.session?.access_token ?? null;
+    });
+    const { data } = supabase.auth.onAuthStateChange((_event, authSession) => {
+      accessTokenRef.current = authSession?.access_token ?? null;
+    });
+    return () => data.subscription.unsubscribe();
+  }, [supabase]);
 
   useEffect(() => {
     let cancelled = false;
@@ -111,22 +127,14 @@ export function useActiveWorkoutSession(sessionId: string) {
       .then(({ data, error }) => {
         if (cancelled || error || !data) return;
 
+        const rows = data as WorkoutSet[];
         const lastSeen: Record<string, PreviousSet> = {};
-        const maxWeight: Record<string, number> = {};
-        const maxSeconds: Record<string, number> = {};
-
-        (data as WorkoutSet[]).forEach((row) => {
-          const seconds = row.seconds ?? null;
+        rows.forEach((row) => {
           if (!(row.exercise in lastSeen)) {
-            lastSeen[row.exercise] = { weight: row.weight, reps: row.reps, seconds };
-          }
-          if (row.weight != null && row.weight > (maxWeight[row.exercise] ?? 0)) {
-            maxWeight[row.exercise] = row.weight;
-          }
-          if (seconds != null && seconds > (maxSeconds[row.exercise] ?? 0)) {
-            maxSeconds[row.exercise] = seconds;
+            lastSeen[row.exercise] = { weight: row.weight, reps: row.reps, seconds: row.seconds ?? null };
           }
         });
+        const { maxWeight, maxSeconds } = bestMarksByExercise(rows);
 
         setPreviousSets(lastSeen);
         setMaxWeightByExercise(maxWeight);
@@ -159,24 +167,50 @@ export function useActiveWorkoutSession(sessionId: string) {
       }
     }
 
-    async function flushActiveWindow() {
+    function flushActiveWindow() {
       const current = sessionRef.current;
       if (!current || !current.resumed_at) return;
 
-      const elapsed = Math.max(0, Math.round((Date.now() - new Date(current.resumed_at).getTime()) / 1000));
-      const nextActive = (current.active_seconds ?? 0) + elapsed;
+      const nextActive = activeSecondsAfterWindow(current.active_seconds, current.resumed_at);
 
-      const { error } = await supabase
-        .from("workout_sessions")
-        .update({ active_seconds: nextActive, resumed_at: null })
-        .eq("id", current.id)
-        .eq("user_id", userId);
-
-      if (!error) {
+      function applyLocally() {
         setSession((session) =>
-          session && session.id === current.id ? { ...session, active_seconds: nextActive, resumed_at: null } : session
+          session && session.id === current!.id ? { ...session, active_seconds: nextActive, resumed_at: null } : session
         );
       }
+
+      async function writeWithClient() {
+        const { error } = await supabase
+          .from("workout_sessions")
+          .update({ active_seconds: nextActive, resumed_at: null })
+          .eq("id", current!.id)
+          .eq("user_id", userId);
+        if (!error) applyLocally();
+      }
+
+      // A keepalive request survives a tab close or hard reload; the
+      // supabase-js write below can be aborted by the unload. The request is
+      // dispatched synchronously here, before the page can go away.
+      const accessToken = accessTokenRef.current;
+      if (!accessToken || typeof fetch !== "function") {
+        void writeWithClient();
+        return;
+      }
+
+      const { url, init } = buildActiveTimeFlushRequest({
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        accessToken,
+        sessionId: current.id,
+        userId,
+        activeSeconds: nextActive
+      });
+
+      fetch(url, init)
+        .then((response) => (response.ok ? applyLocally() : writeWithClient()))
+        // Network failure: if the page is still alive, try once more through
+        // the client (it refreshes an expired token on its own).
+        .catch(() => writeWithClient());
     }
 
     // Always start a fresh active window on mount/resume, even if
@@ -207,11 +241,13 @@ export function useActiveWorkoutSession(sessionId: string) {
 
   async function logSet(exercise: string, weight: number | null, reps: number | null, seconds: number | null = null) {
     const setNumber = sets.filter((s) => s.exercise === exercise).length + 1;
-    // Weighted sets PR on weight; unweighted timed sets (planks, holds) PR on
-    // the longest hold.
-    const isWeightPR = weight != null && weight > (maxWeightByExercise[exercise] ?? 0);
-    const isHoldPR = weight == null && seconds != null && seconds > (maxSecondsByExercise[exercise] ?? 0);
-    const isNewPR = isWeightPR || isHoldPR;
+    const prKind = detectPersonalRecord({
+      weight,
+      seconds,
+      previousMaxWeight: maxWeightByExercise[exercise],
+      previousMaxSeconds: maxSecondsByExercise[exercise]
+    });
+    const isNewPR = prKind !== null;
 
     const { data, error } = await supabase
       .from("workout_sets")
@@ -240,22 +276,12 @@ export function useActiveWorkoutSession(sessionId: string) {
     const newSet = data as WorkoutSet;
     setSets((current) => [...current, newSet]);
 
-    if (isWeightPR && weight != null) {
+    if (prKind === "weight" && weight != null) {
       setMaxWeightByExercise((current) => ({ ...current, [exercise]: weight }));
-      addPR({
-        exercise,
-        value: reps != null ? `${weight} x ${reps}` : String(weight),
-        unit: "lbs",
-        note: "Set during Workout Mode"
-      });
-    } else if (isHoldPR && seconds != null) {
+      addPR(personalRecordEntry(prKind, { exercise, weight, reps, seconds }));
+    } else if (prKind === "hold" && seconds != null) {
       setMaxSecondsByExercise((current) => ({ ...current, [exercise]: seconds }));
-      addPR({
-        exercise,
-        value: String(seconds),
-        unit: "sec",
-        note: "Longest hold, set during Workout Mode"
-      });
+      addPR(personalRecordEntry(prKind, { exercise, weight, reps, seconds }));
     }
 
     return { set: newSet, isNewPR };
