@@ -12,11 +12,12 @@ npm run test:watch  # re-run on save
 npx vitest run tests/lib/recovery.test.ts   # one file
 ```
 
-Before opening a PR, all three of these must pass (CI runs the same steps in
+Before opening a PR, all of these must pass (CI runs the same steps in
 `.github/workflows/ci.yml`):
 
 ```
 npx tsc --noEmit
+npm run lint       # ESLint flat config in eslint.config.mjs; warnings are allowed, errors fail
 npm test
 npm run build      # needs NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY set; any placeholder works
 ```
