@@ -10,7 +10,7 @@ import "@/styles/legal.css";
 export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
   description:
-    "What NextRep collects, who can see athlete and coach data, and how to ask for your data to be deleted. Written in plain language.",
+    "What NextRep collects, who can see athlete and coach data, and how to download or delete your data. Written in plain language.",
   path: "/privacy"
 });
 
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
 
       <main id="main-content" tabIndex={-1} className="legal-content">
         <h1>Privacy Policy</h1>
-        <p className="muted">Last updated September 23, 2026.</p>
+        <p className="muted">Last updated October 1, 2026.</p>
 
         <p>
           NextRep is a training and recovery tracker for volleyball teams. This page explains
@@ -40,8 +40,9 @@ export default function PrivacyPage() {
             <li>Teammates and other teams cannot see your data.</li>
             <li>We don&apos;t sell your data or use it for advertising.</li>
             <li>
-              To delete your account and your data, email{" "}
-              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+              You can download all of your data, or delete your account and your data, yourself from{" "}
+              <strong>Settings</strong> in the app. You can also email{" "}
+              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> and we will do it for you.
             </li>
           </ul>
         </div>
@@ -121,10 +122,20 @@ export default function PrivacyPage() {
             roster.
           </li>
           <li>
-            <strong>Delete your account:</strong> there is no delete button in the app yet, so
-            email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> from the address on your
-            account and ask. We will delete your account and the training, check-in, and profile
-            data linked to it.
+            <strong>Download your data:</strong> in the app, open <strong>Settings</strong> and
+            choose <strong>Download my data</strong>. You get one JSON file with your profile,
+            check-ins, workouts and sets, PRs, calendar, exercise swaps, team memberships, and film
+            tags about your plays.
+          </li>
+          <li>
+            <strong>Delete your account:</strong> in the app, open <strong>Settings</strong>, type
+            the confirmation phrase, and choose <strong>Delete my account</strong>. Your account and
+            the training, check-in, and profile data linked to it are deleted straight away and
+            can&apos;t be recovered. If you coach a team, the team and its rosters, programs,
+            calendar and film are deleted too; your athletes keep their own accounts and data. If
+            you can&apos;t sign in, email{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> from the address on your account
+            and we will do it for you.
           </li>
           <li>
             <strong>Pilot applications:</strong> ask at the same address and we will delete your

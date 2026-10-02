@@ -369,3 +369,14 @@
   color: var(--red);
   font-size: var(--fs-sm);
 }
+
+/* Morning summary email opt-in, under the team header actions. */
+.daily-summary-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  flex-basis: 100%;
+  margin-top: var(--sp-3);
+  color: var(--muted);
+  font-size: 14px;
+}

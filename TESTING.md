@@ -50,6 +50,9 @@ Tests live under `tests/`, mirroring `src/`.
 | Training load | `tests/lib/trainingLoad.test.ts` | Personal and team event weights, 7-day window edges, no double count when a session is on both calendars |
 | Roster paging | `tests/lib/rosterPaging.test.ts` | Page range with a probe row, `hasMore` detection |
 | Program schedule | `tests/lib/programSchedule.test.ts`, `tests/lib/missedWorkouts.test.ts` | Monday-aligned program weeks, start date for a chosen week, assigned days in the 7-day window, missed vs. completed (week, day), coach program vs. recommended plan |
+| Data export and account deletion | `tests/lib/accountData.test.ts` | Tables exported, export file shape and name, typed delete confirmation |
+| Daily coach summary | `tests/lib/dailySummary.test.ts` | Config gating, cron auth, time zone date, numbers match the Attention Center, pain alerts, today's workout, HTML escaping, Resend call |
+| `GET /api/daily-summary` | `tests/api/dailySummaryRoute.test.ts` | Off without env vars, rejects a missing or wrong cron secret, sends one email per opted-in coach, data and send failures |
 | Position starting programs | `tests/data/positionPrograms.test.ts`, `tests/lib/positionProgram.test.ts` | Templates pass the builder's validation, use library exercises with the right measure; position mapping; coach program and plan edits win over the template |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |

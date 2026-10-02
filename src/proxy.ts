@@ -112,10 +112,11 @@ export const config = {
   // Skip Next internals and static/metadata/PWA files (robots.txt, sitemap.xml,
   // manifest, service worker, icons, images), generated metadata routes
   // (icon, apple-icon, opengraph-image, twitter-image; Next appends a hash to
-  // their URLs, hence the optional suffix), the public /api/pilot endpoint, and the
+  // their URLs, hence the optional suffix), the public /api/pilot endpoint, the
+  // /api/daily-summary cron endpoint (it checks its own CRON_SECRET), and the
   // static /offline page. Without this they were redirected to /login for
   // signed-out visitors.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw\\.js$|icons/|offline$|(?:icon|apple-icon|opengraph-image|twitter-image)(?:-[a-z0-9]+)?$|api/pilot$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw\\.js$|icons/|offline$|(?:icon|apple-icon|opengraph-image|twitter-image)(?:-[a-z0-9]+)?$|api/pilot$|api/daily-summary$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
   ]
 };

@@ -22,6 +22,7 @@ import { StatusLabel } from "@/components/shared/StatusLabel";
 
 import { AttentionCenter } from "./AttentionCenter";
 import { CustomProgramPanel } from "./CustomProgramPanel";
+import { DailySummaryToggle } from "./DailySummaryToggle";
 import { ProgramEditor } from "./ProgramEditor";
 import { RosterNameEditor } from "./RosterNameEditor";
 import { TeamCalendarPanel } from "./TeamCalendarPanel";
@@ -216,6 +217,8 @@ export function CoachDashboard({
 
           {regeneratedCode && <span className="muted regenerate-code-status">{regeneratedCode}</span>}
         </div>
+
+        <DailySummaryToggle />
       </div>
 
       <div className="panel">

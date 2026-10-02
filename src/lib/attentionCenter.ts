@@ -13,7 +13,7 @@ export type AttentionItem = {
   signalDate: string;
 };
 
-const PAIN_FIELDS: { key: "kneePain" | "shoulderPain" | "lowerBackPain" | "anklePain"; label: string }[] = [
+export const PAIN_FIELDS: { key: "kneePain" | "shoulderPain" | "lowerBackPain" | "anklePain"; label: string }[] = [
   { key: "kneePain", label: "knee" },
   { key: "shoulderPain", label: "shoulder" },
   { key: "lowerBackPain", label: "lower back" },
@@ -25,7 +25,7 @@ const PAIN_FIELDS: { key: "kneePain" | "shoulderPain" | "lowerBackPain" | "ankle
 // protects what the athlete's own screen tells them). This one flags a
 // coach's roster earlier, at a level worth a check-in rather than a
 // medical redirect.
-const ATTENTION_PAIN_THRESHOLD = 4;
+export const ATTENTION_PAIN_THRESHOLD = 4;
 const READINESS_DROP_THRESHOLD = 20;
 const MIN_WEEKLY_WORKOUTS = 2;
 // Missing one scheduled day is normal; two in a week is a pattern.

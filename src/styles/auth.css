@@ -167,3 +167,46 @@
 .auth-legal a:hover {
   text-decoration: underline;
 }
+
+/* Google sign-in (shown only when NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true). */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Google's button guidelines: white surface, dark text, the four-color mark. */
+.auth-google-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  color: #1f1f1f;
+  border: 1px solid #dadce0;
+  font-weight: 600;
+}
+
+.auth-google-button:hover:not(:disabled) {
+  background: #f8f9fa;
+  box-shadow: none;
+}
+
+.auth-google-legal {
+  margin-top: var(--sp-2);
+  font-size: 13px;
+}
