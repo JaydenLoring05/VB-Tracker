@@ -96,6 +96,8 @@ stays off until its variables are set.
 | `NOTION_TOKEN` | Notion integration token for the personal Training Log sync (`/api/notion-sync`). Server-only. |
 | `NOTION_TRAINING_LOG_DATA_SOURCE_ID` | The Notion data source that finished workouts and check-ins are written to. |
 | `NOTION_SYNC_USER_ID` | The one Supabase user ID whose data is synced. The sync is a no-op for every other user. |
+| `NEXT_PUBLIC_SENTRY_DSN` | Turns on Sentry error monitoring (browser, server and edge). The DSN from your Sentry project's Client Keys page. Without it, Sentry isn't loaded at all. Errors are sent without user info, cookies, headers (except user-agent), request bodies or query strings, and check-in/health fields are redacted (`scrubEvent` in `src/lib/monitoring.ts`). |
+| `NEXT_PUBLIC_ANALYTICS_ENABLED` | `true` turns on Vercel Analytics page views (also enable Analytics for the project in the Vercel dashboard). Cookieless; URLs are sent without query strings, invite codes or record IDs. |
 
 The Notion sync only runs when all three `NOTION_*` variables are set.
 
