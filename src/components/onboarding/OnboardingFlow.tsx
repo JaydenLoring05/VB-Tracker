@@ -4,10 +4,15 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
+import { GuardianFields } from "@/components/guardian/GuardianFields";
+import { validateGuardianAnswer, type GuardianAnswer } from "@/lib/guardian";
+import { createClient as createGuardianClient } from "@/lib/supabase/client";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
 import { useTeam } from "@/hooks/useTeam";
+import { pendingInviteFrom, PENDING_INVITE_KEY } from "@/lib/invite";
 import { startingProgramKeyForPosition } from "@/lib/positionProgram";
+import { createClient } from "@/lib/supabase/client";
 
 type Role = "coach" | "athlete";
 
@@ -50,12 +55,56 @@ export function OnboardingFlow() {
   const [seasonEnd, setSeasonEnd] = useState("");
   const [athletesExpected, setAthletesExpected] = useState("");
   const [trainingDays, setTrainingDays] = useState("");
+  const [guardian, setGuardian] = useState<GuardianAnswer>({ isAdult: null, name: "", email: "", acknowledged: false });
+  const [guardianError, setGuardianError] = useState<string | null>(null);
 
   const [position, setPosition] = useState(POSITIONS[0]);
   const [goals, setGoals] = useState<string[]>(POSITION_DEFAULT_GOALS[POSITIONS[0]] ?? []);
   const [inviteCode, setInviteCode] = useState("");
+  // From an invite link (/join/<code>): this browser's saved code, else the
+  // one stored on the account at sign-up.
+  const [pendingInvite, setPendingInvite] = useState<string | null>(null);
+  const autoJoinTried = useRef(false);
 
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem(PENDING_INVITE_KEY);
+    } catch {
+      // Storage blocked; the account copy below still works.
+    }
+    createClient()
+      .auth.getUser()
+      .then(({ data }) => setPendingInvite(pendingInviteFrom(stored, data.user?.user_metadata)));
+  }, []);
+
+  async function clearPendingInvite() {
+    setPendingInvite(null);
+    try {
+      window.localStorage.removeItem(PENDING_INVITE_KEY);
+    } catch {
+      // Nothing to clear.
+    }
+    await createClient().auth.updateUser({ data: { pending_invite: null } });
+  }
+
+  // Athletes who came from an invite link join automatically at the team step.
+  useEffect(() => {
+    if (step !== 3 || role !== "athlete" || !pendingInvite || autoJoinTried.current) return;
+    autoJoinTried.current = true;
+    setInviteCode(pendingInvite);
+    setSaving(true);
+    joinTeam(pendingInvite).then(async (ok) => {
+      setSaving(false);
+      if (ok) {
+        await clearPendingInvite();
+        setStep(4);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, role, pendingInvite]);
 
   // Each step replaces the last one in place, so move focus to the new step's heading:
   // keyboard and screen reader users would otherwise be left on a control that vanished.
@@ -88,6 +137,14 @@ export function OnboardingFlow() {
   async function handleRoleDetailsSubmit(event: FormEvent) {
     event.preventDefault();
     if (saving) return;
+
+    // Athletes answer the age question; under 18 needs guardian details.
+    const guardianResult = role === "athlete" ? validateGuardianAnswer(guardian) : null;
+    if (guardianResult && !guardianResult.ok) {
+      setGuardianError(guardianResult.error);
+      return;
+    }
+    setGuardianError(null);
     setSaving(true);
 
     if (role === "coach") {
@@ -103,6 +160,17 @@ export function OnboardingFlow() {
       // Saved separately so a missing column (before schema_v45) can't block
       // the position and goals above. A coach program still replaces it.
       await setStartingProgram(startingProgramKeyForPosition(position));
+      if (guardianResult?.ok) {
+        // Separate write: before schema_v52 these columns don't exist, and
+        // that mustn't block onboarding. The athlete is asked again on Today.
+        const { data } = await createGuardianClient().auth.getUser();
+        if (data.user) {
+          const { error } = await createGuardianClient()
+            .from("profiles")
+            .upsert({ user_id: data.user.id, ...guardianResult.fields }, { onConflict: "user_id" });
+          if (error) console.error("Failed to save guardian info", error);
+        }
+      }
     }
 
     setSaving(false);
@@ -117,6 +185,7 @@ export function OnboardingFlow() {
     const ok = role === "coach" ? await createTeam(teamName.trim()) : await joinTeam(inviteCode.trim());
 
     setSaving(false);
+    if (ok && role === "athlete" && pendingInvite) await clearPendingInvite();
     if (ok) setStep(4);
   }
 
@@ -133,6 +202,12 @@ export function OnboardingFlow() {
       {step === 1 && (
         <div className="onboarding-step">
           <h2>Welcome! Are you a coach or an athlete?</h2>
+          {pendingInvite && (
+            <p className="muted onboarding-invite-note">
+              You&apos;re joining a team from an invite link. Choose &quot;I&apos;m an Athlete&quot; and you&apos;ll be added
+              at the end.
+            </p>
+          )}
           <div className="onboarding-role-choice">
             <button type="button" onClick={() => selectRole("coach")}>
               I&apos;m a Coach
@@ -228,6 +303,13 @@ export function OnboardingFlow() {
             ))}
           </fieldset>
 
+          <GuardianFields value={guardian} onChange={setGuardian} idPrefix="onboarding-guardian" />
+          {guardianError && (
+            <p className="guardian-error" role="alert">
+              {guardianError}
+            </p>
+          )}
+
           <button type="submit" disabled={saving}>
             {saving ? "Saving..." : "Continue"}
           </button>
@@ -260,6 +342,7 @@ export function OnboardingFlow() {
       {step === 3 && role === "athlete" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleTeamStep}>
           <h2>Join your team</h2>
+          {pendingInvite && saving && <p className="muted">Joining your team from the invite link…</p>}
           <label>
             Invite code from your coach
             <input
