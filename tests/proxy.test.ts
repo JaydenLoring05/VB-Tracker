@@ -66,7 +66,7 @@ describe("proxy: /demo", () => {
 });
 
 describe("proxy: signed out", () => {
-  it.each(["/", "/login", "/pilot", "/privacy", "/terms", "/auth/callback"])("lets a visitor open %s", async (path) => {
+  it.each(["/", "/login", "/pilot", "/privacy", "/terms", "/auth/callback", "/unsubscribe"])("lets a visitor open %s", async (path) => {
     const response = await proxy(request(path));
     expect(isRedirect(response)).toBe(false);
   });
@@ -208,6 +208,8 @@ describe("proxy matcher", () => {
     "/favicon.ico",
     "/api/pilot",
     "/api/daily-summary",
+    "/api/checkin-reminders",
+    "/api/reminders/unsubscribe",
     "/_next/static/chunks/main.js",
     "/_next/image",
     "/icon",
@@ -234,6 +236,7 @@ describe("proxy matcher", () => {
     "/api/other",
     "/api/pilot/extra",
     "/api/daily-summary/extra",
+    "/api/checkin-reminders/extra",
     "/offline/extra",
     "/sw.jsx",
     "/iconography",

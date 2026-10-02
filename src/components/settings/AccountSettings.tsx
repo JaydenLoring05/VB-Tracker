@@ -6,6 +6,8 @@ import { FormEvent, useState } from "react";
 import { useAccountData } from "@/hooks/useAccountData";
 import { DELETE_CONFIRMATION_PHRASE, isDeleteConfirmed } from "@/lib/accountData";
 
+import { ReminderPreference } from "./ReminderPreference";
+
 export function AccountSettings() {
   const { ownedTeams, exporting, deleting, error, exportData, deleteAccount } = useAccountData();
   const [confirmation, setConfirmation] = useState("");
@@ -20,6 +22,8 @@ export function AccountSettings() {
   return (
     <div className="settings-page">
       <h1>Settings</h1>
+
+      <ReminderPreference />
 
       <section className="panel">
         <h2>Download your data</h2>

@@ -21,6 +21,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusLabel } from "@/components/shared/StatusLabel";
 
 import { AttentionCenter } from "./AttentionCenter";
+import { CheckInReminderSettings } from "./CheckInReminderSettings";
 import { CustomProgramPanel } from "./CustomProgramPanel";
 import { DailySummaryToggle } from "./DailySummaryToggle";
 import { ProgramEditor } from "./ProgramEditor";
@@ -219,6 +220,7 @@ export function CoachDashboard({
         </div>
 
         <DailySummaryToggle />
+        <CheckInReminderSettings team={team} />
       </div>
 
       <div className="panel">
