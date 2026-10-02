@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 
 import { useAccountData } from "@/hooks/useAccountData";
 import { DELETE_CONFIRMATION_PHRASE, isDeleteConfirmed } from "@/lib/accountData";
+import { GuardianPrompt } from "@/components/guardian/GuardianPrompt";
 
 export function AccountSettings() {
   const { ownedTeams, exporting, deleting, error, exportData, deleteAccount } = useAccountData();
@@ -20,6 +21,8 @@ export function AccountSettings() {
   return (
     <div className="settings-page">
       <h1>Settings</h1>
+
+      <GuardianPrompt always />
 
       <section className="panel">
         <h2>Download your data</h2>

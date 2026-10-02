@@ -305,6 +305,11 @@ export function CoachDashboard({
                   {athlete.needsCheckIn && athlete.lastCheckIn !== null && (
                     <span className="pill roster-flag">Needs check-in</span>
                   )}
+                  {athlete.guardianInfoMissing && (
+                    <span className="pill roster-flag roster-flag-guardian" title="Under 18 or hasn't answered: no parent or guardian info yet">
+                      Guardian info missing
+                    </span>
+                  )}
                   <span className="muted roster-last-active">{formatLastActive(athlete.lastActiveAt)}</span>
                 </div>
 
