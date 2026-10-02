@@ -32,6 +32,7 @@ export type SyncSet = {
   set_number: number;
   weight: number | null;
   reps: number | null;
+  seconds?: number | null;
 };
 
 export type SyncSession = {
@@ -87,6 +88,8 @@ export function kneeFeel(pain: number | null | undefined): TrainingLogRow["kneeF
 function formatSet(set: SyncSet): string {
   const weight = finite(set.weight);
   const reps = finite(set.reps);
+  const seconds = finite(set.seconds);
+  if (seconds != null) return weight != null ? `${weight}x${seconds}s` : `${seconds}s`;
   if (weight != null && reps != null) return `${weight}x${reps}`;
   if (reps != null) return `${reps} reps`;
   if (weight != null) return `${weight}`;
