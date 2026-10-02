@@ -96,6 +96,16 @@ describe("row building", () => {
     expect(summarizeSets(session.workout_sets!)).toBe("Back Squat: 135x5, 145x5\nBox Jump: 6 reps");
   });
 
+  it("writes timed sets in seconds", () => {
+    expect(
+      summarizeSets([
+        { exercise: "Planks", set_number: 1, weight: null, reps: null, seconds: 45 },
+        { exercise: "Planks", set_number: 2, weight: null, reps: null, seconds: 40 },
+        { exercise: "Farmer Carries", set_number: 1, weight: 50, reps: null, seconds: 30 }
+      ])
+    ).toBe("Planks: 45s, 40s\nFarmer Carries: 50x30s");
+  });
+
   it("builds a workout row with sets, minutes, and RPE", () => {
     expect(workoutRow(session)).toEqual({
       sourceId: "nextrep-workout-s1",
