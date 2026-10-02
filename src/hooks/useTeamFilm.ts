@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { detailsForTag, TagDetailFields } from "@/components/film/tagMeta";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { createClient } from "@/lib/supabase/client";
-import { FilmTag, FilmTagType, Team, TeamFilm } from "@/types";
+import { FilmResult, FilmTag, FilmTagType, Team, TeamFilm } from "@/types";
 
 export type NewFilmTag = {
   filmId: string;
@@ -14,6 +14,8 @@ export type NewFilmTag = {
   note?: string;
   athleteId?: string | null;
   details?: Partial<TagDetailFields>;
+  /** Three-tap tags only (schema_v53). Left out of the insert otherwise. */
+  result?: FilmResult;
 };
 
 /**
@@ -169,6 +171,7 @@ export function useTeamFilm(team: Team | null) {
         note: input.note || null,
         athlete_id: input.athleteId ?? null,
         ...detailsForTag(input.tag, input.details ?? {}),
+        ...(input.result ? { result: input.result } : {}),
         created_by: userId
       })
       .select()

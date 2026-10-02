@@ -1,19 +1,22 @@
 "use client";
 
 import { Clapperboard } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { AddFilmForm } from "@/components/film/AddFilmForm";
 import { FilmList } from "@/components/film/FilmList";
 import { FilmPanel } from "@/components/film/FilmPanel";
+import { MyClips } from "@/components/film/MyClips";
 import { FilmAthlete } from "@/components/film/TagDetailPanel";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
+import { useMyClips } from "@/hooks/useMyClips";
 import { useTeam } from "@/hooks/useTeam";
 import { useTeamCalendar } from "@/hooks/useTeamCalendar";
 import { useTeamFilm } from "@/hooks/useTeamFilm";
 import { useTeamMemberNames } from "@/hooks/useTeamMemberNames";
+import { clipStart } from "@/lib/filmQuickTag";
 import { FilmTag, TeamFilm } from "@/types";
 
 import "@/styles/film.css";
@@ -40,6 +43,18 @@ export default function FilmPage() {
   const [pendingDeleteTag, setPendingDeleteTag] = useState<FilmTag | null>(null);
 
   const isCoach = role === "coach";
+
+  // Athletes land on their own clips; "All film" is the team library.
+  const [libraryView, setLibraryView] = useState<"clips" | "all">("clips");
+  const [seekRequest, setSeekRequest] = useState<{ seconds: number; id: number } | null>(null);
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const myClips = useMyClips(isCoach ? null : activeTeam, isCoach ? null : userId);
+
+  function playClip(filmId: string, seconds: number) {
+    selectFilm(filmId);
+    setSeekRequest({ seconds: clipStart(seconds), id: Date.now() });
+    viewerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   // Coaches pick from the full roster (the same hook the coach dashboard
   // uses). Athletes get just the team's names; their own tags read "You".
@@ -101,16 +116,43 @@ export default function FilmPage() {
 
         {isCoach && <AddFilmForm events={events} onAdd={addFilm} />}
 
-        <FilmList
-          films={films}
-          selectedFilmId={selectedFilmId}
-          isCoach={isCoach}
-          onSelect={selectFilm}
-          onDelete={setPendingDeleteFilm}
-        />
+        {!isCoach && (
+          <div className="film-library-tabs" role="tablist" aria-label="Film">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={libraryView === "clips"}
+              className={libraryView === "clips" ? "ghost tag-chip active" : "ghost tag-chip"}
+              onClick={() => setLibraryView("clips")}
+            >
+              My clips
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={libraryView === "all"}
+              className={libraryView === "all" ? "ghost tag-chip active" : "ghost tag-chip"}
+              onClick={() => setLibraryView("all")}
+            >
+              All film
+            </button>
+          </div>
+        )}
+
+        {!isCoach && libraryView === "clips" ? (
+          <MyClips clips={myClips.clips} loading={myClips.loading} error={myClips.error} onPlay={playClip} />
+        ) : (
+          <FilmList
+            films={films}
+            selectedFilmId={selectedFilmId}
+            isCoach={isCoach}
+            onSelect={selectFilm}
+            onDelete={setPendingDeleteFilm}
+          />
+        )}
       </div>
 
-      <div className="panel film-viewer-panel">
+      <div className="panel film-viewer-panel" ref={viewerRef}>
         {selectedFilm ? (
           <FilmPanel
             film={selectedFilm}
@@ -121,6 +163,7 @@ export default function FilmPage() {
             onAddTag={addTag}
             onDeleteTag={setPendingDeleteTag}
             onUndoTag={deleteTag}
+            seekRequest={seekRequest}
           />
         ) : (
           <p className="muted">Select a film to review.</p>

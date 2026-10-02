@@ -68,20 +68,34 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, { videoId: string }
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
+  // The player's methods only exist once it's ready. A seek asked for
+  // before then (opening a clip loads a new film) waits here.
+  const readyRef = useRef(false);
+  const pendingSeekRef = useRef<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    readyRef.current = false;
 
     loadYouTubeApi().then(() => {
       if (cancelled || !containerRef.current || !window.YT) return;
 
       playerRef.current = new window.YT.Player(containerRef.current, {
-        videoId
+        videoId,
+        events: {
+          onReady: () => {
+            readyRef.current = true;
+            const pending = pendingSeekRef.current;
+            pendingSeekRef.current = null;
+            if (pending !== null) playerRef.current?.seekTo(pending, true);
+          }
+        }
       });
     });
 
     return () => {
       cancelled = true;
+      readyRef.current = false;
       playerRef.current?.destroy();
       playerRef.current = null;
     };
@@ -90,16 +104,19 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, { videoId: string }
   useImperativeHandle(
     ref,
     () => ({
-      getCurrentTime: () => playerRef.current?.getCurrentTime() ?? 0,
-      seekTo: (seconds: number) => playerRef.current?.seekTo(seconds, true),
+      getCurrentTime: () => (readyRef.current ? playerRef.current?.getCurrentTime() ?? 0 : 0),
+      seekTo: (seconds: number) => {
+        if (readyRef.current) playerRef.current?.seekTo(seconds, true);
+        else pendingSeekRef.current = seconds;
+      },
       seekBy: (deltaSeconds: number) => {
         const player = playerRef.current;
-        if (!player) return;
+        if (!player || !readyRef.current) return;
         player.seekTo(Math.max(0, player.getCurrentTime() + deltaSeconds), true);
       },
       togglePlay: () => {
         const player = playerRef.current;
-        if (!player) return;
+        if (!player || !readyRef.current) return;
         const state = player.getPlayerState();
         if (state === YT_PLAYING || state === YT_BUFFERING) player.pauseVideo();
         else player.playVideo();
