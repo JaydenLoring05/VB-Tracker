@@ -924,3 +924,57 @@
     align-items: stretch;
   }
 }
+
+/* Real product screenshots */
+
+.landing-shots {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-5);
+}
+
+.landing-shot {
+  margin: 0;
+}
+
+.landing-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.35);
+}
+
+.landing-shot figcaption {
+  margin-top: var(--sp-3);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.landing-shot figcaption strong {
+  color: var(--text);
+}
+
+.landing-shots-cta {
+  margin-top: var(--sp-6);
+}
+
+@media (min-width: 900px) {
+  .landing-shots {
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+  }
+
+  /* Paired shots share one frame size; taller crops (film room) letterbox instead of stretching the row. */
+  .landing-shot:not(.landing-shot-main) img {
+    aspect-ratio: 1280 / 860;
+    object-fit: contain;
+    background: var(--surface-2);
+  }
+
+  .landing-shot-main {
+    grid-column: 1 / -1;
+  }
+}

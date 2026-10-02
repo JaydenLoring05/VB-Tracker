@@ -125,6 +125,8 @@ export default function OfflinePage() {
           NextRep can&apos;t reach the network right now. Check your signal or Wi-Fi, then try
           again.
         </p>
+        {/* A full page load on purpose: the client router may be what failed offline. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a className="offline-retry" href="/">
           Try again
         </a>

@@ -9,11 +9,24 @@ import { DemoProvider, type DemoContextValue } from "@/context/DemoContext";
 import { buildDemoData, type DemoData } from "@/data/demoData";
 
 import { DemoBanner } from "./DemoBanner";
+import { DemoFilmRoom } from "./DemoFilmRoom";
 import { DemoSignupPrompt } from "./DemoSignupPrompt";
 import { DemoTour } from "./DemoTour";
 import { DemoTrackerProvider } from "./DemoTrackerProvider";
+import { DemoWorkout } from "./DemoWorkout";
 
-type DemoView = "coach" | "athlete";
+type DemoView = "coach" | "athlete" | "workout" | "film";
+
+const VIEWS: { id: DemoView; label: string; title: string }[] = [
+  { id: "coach", label: "Coach view", title: "Coach dashboard" },
+  { id: "athlete", label: "Athlete view", title: "Athlete view" },
+  { id: "workout", label: "Workout Mode", title: "Workout Mode" },
+  { id: "film", label: "Film room", title: "Film room" }
+];
+
+// App routes that have a demo version: clicking a link to them switches tabs
+// instead of asking the visitor to sign up.
+const DEMO_VIEW_FOR_PATH: Record<string, DemoView> = { "/workout": "workout", "/film": "film" };
 
 // The only routes the demo may navigate to: everything else needs a login.
 const PUBLIC_LINK_PATHS = ["/", "/login", "/demo"];
@@ -79,10 +92,17 @@ export function DemoExperience() {
   function interceptAppLinks(event: MouseEvent<HTMLElement>) {
     const link = (event.target as HTMLElement).closest("a[href]");
     const href = link?.getAttribute("href");
-    if (!href || !href.startsWith("/") || PUBLIC_LINK_PATHS.includes(href.split(/[?#]/)[0])) return;
+    const path = href?.split(/[?#]/)[0] ?? "";
+    if (!href || !href.startsWith("/") || PUBLIC_LINK_PATHS.includes(path)) return;
 
     event.preventDefault();
     event.stopPropagation();
+    const demoView = DEMO_VIEW_FOR_PATH[path] ?? (path.startsWith("/workout/") ? "workout" : undefined);
+    if (demoView) {
+      setView(demoView);
+      window.scrollTo({ top: 0 });
+      return;
+    }
     requestSignup("That page");
   }
 
@@ -101,31 +121,30 @@ export function DemoExperience() {
               <div className="demo-intro">
                 <div>
                   <p className="micro micro-gold">Interactive demo</p>
-                  <h1>{view === "coach" ? "Coach dashboard" : "Athlete view"}</h1>
+                  <h1>{VIEWS.find((option) => option.id === view)?.title}</h1>
                   <p className="muted">
                     {view === "coach"
                       ? `${data.team.name}, week ${data.spotlight.week} of the season. Click around, nothing is saved.`
-                      : "This is what Ava Thompson sees when she opens NextRep today."}
+                      : view === "athlete"
+                        ? "This is what Ava Thompson sees when she opens NextRep today."
+                        : view === "workout"
+                          ? `Ava's ${data.workout.day} lower-body session. Log a set, start the rest timer, finish for the summary. Nothing is saved.`
+                          : "Review game film and tag plays by athlete, with the mouse, the keyboard (press ?) or your voice."}
                   </p>
                 </div>
 
                 <div className="demo-view-switch" data-demo-view-switch role="group" aria-label="Demo view">
-                  <button
-                    type="button"
-                    className={view === "coach" ? "" : "ghost"}
-                    aria-pressed={view === "coach"}
-                    onClick={() => setView("coach")}
-                  >
-                    Coach view
-                  </button>
-                  <button
-                    type="button"
-                    className={view === "athlete" ? "" : "ghost"}
-                    aria-pressed={view === "athlete"}
-                    onClick={() => setView("athlete")}
-                  >
-                    Athlete view
-                  </button>
+                  {VIEWS.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={view === option.id ? "" : "ghost"}
+                      aria-pressed={view === option.id}
+                      onClick={() => setView(option.id)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -144,8 +163,12 @@ export function DemoExperience() {
                       return false;
                     }}
                   />
-                ) : (
+                ) : view === "athlete" ? (
                   <DashboardCards />
+                ) : view === "workout" ? (
+                  <DemoWorkout workout={data.workout} onExit={() => setView("athlete")} />
+                ) : (
+                  <DemoFilmRoom data={data} requestSignup={requestSignup} />
                 )}
               </div>
 
