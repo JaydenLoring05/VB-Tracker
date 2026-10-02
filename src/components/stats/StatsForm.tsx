@@ -4,20 +4,13 @@
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { StatEntry } from "@/types";
 
+// Test day numbers only. The daily fields (sleep, energy, stress, motivation,
+// soreness, pain) moved to the 30-second DailyCheckIn.
 const fields: [keyof StatEntry, string, number?][] = [
   ["vertical", "Vertical Jump"],
   ["approach", "Approach Touch"],
   ["weight", "Body Weight"],
-  ["pullups", "Max Pull-Ups"],
-  ["sleep", "Sleep Hours", 10],
-  ["energy", "Energy", 10],
-  ["stress", "Stress", 10],
-  ["motivation", "Motivation", 10],
-  ["soreness", "General Soreness", 10],
-  ["kneePain", "Knee Discomfort", 10],
-  ["shoulderPain", "Shoulder Discomfort", 10],
-  ["lowerBackPain", "Lower-Back Discomfort", 10],
-  ["anklePain", "Ankle Discomfort", 10]
+  ["pullups", "Max Pull-Ups"]
 ];
 
 export function StatsForm() {
@@ -26,8 +19,9 @@ export function StatsForm() {
   return (
     <div className="panel">
       <h2>
-        Performance Stats
+        Test day numbers
       </h2>
+      <p className="muted">Vertical, approach touch, body weight and pull-ups, whenever you test them.</p>
 
       <div className="stats-grid">
         {fields.map(([key, label, max]) => (
