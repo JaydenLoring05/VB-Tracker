@@ -35,7 +35,9 @@ export function AthleteTeamView({ team }: { team: Team }) {
           check in on you. Your data stays read-only to them.
         </p>
         <p className="muted">
-          {customizedCount > 0
+          {teamOverride?.customProgram
+            ? `You're on your coach's program, "${teamOverride.customProgram.name}". Your Workouts page already shows it.`
+            : customizedCount > 0
             ? "Your coach has adjusted the training plan for your team, and your Workouts page already reflects it."
             : "You're following the standard training plan. If your coach changes it, your Workouts page updates on its own."}
         </p>

@@ -7,7 +7,8 @@ import { Celebrate } from "@/components/shared/Celebrate";
 import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
 import { getExercise } from "@/data/exercises";
-import { getPrescription, getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
+import { getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
+import { getExerciseTarget } from "@/lib/customProgram";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
@@ -215,12 +216,21 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     );
   }
 
+  if (day.exercises.length === 0) {
+    return (
+      <div className="panel">
+        <h2>{day.title || "Rest day"}</h2>
+        <p className="muted">There are no exercises on {session.day} in your program. Enjoy the rest.</p>
+      </div>
+    );
+  }
+
   const originalExercise = day.exercises[exerciseIndex];
   const exercise = resolvedExercises[exerciseIndex];
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
   const lastTime = previousSets[exercise];
   const cues = getExercise(originalExercise)?.cues ?? [];
-  const prescription = getPrescription(session.week, exercise);
+  const prescription = getExerciseTarget(day, session.week, exercise);
   const isTimed = getExerciseMeasure(exercise) === "time";
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
   currentExerciseRef.current = exercise ?? null;

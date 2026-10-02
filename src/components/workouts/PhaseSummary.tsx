@@ -1,5 +1,6 @@
 "use client";
 
+import { useTrackerContext } from "@/context/TrackerContext";
 import { getPhase } from "@/data/workoutPlan";
 import { useWorkoutLogs } from "@/hooks/useWorkoutLogs";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
@@ -7,7 +8,20 @@ import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
 export function PhaseSummary() {
   const { week } = useWorkoutProgress();
   const { weeklyLogCount } = useWorkoutLogs();
+  const { teamOverride } = useTrackerContext();
   const phase = getPhase(week);
+  const customProgram = teamOverride?.customProgram;
+
+  if (customProgram) {
+    return (
+      <section className="panel">
+        <p className="micro micro-gold">Coach&apos;s program</p>
+        <h2>{customProgram.name}</h2>
+        <p className="muted">Your coach built this week. It repeats until they change it.</p>
+        <p className="muted">Workout logs this week: {weeklyLogCount}</p>
+      </section>
+    );
+  }
 
   return (
     <section className="panel">

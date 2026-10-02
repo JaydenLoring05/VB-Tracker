@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-import { getPrescription, getWorkoutDays } from "@/data/workoutPlan";
+import { getWorkoutDays } from "@/data/workoutPlan";
+import { getExerciseTarget } from "@/lib/customProgram";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useTrackerContext } from "@/context/TrackerContext";
@@ -55,13 +56,15 @@ export function StartWorkoutScreen() {
           <ul>
             {day.exercises.map((exercise) => (
               <li key={exercise}>
-                {exercise}: {getPrescription(week, exercise)}
+                {exercise}: {getExerciseTarget(day, week, exercise)}
               </li>
             ))}
           </ul>
         </div>
 
-        <button disabled={loading || starting} onClick={() => startWorkout(selectedDay)}>
+        {day.exercises.length === 0 && <p className="muted">Rest day. Nothing to log.</p>}
+
+        <button disabled={loading || starting || day.exercises.length === 0} onClick={() => startWorkout(selectedDay)}>
           {starting ? "Starting…" : "Start Workout"}
         </button>
       </div>

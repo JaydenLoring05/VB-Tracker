@@ -3,7 +3,7 @@
 import { ChevronDown, ChevronRight, Repeat } from "lucide-react";
 import { useState } from "react";
 
-import { getPrescription } from "@/data/workoutPlan";
+import { getExerciseTarget } from "@/lib/customProgram";
 import { useExerciseLibrary } from "@/hooks/useExerciseLibrary";
 import { getSubstitutionCandidates, useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { useWorkoutLogs } from "@/hooks/useWorkoutLogs";
@@ -94,7 +94,7 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
                 >
                   {exercise}
                 </button>
-                : {getPrescription(week, exercise)}
+                : {getExerciseTarget(day, week, exercise)}
                 {isSubstituted && <span className="substituted-badge">swapped</span>}
               </span>
 
