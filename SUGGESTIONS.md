@@ -22,6 +22,7 @@ Each was finished in its own PR.
 | Homepage product-demo section | #36 (`feat/landing-product-screenshots`) |
 | Public demo team/dashboard | Already shipped as `/demo`; verified, no change needed (below) |
 | Real visual identity (volleyball only) | Decided to keep the current logo (the gold pulse mark and app icons); the monogram in #37 was closed without merging |
+| Demo versions of Workout Mode and the film room | #39 (`feat/demo-workout-and-film`) |
 
 The public demo was checked end to end on a production build, and it covers
 what the suggestion asked for:
@@ -120,6 +121,12 @@ and `robots.ts`.
   `DAILY_SUMMARY_TIME_ZONE` sets one zone for "today", so coaches in other
   time zones get it at odd hours. Store a time zone per coach (or per
   team), run the cron hourly, and send to coaches whose local hour matches.
+- **Film hotkeys ignore key presses for a moment after the player loads.**
+  In `src/components/film/FilmPanel.tsx`, keyboard tagging only starts
+  responding a second or two after the YouTube player mounts (found while
+  writing the e2e test in #39, which has to retry the first key). Attach the
+  window keydown listener immediately or queue keys until the player is
+  ready, so a coach who starts tagging right away doesn't lose presses.
 
 ## Athlete experience
 
@@ -143,12 +150,3 @@ and `robots.ts`.
   whole team has to ask every athlete to reset their week. A coach action
   that sets the start date for the team or a group would keep everyone on
   the same week and make the missed-day signal accurate from day one.
-
-## Marketing & onboarding
-
-- **The demo has no Workout Mode or film room.** `/demo` shows only the
-  coach dashboard and the athlete home. "Start today's workout" and the
-  film page open the sign-up prompt, so the README and landing screenshots
-  can't show the two most hands-on features. Read-only demo versions of
-  `ActiveWorkoutView` (with sample sets) and the film room (a sample video
-  with tags), fed from `src/data/demoData.ts`, would close that gap.

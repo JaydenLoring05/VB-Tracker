@@ -13,8 +13,7 @@ Part 1:
 - [ ] #23 `test/demo-smoke-playwright`
 - [ ] #24 `docs/architecture`
 - [ ] #25 `chore/package-metadata`
-- [ ] #26 `docs/readme-screenshots`: has a question for you at the top
-      (`/demo` has no Workout Mode or film room to screenshot)
+- [ ] #26 `docs/readme-screenshots`: includes Workout Mode and film room shots from #39
 
 Part 2:
 - [ ] #27 `fix/workout-timer-keepalive`
@@ -27,6 +26,9 @@ Part 2:
 - [ ] #34 `feat/google-sign-in`: Google Cloud, Supabase and Vercel steps in the PR
 - [ ] #35 `feat/daily-coach-summary-email`: **run `schema_v47_daily_coach_summary.sql` first**, then the cron secret and Resend steps in the PR
 - [ ] #36 `feat/landing-product-screenshots`
+
+Follow-ups:
+- [ ] #39 `feat/demo-workout-and-film`: merge before #26 and #36 so the live demo matches their screenshots
 
 Part 3:
 - [ ] #38 `docs/refresh-suggestions-tasks` (this file and SUGGESTIONS.md)
