@@ -12,16 +12,20 @@ import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { formatSetValue, getExerciseMeasure, parseTargetSeconds } from "@/lib/exerciseMeasure";
 import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
 import { formatDuration } from "@/lib/time";
 
 import { DiscomfortSuggestion } from "./DiscomfortSuggestion";
+import { HoldTimer } from "./HoldTimer";
 import { RestOverBanner, RestTimer } from "./RestTimer";
 import { WorkoutSummary } from "./WorkoutSummary";
 
 const REST_DURATION = 90;
 const WEIGHT_INCREMENTS = [5, 10];
 const REPS_INCREMENTS = [1, 5];
+const SECONDS_INCREMENTS = [5, 15];
+const DEFAULT_HOLD_SECONDS = 30;
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -47,6 +51,8 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
+  const [seconds, setSeconds] = useState("");
+  const [holdTarget, setHoldTarget] = useState<number | null>(null);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
   const [restSecondsLeft, setRestSecondsLeft] = useState<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -214,12 +220,17 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
   const lastTime = previousSets[exercise];
   const cues = getExercise(originalExercise)?.cues ?? [];
+  const prescription = getPrescription(session.week, exercise);
+  const isTimed = getExerciseMeasure(exercise) === "time";
+  const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
   currentExerciseRef.current = exercise ?? null;
 
   function goToExercise(nextIndex: number) {
     setExerciseIndex(Math.max(0, Math.min(resolvedExercises.length - 1, nextIndex)));
     setWeight("");
     setReps("");
+    setSeconds("");
+    setHoldTarget(null);
     setRestEndsAt(null);
     setRestOver(false);
     setShowCues(false);
@@ -235,7 +246,12 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     setReps(String(Math.max(0, current + amount)));
   }
 
-  const canLogSet = reps.trim() !== "" && !isLogging;
+  function bumpSeconds(amount: number) {
+    const current = Number(seconds) || 0;
+    setSeconds(String(Math.max(0, current + amount)));
+  }
+
+  const canLogSet = (isTimed ? seconds.trim() !== "" && Number(seconds) > 0 : reps.trim() !== "") && !isLogging;
 
   async function handleLogSet(event: FormEvent) {
     event.preventDefault();
@@ -246,7 +262,10 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
     setRestOver(false);
     setIsLogging(true);
     try {
-      const result = await logSet(exercise, weight.trim() === "" ? null : Number(weight), Number(reps));
+      const loggedWeight = weight.trim() === "" ? null : Number(weight);
+      const result = isTimed
+        ? await logSet(exercise, loggedWeight, null, Math.round(Number(seconds)))
+        : await logSet(exercise, loggedWeight, Number(reps));
 
       if (result?.isNewPR) {
         vibrate([80, 40, 80]);
@@ -328,12 +347,8 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
 
       <div className="panel">
         <h3>{exercise}</h3>
-        <p className="muted">Target: {getPrescription(session.week, exercise)}</p>
-        {lastTime && (
-          <p className="muted last-time">
-            Last time: {lastTime.weight ?? "-"} x {lastTime.reps ?? "-"}
-          </p>
-        )}
+        <p className="muted">Target: {prescription}</p>
+        {lastTime && <p className="muted last-time">Last time: {formatSetValue(lastTime)}</p>}
 
         {cues.length > 0 && (
           <div className="exercise-cues">
@@ -369,7 +384,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
             {exerciseSets.map((set) => (
               <div className={`logged-set${prSetIds[set.id] ? " logged-set-pr" : ""}`} key={set.id}>
                 <span>
-                  Set {set.set_number}: {set.weight ?? "-"} x {set.reps ?? "-"}
+                  Set {set.set_number}: {formatSetValue(set)}
                   {prSetIds[set.id] && (
                     <span className="pr-badge">
                       <Trophy size={12} /> New PR
@@ -399,13 +414,21 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
         ) : (
           <>
           {restOver && <RestOverBanner onDismiss={() => setRestOver(false)} />}
+          {isTimed && (
+            <HoldTimer
+              key={exercise}
+              targetSeconds={targetSeconds}
+              onTargetChange={setHoldTarget}
+              onDone={(held) => setSeconds(String(held))}
+            />
+          )}
           <form className="log-set-form" onSubmit={handleLogSet}>
             <div className="weight-input-group">
               <input
                 type="number"
                 inputMode="decimal"
                 aria-label="Weight"
-                placeholder="Weight"
+                placeholder={isTimed ? "Weight (optional)" : "Weight"}
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
               />
@@ -423,6 +446,32 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
                 ))}
               </div>
             </div>
+            {isTimed ? (
+            <div className="weight-input-group">
+              <input
+                type="number"
+                inputMode="numeric"
+                aria-label="Seconds"
+                placeholder="Seconds"
+                value={seconds}
+                onChange={(e) => setSeconds(e.target.value)}
+                required
+              />
+              <div className="input-increments">
+                {SECONDS_INCREMENTS.map((amount) => (
+                  <button
+                    type="button"
+                    key={amount}
+                    className="ghost"
+                    onClick={() => bumpSeconds(amount)}
+                    aria-label={`Add ${amount} seconds`}
+                  >
+                    +{amount}s
+                  </button>
+                ))}
+              </div>
+            </div>
+            ) : (
             <div className="weight-input-group">
               <input
                 type="number"
@@ -447,6 +496,7 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
                 ))}
               </div>
             </div>
+            )}
             <button type="submit" disabled={!canLogSet}>
               <CheckCircle2 size={16} /> {isLogging ? "Saving…" : "Log Set"}
             </button>
