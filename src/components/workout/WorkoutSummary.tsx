@@ -16,13 +16,16 @@ export function WorkoutSummary({
   durationSeconds,
   sets,
   rpe,
-  onRateRPE
+  onRateRPE,
+  onDone
 }: {
   day: string;
   durationSeconds: number | null;
   sets: WorkoutSet[];
   rpe?: number | null;
   onRateRPE?: (rpe: number) => Promise<boolean>;
+  /** Replaces the default "Back to Dashboard" navigation. */
+  onDone?: () => void;
 }) {
   const router = useRouter();
   const [savingRPE, setSavingRPE] = useState(false);
@@ -124,7 +127,7 @@ export function WorkoutSummary({
         </div>
       )}
 
-      <button onClick={() => router.push("/dashboard")}>Back to Dashboard</button>
+      <button onClick={() => (onDone ? onDone() : router.push("/dashboard"))}>Back to Dashboard</button>
     </div>
   );
 }

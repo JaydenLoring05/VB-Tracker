@@ -48,7 +48,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Auth, DB error and date helpers | `tests/lib/smallHelpers.test.ts` | Dead-session detection, user-facing errors, `todayISO`, `formatLastActive` |
 | Personal records | `tests/lib/personalRecord.test.ts` | First-ever set, ties, heavier set, longer hold, weighted timed sets, null inputs, PR board labels |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
-| Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday |
+| Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |
 | `src/proxy.ts` | `tests/proxy.test.ts` | Public paths, `/demo`, signed-out redirect, dead-session cookie clearing, matcher exclusions |
 | `public/sw.js` | `tests/serviceWorker.test.ts` | Only static assets and `/offline` are cached; never HTML, Supabase or non-GET |
