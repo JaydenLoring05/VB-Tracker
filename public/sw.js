@@ -20,9 +20,9 @@
  * activate deletes every older nextrep-* cache and claims open pages, so nobody keeps a stale copy.
  * (Hashed /_next/static files never need a bump: new builds use new file names.)
  * v1: first release. v2: offline page rebuilt on the new design system, theme color aligned to
- * the app background, cache size cap.
+ * the app background, cache size cap. v3: new volleyball "N" monogram icons.
  */
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const CACHE_PREFIX = "nextrep-";
 const STATIC_CACHE = `${CACHE_PREFIX}static-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline";

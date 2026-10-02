@@ -9,53 +9,43 @@ import sharp from "sharp";
 
 const OUT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "public", "icons");
 
-// Brand tokens, copied from src/styles/base.css
-const BG = "#05070a";
-const BG_GLOW = "#1a1f29";
-const GOLD = "#ffc400";
-const GOLD_LIGHT = "#ffdd55";
-const GOLD_DEEP = "#e7a900";
+// Brand tokens, matching src/styles/tokens.css (--bg, --gold, --on-gold) and
+// the offline page.
+const BG = "#070503";
+const BG_GLOW = "#1a150d";
+const GOLD = "#e5ac4c";
+const INK = "#140f08";
 
-// Volleyball panel seams for a unit circle centered on the origin. A pinwheel of three
-// curved arms (rotated 120 degrees apart), each with a parallel companion seam.
-const SEAM_MAIN = "M 0 0 C 0.02 -0.55 0.4 -0.9 0.98 -0.2";
-const SEAM_EDGE = "M -0.62 -0.3 C -0.35 -0.62 0.05 -0.92 0.5 -0.87";
+// The NextRep monogram from src/components/shared/Brand.tsx (MONOGRAM_PATHS),
+// in its 32x32 box: a volleyball whose seams form an "N".
+const BALL = { cx: 16, cy: 16, r: 11.2 };
+const SEAMS =
+  "M11.2 7.2 Q8.6 16 11.2 24.8 M20.8 7.2 Q23.4 16 20.8 24.8 M11.2 7.2 C14.6 12.6 17.4 19.4 20.8 24.8";
 
+// ballRatio: the ball's radius as a share of the canvas.
 function iconSvg(size, ballRatio) {
-  const r = size * ballRatio;
   const c = size / 2;
-  const stroke = 0.075;
-  const seams = [0, 120, 240]
-    .map(
-      (deg) =>
-        `<g transform="rotate(${deg})"><path d="${SEAM_MAIN}"/><path d="${SEAM_EDGE}"/></g>`
-    )
-    .join("");
+  const stroke = 2.4;
+  const scale = (size * ballRatio) / (BALL.r + stroke * 1.4);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
   <defs>
     <radialGradient id="bg" cx="50%" cy="28%" r="78%">
       <stop offset="0" stop-color="${BG_GLOW}"/>
       <stop offset="0.62" stop-color="${BG}"/>
-      <stop offset="1" stop-color="#020304"/>
+      <stop offset="1" stop-color="#020201"/>
     </radialGradient>
-    <linearGradient id="ball" x1="0.2" y1="0" x2="0.8" y2="1">
-      <stop offset="0" stop-color="${GOLD_LIGHT}"/>
-      <stop offset="0.55" stop-color="${GOLD}"/>
-      <stop offset="1" stop-color="${GOLD_DEEP}"/>
-    </linearGradient>
     <radialGradient id="halo" cx="50%" cy="50%" r="50%">
-      <stop offset="0.55" stop-color="${GOLD}" stop-opacity="0.22"/>
+      <stop offset="0.55" stop-color="${GOLD}" stop-opacity="0.2"/>
       <stop offset="1" stop-color="${GOLD}" stop-opacity="0"/>
     </radialGradient>
-    <clipPath id="clip"><circle cx="0" cy="0" r="1"/></clipPath>
   </defs>
   <rect width="${size}" height="${size}" fill="url(#bg)"/>
-  <circle cx="${c}" cy="${c}" r="${r * 1.6}" fill="url(#halo)"/>
-  <g transform="translate(${c} ${c}) scale(${r})">
-    <circle r="1" fill="url(#ball)"/>
-    <g clip-path="url(#clip)" fill="none" stroke="${BG}" stroke-width="${stroke}" stroke-linecap="round" opacity="0.88">${seams}</g>
-    <circle r="1" fill="none" stroke="${BG}" stroke-opacity="0.35" stroke-width="${stroke * 0.6}"/>
+  <circle cx="${c}" cy="${c}" r="${size * ballRatio * 1.6}" fill="url(#halo)"/>
+  <g transform="translate(${c} ${c}) scale(${scale}) translate(${-BALL.cx} ${-BALL.cy})">
+    <circle cx="${BALL.cx}" cy="${BALL.cy}" r="${BALL.r + stroke * 1.4}" fill="${GOLD}"/>
+    <circle cx="${BALL.cx}" cy="${BALL.cy}" r="${BALL.r}" fill="none" stroke="${INK}" stroke-width="${stroke}"/>
+    <path d="${SEAMS}" fill="none" stroke="${INK}" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>`;
 }
