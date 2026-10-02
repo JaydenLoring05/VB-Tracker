@@ -7,6 +7,8 @@ import { RECOMMENDED_PLAN_WEEKS } from "@/lib/missedWorkouts";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
 import { programWeekOn } from "@/lib/programSchedule";
 import { createClient } from "@/lib/supabase/client";
+import type { StartingProgramKey } from "@/data/positionPrograms";
+import { applyStartingProgram, parseStartingProgramKey } from "@/lib/positionProgram";
 import { todayISO } from "@/lib/storage";
 import { TeamOverrideData } from "@/lib/programResolution";
 import { fromStatsRow, type StatsRow } from "@/lib/statsRow";
@@ -155,7 +157,12 @@ export type TrackerContextValue = {
   substitutions: ExerciseSubstitutions;
   setSubstitution: (originalExercise: string, chosenExercise: string) => void;
   clearSubstitution: (originalExercise: string) => void;
+  /** The coach's plan changes, or the athlete's starting program when the coach hasn't made any. */
   teamOverride: TeamOverrideData | null;
+  /** Position-based starting program the athlete picked (profiles.starting_program), or null for the recommended plan. */
+  startingProgram: StartingProgramKey | null;
+  /** Saves the starting program (null = recommended plan). Resolves false if it didn't save. */
+  setStartingProgram: (key: StartingProgramKey | null) => Promise<boolean>;
 
   workoutStreak: number;
 
@@ -197,6 +204,7 @@ export function TrackerProvider({
   const [prs, setPrs] = useState<PRRecord[]>([]);
   const [substitutions, setSubstitutions] = useState<ExerciseSubstitutions>({});
   const [teamOverride, setTeamOverride] = useState<TeamOverrideData | null>(null);
+  const [startingProgram, setStartingProgramState] = useState<StartingProgramKey | null>(null);
   const [workoutStreak, setWorkoutStreak] = useState(0);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [syncRetry, setSyncRetry] = useState<(() => void) | null>(null);
@@ -227,6 +235,43 @@ export function TrackerProvider({
   }, []);
 
   const reloadData = useCallback(() => setLoadAttempt((attempt) => attempt + 1), []);
+
+  useEffect(() => {
+    // Before schema_v45 the column doesn't exist; the error just means no
+    // starting program, so the athlete stays on the recommended plan.
+    let cancelled = false;
+    supabase
+      .from("profiles")
+      .select("starting_program")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!cancelled && !error) setStartingProgramState(parseStartingProgramKey(data?.starting_program));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, userId]);
+
+  const setStartingProgram = useCallback(
+    async (key: StartingProgramKey | null) => {
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({ user_id: userId, starting_program: key }, { onConflict: "user_id" });
+      if (error) {
+        console.error("Failed to save starting program", error);
+        return false;
+      }
+      setStartingProgramState(key);
+      return true;
+    },
+    [supabase, userId]
+  );
+
+  const resolvedOverride = useMemo(
+    () => applyStartingProgram(teamOverride, startingProgram),
+    [teamOverride, startingProgram]
+  );
 
   function retrySyncError() {
     if (syncRetry) {
@@ -802,7 +847,9 @@ export function TrackerProvider({
     substitutions,
     setSubstitution,
     clearSubstitution,
-    teamOverride,
+    teamOverride: resolvedOverride,
+    startingProgram,
+    setStartingProgram,
     workoutStreak,
     syncError,
     syncRetry,

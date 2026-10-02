@@ -53,6 +53,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Data export and account deletion | `tests/lib/accountData.test.ts` | Tables exported, export file shape and name, typed delete confirmation |
 | Daily coach summary | `tests/lib/dailySummary.test.ts` | Config gating, cron auth, time zone date, numbers match the Attention Center, pain alerts, today's workout, HTML escaping, Resend call |
 | `GET /api/daily-summary` | `tests/api/dailySummaryRoute.test.ts` | Off without env vars, rejects a missing or wrong cron secret, sends one email per opted-in coach, data and send failures |
+| Position starting programs | `tests/data/positionPrograms.test.ts`, `tests/lib/positionProgram.test.ts` | Templates pass the builder's validation, use library exercises with the right measure; position mapping; coach program and plan edits win over the template |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |

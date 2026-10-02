@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
 import { exercises as exerciseCatalog } from "@/data/exercises";
+import { POSITION_PROGRAMS, type StartingProgramKey } from "@/data/positionPrograms";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { TeamGroup, useCustomPrograms } from "@/hooks/useCustomPrograms";
 import { getExerciseMeasure } from "@/lib/exerciseMeasure";
@@ -451,6 +452,22 @@ export function CustomProgramPanel({ team }: { team: Team }) {
         <button type="button" className="ghost" onClick={() => setEditing(blankProgram("My program"))}>
           <Plus size={14} /> Start blank
         </button>
+        <select
+          aria-label="Start from a position template"
+          value=""
+          onChange={(e) => {
+            const template = POSITION_PROGRAMS[e.target.value as StartingProgramKey];
+            // A copy, so editing never changes the shared template.
+            if (template) setEditing(structuredClone(template.program));
+          }}
+        >
+          <option value="">Start from a position template...</option>
+          {Object.values(POSITION_PROGRAMS).map((template) => (
+            <option key={template.key} value={template.key}>
+              {template.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {programs.length > 0 && (

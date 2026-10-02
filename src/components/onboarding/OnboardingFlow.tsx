@@ -3,8 +3,11 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
+import { useTrackerContext } from "@/context/TrackerContext";
+import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
 import { useTeam } from "@/hooks/useTeam";
+import { startingProgramKeyForPosition } from "@/lib/positionProgram";
 
 type Role = "coach" | "athlete";
 
@@ -35,6 +38,7 @@ const TOTAL_STEPS = 4;
 export function OnboardingFlow() {
   const router = useRouter();
   const { updateProfile } = useProfile();
+  const { setStartingProgram } = useTrackerContext();
   const { createTeam, joinTeam, error: teamError } = useTeam();
 
   const [step, setStep] = useState(1);
@@ -96,6 +100,9 @@ export function OnboardingFlow() {
       });
     } else {
       await updateProfile({ position, training_goals: goals });
+      // Saved separately so a missing column (before schema_v45) can't block
+      // the position and goals above. A coach program still replaces it.
+      await setStartingProgram(startingProgramKeyForPosition(position));
     }
 
     setSaving(false);
@@ -203,6 +210,13 @@ export function OnboardingFlow() {
               ))}
             </select>
           </label>
+          {startingProgramKeyForPosition(position) && (
+            <p className="muted">
+              You&apos;ll start on the {POSITION_PROGRAMS[startingProgramKeyForPosition(position)!].label} program:{" "}
+              {POSITION_PROGRAMS[startingProgramKeyForPosition(position)!].focus} You can switch on the Workouts page,
+              and your coach can assign their own.
+            </p>
+          )}
 
           <fieldset className="onboarding-goals">
             <legend>Training goals (pick 1-2)</legend>

@@ -29,6 +29,15 @@
   min-height: auto;
 }
 
+/* Starting program picker in the phase panel (StartingProgramPicker). */
+.starting-program-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0;
+}
+
 .day-card-collapsed {
   min-height: auto;
   align-self: start;

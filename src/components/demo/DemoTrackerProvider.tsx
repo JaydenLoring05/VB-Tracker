@@ -71,6 +71,11 @@ export function DemoTrackerProvider({
       setSubstitution: blocked("Swapping exercises"),
       clearSubstitution: blocked("Swapping exercises"),
       teamOverride: null,
+      startingProgram: null,
+      setStartingProgram: async () => {
+        requestSignup("Choosing a starting program");
+        return false;
+      },
 
       workoutStreak: spotlight.workoutStreak,
 
