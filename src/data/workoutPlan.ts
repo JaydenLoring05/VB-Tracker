@@ -402,11 +402,32 @@ export function getPrescription(week: number, exercise: string) {
     return "3x3";
   }
 
+  // Timed holds: planks, hollow holds, L-sits, handstands. Hold longer as
+  // the phases go on, then back off in the taper.
   if (
-    exercise.includes("Mobility") ||
-    exercise.includes("Stretch") ||
-    exercise.includes("CARs")
+    exercise.includes("Plank") ||
+    exercise.includes("Hollow Hold") ||
+    exercise.includes("L-Sit") ||
+    exercise.includes("Handstand")
   ) {
+    const eachSide = exercise.includes("Side Plank") ? " each side" : "";
+    if (week <= 4) return `3x20-30 sec${eachSide}`;
+    if (week <= 8) return `3x30-45 sec${eachSide}`;
+    if (week <= 16) return `3x45-60 sec${eachSide}`;
+    return `2-3x30 sec${eachSide}`;
+  }
+
+  if (exercise.includes("Deep Squat Hold")) return "3x30-60 sec";
+  if (exercise.includes("Couch Stretch")) return "2x45-60 sec each side";
+  if (exercise.includes("Farmer Carr")) return "3x30-40 sec";
+  if (exercise.includes("Jump Rope")) return "3x60 sec";
+  if (exercise.includes("Foam Roll")) return "5-10 min";
+  if (exercise.includes("Easy Bike")) return "15-20 min";
+  if (exercise.startsWith("Walk")) return "20-30 min";
+
+  if (exercise.includes("CARs")) return "2x5 each direction";
+
+  if (exercise.includes("Mobility") || exercise.includes("Stretch")) {
     return "10-20 min";
   }
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Celebrate } from "@/components/shared/Celebrate";
+import { formatSetValue } from "@/lib/exerciseMeasure";
 import { formatDuration } from "@/lib/time";
 import { WorkoutSet } from "@/types";
 
@@ -87,7 +88,7 @@ export function WorkoutSummary({
                   <span className="muted">
                     {" "}
                     {exerciseSets
-                      .map((s) => `${s.weight ?? "-"}x${s.reps ?? "-"}`)
+                      .map((s) => formatSetValue(s))
                       .join(", ")}
                   </span>
                 </li>

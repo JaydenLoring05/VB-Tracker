@@ -10,7 +10,7 @@ import { resolveWorkoutDays } from "@/lib/programResolution";
 import { createClient } from "@/lib/supabase/client";
 import { WorkoutSession, WorkoutSet } from "@/types";
 
-export type PreviousSet = { weight: number | null; reps: number | null };
+export type PreviousSet = { weight: number | null; reps: number | null; seconds: number | null };
 
 export function useActiveWorkoutSession(sessionId: string) {
   const { userId, setExerciseChecked, addPR, reportSyncError, teamOverride, substitutions } = useTrackerContext();
@@ -25,6 +25,7 @@ export function useActiveWorkoutSession(sessionId: string) {
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [previousSets, setPreviousSets] = useState<Record<string, PreviousSet>>({});
   const [maxWeightByExercise, setMaxWeightByExercise] = useState<Record<string, number>>({});
+  const [maxSecondsByExercise, setMaxSecondsByExercise] = useState<Record<string, number>>({});
 
   const sessionRef = useRef(session);
   useEffect(() => {
@@ -100,7 +101,9 @@ export function useActiveWorkoutSession(sessionId: string) {
 
     supabase
       .from("workout_sets")
-      .select("exercise, weight, reps, created_at")
+      // "*" rather than a column list so this still works before the
+      // seconds column (schema_v42) exists.
+      .select("*")
       .eq("user_id", userId)
       .in("exercise", resolvedExercises)
       .neq("session_id", sessionId)
@@ -110,18 +113,24 @@ export function useActiveWorkoutSession(sessionId: string) {
 
         const lastSeen: Record<string, PreviousSet> = {};
         const maxWeight: Record<string, number> = {};
+        const maxSeconds: Record<string, number> = {};
 
-        data.forEach((row) => {
+        (data as WorkoutSet[]).forEach((row) => {
+          const seconds = row.seconds ?? null;
           if (!(row.exercise in lastSeen)) {
-            lastSeen[row.exercise] = { weight: row.weight, reps: row.reps };
+            lastSeen[row.exercise] = { weight: row.weight, reps: row.reps, seconds };
           }
           if (row.weight != null && row.weight > (maxWeight[row.exercise] ?? 0)) {
             maxWeight[row.exercise] = row.weight;
+          }
+          if (seconds != null && seconds > (maxSeconds[row.exercise] ?? 0)) {
+            maxSeconds[row.exercise] = seconds;
           }
         });
 
         setPreviousSets(lastSeen);
         setMaxWeightByExercise(maxWeight);
+        setMaxSecondsByExercise(maxSeconds);
       });
 
     return () => {
@@ -196,9 +205,13 @@ export function useActiveWorkoutSession(sessionId: string) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.id, session?.ended_at]);
 
-  async function logSet(exercise: string, weight: number | null, reps: number | null) {
+  async function logSet(exercise: string, weight: number | null, reps: number | null, seconds: number | null = null) {
     const setNumber = sets.filter((s) => s.exercise === exercise).length + 1;
-    const isNewPR = weight != null && weight > (maxWeightByExercise[exercise] ?? 0);
+    // Weighted sets PR on weight; unweighted timed sets (planks, holds) PR on
+    // the longest hold.
+    const isWeightPR = weight != null && weight > (maxWeightByExercise[exercise] ?? 0);
+    const isHoldPR = weight == null && seconds != null && seconds > (maxSecondsByExercise[exercise] ?? 0);
+    const isNewPR = isWeightPR || isHoldPR;
 
     const { data, error } = await supabase
       .from("workout_sets")
@@ -208,7 +221,10 @@ export function useActiveWorkoutSession(sessionId: string) {
         exercise,
         set_number: setNumber,
         weight,
-        reps
+        reps,
+        // Only sent for timed sets, so rep sets keep saving even before
+        // schema_v42 adds the column.
+        ...(seconds != null ? { seconds } : {})
       })
       .select()
       .single();
@@ -216,7 +232,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     if (error) {
       console.error("Failed to log set", error);
       reportSyncError("That set didn't save. Check your connection and log it again.", () =>
-        logSet(exercise, weight, reps)
+        logSet(exercise, weight, reps, seconds)
       );
       return null;
     }
@@ -224,13 +240,21 @@ export function useActiveWorkoutSession(sessionId: string) {
     const newSet = data as WorkoutSet;
     setSets((current) => [...current, newSet]);
 
-    if (isNewPR && weight != null) {
+    if (isWeightPR && weight != null) {
       setMaxWeightByExercise((current) => ({ ...current, [exercise]: weight }));
       addPR({
         exercise,
         value: reps != null ? `${weight} x ${reps}` : String(weight),
         unit: "lbs",
         note: "Set during Workout Mode"
+      });
+    } else if (isHoldPR && seconds != null) {
+      setMaxSecondsByExercise((current) => ({ ...current, [exercise]: seconds }));
+      addPR({
+        exercise,
+        value: String(seconds),
+        unit: "sec",
+        note: "Longest hold, set during Workout Mode"
       });
     }
 

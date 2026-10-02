@@ -115,6 +115,12 @@ async function notify(nextExercise: string | null) {
   }
 }
 
+/** End-of-hold alert for timed sets: beeps and vibration, no notification. */
+export function fireHoldAlert() {
+  playBeeps();
+  vibrate();
+}
+
 export function fireRestAlert(nextExercise: string | null = null) {
   playBeeps();
   vibrate();
