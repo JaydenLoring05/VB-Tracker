@@ -35,7 +35,6 @@ Rules for automated runs:
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
 | B-03 | Athlete stats table overflows at modal width | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
-| F-02 | Film made simple: tag a play in three taps, timestamp comments, "my clips" for athletes | building | me | L |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
@@ -86,19 +85,6 @@ Rules for automated runs:
 
   Show them on the film page and in the athlete drill-down. This is the
   payoff for the time coaches spend tagging.
-- **F-02. Film made simple.** Jayden's words: the film feature is hard to
-  use and should be the thing that sets NextRep apart for teams. Flow
-  Jayden picked (Oct 2), YouTube first, nothing from Film Room yet:
-  - the coach pastes a YouTube link, then taps athlete, skill, result
-    (three taps); the tag saves at the video time of the first tap;
-  - a comment box stamps the current video time when the coach starts
-    typing, for one athlete or the whole team;
-  - athletes get "My clips": their own tagged plays and the comments left
-    for them, grouped by film, each opening the video just before the play.
-
-  The older detailed tag buttons, hotkeys and voice tagging stay, behind
-  "Detailed tags". Needs `schema_v53_film_quick_tags.sql` (adds `result`
-  and the `serve` / `attack` tags).
 - **F-03. Film links that aren't YouTube.** `parseYouTubeId` in
   `src/lib/film.ts` only recognises YouTube hosts. For any other link,
   `FilmPanel` shows an "Open video" link that opens in a new tab in place of
@@ -230,6 +216,7 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Film made simple: three-tap tags, timed comments, "My clips" (F-02) | me | #58 |
 | Team streak in the coach's sidebar | not recorded | #56 |
 | Attention Center items can be cleared; Send reminder and Recognize achievement send a message | bug | #55 |
 | Pilot-ending banner, optional payment link, roster warning past 16 | not recorded | #52 |
