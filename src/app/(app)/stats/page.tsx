@@ -1,4 +1,5 @@
 import { CoachPanel } from "@/components/stats/CoachPanel";
+import { DailyCheckIn } from "@/components/stats/DailyCheckIn";
 import { PerformanceProfileForm } from "@/components/stats/PerformanceProfileForm";
 import { PRTracker } from "@/components/stats/PRTracker";
 import { ProgressCharts } from "@/components/stats/ProgressCharts";
@@ -14,6 +15,7 @@ export default function StatsPage() {
       <StatsHeadline />
 
       <section id="stats" className="lower-grid">
+        <DailyCheckIn compact />
         <StatsForm />
         <ProgressCharts />
       </section>

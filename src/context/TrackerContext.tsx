@@ -5,12 +5,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { parseProgramDays, pickAssignedProgramId } from "@/lib/customProgram";
 import { RECOMMENDED_PLAN_WEEKS } from "@/lib/missedWorkouts";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
+import { latestStatsUpsert } from "@/lib/statsRow";
 import { programWeekOn } from "@/lib/programSchedule";
 import { createClient } from "@/lib/supabase/client";
 import type { StartingProgramKey } from "@/data/positionPrograms";
 import { applyStartingProgram, parseStartingProgramKey } from "@/lib/positionProgram";
 import { todayISO } from "@/lib/storage";
 import { TeamOverrideData } from "@/lib/programResolution";
+import { latestEntryPerDay, sameDayDateValues } from "@/lib/statsHistory";
 import { fromStatsRow, type StatsRow } from "@/lib/statsRow";
 import { CalendarEvent, StatEntry } from "@/types";
 
@@ -441,7 +443,8 @@ export function TrackerProvider({
       setWorkoutNotes(notesMap);
 
       setStats(latestRes.data ? fromStatsRow(latestRes.data) : emptyStats);
-      setHistory((historyRes.data ?? []).map(fromStatsRow));
+      // One entry per day (the latest save), with dates normalized; see src/lib/statsHistory.ts.
+      setHistory(latestEntryPerDay((historyRes.data ?? []) as StatsRow[]).map(fromStatsRow));
 
       if ((calendarRes.data ?? []).length > 0) {
         setCalendarEvents(calendarRes.data as CalendarEvent[]);
@@ -638,10 +641,12 @@ export function TrackerProvider({
   function saveStats() {
     const previousStats = stats;
     const previousHistory = history;
-    const entry = { ...stats, date: new Date().toLocaleDateString("en-US") };
+    const [today, legacyToday] = sameDayDateValues();
+    const entry = { ...stats, date: today };
 
     setStats(entry);
-    setHistory((current) => [...current, entry]);
+    // A second save on the same day replaces that day's entry instead of adding one.
+    setHistory((current) => [...current.filter((item) => item.date !== today), entry]);
 
     const row = toStatsRow(entry);
     let failed = false;
@@ -656,7 +661,7 @@ export function TrackerProvider({
 
     supabase
       .from("latest_stats")
-      .upsert({ user_id: userId, ...row }, { onConflict: "user_id" })
+      .upsert(latestStatsUpsert(userId, row), { onConflict: "user_id" })
       .then(({ error }) => {
         if (error) {
           console.error("Failed to save latest stats", error);
@@ -664,10 +669,24 @@ export function TrackerProvider({
         }
       });
 
+    // Update today's row if there is one (saved in either date format), else insert.
     supabase
       .from("stats_history")
-      .insert({ user_id: userId, ...row })
-      .then(({ error }) => {
+      .select("id")
+      .eq("user_id", userId)
+      .in("date", [today, legacyToday])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .then(async ({ data: existing, error: lookupError }) => {
+        if (lookupError) {
+          console.error("Failed to look up today's stats entry", lookupError);
+          rollbackOnce("Couldn't save your stats. Check your connection and try again.");
+          return;
+        }
+        const todayRow = existing?.[0] as { id: string } | undefined;
+        const { error } = todayRow
+          ? await supabase.from("stats_history").update(row).eq("id", todayRow.id).eq("user_id", userId)
+          : await supabase.from("stats_history").insert({ user_id: userId, ...row });
         if (error) {
           console.error("Failed to save stats history", error);
           rollbackOnce("Couldn't save your stats. Check your connection and try again.");

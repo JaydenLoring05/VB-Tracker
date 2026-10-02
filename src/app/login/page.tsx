@@ -6,12 +6,22 @@ import Link from "next/link";
 
 import { Brand } from "@/components/shared/Brand";
 import { authErrorMessage } from "@/lib/authErrors";
+import { normalizeInviteCode, PENDING_INVITE_KEY } from "@/lib/invite";
 import { googleOAuthRedirectTo, isGoogleSignInEnabled } from "@/lib/googleAuth";
 import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
 
 type Mode = "sign-in" | "sign-up" | "forgot-password";
+
+// An invite code saved by /join/<code> before the athlete signed in or up.
+function pendingInvite(): string | null {
+  try {
+    return normalizeInviteCode(window.localStorage.getItem(PENDING_INVITE_KEY));
+  } catch {
+    return null;
+  }
+}
 
 // Inlined at build time. Off until the Google Cloud and Supabase dashboard setup is done.
 const GOOGLE_SIGN_IN = isGoogleSignInEnabled(process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED);
@@ -125,14 +135,20 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      // Came from an invite link: finish joining with one tap.
+      const invite = pendingInvite();
+      router.push(invite ? `/join/${invite}` : "/dashboard");
       router.refresh();
       return;
     }
 
+    // Also store a pending invite on the account, so it survives a
+    // confirmation email that opens in a different browser.
+    const invite = pendingInvite();
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
-      password
+      password,
+      ...(invite ? { options: { data: { pending_invite: invite } } } : {})
     });
 
     setLoading(false);

@@ -12,6 +12,7 @@ import {
 } from "@/lib/attentionCenter";
 import { displayMemberName } from "@/lib/memberName";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
+import { latestEntryPerDay, normalizeStatDate } from "@/lib/statsHistory";
 import { fromStatsRow, type StatsRow } from "@/lib/statsRow";
 import type { RosterAthlete, StatEntry } from "@/types";
 
@@ -114,7 +115,7 @@ export function buildTeamSummary(team: DailySummaryTeamData, now: Date, today: s
   const completed: Record<string, number> = {};
   const prs: Record<string, { exercise: string; date: string }[]> = {};
   team.athletes.forEach((athlete) => {
-    history[athlete.user_id] = athlete.stats_history.map(fromStatsRow);
+    history[athlete.user_id] = latestEntryPerDay(athlete.stats_history).map(fromStatsRow);
     completed[athlete.user_id] = athlete.completed_last7;
     prs[athlete.user_id] = athlete.recent_prs;
   });
@@ -125,7 +126,8 @@ export function buildTeamSummary(team: DailySummaryTeamData, now: Date, today: s
   const yesterday = shiftDate(today, -1);
   const painAlerts = team.athletes.flatMap((athlete, index) => {
     const row = athlete.latest_stats;
-    if (!row?.date || row.date < yesterday) return [];
+    const checkInDay = row ? normalizeStatDate(row.date, row.updated_at) : "";
+    if (!row || !checkInDay || checkInDay < yesterday) return [];
     const entry = fromStatsRow(row);
     const parts = PAIN_FIELDS.filter(({ key }) => Number(entry[key]) >= ATTENTION_PAIN_THRESHOLD).map(
       ({ label }) => label

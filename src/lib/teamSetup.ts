@@ -1,3 +1,5 @@
+import { inviteUrl } from "@/lib/invite";
+
 export type SetupStepId = "team" | "invite" | "program" | "readiness";
 
 export type SetupInputs = {
@@ -93,7 +95,9 @@ export function computeSetupProgress(input: SetupInputs): SetupProgress {
 
 export function buildInviteMessage(teamName: string, inviteCode: string, origin: string) {
   return [
-    `Join ${teamName} on NextRep.`,
+    `Join ${teamName} on NextRep: ${inviteUrl(origin, inviteCode)}`,
+    "",
+    "Or join by code:",
     `1. Create an account at ${origin}/login`,
     `2. Choose "I'm an Athlete"`,
     `3. Enter the team invite code: ${inviteCode}`

@@ -66,12 +66,12 @@ describe("proxy: /demo", () => {
 });
 
 describe("proxy: signed out", () => {
-  it.each(["/", "/login", "/pilot", "/privacy", "/terms", "/auth/callback", "/unsubscribe"])("lets a visitor open %s", async (path) => {
+  it.each(["/", "/login", "/pilot", "/privacy", "/terms", "/auth/callback", "/join/A1B2C3", "/unsubscribe"])("lets a visitor open %s", async (path) => {
     const response = await proxy(request(path));
     expect(isRedirect(response)).toBe(false);
   });
 
-  it.each(["/dashboard", "/coach", "/stats", "/workouts", "/settings", "/pilot/extra", "/demo/extra", "/login/x"])(
+  it.each(["/dashboard", "/coach", "/stats", "/workouts", "/settings", "/pilot/extra", "/demo/extra", "/login/x", "/join"])(
     "redirects %s to /login",
     async (path) => {
       const response = await proxy(request(`${path}?tab=1`));
@@ -99,7 +99,7 @@ describe("proxy: signed in", () => {
     expect(location(response).pathname).toBe("/dashboard");
   });
 
-  it.each(["/dashboard", "/coach", "/pilot", "/privacy", "/terms", "/auth/callback"])(
+  it.each(["/dashboard", "/coach", "/pilot", "/privacy", "/terms", "/auth/callback", "/join/A1B2C3"])(
     "lets a signed-in user open %s",
     async (path) => {
       expect(isRedirect(await proxy(request(path)))).toBe(false);

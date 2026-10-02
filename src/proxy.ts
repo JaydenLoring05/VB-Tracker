@@ -86,7 +86,10 @@ export async function proxy(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isAuthPage = AUTH_PAGES.includes(pathname);
-  const isPublic = isAuthPage || ALWAYS_PUBLIC.includes(pathname);
+  // Invite links open signed out too: the page saves the code and walks a new
+  // athlete through sign-up (see src/app/join/[code]).
+  const isInviteLink = pathname.startsWith("/join/");
+  const isPublic = isAuthPage || ALWAYS_PUBLIC.includes(pathname) || isInviteLink;
 
   if (!user && !isPublic) {
     return redirectTo(request, "/login", response, { clearSession: deadSession });

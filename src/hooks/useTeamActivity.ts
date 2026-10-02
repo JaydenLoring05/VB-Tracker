@@ -7,6 +7,7 @@ import { fromStatsRow, StatsRow } from "@/context/TrackerContext";
 import { useSupabase } from "@/hooks/useSupabase";
 import { parseProgramDays, pickAssignedProgramId, type ProgramDay } from "@/lib/customProgram";
 import { missedAssignedWorkouts } from "@/lib/missedWorkouts";
+import { latestEntryPerDay } from "@/lib/statsHistory";
 import { todayISO } from "@/lib/storage";
 import { RosterAthlete, StatEntry, Team } from "@/types";
 
@@ -107,10 +108,15 @@ export function useTeamActivity(team: Team | null, roster: RosterAthlete[]) {
         return;
       }
 
-      const statsHistoryByUser: Record<string, StatEntry[]> = {};
+      // One entry per athlete per day (the latest save), with dates normalized.
+      const rowsByUser: Record<string, (StatsRow & { user_id: string; created_at?: string })[]> = {};
       (historyRes.data ?? []).forEach((row) => {
-        const typedRow = row as StatsRow & { user_id: string };
-        (statsHistoryByUser[typedRow.user_id] ??= []).push(fromStatsRow(typedRow));
+        const typedRow = row as StatsRow & { user_id: string; created_at?: string };
+        (rowsByUser[typedRow.user_id] ??= []).push(typedRow);
+      });
+      const statsHistoryByUser: Record<string, StatEntry[]> = {};
+      Object.entries(rowsByUser).forEach(([userId, rows]) => {
+        statsHistoryByUser[userId] = latestEntryPerDay(rows).map(fromStatsRow);
       });
 
       const sessions = (sessionsRes.data ?? []) as SessionRow[];

@@ -245,3 +245,26 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* One-tap entry to the daily check-in, shown until today's is saved. */
+.today-checkin {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  min-height: 64px;
+  color: var(--text);
+  text-decoration: none;
+  border-color: var(--gold);
+}
+
+.today-checkin > span {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.today-checkin svg {
+  flex: 0 0 auto;
+  color: var(--gold);
+}
