@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
+import { activeSecondsAfterWindow, buildActiveTimeFlushRequest } from "@/lib/activeTimeFlush";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { createClient } from "@/lib/supabase/client";
@@ -31,6 +32,20 @@ export function useActiveWorkoutSession(sessionId: string) {
   useEffect(() => {
     sessionRef.current = session;
   }, [session]);
+
+  // The user's current access token, kept in a ref so the unload flush can
+  // send its keepalive request synchronously (there is no time to await
+  // getSession() once the page is going away).
+  const accessTokenRef = useRef<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      accessTokenRef.current = data.session?.access_token ?? null;
+    });
+    const { data } = supabase.auth.onAuthStateChange((_event, authSession) => {
+      accessTokenRef.current = authSession?.access_token ?? null;
+    });
+    return () => data.subscription.unsubscribe();
+  }, [supabase]);
 
   useEffect(() => {
     let cancelled = false;
@@ -159,24 +174,50 @@ export function useActiveWorkoutSession(sessionId: string) {
       }
     }
 
-    async function flushActiveWindow() {
+    function flushActiveWindow() {
       const current = sessionRef.current;
       if (!current || !current.resumed_at) return;
 
-      const elapsed = Math.max(0, Math.round((Date.now() - new Date(current.resumed_at).getTime()) / 1000));
-      const nextActive = (current.active_seconds ?? 0) + elapsed;
+      const nextActive = activeSecondsAfterWindow(current.active_seconds, current.resumed_at);
 
-      const { error } = await supabase
-        .from("workout_sessions")
-        .update({ active_seconds: nextActive, resumed_at: null })
-        .eq("id", current.id)
-        .eq("user_id", userId);
-
-      if (!error) {
+      function applyLocally() {
         setSession((session) =>
-          session && session.id === current.id ? { ...session, active_seconds: nextActive, resumed_at: null } : session
+          session && session.id === current!.id ? { ...session, active_seconds: nextActive, resumed_at: null } : session
         );
       }
+
+      async function writeWithClient() {
+        const { error } = await supabase
+          .from("workout_sessions")
+          .update({ active_seconds: nextActive, resumed_at: null })
+          .eq("id", current!.id)
+          .eq("user_id", userId);
+        if (!error) applyLocally();
+      }
+
+      // A keepalive request survives a tab close or hard reload; the
+      // supabase-js write below can be aborted by the unload. The request is
+      // dispatched synchronously here, before the page can go away.
+      const accessToken = accessTokenRef.current;
+      if (!accessToken || typeof fetch !== "function") {
+        void writeWithClient();
+        return;
+      }
+
+      const { url, init } = buildActiveTimeFlushRequest({
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        accessToken,
+        sessionId: current.id,
+        userId,
+        activeSeconds: nextActive
+      });
+
+      fetch(url, init)
+        .then((response) => (response.ok ? applyLocally() : writeWithClient()))
+        // Network failure: if the page is still alive, try once more through
+        // the client (it refreshes an expired token on its own).
+        .catch(() => writeWithClient());
     }
 
     // Always start a fresh active window on mount/resume, even if
