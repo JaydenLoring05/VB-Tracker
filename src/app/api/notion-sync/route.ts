@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
   const [sessionsResult, checkInsResult] = await Promise.all([
     supabase
       .from("workout_sessions")
-      .select("id, week, day, ended_at, duration_seconds, rpe, workout_sets(exercise, set_number, weight, reps)")
+      .select("id, week, day, ended_at, duration_seconds, rpe, workout_sets(exercise, set_number, weight, reps, seconds)")
       .eq("user_id", user.id)
       .not("ended_at", "is", null)
       .gte("ended_at", sinceISO)
