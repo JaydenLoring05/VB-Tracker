@@ -1,9 +1,13 @@
 "use client";
 
 import { useTrackerContext } from "@/context/TrackerContext";
+import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { getPhase } from "@/data/workoutPlan";
 import { useWorkoutLogs } from "@/hooks/useWorkoutLogs";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
+import { startingProgramKeyFromId } from "@/lib/positionProgram";
+
+import { StartingProgramPicker } from "./StartingProgramPicker";
 
 export function PhaseSummary() {
   const { week } = useWorkoutProgress();
@@ -11,6 +15,20 @@ export function PhaseSummary() {
   const { teamOverride } = useTrackerContext();
   const phase = getPhase(week);
   const customProgram = teamOverride?.customProgram;
+  const startingKey = startingProgramKeyFromId(customProgram?.id);
+
+  if (startingKey) {
+    const template = POSITION_PROGRAMS[startingKey];
+    return (
+      <section className="panel">
+        <p className="micro micro-gold">Starting program</p>
+        <h2>{template.program.name}</h2>
+        <p className="muted">{template.focus} The week repeats; your coach can assign a different program any time.</p>
+        <StartingProgramPicker />
+        <p className="muted">Workout logs this week: {weeklyLogCount}</p>
+      </section>
+    );
+  }
 
   if (customProgram) {
     return (
@@ -35,6 +53,7 @@ export function PhaseSummary() {
       <p>
         <strong>Progression:</strong> {phase.sets}
       </p>
+      <StartingProgramPicker />
       <p className="muted">Workout logs this week: {weeklyLogCount}</p>
     </section>
   );

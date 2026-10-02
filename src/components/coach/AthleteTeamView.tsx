@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { useTeamCalendar } from "@/hooks/useTeamCalendar";
+import { startingProgramKeyFromId } from "@/lib/positionProgram";
 import { todayISO } from "@/lib/storage";
 import { Team } from "@/types";
 
@@ -35,7 +36,9 @@ export function AthleteTeamView({ team }: { team: Team }) {
           check in on you. Your data stays read-only to them.
         </p>
         <p className="muted">
-          {teamOverride?.customProgram
+          {startingProgramKeyFromId(teamOverride?.customProgram?.id)
+            ? `You're on the "${teamOverride?.customProgram?.name}" starting program for your position. If your coach assigns a program or adjusts the plan, theirs replaces it.`
+            : teamOverride?.customProgram
             ? `You're on your coach's program, "${teamOverride.customProgram.name}". Your Workouts page already shows it.`
             : customizedCount > 0
             ? "Your coach has adjusted the training plan for your team, and your Workouts page already reflects it."
