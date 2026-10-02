@@ -56,6 +56,12 @@ Tests live under `tests/`, mirroring `src/`.
 | Position starting programs | `tests/data/positionPrograms.test.ts`, `tests/lib/positionProgram.test.ts` | Templates pass the builder's validation, use library exercises with the right measure; position mapping; coach program and plan edits win over the template |
 | Feedback | `tests/lib/feedback.test.ts` | Message validation and control characters, same-site page only, short device label, app version, escaped notification email |
 | `POST /api/feedback` | `tests/api/feedbackRoute.test.ts` | Signed in only, same-origin, empty rejected, role and team from the database (not the browser), emails only when Resend is set, save failure sends nothing |
+| Check-in reminders | `tests/lib/checkInReminders.test.ts` | Email content (first name, escaped team, check-in link, unsubscribe link and one-click headers, no health data), token validation, hour and time-zone options, headers passed to Resend |
+| `GET /api/checkin-reminders`, `POST /api/reminders/unsubscribe` | `tests/api/checkInRemindersRoute.test.ts` | Off without env vars, cron secret required, one email per due athlete, lookup failure sends nothing, unsubscribe by valid token only |
+| Invite links | `tests/lib/invite.test.ts` | Code normalization, `/join/<code>` URL, join error messages (dead code, already on a team, no server text), pending invite from this browser or the account, invite message leads with the link |
+| Daily check-in | `tests/lib/dailyCheckIn.test.ts` | Daily vs. pain fields, starting values (pain always 0), pain saved as 0 when collapsed, test-day numbers untouched, readiness unchanged, sleep stepper, checked in today |
+| `latest_stats` save | `tests/lib/statsRow.test.ts` | Each save stamps `updated_at`, so "last check-in" moves forward |
+| Stats history dates | `tests/lib/statsHistory.test.ts` | Old `M/D/YYYY` and ISO dates normalize to one day, latest save per day wins, pain streaks on old-format rows are flagged |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |

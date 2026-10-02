@@ -106,6 +106,10 @@ export type Team = {
   invite_code: string;
   created_at: string;
   plan_tier: "pilot" | "paid";
+  /** Athlete check-in reminder emails (schema_v50). Missing before that SQL runs. */
+  checkin_reminder_enabled?: boolean;
+  checkin_reminder_hour?: number;
+  checkin_reminder_time_zone?: string;
 };
 
 export type TeamMember = {

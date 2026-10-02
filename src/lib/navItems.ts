@@ -56,7 +56,7 @@ const feedback: NavLink = { href: "/feedback", label: "Send feedback", icon: Mes
 
 const athleteNav: NavConfig = {
   primary: [
-    { href: "/dashboard", label: "Today", icon: Home, alsoMatches: ["/workout"] },
+    { href: "/dashboard", label: "Today", icon: Home, alsoMatches: ["/workout", "/check-in"] },
     { href: "/workouts", label: "Plan", icon: Dumbbell, alsoMatches: ["/calendar", "/plan"] },
     // Coach-only pages redirect athletes to their own version.
     { href: "/stats", label: "Progress", icon: BarChart3, alsoMatches: ["/team-progress"] },

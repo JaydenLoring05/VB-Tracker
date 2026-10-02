@@ -21,6 +21,12 @@
   margin: var(--sp-3) 0;
 }
 
+.settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+
 /* Send feedback */
 .feedback-panel {
   display: grid;

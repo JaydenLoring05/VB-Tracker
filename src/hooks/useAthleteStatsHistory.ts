@@ -6,6 +6,7 @@ import { useDemo } from "@/context/DemoContext";
 import { fromStatsRow, StatsRow } from "@/context/TrackerContext";
 import { useSupabase } from "@/hooks/useSupabase";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
+import { latestEntryPerDay } from "@/lib/statsHistory";
 import { StatEntry } from "@/types";
 
 export type AthleteStatsPoint = StatEntry & { recovery: number; recoveryLabel: string };
@@ -55,7 +56,7 @@ export function useAthleteStatsHistory(userId: string | null) {
           return;
         }
 
-        setHistory(((data ?? []) as StatsRow[]).map((row) => toStatsPoint(fromStatsRow(row))));
+        setHistory(latestEntryPerDay((data ?? []) as StatsRow[]).map((row) => toStatsPoint(fromStatsRow(row))));
         setLoading(false);
       });
 

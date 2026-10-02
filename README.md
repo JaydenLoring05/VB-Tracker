@@ -82,7 +82,7 @@ Regenerate them with `node scripts/capture-readme-screenshots.mjs` against a run
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
    ```
-3. Run every file in `supabase/`, once each, in your project's SQL Editor, in this order, to create the tables, row-level security policies, and constraints: `schema.sql`, `schema_v18_5.sql`, `schema_v19.sql`, `schema_v20_teams.sql`, `schema_v21_substitutions.sql`, `schema_v22_profiles.sql`, `schema_v23_team_management.sql`, `schema_v24_performance_profiles.sql`, `schema_v25_removal_notices.sql`, `schema_v26_multi_team_coach.sql`, `schema_v27_team_plan_tier.sql`, `schema_v28_team_exercise_defaults.sql`, `schema_v29_team_day_overrides.sql`, `schema_v30_workout_active_time.sql`, `schema_v31_readiness_expansion.sql`, `schema_v32_workout_rpe.sql`, `schema_v33_team_calendar.sql`, `schema_v34_profile_onboarding.sql`, `schema_v35_team_film.sql`, `schema_v36_film_tag_details.sql`, `schema_v40_pilot_applications.sql`, `schema_v41_team_member_names.sql`, `schema_v42_workout_set_seconds.sql`, `schema_v43_team_programs.sql`, `schema_v44_program_start_date.sql`, `schema_v45_starting_program.sql`, `schema_v46_delete_my_account.sql`, `schema_v47_daily_coach_summary.sql`, `schema_v47_daily_coach_summary.sql`, `schema_v51_feedback.sql`. (There are no v37 to v39 files.)
+3. Run every file in `supabase/`, once each, in your project's SQL Editor, in this order, to create the tables, row-level security policies, and constraints: `schema.sql`, `schema_v18_5.sql`, `schema_v19.sql`, `schema_v20_teams.sql`, `schema_v21_substitutions.sql`, `schema_v22_profiles.sql`, `schema_v23_team_management.sql`, `schema_v24_performance_profiles.sql`, `schema_v25_removal_notices.sql`, `schema_v26_multi_team_coach.sql`, `schema_v27_team_plan_tier.sql`, `schema_v28_team_exercise_defaults.sql`, `schema_v29_team_day_overrides.sql`, `schema_v30_workout_active_time.sql`, `schema_v31_readiness_expansion.sql`, `schema_v32_workout_rpe.sql`, `schema_v33_team_calendar.sql`, `schema_v34_profile_onboarding.sql`, `schema_v35_team_film.sql`, `schema_v36_film_tag_details.sql`, `schema_v40_pilot_applications.sql`, `schema_v41_team_member_names.sql`, `schema_v42_workout_set_seconds.sql`, `schema_v43_team_programs.sql`, `schema_v44_program_start_date.sql`, `schema_v45_starting_program.sql`, `schema_v46_delete_my_account.sql`, `schema_v47_daily_coach_summary.sql`, `schema_v48_skill_ratings.sql`, `schema_v49_invite_preview.sql`, `schema_v50_checkin_reminders.sql`, `schema_v51_feedback.sql`. (There are no v37 to v39 files.)
 4. `npm run dev`
 
 ### Optional environment variables
@@ -96,8 +96,26 @@ stays off until its variables are set.
 | `NOTION_TOKEN` | Notion integration token for the personal Training Log sync (`/api/notion-sync`). Server-only. |
 | `NOTION_TRAINING_LOG_DATA_SOURCE_ID` | The Notion data source that finished workouts and check-ins are written to. |
 | `NOTION_SYNC_USER_ID` | The one Supabase user ID whose data is synced. The sync is a no-op for every other user. |
+| `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | `true` shows "Continue with Google" on `/login`. Needs the Google Cloud and Supabase setup described in PR #34. Read at build time, so redeploy after changing it. |
 
 The Notion sync only runs when all three `NOTION_*` variables are set.
+
+### Optional: daily coach summary email
+
+Off until all of these are set (Vercel → Settings → Environment Variables). Coaches opt in from their dashboard.
+
+| Variable | What it does |
+| --- | --- |
+| `RESEND_API_KEY` | API key from [Resend](https://resend.com), used to send the email. Server-only. |
+| `DAILY_SUMMARY_FROM` | Sender, e.g. `NextRep <summary@yourdomain.com>`, on a domain verified in Resend. |
+| `CRON_SECRET` | Random string. Vercel Cron sends it to `/api/daily-summary`; store its SHA-256 hash in `private.cron_secrets` (see `schema_v47_daily_coach_summary.sql`). |
+| `DAILY_SUMMARY_TIME_ZONE` | Optional IANA time zone for "today" (default `America/Los_Angeles`). The cron in `vercel.json` runs at 13:00 UTC. |
+
+### Optional: athlete check-in reminders
+
+A daily email to athletes who haven't checked in yet. It reuses the daily coach summary email setup (`RESEND_API_KEY`, `DAILY_SUMMARY_FROM`, `CRON_SECRET` and the secret's hash in `private.cron_secrets`) and is off until those are set. Coaches turn reminders on and pick the time and time zone on their dashboard; athletes can opt out in Settings or from the email.
+
+The hourly trigger is `.github/workflows/checkin-reminders.yml` (an hourly Vercel cron isn't available on the Hobby plan). To turn it on, add the same `CRON_SECRET` as a GitHub repository secret (Settings → Secrets and variables → Actions). An optional repository variable `SITE_URL` overrides the production URL.
 
 Run the unit tests with `npm test`; see [TESTING.md](TESTING.md) for what is covered.
 

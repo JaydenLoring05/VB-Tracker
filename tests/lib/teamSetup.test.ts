@@ -118,7 +118,7 @@ describe("computeSetupProgress", () => {
 describe("share messages", () => {
   it("builds an invite message with team, code and sign-up link", () => {
     const message = buildInviteMessage("Varsity Girls", "NR-1234", "https://nextrep.app");
-    expect(message).toContain("Join Varsity Girls on NextRep.");
+    expect(message).toContain("Join Varsity Girls on NextRep: https://nextrep.app/join/NR-1234");
     expect(message).toContain("https://nextrep.app/login");
     expect(message).toContain("NR-1234");
   });
