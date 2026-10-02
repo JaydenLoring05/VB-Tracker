@@ -21,6 +21,17 @@ npm test
 npm run build      # needs NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY set; any placeholder works
 ```
 
+## End-to-end smoke test
+
+`e2e/demo.spec.ts` opens the public `/demo` page in Chromium against a production build and checks that the sample
+roster and the Attention Center render. It needs no account or secrets. CI runs it as a separate `e2e` job.
+
+```
+npx playwright install chromium   # once
+npm run build
+npm run test:e2e
+```
+
 ## What is covered
 
 Tests live under `tests/`, mirroring `src/`.
@@ -47,7 +58,7 @@ Tests live under `tests/`, mirroring `src/`.
 - Row-level security and SQL functions. These need a real Postgres; run them against a Supabase branch, not in unit tests.
 - Personal-record detection: it is inline in `useActiveWorkoutSession.logSet` (`weight > previous max`), so it cannot be
   tested without extracting it into `src/lib`.
-- Browser behavior of the service worker (install prompts, real cache eviction) and end-to-end flows. The
+- Browser behavior of the service worker (install prompts, real cache eviction) and signed-in end-to-end flows. The
   `scripts/playwright-verify` scripts cover those manually against a running app.
 
 ## Add a test
