@@ -90,6 +90,8 @@ export type WorkoutSet = {
   set_number: number;
   weight: number | null;
   reps: number | null;
+  /** Set duration for timed exercises (planks, holds). Null for rep-based sets. */
+  seconds?: number | null;
   created_at: string;
 };
 
