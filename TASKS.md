@@ -1,54 +1,55 @@
 # Tasks
 
-What's still open after the October 2026 pass. Everything in "Ready for
-review" is an open PR to `main`. Each one passed `npx tsc --noEmit`,
-`npm test` and `npm run build` before it was opened.
+What's open after the launch-readiness pass. Everything below is an open PR
+to `main`; each passed `npx tsc --noEmit`, `npm run lint`, `npm test` and
+`npm run build` before it was opened. The launch steps (database, accounts,
+dry run) are in [docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md).
 
-## Ready for review (merge in this order)
+## Merge in this order
 
-Part 1:
-- [ ] #20 `docs/readme-accuracy`
-- [ ] #21 `chore/eslint-flat-config`
-- [ ] #22 `refactor/personal-record-lib`
-- [ ] #23 `test/demo-smoke-playwright`
-- [ ] #24 `docs/architecture`
-- [ ] #25 `chore/package-metadata`
-- [ ] #26 `docs/readme-screenshots`: includes Workout Mode and film room shots from #39
+**SQL first** means: run that file in the Supabase SQL Editor before merging,
+and confirm it with the check query in the launch checklist.
 
-Part 2:
-- [ ] #27 `fix/workout-timer-keepalive`
-- [ ] #28 `feat/training-load-team-events`
-- [ ] #29 `feat/coach-roster-limit`
-- [ ] #30 `fix/substitution-references`
-- [ ] #31 `feat/missed-assigned-days`: **run `schema_v44_program_start_date.sql` first**
-- [ ] #32 `feat/position-starting-programs`: **run `schema_v45_starting_program.sql` first**
-- [ ] #33 `feat/data-export-account-deletion`: **run `schema_v46_delete_my_account.sql` first**
-- [ ] #34 `feat/google-sign-in`: Google Cloud, Supabase and Vercel steps in the PR
-- [ ] #35 `feat/daily-coach-summary-email`: **run `schema_v47_daily_coach_summary.sql` first**, then the cron secret and Resend steps in the PR
-- [ ] #36 `feat/landing-product-screenshots`
+| Order | PR | What | SQL first |
+| --- | --- | --- | --- |
+| 1 | #41 | Renumber the skill-ratings schema to v48; refresh TASKS.md | No (its statement already ran) |
+| 2 | #47 | Restore the daily coach summary README section | No |
+| 3 | #42 | Confirm Clear History and PR delete, require a PR exercise, one check-in per day | No |
+| 4 | #46 | Refresh `latest_stats.updated_at` on every check-in | No |
+| 5 | #43 | 30-second daily check-in, one tap from Today | No |
+| 6 | #44 | Invite link and QR code | **`schema_v49_invite_preview.sql`** |
+| 7 | #45 | Athlete check-in reminder emails (needs #43's `/check-in`) | **`schema_v50_checkin_reminders.sql`** |
+| 8 | #48 | In-app Send feedback | **`schema_v51_feedback.sql`** |
+| 9 | #49 | Parent or guardian step for athletes under 18 | **`schema_v52_guardian_info.sql`** |
+| 10 | #50 | Sentry and Vercel Analytics, off until configured | No |
+| 11 | #51 | Notion sync behind a founder flag | No |
+| 12 | #52 | Pilot-ending banner, payment link, roster warning | No |
+| 13 | #53 | Launch checklist and this file | No |
 
-Follow-ups:
-- [ ] #39 `feat/demo-workout-and-film`: merge before #26 and #36 so the live demo matches their screenshots
+Merge notes:
+- Several PRs add a schema file to the README setup list, and several add a
+  row to the TESTING.md coverage table. Those doc conflicts are always "keep
+  both sides" (schema files in version order).
+- #45 and #47 both add a README section after the Notion paragraph; keep both.
+- #41 and #53 both rewrite this file; keep #53's version.
 
-Part 3:
-- [ ] #38 `docs/refresh-suggestions-tasks` (this file and SUGGESTIONS.md)
+## Needs you
 
-## Merge notes
+- [ ] Run v49–v52 as their PRs come up (table above).
+- [ ] Email setup: Resend domain, Supabase SMTP through Resend, `RESEND_API_KEY`,
+      `DAILY_SUMMARY_FROM`, `CRON_SECRET` (Vercel and GitHub), and the
+      secret's hash in `private.cron_secrets`.
+- [ ] `NEXT_PUBLIC_SENTRY_DSN` and `NEXT_PUBLIC_ANALYTICS_ENABLED`.
+- [ ] `NEXT_PUBLIC_PAYMENT_LINK`.
+- [ ] Optional: Google sign-in (#34's steps).
+- [ ] Have the under-18 wording checked (#49). This is not legal advice.
+- [ ] Answer the open questions at the top of #51 (no Notion settings screen
+      exists) and in #44 (QR also in the team header, not only the checklist).
+- [ ] Do the dry run in the launch checklist with one coach and three athletes.
 
-Checked by merging every open PR (#20–#36, #38, #39) into `main` in the
-order above on a throwaway branch. All code merges cleanly, and the
-combined result passes `tsc`, lint, 562 unit tests, the build and all three
-Playwright tests (the `/demo` smoke test plus #39's Workout Mode and film
-room tests). #26's screenshot script also regenerates all five images on
-that build.
-The only conflicts are in docs, and both are "keep both sides":
+## Not from this pass
 
-- **README.md setup list.** Several branches add their schema file right
-  after v35, because `main` still ends there. Merge #20 (`docs/readme-accuracy`)
-  first; each later conflict then becomes "append the new file after
-  `schema_v43_team_programs.sql`", in order v44 to v47.
-- **TESTING.md coverage table.** Each feature branch adds one row in the
-  same place. Keep every row.
+- [ ] #16 `simplify-workout-film` ("Simplify 5: workout logger up front, film icon cleanup").
 
 ## Next up
 
