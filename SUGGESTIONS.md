@@ -43,6 +43,8 @@ Rules for automated runs:
 | F-09 | Morning email at each coach's local time | new | your idea | M |
 | F-10 | Notion settings screen (status and "Sync now") | new | your idea | S |
 | F-11 | Beach-specific starting program | new | your idea | M |
+| F-12 | Pilot clock starts at the first athlete workout, not team creation | new | your idea | S |
+| F-13 | Weekly "you haven't trained yet" email to athletes | new | your idea | M |
 | R-01 | Database sets `latest_stats.updated_at` itself (needs SQL) | new | your idea | S |
 | R-02 | Coaches can read a guardian's email, not just the flag (needs SQL) | new | your idea | S |
 | R-03 | Automated tests for row-level security | new | your idea | M |
@@ -122,6 +124,13 @@ Rules for automated runs:
   request behind a flag, but the founder still sets the sync up through
   server variables. A small Settings section (status and "Sync now") behind
   the same flag would make it self-serve.
+- **F-12. The pilot clock starts when the team is created.** `pilotBanner`
+  in `src/lib/pilot.ts` counts the 30 days from `teams.created_at`, so a
+  coach who sets up before the season loses pilot days before any athlete
+  trains. Starting the clock at the team's first finished athlete workout
+  (falling back to `created_at` when there is none) gives every pilot a fair
+  30 days of real use before the "Continue for $29/month" banner. Keep the
+  same date in the Notion Teams table's Pilot start.
 
 ### Athlete experience
 
@@ -160,6 +169,14 @@ Rules for automated runs:
   - onboarding has no beach option to pick it from.
 
   Add a `beach` key, a template and an onboarding choice together.
+- **F-13. Nothing nudges an athlete who stops training.** The Attention
+  Center flags missed workouts to the coach, and athletes get check-in
+  reminder emails (schema v50, `src/lib/checkInReminders.ts`), but no
+  email reaches an athlete who hasn't finished a workout this week. A weekly
+  reminder that reuses the check-in reminder's opt-in, unsubscribe link and
+  hourly job would raise "Athletes logging", the weekly number that best
+  predicts a pilot team paying. Needs working email (Resend key and sender
+  domain) first.
 
 ### Reliability and security
 
