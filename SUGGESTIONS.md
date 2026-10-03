@@ -31,7 +31,6 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| B-01 | Copied check-in reminder still points at `/stats` | planned | bug | S |
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
 | B-03 | Athlete stats table overflows at modal width | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
@@ -57,10 +56,6 @@ Rules for automated runs:
 
 ### Bugs
 
-- **B-01. The copied check-in reminder still points at `/stats`.**
-  `buildCheckInReminder` in `src/lib/teamSetup.ts` (the coach's "Copy
-  check-in reminder" text) sends athletes to `/stats`. Since #43 the faster
-  path is `/check-in`. It's a one-line change.
 - **B-02. Film hotkeys ignore key presses for a moment after the player
   loads.** In `src/components/film/FilmPanel.tsx`, keyboard tagging only
   starts responding a second or two after the YouTube player mounts (found
@@ -229,6 +224,7 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Copied check-in reminder links to `/check-in`, not `/stats` (B-01) | bug | #61 |
 | Film made simple: three-tap tags, timed comments, "My clips" (F-02) | me | #58 |
 | Team streak in the coach's sidebar | not recorded | #56 |
 | Attention Center items can be cleared; Send reminder and Recognize achievement send a message | bug | #55 |

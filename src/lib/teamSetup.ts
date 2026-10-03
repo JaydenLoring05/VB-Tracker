@@ -107,6 +107,6 @@ export function buildInviteMessage(teamName: string, inviteCode: string, origin:
 export function buildCheckInReminder(teamName: string, origin: string) {
   return [
     `Quick one for ${teamName}: log today's check-in on NextRep so I can see how everyone is recovering.`,
-    `Open ${origin}/stats and fill in sleep, energy and soreness. It takes about 30 seconds.`
+    `Open ${origin}/check-in and fill in sleep, energy and soreness. It takes about 30 seconds.`
   ].join("\n");
 }
