@@ -123,9 +123,10 @@ describe("share messages", () => {
     expect(message).toContain("NR-1234");
   });
 
-  it("builds a check-in reminder pointing at /stats", () => {
+  it("builds a check-in reminder pointing at the 30-second /check-in page, not /stats", () => {
     const message = buildCheckInReminder("Varsity Girls", "https://nextrep.app");
     expect(message).toContain("Varsity Girls");
-    expect(message).toContain("https://nextrep.app/stats");
+    expect(message).toContain("https://nextrep.app/check-in");
+    expect(message).not.toContain("/stats");
   });
 });
