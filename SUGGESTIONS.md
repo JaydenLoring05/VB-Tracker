@@ -50,9 +50,12 @@ Rules for automated runs:
 | R-03 | Automated tests for row-level security | new | your idea | M |
 | R-04 | Several screens only see the first 100 athletes of a roster | new | your idea | S |
 | R-05 | Reminder timing depends on GitHub's scheduler | new | your idea | S |
+| R-06 | README setup steps leave out `schema_v53` | new | your idea | S |
 | A-01 | Split `TrackerContext.tsx` into smaller providers | new | your idea | L |
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
+| F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
+| B-04 | The Workout Mode browser test fails on rest days, turning CI red | new | your idea | S |
 
 ## Details
 
@@ -70,6 +73,16 @@ Rules for automated runs:
   the column headers run together ("MOTIVATIONSORENESSKNEE") and dates wrap
   onto two lines. It's visible in `docs/screenshots/athlete-drilldown.jpg`.
   Show fewer columns on narrow widths, or let the table scroll sideways.
+
+- **B-04. The Workout Mode browser test fails on rest days.**
+  `e2e/demo-workout-and-film.spec.ts` clicks "Start Today's Workout" on the
+  demo athlete view. On a rest day `DashboardCards` shows "Want to train
+  anyway? Pick a workout" in its place, so the test times out and the `e2e`
+  check goes red on every PR opened that day (seen on #62 and #63 on Sunday
+  2026-10-04). The app is fine; the test depends on the weekday. Open
+  Workout Mode from the demo's "Workout Mode" tab, or pin the demo's clock
+  to a training day. Sits at the bottom of the table only to keep this
+  file from conflicting with the open PRs; move it up when you plan it.
 
 ### Film
 
@@ -97,6 +110,14 @@ Rules for automated runs:
   It also sets the price of the solo plan (F-06): launch Athlete Pro at
   $7.99/month or $59/year, and raise new signups to about $14.99/month or
   $99/year once AI film ships. Split into smaller rows before building.
+
+- **F-15. Three-tap sets record the zone.** The three-tap flow saves a set
+  as Good / Hittable / Error (`QUICK_RESULTS` in `src/lib/filmQuickTag.ts`)
+  and leaves `set_zone` empty, so the set distribution in film stats (F-01)
+  only counts sets tagged through "Detailed tags" or by voice. A fourth tap
+  for the zone on sets only (six buttons laid out like the court, with a
+  "Skip") would fill it from the flow coaches use most. No schema change:
+  `set_zone` exists since v36.
 
 ### Coach experience
 
@@ -209,6 +230,13 @@ Rules for automated runs:
   only allows daily crons. GitHub can run late at busy times. Moving the
   trigger to an hourly Vercel cron (Pro) or Supabase `pg_cron` + `pg_net`
   would make the timing exact. The Vercel option costs money.
+
+- **R-06. The README's setup steps leave out `schema_v53`.** Step 3 of the
+  README lists every schema file to run and stops at
+  `schema_v52_guardian_info.sql`. `schema_v53_film_quick_tags.sql` (F-02,
+  #58) is missing, so a fresh install following the README has no
+  `film_tags.result` column and three-tap tags fail to save.
+  `docs/LAUNCH_CHECKLIST.md` already lists v53. Add it to the README list.
 
 ### Architecture
 
