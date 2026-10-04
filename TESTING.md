@@ -67,6 +67,7 @@ Tests live under `tests/`, mirroring `src/`.
 | `latest_stats` save | `tests/lib/statsRow.test.ts` | Each save stamps `updated_at`, so "last check-in" moves forward |
 | Stats history dates | `tests/lib/statsHistory.test.ts` | Old `M/D/YYYY` and ISO dates normalize to one day, latest save per day wins, pain streaks on old-format rows are flagged |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
+| YouTube player controls | `tests/lib/youtubePlayerHandle.test.ts` | Before the player is ready: time reads 0:00, a tag key still starts a tag, a seek waits, play/pause and seek keys never throw; once ready: seek, seek-by clamped at 0:00, play/pause |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |
 | `src/proxy.ts` | `tests/proxy.test.ts` | Public paths, `/demo`, signed-out redirect, dead-session cookie clearing, matcher exclusions |

@@ -37,12 +37,10 @@ test("the film room shows sample film and tags, and keyboard tagging adds one", 
   const before = Number(/\((\d+)\)/.exec((await page.getByRole("button", { name: /Kill \(\d+\)/ }).innerText()) ?? "")?.[1]);
 
   await page.locator("h1").click();
-  // The hotkey listener attaches once the player has mounted; retry K until the hint shows.
-  await expect(async () => {
-    await page.keyboard.press("Escape");
-    await page.keyboard.press("k");
-    await expect(page.getByText("Kill → direction?")).toBeVisible({ timeout: 500 });
-  }).toPass({ timeout: 10_000 });
+  // Press K once, straight away, while the YouTube player may still be loading.
+  // A hotkey must work on the first press (B-02), so there is no retry here.
+  await page.keyboard.press("k");
+  await expect(page.getByText("Kill → direction?")).toBeVisible();
   await page.keyboard.press("c");
   await page.keyboard.press("Enter");
   await expect(page.getByRole("button", { name: `Kill (${before + 1})` })).toBeVisible();
