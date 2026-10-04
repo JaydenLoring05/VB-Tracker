@@ -51,6 +51,10 @@ Regenerate them with `node scripts/capture-readme-screenshots.mjs` against a run
   and type, block outcome or attack direction. Coaches can tag with the
   keyboard (one key per tag type, then a detail key) or by voice
   ("Maya pass two") through the browser's Web Speech API
+- Film stats from tags: each film has a Stats view with the passing average
+  per athlete (0 to 3), where the sets went by court zone, and block outcomes
+  per athlete. The coach's athlete drill-down has a Film tab with the same
+  numbers film by film. Athletes see their own passing and blocking rows
 - Coach program builder: coaches build their own repeating week and assign it
   to the whole team, a group of athletes, or one athlete (the most specific
   assignment wins)

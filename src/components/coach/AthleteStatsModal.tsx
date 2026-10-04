@@ -17,21 +17,27 @@ import { useAthleteAdherence } from "@/hooks/useAthleteAdherence";
 import { useAthletePRs } from "@/hooks/useAthletePRs";
 import { useAthleteStatsHistory } from "@/hooks/useAthleteStatsHistory";
 
-type Tab = "recovery" | "prs" | "adherence";
+import { AthleteFilmStats } from "./AthleteFilmStats";
+
+type Tab = "recovery" | "prs" | "adherence" | "film";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "recovery", label: "Recovery" },
   { id: "prs", label: "PRs" },
-  { id: "adherence", label: "Adherence" }
+  { id: "adherence", label: "Adherence" },
+  { id: "film", label: "Film" }
 ];
 
 export function AthleteStatsModal({
   userId,
   displayName,
+  teamId,
   onClose
 }: {
   userId: string;
   displayName: string;
+  /** The team being viewed. Keeps the Film tab to that team's film. */
+  teamId?: string;
   onClose: () => void;
 }) {
   const [tab, setTab] = useState<Tab>("recovery");
@@ -212,6 +218,8 @@ export function AthleteStatsModal({
             </div>
           </>
         ))}
+
+      {tab === "film" && <AthleteFilmStats userId={userId} teamId={teamId} displayName={displayName} />}
     </ModalDialog>
   );
 }
