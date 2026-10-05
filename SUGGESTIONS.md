@@ -35,6 +35,7 @@ Rules for automated runs:
 | B-03 | Athlete stats table overflows at modal width | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
+| B-05 | Daily coach summary email fails with `text = date` in `daily_summary_data` (needs SQL) | building | bug | S |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
@@ -58,6 +59,17 @@ Rules for automated runs:
 
 ### Bugs
 
+- **B-05. The daily coach summary email fails every morning.** Vercel logged
+  `daily-summary: could not load summary data operator does not exist:
+  text = date` from `/api/daily-summary` on 2026-10-04 at 13:26 UTC.
+  `daily_summary_data` (schema v47) finds today's team events with
+  `e.date = p_today`, but `team_calendar_events.date` is text (schema v33)
+  and `p_today` is a date, so Postgres rejects the whole query on every
+  call and no coach gets the email.
+  `schema_v54_daily_summary_date_fix.sql` replaces the function with that
+  one line changed to compare text with text. Needs the file run in the SQL
+  Editor. The row sits below F-03 only to keep this file from conflicting
+  with the open PRs.
 - **B-02. Film hotkeys ignore key presses for a moment after the player
   loads.** In `src/components/film/FilmPanel.tsx`, keyboard tagging only
   starts responding a second or two after the YouTube player mounts (found
