@@ -33,7 +33,6 @@ Rules for automated runs:
 | --- | --- | --- | --- | --- |
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
 | B-03 | Athlete stats table overflows at modal width | planned | bug | S |
-| B-04 | Demo Workout Mode e2e test fails on rest days, turning CI red | building | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
@@ -71,13 +70,6 @@ Rules for automated runs:
   the column headers run together ("MOTIVATIONSORENESSKNEE") and dates wrap
   onto two lines. It's visible in `docs/screenshots/athlete-drilldown.jpg`.
   Show fewer columns on narrow widths, or let the table scroll sideways.
-- **B-04. The demo Workout Mode e2e test fails on rest days.**
-  `e2e/demo-workout-and-film.spec.ts` clicked `/Start today/i` on the demo
-  athlete view, but every program phase makes Sunday a rest day, so on Sunday
-  the dashboard shows "Want to train anyway? Pick a workout" instead and the
-  test timed out. The `e2e` check went red on every PR opened on a Sunday
-  (#62, #63 and #64 all failed that way on 4 October). The app is fine: both
-  labels link to `/workout`. The spec now matches whichever label is shown.
 
 ### Film
 
@@ -249,6 +241,7 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Demo Workout Mode e2e test fails on rest days (B-04) | bug | #66 |
 | Copied check-in reminder links to `/check-in`, not `/stats` (B-01) | bug | #61 |
 | Film made simple: three-tap tags, timed comments, "My clips" (F-02) | me | #58 |
 | Team streak in the coach's sidebar | not recorded | #56 |
