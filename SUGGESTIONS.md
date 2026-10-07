@@ -32,7 +32,7 @@ Rules for automated runs:
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
-| B-03 | Athlete stats table overflows at modal width | planned | bug | S |
+| B-03 | Athlete stats table overflows at modal width | building | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
