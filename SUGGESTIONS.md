@@ -224,8 +224,6 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
-| Film hotkeys work on the first press while the player loads, with tests (B-02) | bug | #62 |
-| Demo Workout Mode e2e test fails on rest days (B-04) | bug | #66 |
 | Athlete stats table columns fit their headers and dates at modal width (B-03) | bug | #67 |
 | Copied check-in reminder links to `/check-in`, not `/stats` (B-01) | bug | #61 |
 | Film made simple: three-tap tags, timed comments, "My clips" (F-02) | me | #58 |
