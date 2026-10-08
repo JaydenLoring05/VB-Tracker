@@ -31,6 +31,8 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
+| B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
+| F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
@@ -52,6 +54,16 @@ Rules for automated runs:
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
 
 ## Details
+
+### Bugs
+
+- **B-02. Film hotkeys ignore key presses for a moment after the player
+  loads.** In `src/components/film/FilmPanel.tsx`, keyboard tagging only
+  starts responding a second or two after the YouTube player mounts (found
+  while writing the e2e test in #39, which has to retry the first key).
+  Attach the window keydown listener immediately or queue keys until the
+  player is ready, so a coach who starts tagging right away doesn't lose
+  presses.
 
 ### Film
 
@@ -213,9 +225,6 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
-| Film stats from tags: passing average, set distribution, block outcomes (F-01) | me | #63 |
-| Film hotkeys work on the first press while the player loads, with tests (B-02) | bug | #62 |
-| Demo Workout Mode e2e test fails on rest days (B-04) | bug | #66 |
 | Athlete stats table columns fit their headers and dates at modal width (B-03) | bug | #67 |
 | Copied check-in reminder links to `/check-in`, not `/stats` (B-01) | bug | #61 |
 | Film made simple: three-tap tags, timed comments, "My clips" (F-02) | me | #58 |
