@@ -16,8 +16,12 @@ import { ModalDialog } from "@/components/shared/ModalDialog";
 import { useAthleteAdherence } from "@/hooks/useAthleteAdherence";
 import { useAthletePRs } from "@/hooks/useAthletePRs";
 import { useAthleteStatsHistory } from "@/hooks/useAthleteStatsHistory";
+import { gridTemplate, RECOVERY_COLUMNS } from "@/lib/statsTable";
 
 type Tab = "recovery" | "prs" | "adherence";
+
+// Read by .athlete-stats-row in coach.css, so the header and every row share the same tracks.
+const RECOVERY_TABLE_STYLE = { "--stats-columns": gridTemplate(RECOVERY_COLUMNS) } as React.CSSProperties;
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "recovery", label: "Recovery" },
@@ -94,34 +98,25 @@ export function AthleteStatsModal({
               </LineChart>
             </ResponsiveContainer>
 
-            <div className="athlete-stats-table">
+            {/* Wider than the modal, so it scrolls sideways: focusable for keyboard users. */}
+            <div
+              className="athlete-stats-table"
+              style={RECOVERY_TABLE_STYLE}
+              role="region"
+              aria-label="Recovery history"
+              tabIndex={0}
+            >
               <div className="athlete-stats-row athlete-stats-header">
-                <span>Date</span>
-                <span>Recovery</span>
-                <span>Sleep</span>
-                <span>Stress</span>
-                <span>Motivation</span>
-                <span>Soreness</span>
-                <span>Knee</span>
-                <span>Shoulder</span>
-                <span>Low Back</span>
-                <span>Ankle</span>
+                {RECOVERY_COLUMNS.map((column) => (
+                  <span key={column.key}>{column.label}</span>
+                ))}
               </div>
 
               {[...history].reverse().map((entry, index) => (
                 <div className="athlete-stats-row" key={`${entry.date}-${index}`}>
-                  <span>{entry.date || "-"}</span>
-                  <span>
-                    {entry.recovery}% · {entry.recoveryLabel}
-                  </span>
-                  <span>{entry.sleep || "-"}</span>
-                  <span>{entry.stress || "-"}</span>
-                  <span>{entry.motivation || "-"}</span>
-                  <span>{entry.soreness || "-"}</span>
-                  <span>{entry.kneePain || "-"}</span>
-                  <span>{entry.shoulderPain || "-"}</span>
-                  <span>{entry.lowerBackPain || "-"}</span>
-                  <span>{entry.anklePain || "-"}</span>
+                  {RECOVERY_COLUMNS.map((column) => (
+                    <span key={column.key}>{column.value(entry)}</span>
+                  ))}
                 </div>
               ))}
             </div>
