@@ -36,7 +36,6 @@ Rules for automated runs:
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
-| B-05 | Daily coach summary email fails with `text = date` in `daily_summary_data` (needs SQL) | building | bug | S |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
 | F-08 | Skill radar history (overlay last month on this month) | new | your idea | M |
@@ -175,17 +174,6 @@ Rules for automated runs:
 
 ### Reliability and security
 
-- **B-05. The daily coach summary email fails every morning.** Vercel logged
-  `daily-summary: could not load summary data operator does not exist:
-  text = date` from `/api/daily-summary` on 2026-10-04 at 13:26 UTC.
-  `daily_summary_data` (schema v47) finds today's team events with
-  `e.date = p_today`, but `team_calendar_events.date` is text (schema v33)
-  and `p_today` is a date, so Postgres rejects the whole query on every
-  call and no coach gets the email.
-  `schema_v54_daily_summary_date_fix.sql` replaces the function with that
-  one line changed to compare text with text. Needs the file run in the SQL
-  Editor. The row sits below F-05, and this entry sits here, only to keep
-  this file from conflicting with the other open PRs.
 - **R-01. `latest_stats.updated_at` should also be set by the database.**
   #46 fixes it in the app's save. A `before update` trigger on
   `latest_stats` would protect any future writer (an import, an admin fix)
