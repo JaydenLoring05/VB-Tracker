@@ -31,6 +31,7 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
+| B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
@@ -53,6 +54,16 @@ Rules for automated runs:
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
 
 ## Details
+
+### Bugs
+
+- **B-02. Film hotkeys ignore key presses for a moment after the player
+  loads.** In `src/components/film/FilmPanel.tsx`, keyboard tagging only
+  starts responding a second or two after the YouTube player mounts (found
+  while writing the e2e test in #39, which has to retry the first key).
+  Attach the window keydown listener immediately or queue keys until the
+  player is ready, so a coach who starts tagging right away doesn't lose
+  presses.
 
 ### Film
 
