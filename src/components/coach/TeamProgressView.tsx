@@ -166,6 +166,7 @@ export function TeamProgressView({ team }: { team: Team }) {
         <AthleteStatsModal
           userId={selected.userId}
           displayName={selected.displayName}
+          teamId={team.id}
           onClose={() => setSelected(null)}
         />
       )}

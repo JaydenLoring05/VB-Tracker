@@ -25,7 +25,8 @@ npm run build      # needs NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_
 ## End-to-end smoke test
 
 `e2e/demo.spec.ts` opens the public `/demo` page in Chromium against a production build and checks that the sample
-roster and the Attention Center render. It needs no account or secrets. CI runs it as a separate `e2e` job.
+roster and the Attention Center render. `e2e/demo-film-stats.spec.ts` checks the film room's Stats view and the
+Film tab of the athlete drill-down on the same page. They need no account or secrets. CI runs them as a separate `e2e` job.
 
 ```
 npx playwright install chromium   # once
@@ -63,13 +64,16 @@ Tests live under `tests/`, mirroring `src/`.
 | Check-in reminders | `tests/lib/checkInReminders.test.ts` | Email content (first name, escaped team, check-in link, unsubscribe link and one-click headers, no health data), token validation, hour and time-zone options, headers passed to Resend |
 | `GET /api/checkin-reminders`, `POST /api/reminders/unsubscribe` | `tests/api/checkInRemindersRoute.test.ts` | Off without env vars, cron secret required, one email per due athlete, lookup failure sends nothing, unsubscribe by valid token only |
 | Invite links | `tests/lib/invite.test.ts` | Code normalization, `/join/<code>` URL, join error messages (dead code, already on a team, no server text), pending invite from this browser or the account, invite message leads with the link |
+| Film stats | `tests/lib/filmStats.test.ts` | Set distribution by zone (shares, empty zones, sets with no zone), passing average per athlete and for the team (0 counts, unrated and out-of-range skipped, sort order), block outcomes (three-tap Error, blocks with no outcome), one athlete's rows only, per-film lines newest first, number formatting |
 | Daily check-in | `tests/lib/dailyCheckIn.test.ts` | Daily vs. pain fields, starting values (pain always 0), pain saved as 0 when collapsed, test-day numbers untouched, readiness unchanged, sleep stepper, checked in today |
 | `latest_stats` save | `tests/lib/statsRow.test.ts` | Each save stamps `updated_at`, so "last check-in" moves forward |
 | Stats history dates | `tests/lib/statsHistory.test.ts` | Old `M/D/YYYY` and ISO dates normalize to one day, latest save per day wins, pain streaks on old-format rows are flagged |
 | Recovery history table | `tests/lib/statsTable.test.ts` | Every column is as wide as its header and widest value (no run-together headers, dates on one line), one track per column, cell text and dashes for blanks |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
+| YouTube player controls | `tests/lib/youtubePlayerHandle.test.ts` | Before the player is ready: time reads 0:00, a tag key still starts a tag, a seek waits, play/pause and seek keys never throw; once ready: seek, seek-by clamped at 0:00, play/pause |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |
+| Dashboard workout call to action | `tests/lib/dashboardCta.test.ts` | Label and link for every weekday of every phase, Sunday is a rest day in all four, open session wins, unlisted weekday rests |
 | `src/proxy.ts` | `tests/proxy.test.ts` | Public paths, `/demo`, signed-out redirect, dead-session cookie clearing, matcher exclusions |
 | `public/sw.js` | `tests/serviceWorker.test.ts` | Only static assets and `/offline` are cached; never HTML, Supabase or non-GET |
 
