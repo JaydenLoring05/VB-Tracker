@@ -32,7 +32,6 @@ Rules for automated runs:
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
-| B-03 | Athlete stats table overflows at modal width | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | B-05 | Daily coach summary email fails with `text = date` in `daily_summary_data` (needs SQL) | building | bug | S |
@@ -77,11 +76,6 @@ Rules for automated runs:
   Attach the window keydown listener immediately or queue keys until the
   player is ready, so a coach who starts tagging right away doesn't lose
   presses.
-- **B-03. The athlete stats table overflows at modal width.** In
-  `AthleteStatsModal`'s recovery history table, at the 640 px modal width
-  the column headers run together ("MOTIVATIONSORENESSKNEE") and dates wrap
-  onto two lines. It's visible in `docs/screenshots/athlete-drilldown.jpg`.
-  Show fewer columns on narrow widths, or let the table scroll sideways.
 
 ### Film
 
@@ -253,6 +247,7 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Athlete stats table columns fit their headers and dates at modal width (B-03) | bug | #67 |
 | Copied check-in reminder links to `/check-in`, not `/stats` (B-01) | bug | #61 |
 | Film made simple: three-tap tags, timed comments, "My clips" (F-02) | me | #58 |
 | Team streak in the coach's sidebar | not recorded | #56 |
