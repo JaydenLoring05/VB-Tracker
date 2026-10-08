@@ -31,9 +31,6 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
-| B-03 | Athlete stats table overflows at modal width | planned | bug | S |
-| F-01 | Film stats from tags (set distribution, pass average, block outcomes) | building | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
@@ -56,33 +53,8 @@ Rules for automated runs:
 
 ## Details
 
-### Bugs
-
-- **B-02. Film hotkeys ignore key presses for a moment after the player
-  loads.** In `src/components/film/FilmPanel.tsx`, keyboard tagging only
-  starts responding a second or two after the YouTube player mounts (found
-  while writing the e2e test in #39, which has to retry the first key).
-  Attach the window keydown listener immediately or queue keys until the
-  player is ready, so a coach who starts tagging right away doesn't lose
-  presses.
-- **B-03. The athlete stats table overflows at modal width.** In
-  `AthleteStatsModal`'s recovery history table, at the 640 px modal width
-  the column headers run together ("MOTIVATIONSORENESSKNEE") and dates wrap
-  onto two lines. It's visible in `docs/screenshots/athlete-drilldown.jpg`.
-  Show fewer columns on narrow widths, or let the table scroll sideways.
-
 ### Film
 
-- **F-01. Film stats from tags.** `film_tags` already records `athlete_id`,
-  `pass_rating`, `set_zone`, `set_type`, `block_outcome` and
-  `attack_direction` (schema v36), but nothing aggregates them. Pure
-  functions in `src/lib` could compute:
-  - set distribution by zone;
-  - pass-rating average per athlete (the 0–3 passing scale);
-  - block outcomes per athlete per match.
-
-  Show them on the film page and in the athlete drill-down. This is the
-  payoff for the time coaches spend tagging.
 - **F-03. Film links that aren't YouTube.** `parseYouTubeId` in
   `src/lib/film.ts` only recognises YouTube hosts. For any other link,
   `FilmPanel` shows an "Open video" link that opens in a new tab in place of
@@ -241,6 +213,10 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Film stats from tags: passing average, set distribution, block outcomes (F-01) | me | #63 |
+| Film hotkeys work on the first press while the player loads, with tests (B-02) | bug | #62 |
+| Demo Workout Mode e2e test fails on rest days (B-04) | bug | #66 |
+| Athlete stats table columns fit their headers and dates at modal width (B-03) | bug | #67 |
 | Copied check-in reminder links to `/check-in`, not `/stats` (B-01) | bug | #61 |
 | Film made simple: three-tap tags, timed comments, "My clips" (F-02) | me | #58 |
 | Team streak in the coach's sidebar | not recorded | #56 |
