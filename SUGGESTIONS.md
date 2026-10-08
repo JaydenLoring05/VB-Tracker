@@ -54,7 +54,6 @@ Rules for automated runs:
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
 | F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
-| B-04 | The Workout Mode browser test fails on rest days, turning CI red | new | your idea | S |
 
 ## Details
 
@@ -67,16 +66,6 @@ Rules for automated runs:
   Attach the window keydown listener immediately or queue keys until the
   player is ready, so a coach who starts tagging right away doesn't lose
   presses.
-
-- **B-04. The Workout Mode browser test fails on rest days.**
-  `e2e/demo-workout-and-film.spec.ts` clicks "Start Today's Workout" on the
-  demo athlete view. On a rest day `DashboardCards` shows "Want to train
-  anyway? Pick a workout" in its place, so the test times out and the `e2e`
-  check goes red on every PR opened that day (seen on #62 and #63 on Sunday
-  2026-10-04). The app is fine; the test depends on the weekday. Open
-  Workout Mode from the demo's "Workout Mode" tab, or pin the demo's clock
-  to a training day. Sits at the bottom of the table only to keep this
-  file from conflicting with the open PRs; move it up when you plan it.
 
 ### Film
 
