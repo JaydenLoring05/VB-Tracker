@@ -67,6 +67,16 @@ Rules for automated runs:
 
 ### Film
 
+- **F-01. Film stats from tags.** `film_tags` already records `athlete_id`,
+  `pass_rating`, `set_zone`, `set_type`, `block_outcome` and
+  `attack_direction` (schema v36), but nothing aggregates them. Pure
+  functions in `src/lib` could compute:
+  - set distribution by zone;
+  - pass-rating average per athlete (the 0–3 passing scale);
+  - block outcomes per athlete per match.
+
+  Show them on the film page and in the athlete drill-down. This is the
+  payoff for the time coaches spend tagging.
 - **F-03. Film links that aren't YouTube.** `parseYouTubeId` in
   `src/lib/film.ts` only recognises YouTube hosts. For any other link,
   `FilmPanel` shows an "Open video" link that opens in a new tab in place of
