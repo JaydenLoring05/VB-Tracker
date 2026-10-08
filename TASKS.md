@@ -7,7 +7,8 @@ checks. The launch steps (database, accounts, dry run) are in
 
 ## Open pull requests
 
-Merge them in this order. Each one merges cleanly after the ones above it.
+They can be merged in any order. None of them conflicts with another.
+The order below is the suggested one.
 
 | Order | PR | What | Needs SQL | Waiting on |
 | --- | --- | --- | --- | --- |
@@ -17,8 +18,10 @@ Merge them in this order. Each one merges cleanly after the ones above it.
 | 4 | #63 | F-01: film stats from tags (passing average, set distribution, block outcomes) | No | You to try the preview, then merge. Questions for you are in the PR description |
 | 5 | This PR | Housekeeping: this file and two new backlog rows | No | Your merge |
 
-#62 includes #66's change, and #63 includes both, so merging a later one
-first also works. #65 and this PR stand alone.
+#62 carries #66's change and #63 carries both, because they edit the same
+browser test. SUGGESTIONS.md is edited only by this PR, which marks B-02,
+B-04, B-05 and F-01 `building`. The weekly update moves each one to Shipped
+once its PR is merged.
 
 The bug-fix PRs were not merged automatically on 8 October: the session
 that updated them was not allowed to merge. They are ready when you are.
