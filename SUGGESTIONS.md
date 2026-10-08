@@ -31,8 +31,10 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
-| F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
+| B-02 | Film hotkeys ignore key presses right after the player loads (PR #62) | building | bug | S |
+| B-04 | The Workout Mode browser test fails on rest days, turning CI red (PR #66) | building | bug | S |
+| B-05 | Daily coach summary email fails with `text = date` (PR #65, needs SQL) | building | bug | S |
+| F-01 | Film stats from tags (set distribution, pass average, block outcomes) (PR #63) | building | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
@@ -49,9 +51,11 @@ Rules for automated runs:
 | R-03 | Automated tests for row-level security | new | your idea | M |
 | R-04 | Several screens only see the first 100 athletes of a roster | new | your idea | S |
 | R-05 | Reminder timing depends on GitHub's scheduler | new | your idea | S |
+| R-06 | README setup steps leave out `schema_v53` | new | your idea | S |
 | A-01 | Split `TrackerContext.tsx` into smaller providers | new | your idea | L |
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
+| F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
 
 ## Details
 
@@ -64,6 +68,21 @@ Rules for automated runs:
   Attach the window keydown listener immediately or queue keys until the
   player is ready, so a coach who starts tagging right away doesn't lose
   presses.
+- **B-04. The Workout Mode browser test fails on rest days.**
+  `e2e/demo-workout-and-film.spec.ts` clicked "Start Today's Workout" on the
+  demo athlete view. On a rest day (every Sunday) `DashboardCards` shows
+  "Want to train anyway? Pick a workout" in its place, so the test timed
+  out and the `e2e` check went red on every PR opened that day (#62, #63
+  and #64 on 2026-10-04). The app was never at fault. #66 makes the test
+  click whichever label the dashboard shows.
+- **B-05. The daily coach summary email fails every morning.** Vercel logs
+  `daily-summary: could not load summary data operator does not exist:
+  text = date` from `/api/daily-summary` each day at 13:26 UTC since
+  2026-10-04. `daily_summary_data` (schema v47) compares
+  `team_calendar_events.date`, a text column, with `p_today`, a date, so
+  Postgres rejects the query and no coach gets the email. #65 adds
+  `schema_v54_daily_summary_date_fix.sql`, which compares text with text.
+  The email stays broken until that file is run in the SQL Editor.
 
 ### Film
 
@@ -91,6 +110,14 @@ Rules for automated runs:
   It also sets the price of the solo plan (F-06): launch Athlete Pro at
   $7.99/month or $59/year, and raise new signups to about $14.99/month or
   $99/year once AI film ships. Split into smaller rows before building.
+
+- **F-15. Three-tap sets record the zone.** The three-tap flow saves a set
+  as Good / Hittable / Error (`QUICK_RESULTS` in `src/lib/filmQuickTag.ts`)
+  and leaves `set_zone` empty, so the set distribution in film stats (F-01)
+  only counts sets tagged through "Detailed tags" or by voice. A fourth tap
+  for the zone on sets only (six buttons laid out like the court, with a
+  "Skip") would fill it from the flow coaches use most. No schema change:
+  `set_zone` exists since v36.
 
 ### Coach experience
 
@@ -203,6 +230,13 @@ Rules for automated runs:
   only allows daily crons. GitHub can run late at busy times. Moving the
   trigger to an hourly Vercel cron (Pro) or Supabase `pg_cron` + `pg_net`
   would make the timing exact. The Vercel option costs money.
+
+- **R-06. The README's setup steps leave out `schema_v53`.** Step 3 of the
+  README lists every schema file to run and stops at
+  `schema_v52_guardian_info.sql`. `schema_v53_film_quick_tags.sql` (F-02,
+  #58) is missing, so a fresh install following the README has no
+  `film_tags.result` column and three-tap tags fail to save.
+  `docs/LAUNCH_CHECKLIST.md` already lists v53. Add it to the README list.
 
 ### Architecture
 
