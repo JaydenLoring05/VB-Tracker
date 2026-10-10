@@ -13,8 +13,11 @@ import { getExerciseMeasure } from "@/lib/exerciseMeasure";
 import {
   blankProgram,
   CustomProgram,
+  exerciseKey,
   formatTarget,
+  hasStartingTargets,
   newProgramExercise,
+  ownExercises,
   pickAssignedProgramId,
   ProgramDay,
   ProgramExercise,
@@ -33,6 +36,8 @@ function ExerciseRow({
   exercise,
   index,
   count,
+  remembered,
+  onTyping,
   onChange,
   onMove,
   onRemove
@@ -40,6 +45,10 @@ function ExerciseRow({
   exercise: ProgramExercise;
   index: number;
   count: number;
+  /** The coach's own exercises from this and earlier programs. */
+  remembered: ProgramExercise[];
+  /** The name box that has focus and its text, or null when none does. */
+  onTyping: (name: string | null) => void;
   onChange: (next: ProgramExercise) => void;
   onMove: (direction: -1 | 1) => void;
   onRemove: () => void;
@@ -54,8 +63,21 @@ function ExerciseRow({
         aria-label="Exercise"
         placeholder="Exercise name"
         value={exercise.name}
+        onFocus={() => onTyping(exercise.name)}
+        onBlur={() => onTyping(null)}
         onChange={(event) => {
           const name = event.target.value;
+          onTyping(name);
+          // One of the coach's own exercises picked from the suggestions (the text arrives in
+          // one jump, not one letter): bring back the sets and reps it had last time, unless
+          // this row's targets were already changed. Typing letter by letter never does this,
+          // so "Step-up" on the way to "Step-up lateral" doesn't pull in the wrong targets.
+          const picked = Math.abs(name.length - exercise.name.length) > 1;
+          const before = remembered.find((r) => exerciseKey(r.name) === exerciseKey(name));
+          if (picked && before && hasStartingTargets(exercise)) {
+            onChange({ ...before, name });
+            return;
+          }
           // Follow the name's usual measure (Planks -> seconds) unless the
           // coach already switched this row away from its default.
           const followsDefault = timed === (getExerciseMeasure(exercise.name) === "time");
@@ -123,7 +145,17 @@ function ExerciseRow({
   );
 }
 
-function DayEditor({ day, onChange }: { day: ProgramDay; onChange: (next: ProgramDay) => void }) {
+function DayEditor({
+  day,
+  remembered,
+  onTyping,
+  onChange
+}: {
+  day: ProgramDay;
+  remembered: ProgramExercise[];
+  onTyping: (name: string | null) => void;
+  onChange: (next: ProgramDay) => void;
+}) {
   function updateExercise(index: number, next: ProgramExercise) {
     onChange({ ...day, exercises: day.exercises.map((exercise, i) => (i === index ? next : exercise)) });
   }
@@ -187,6 +219,8 @@ function DayEditor({ day, onChange }: { day: ProgramDay; onChange: (next: Progra
                 exercise={exercise}
                 index={index}
                 count={day.exercises.length}
+                remembered={remembered}
+                onTyping={onTyping}
                 onChange={(next) => updateExercise(index, next)}
                 onMove={(direction) => moveExercise(index, direction)}
                 onRemove={() => onChange({ ...day, exercises: day.exercises.filter((_, i) => i !== index) })}
@@ -209,11 +243,14 @@ function DayEditor({ day, onChange }: { day: ProgramDay; onChange: (next: Progra
 
 function ProgramEditorForm({
   initial,
+  savedPrograms,
   saving,
   onSave,
   onCancel
 }: {
   initial: Draft;
+  /** Every program this team already has, newest first. */
+  savedPrograms: CustomProgram[];
   saving: boolean;
   onSave: (draft: Draft) => void;
   onCancel: () => void;
@@ -221,6 +258,14 @@ function ProgramEditorForm({
   const [draft, setDraft] = useState<Draft>(initial);
   const [showProblems, setShowProblems] = useState(false);
   const problems = validateProgram(draft);
+  // Text of the exercise name box being typed in, so its own half-typed text isn't offered back.
+  const [typing, setTyping] = useState<string | null>(null);
+  // The coach's own exercises, from this draft first and then saved programs, so one
+  // typed on Monday is offered on Tuesday before anything is saved.
+  const remembered = useMemo(
+    () => ownExercises([draft, ...savedPrograms], exerciseCatalog.map((exercise) => exercise.name)),
+    [draft, savedPrograms]
+  );
 
   function updateDay(next: ProgramDay) {
     setDraft((current) => ({ ...current, days: current.days.map((day) => (day.day === next.day ? next : day)) }));
@@ -240,6 +285,11 @@ function ProgramEditorForm({
         {exerciseCatalog.map((exercise) => (
           <option key={exercise.name} value={exercise.name} />
         ))}
+        {remembered
+          .filter((exercise) => typing == null || exerciseKey(exercise.name) !== exerciseKey(typing))
+          .map((exercise) => (
+            <option key={`own-${exercise.name}`} value={exercise.name} label={`${exercise.name} (yours)`} />
+          ))}
       </datalist>
 
       <label className="custom-program-name">
@@ -249,11 +299,12 @@ function ProgramEditorForm({
 
       <p className="muted">
         This week repeats every week. Pick training days, name them, and set each exercise as sets × reps or sets ×
-        seconds. Type any exercise, or pick one from the library.
+        seconds. Type any exercise, or pick one from the library. Exercises you add yourself show up in the
+        suggestions next time, and picking one brings back its sets and reps.
       </p>
 
       {draft.days.map((day) => (
-        <DayEditor key={day.day} day={day} onChange={updateDay} />
+        <DayEditor key={day.day} day={day} remembered={remembered} onTyping={setTyping} onChange={updateDay} />
       ))}
 
       {showProblems && problems.length > 0 && (
@@ -414,11 +465,13 @@ export function CustomProgramPanel({ team }: { team: Team }) {
   }
 
   if (editing) {
+    const newestFirst = [...programs].sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
     return (
       <section className="panel custom-program-panel">
         <h3>{editing.id ? `Edit ${editing.name}` : "New program"}</h3>
         <ProgramEditorForm
           initial={editing}
+          savedPrograms={newestFirst}
           saving={saving}
           onSave={handleSave}
           onCancel={() => setEditing(null)}

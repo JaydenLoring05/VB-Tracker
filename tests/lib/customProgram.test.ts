@@ -5,6 +5,9 @@ import {
   exerciseFromPrescription,
   formatTarget,
   getExerciseTarget,
+  hasStartingTargets,
+  newProgramExercise,
+  ownExercises,
   parseProgramDays,
   pickAssignedProgramId,
   ProgramAssignment,
@@ -171,5 +174,80 @@ describe("parseProgramDays", () => {
       }
     ]);
     expect(parseProgramDays(null)).toEqual([]);
+  });
+});
+
+describe("ownExercises", () => {
+  const library = ["Back Squat", "Planks"];
+  const day = (name: string, exercises: { name: string; sets: number; reps: string | null; seconds: number | null }[]) => ({
+    days: [{ day: name, title: "Training", notes: "", minutes: "45", rest: false, exercises }]
+  });
+
+  it("returns names that aren't in the library, with their targets", () => {
+    const programs = [
+      day("Monday", [
+        { name: "Back Squat", sets: 4, reps: "5", seconds: null },
+        { name: "Bulgarian step-up", sets: 4, reps: "6", seconds: null }
+      ])
+    ];
+    expect(ownExercises(programs, library)).toEqual([{ name: "Bulgarian step-up", sets: 4, reps: "6", seconds: null }]);
+  });
+
+  it("ignores case and outer spaces against the library", () => {
+    const programs = [day("Monday", [{ name: "  back squat ", sets: 3, reps: "8", seconds: null }])];
+    expect(ownExercises(programs, library)).toEqual([]);
+  });
+
+  it("keeps the first spelling and targets found, so the program passed first wins", () => {
+    const draft = day("Tuesday", [{ name: "Bulgarian Step-Up", sets: 5, reps: "5", seconds: null }]);
+    const saved = day("Monday", [{ name: "bulgarian step-up", sets: 3, reps: "10", seconds: null }]);
+    expect(ownExercises([draft, saved], library)).toEqual([
+      { name: "Bulgarian Step-Up", sets: 5, reps: "5", seconds: null }
+    ]);
+  });
+
+  it("skips rows with no name and trims the ones it keeps", () => {
+    const programs = [
+      day("Monday", [
+        { name: "", sets: 3, reps: "8", seconds: null },
+        { name: "   ", sets: 3, reps: "8", seconds: null },
+        { name: " Copenhagen hold ", sets: 3, reps: null, seconds: 20 }
+      ])
+    ];
+    expect(ownExercises(programs, library)).toEqual([{ name: "Copenhagen hold", sets: 3, reps: null, seconds: 20 }]);
+  });
+
+  it("sorts by name and finds exercises on every day of every program", () => {
+    const programs = [
+      {
+        days: [
+          ...day("Monday", [{ name: "Wall drill", sets: 3, reps: "8", seconds: null }]).days,
+          ...day("Wednesday", [{ name: "Ankle hops", sets: 2, reps: "20", seconds: null }]).days
+        ]
+      },
+      day("Friday", [{ name: "Net jumps", sets: 3, reps: "6", seconds: null }])
+    ];
+    expect(ownExercises(programs, library).map((exercise) => exercise.name)).toEqual([
+      "Ankle hops",
+      "Net jumps",
+      "Wall drill"
+    ]);
+  });
+
+  it("returns nothing for no programs", () => {
+    expect(ownExercises([], library)).toEqual([]);
+  });
+});
+
+describe("hasStartingTargets", () => {
+  it("is true for a row nobody has changed", () => {
+    expect(hasStartingTargets(newProgramExercise(""))).toBe(true);
+    expect(hasStartingTargets(newProgramExercise("Planks"))).toBe(true);
+  });
+
+  it("is false once sets, reps or seconds were changed", () => {
+    expect(hasStartingTargets({ ...newProgramExercise(""), sets: 4 })).toBe(false);
+    expect(hasStartingTargets({ ...newProgramExercise(""), reps: "10" })).toBe(false);
+    expect(hasStartingTargets({ ...newProgramExercise("Planks"), seconds: 45 })).toBe(false);
   });
 });

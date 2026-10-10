@@ -49,6 +49,38 @@ export function formatTarget(exercise: ProgramExercise): string {
   return `${sets}x${exercise.reps?.trim() || "?"}`;
 }
 
+/**
+ * The coach's own exercises: every name used in the given programs that
+ * isn't in the library, each with the targets it was last given. Pass the
+ * program being edited first, then saved programs newest first, so the first
+ * spelling and targets found win. Matching ignores case and outer spaces.
+ */
+export function ownExercises(programs: Pick<CustomProgram, "days">[], libraryNames: string[]): ProgramExercise[] {
+  const known = new Set(libraryNames.map(exerciseKey));
+  const found = new Map<string, ProgramExercise>();
+  for (const program of programs) {
+    for (const day of program.days) {
+      for (const exercise of day.exercises) {
+        const key = exerciseKey(exercise.name);
+        if (key === "" || known.has(key) || found.has(key)) continue;
+        found.set(key, { ...exercise, name: exercise.name.trim() });
+      }
+    }
+  }
+  return [...found.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** How exercise names are compared: "  Step-Up " and "step-up" are the same exercise. */
+export function exerciseKey(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+/** True while a row still has the targets a new row starts with, so filling them in overwrites nothing. */
+export function hasStartingTargets(exercise: ProgramExercise): boolean {
+  const start = newProgramExercise(exercise.name);
+  return exercise.sets === start.sets && exercise.reps === start.reps && exercise.seconds === start.seconds;
+}
+
 /** A new exercise with sensible starting targets for its type. */
 export function newProgramExercise(name: string): ProgramExercise {
   return getExerciseMeasure(name) === "time"
