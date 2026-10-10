@@ -14,6 +14,7 @@ import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
 import { checkedInToday } from "@/lib/dailyCheckIn";
+import { todayWorkoutCta } from "@/lib/dashboardCta";
 import { todayName } from "@/lib/storage";
 
 const RECOVERY_COLOR: Record<string, string> = {
@@ -40,7 +41,8 @@ export function DashboardCards() {
   const todayWorkout = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions).find(
     (day) => day.day === today
   );
-  const isRestDay = !todayWorkout || Boolean(todayWorkout.rest);
+  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession));
+  const isRestDay = cta.isRestDay;
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";
   const phase = getPhase(week);
   const recentPRs = prs.slice(0, 3);
@@ -77,14 +79,14 @@ export function DashboardCards() {
           )}
         </p>
 
-        {!isRestDay || openSession ? (
-          <Link href="/workout" className="btn dashboard-hero-cta">
-            {openSession ? "Continue Workout" : "Start Today's Workout"}
+        {cta.prominent ? (
+          <Link href={cta.href} className="btn dashboard-hero-cta">
+            {cta.label}
             <ArrowRight size={22} aria-hidden="true" />
           </Link>
         ) : (
-          <Link href="/workout" className="dashboard-inline-link">
-            Want to train anyway? Pick a workout
+          <Link href={cta.href} className="dashboard-inline-link">
+            {cta.label}
           </Link>
         )}
       </section>

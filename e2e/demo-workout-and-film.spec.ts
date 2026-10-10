@@ -1,5 +1,15 @@
 import { expect, test } from "@playwright/test";
 
+import { WORKOUT_CTA_LABELS } from "../src/lib/dashboardCta";
+
+// Matches whichever call to action the athlete dashboard shows today. On a rest
+// day (every Sunday) there is no "Start Today's Workout" button, only the quiet
+// "Want to train anyway?" link, and both open the demo's Workout Mode.
+const WORKOUT_CTA = new RegExp(
+  WORKOUT_CTA_LABELS.map((label) => label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"),
+  "i"
+);
+
 // The demo versions of Workout Mode and the film room: real components on
 // in-memory sample data. No account, no Supabase, nothing saved.
 test.beforeEach(async ({ page }) => {
@@ -10,8 +20,8 @@ test.beforeEach(async ({ page }) => {
 test("Workout Mode logs a set, flags a PR and finishes on /demo", async ({ page }) => {
   await page.goto("/demo");
   await page.getByRole("button", { name: "Athlete view" }).click();
-  // The athlete's "Start today's workout" opens the demo Workout Mode instead of a sign-up prompt.
-  await page.getByText(/Start today/i).first().click();
+  // The athlete's workout link opens the demo Workout Mode instead of a sign-up prompt.
+  await page.locator("#dashboard").getByRole("link", { name: WORKOUT_CTA }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Workout Mode" })).toBeVisible();
 
   await page.getByPlaceholder("Weight").fill("160");

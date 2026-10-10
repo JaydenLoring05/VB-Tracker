@@ -70,6 +70,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |
+| Dashboard workout call to action | `tests/lib/dashboardCta.test.ts` | Label and link for every weekday of every phase, Sunday is a rest day in all four, open session wins, unlisted weekday rests |
 | `src/proxy.ts` | `tests/proxy.test.ts` | Public paths, `/demo`, signed-out redirect, dead-session cookie clearing, matcher exclusions |
 | `public/sw.js` | `tests/serviceWorker.test.ts` | Only static assets and `/offline` are cached; never HTML, Supabase or non-GET |
 
