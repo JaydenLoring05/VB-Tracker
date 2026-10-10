@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { WholeNumberInput } from "@/components/shared/WholeNumberInput";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { exercises as exerciseCatalog } from "@/data/exercises";
 import { POSITION_PROGRAMS, type StartingProgramKey } from "@/data/positionPrograms";
@@ -67,23 +68,17 @@ function ExerciseRow({
         }}
       />
       <div className="custom-program-target">
-        <input
-          type="number"
-          inputMode="numeric"
-          min={1}
+        <WholeNumberInput
           aria-label={`Sets for ${exercise.name || "exercise"}`}
           value={exercise.sets}
-          onChange={(event) => onChange({ ...exercise, sets: Math.max(1, Number(event.target.value) || 1) })}
+          onCommit={(sets) => onChange({ ...exercise, sets })}
         />
         <span aria-hidden="true">sets ×</span>
         {timed ? (
-          <input
-            type="number"
-            inputMode="numeric"
-            min={1}
+          <WholeNumberInput
             aria-label={`Seconds for ${exercise.name || "exercise"}`}
-            value={exercise.seconds ?? ""}
-            onChange={(event) => onChange({ ...exercise, seconds: Math.max(0, Number(event.target.value) || 0) })}
+            value={exercise.seconds}
+            onCommit={(seconds) => onChange({ ...exercise, seconds })}
           />
         ) : (
           <input
