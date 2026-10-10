@@ -15,6 +15,7 @@ import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { formatSetValue, getExerciseMeasure, parseTargetSeconds } from "@/lib/exerciseMeasure";
 import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
+import { resumeExerciseIndex } from "@/lib/workoutResume";
 import { formatDuration } from "@/lib/time";
 
 import { DiscomfortSuggestion } from "./DiscomfortSuggestion";
@@ -86,6 +87,10 @@ export function WorkoutModeView({
   const currentExerciseRef = useRef<string | null>(null);
   const isLoggingRef = useRef(false);
   const isFinishingRef = useRef(false);
+  // Sets already saved when this screen opened, so a returning athlete is told they are there.
+  const [resumedSetCount, setResumedSetCount] = useState<number | null>(null);
+  // True once the athlete has moved, logged or removed anything in this visit.
+  const touchedRef = useRef(false);
 
   const { resolveExercise, setSubstitution } = useExerciseSubstitutions();
   const { teamOverride, substitutions, stats } = useTrackerContext();
@@ -106,6 +111,21 @@ export function WorkoutModeView({
   );
 
   const showSummary = finished || session?.ended_at != null;
+
+  // Coming back to a workout: open on the exercise the athlete had reached, not on the
+  // first one with an empty form, which looked like nothing had saved. Runs when the
+  // session and its saved sets arrive, and again if the program resolves a moment later
+  // (a coach's program loads after the default plan), but never once the athlete has
+  // done anything in this visit.
+  useEffect(() => {
+    if (touchedRef.current || loading || !session || !day) return;
+    if (sets.length === 0 || session.ended_at) return;
+
+    setExerciseIndex(
+      resumeExerciseIndex(resolvedExercises, sets, (name) => getExerciseTarget(day, session.week, name))
+    );
+    setResumedSetCount(sets.length);
+  }, [loading, session, day, resolvedExercises, sets]);
 
   useEffect(() => {
     if (!session || showSummary) return;
@@ -254,7 +274,9 @@ export function WorkoutModeView({
   currentExerciseRef.current = exercise ?? null;
 
   function goToExercise(nextIndex: number) {
+    touchedRef.current = true;
     setExerciseIndex(Math.max(0, Math.min(resolvedExercises.length - 1, nextIndex)));
+    setResumedSetCount(null);
     setWeight("");
     setReps("");
     setSeconds("");
@@ -288,6 +310,8 @@ export function WorkoutModeView({
     // This tap is the user gesture that lets the end-of-rest beeps play on phones.
     primeRestAlert();
     setRestOver(false);
+    touchedRef.current = true;
+    setResumedSetCount(null);
     setIsLogging(true);
     try {
       const loggedWeight = weight.trim() === "" ? null : Number(weight);
@@ -342,6 +366,13 @@ export function WorkoutModeView({
 
         <div className="workout-elapsed">{formatDuration(elapsedSeconds)}</div>
       </div>
+
+      {resumedSetCount != null && (
+        <p className="panel workout-resumed" role="status">
+          Welcome back. {resumedSetCount} set{resumedSetCount === 1 ? "" : "s"} from earlier{" "}
+          {resumedSetCount === 1 ? "is" : "are"} saved. You&apos;re on {exercise}.
+        </p>
+      )}
 
       <div className="panel workout-warm-up">
         <button type="button" className="ghost warm-up-toggle" onClick={() => setShowWarmUp((current) => !current)}>
@@ -423,7 +454,10 @@ export function WorkoutModeView({
                 <button
                   type="button"
                   className="ghost danger-button"
-                  onClick={() => deleteSet(set.id)}
+                  onClick={() => {
+                    touchedRef.current = true;
+                    deleteSet(set.id);
+                  }}
                   aria-label={`Remove set ${set.set_number}`}
                 >
                   Remove

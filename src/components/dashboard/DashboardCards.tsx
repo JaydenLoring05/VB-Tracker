@@ -41,7 +41,7 @@ export function DashboardCards() {
   const todayWorkout = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions).find(
     (day) => day.day === today
   );
-  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession));
+  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession), openSession?.id);
   const isRestDay = cta.isRestDay;
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";
   const phase = getPhase(week);

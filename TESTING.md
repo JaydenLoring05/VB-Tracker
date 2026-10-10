@@ -48,6 +48,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Program resolution | `tests/lib/programResolution.test.ts` | Phase boundaries, pilot vs paid overrides, substitutions |
 | Auth, DB error and date helpers | `tests/lib/smallHelpers.test.ts` | Dead-session detection, user-facing errors, `todayISO`, `formatLastActive` |
 | Personal records | `tests/lib/personalRecord.test.ts` | First-ever set, ties, heavier set, longer hold, weighted timed sets, null inputs, PR board labels |
+| Coming back to a workout | `tests/lib/workoutResume.test.ts`, `tests/lib/dashboardCta.test.ts` | Set count from a target ("3x8", "3-4x8", "10-20 min"), opens on the exercise the athlete reached, moves on once it is done, skipped exercises, unknown targets; Continue Workout links to the open session |
 | Training load | `tests/lib/trainingLoad.test.ts` | Personal and team event weights, 7-day window edges, no double count when a session is on both calendars |
 | Roster paging | `tests/lib/rosterPaging.test.ts` | Page range with a probe row, `hasMore` detection |
 | Program schedule | `tests/lib/programSchedule.test.ts`, `tests/lib/missedWorkouts.test.ts` | Monday-aligned program weeks, start date for a chosen week, assigned days in the 7-day window, missed vs. completed (week, day), coach program vs. recommended plan |
