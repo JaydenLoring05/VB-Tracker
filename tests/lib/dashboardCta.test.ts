@@ -65,4 +65,23 @@ describe("todayWorkoutCta", () => {
     expect(cta.isRestDay).toBe(true);
     expect(cta.label).toBe(REST_DAY_WORKOUT_LABEL);
   });
+
+  it("sends Continue Workout straight to the workout in progress", () => {
+    const todayWorkout = resolveWorkoutDays(getWorkoutDays(1), 1, null, {}).find((day) => day.day === "Monday");
+    const cta = todayWorkoutCta(todayWorkout, true, "abc-123");
+    expect(cta.label).toBe(CONTINUE_WORKOUT_LABEL);
+    expect(cta.href).toBe("/workout/abc-123");
+    expect(cta.prominent).toBe(true);
+  });
+
+  it("falls back to /workout when the open workout's id isn't known", () => {
+    const todayWorkout = resolveWorkoutDays(getWorkoutDays(1), 1, null, {}).find((day) => day.day === "Monday");
+    expect(todayWorkoutCta(todayWorkout, true).href).toBe(WORKOUT_CTA_HREF);
+    expect(todayWorkoutCta(todayWorkout, true, null).href).toBe(WORKOUT_CTA_HREF);
+  });
+
+  it("never uses a session id when no workout is open", () => {
+    const todayWorkout = resolveWorkoutDays(getWorkoutDays(1), 1, null, {}).find((day) => day.day === "Monday");
+    expect(todayWorkoutCta(todayWorkout, false, "abc-123").href).toBe(WORKOUT_CTA_HREF);
+  });
 });

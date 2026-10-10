@@ -22,19 +22,19 @@ export function StartWorkoutScreen() {
       {openSession && (
         <div className="panel resume-banner">
           <div>
-            <h3>Unfinished workout</h3>
+            <h3>Workout in progress</h3>
             <p className="muted">
-              You have an open session from {openSession.day}, week {openSession.week}.
+              {openSession.day}, week {openSession.week}. Your sets are saved. Pick up where you left off.
             </p>
           </div>
           <button onClick={resumeWorkout}>
-            Resume
+            Continue Workout
           </button>
         </div>
       )}
 
       <div className="panel">
-        <h2>Start a Workout</h2>
+        <h2>{openSession ? "Or start a new workout" : "Start a Workout"}</h2>
         <p className="muted">Pick a day, then log sets as you go with a rest timer between them.</p>
 
         <div className="filter-row">
@@ -64,8 +64,14 @@ export function StartWorkoutScreen() {
 
         {day.exercises.length === 0 && <p className="muted">Rest day. Nothing to log.</p>}
 
-        <button disabled={loading || starting || day.exercises.length === 0} onClick={() => startWorkout(selectedDay)}>
-          {starting ? "Starting…" : "Start Workout"}
+        {/* With a workout in progress, Continue above is the main button. This one starts a
+            second, empty session, so it is the quiet one and says so. */}
+        <button
+          className={openSession ? "ghost" : undefined}
+          disabled={loading || starting || day.exercises.length === 0}
+          onClick={() => startWorkout(selectedDay)}
+        >
+          {starting ? "Starting…" : openSession ? "Start a new workout" : "Start Workout"}
         </button>
       </div>
     </div>
