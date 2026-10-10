@@ -33,6 +33,7 @@ Rules for automated runs:
 | --- | --- | --- | --- | --- |
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
+| B-04 | Plan builder: sets and seconds boxes can't be cleared and retyped | building | bug | S |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
@@ -64,6 +65,13 @@ Rules for automated runs:
   Attach the window keydown listener immediately or queue keys until the
   player is ready, so a coach who starts tagging right away doesn't lose
   presses.
+
+- **B-04. Sets and seconds boxes in the plan builder can't be cleared and
+  retyped.** Reported by Taichi (UNLV) on 2026-10-10: he couldn't backspace
+  and type a two-digit number, so he used the up and down arrows. In
+  `ExerciseRow` (`src/components/coach/CustomProgramPanel.tsx`) the sets box
+  turned an empty value straight back into 1, so clearing "3" and typing
+  "12" gave "112". Jayden asked for the fix in chat the same day.
 
 ### Film
 

@@ -67,6 +67,7 @@ Tests live under `tests/`, mirroring `src/`.
 | `latest_stats` save | `tests/lib/statsRow.test.ts` | Each save stamps `updated_at`, so "last check-in" moves forward |
 | Stats history dates | `tests/lib/statsHistory.test.ts` | Old `M/D/YYYY` and ISO dates normalize to one day, latest save per day wins, pain streaks on old-format rows are flagged |
 | Recovery history table | `tests/lib/statsTable.test.ts` | Every column is as wide as its header and widest value (no run-together headers, dates on one line), one track per column, cell text and dashes for blanks |
+| Whole-number fields | `tests/lib/numberInput.test.ts` | One- and two-digit numbers, an empty field is "no change" not a default, minimums, decimals and signs rejected |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo films embed, tags use roster athletes and valid details; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |
