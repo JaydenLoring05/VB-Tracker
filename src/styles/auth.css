@@ -241,3 +241,47 @@
   min-height: 52px;
   margin-top: var(--sp-4);
 }
+
+/* Password field with a show/hide button inside its right edge. */
+.auth-password {
+  position: relative;
+}
+
+.auth-password input {
+  /* Room for the 44px button, so long passwords never run under it. */
+  padding-right: 48px;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 100%;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.auth-password-toggle:hover:not(:disabled),
+.auth-password-toggle:active:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  color: var(--text);
+}
+
+.auth-password-toggle[aria-pressed="true"] {
+  color: var(--gold);
+}
+
+.auth-field .auth-error {
+  margin: 0;
+  font-size: var(--fs-xs);
+}
+
+.auth-hint-ok {
+  color: var(--green);
+}

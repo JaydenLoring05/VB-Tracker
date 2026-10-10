@@ -5,9 +5,11 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { Brand } from "@/components/shared/Brand";
+import { PasswordField } from "@/components/shared/PasswordField";
 import { authErrorMessage } from "@/lib/authErrors";
 import { normalizeInviteCode, PENDING_INVITE_KEY } from "@/lib/invite";
 import { googleOAuthRedirectTo, isGoogleSignInEnabled } from "@/lib/googleAuth";
+import { MIN_PASSWORD_LENGTH, newPasswordProblem, passwordMatchState } from "@/lib/passwordForm";
 import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
@@ -33,6 +35,10 @@ export default function LoginPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  // Sign-up only: the new password is too short or the two copies differ. Kept apart from
+  // `error` so focus goes to the password fields, not back to the email.
+  const [passwordProblem, setPasswordProblem] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,6 +46,7 @@ export default function LoginPage() {
   const [resendState, setResendState] = useState<ResendState>("idle");
   const [resetSent, setResetSent] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
+  const confirmRef = useRef<HTMLInputElement>(null);
 
   // A form-level error (wrong password, unknown email, missing email) is announced by
   // its role="alert"; moving focus to the first field puts the fix under the cursor.
@@ -64,6 +71,12 @@ export default function LoginPage() {
       window.history.replaceState(null, "", "/login");
     }
   }, []);
+
+  function switchMode(next: Mode) {
+    setMode(next);
+    setConfirmPassword("");
+    setPasswordProblem("");
+  }
 
   async function handleResend() {
     if (!email.trim()) {
@@ -116,8 +129,19 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
     setMessage("");
+    setPasswordProblem("");
     setNeedsConfirmation(false);
     setResendState("idle");
+
+    if (mode === "sign-up") {
+      const problem = newPasswordProblem(password, confirmPassword);
+      if (problem) {
+        setPasswordProblem(problem);
+        confirmRef.current?.focus();
+        return;
+      }
+    }
+
     setLoading(true);
 
     const supabase = createClient();
@@ -173,7 +197,7 @@ export default function LoginPage() {
 
     setMessage("Check your email to confirm your account, then sign in.");
     setNeedsConfirmation(true);
-    setMode("sign-in");
+    switchMode("sign-in");
   }
 
 
@@ -193,6 +217,8 @@ export default function LoginPage() {
       setLoading(false);
     }
   }
+  const matchState = passwordMatchState(password, confirmPassword);
+
   return (
     <main id="main-content" tabIndex={-1} className="auth-shell">
       <Link href="/" className="auth-back-link">
@@ -240,25 +266,60 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="auth-field">
-            <label htmlFor="auth-password">Password</label>
-            <input
-              id="auth-password"
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
-              aria-invalid={error ? true : undefined}
-              aria-describedby={error ? "auth-error" : mode === "sign-up" ? "auth-password-hint" : undefined}
-            />
+          <PasswordField
+            id="auth-password"
+            label="Password"
+            value={password}
+            onChange={(value) => {
+              setPassword(value);
+              setPasswordProblem("");
+            }}
+            autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
+            invalid={Boolean(error)}
+            describedBy={error ? "auth-error" : mode === "sign-up" ? "auth-password-hint" : undefined}
+          >
             {mode === "sign-up" && !error && (
               <p className="auth-hint" id="auth-password-hint">
-                At least 6 characters.
+                At least {MIN_PASSWORD_LENGTH} characters.
               </p>
             )}
-          </div>
+          </PasswordField>
+
+          {mode === "sign-up" && (
+            <PasswordField
+              id="auth-confirm-password"
+              label="Confirm password"
+              value={confirmPassword}
+              onChange={(value) => {
+                setConfirmPassword(value);
+                setPasswordProblem("");
+              }}
+              autoComplete="new-password"
+              inputRef={confirmRef}
+              invalid={Boolean(passwordProblem) || matchState === "mismatch"}
+              describedBy="auth-confirm-status"
+            >
+              {/* One element for every state, so screen readers hear each change. */}
+              <p
+                id="auth-confirm-status"
+                className={
+                  passwordProblem || matchState === "mismatch"
+                    ? "auth-error"
+                    : matchState === "match"
+                      ? "auth-hint auth-hint-ok"
+                      : "auth-hint"
+                }
+                role={passwordProblem ? "alert" : "status"}
+              >
+                {passwordProblem ||
+                  (matchState === "match"
+                    ? "Passwords match."
+                    : matchState === "mismatch"
+                      ? "Passwords don't match yet."
+                      : "Type it again so a typo can't lock you out.")}
+              </p>
+            </PasswordField>
+          )}
 
           {error && (
             <p className="auth-error" id="auth-error" role="alert">
@@ -345,7 +406,7 @@ export default function LoginPage() {
           {mode === "sign-in" ? (
             <span>
               Need an account?{" "}
-              <button type="button" onClick={() => setMode("sign-up")}>
+              <button type="button" onClick={() => switchMode("sign-up")}>
                 Sign up
               </button>
             </span>
@@ -358,7 +419,7 @@ export default function LoginPage() {
           {mode !== "sign-in" && (
             <span>
               Already have an account?{" "}
-              <button type="button" onClick={() => setMode("sign-in")}>
+              <button type="button" onClick={() => switchMode("sign-in")}>
                 Sign in
               </button>
             </span>
