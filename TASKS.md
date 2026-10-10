@@ -10,7 +10,9 @@ morning email fix (#65). The launch steps (database, accounts, dry run) are in
 
 | PR | What | Needs SQL | Waiting on |
 | --- | --- | --- | --- |
-| This PR | Backlog: seven rows moved to Shipped, max day (F-28) added, and the plan builder brief | No | Your merge |
+| #74 | B-07: Continue Workout reopens the workout in progress, on the exercise you reached | No | Your merge |
+| #73 | F-16: plan builder saves each day and keeps unsaved work | No | Your merge |
+| This PR | Backlog: seven rows moved to Shipped, new rows from 10 October, and the plan builder brief | No | Your merge |
 
 ## Needs you
 

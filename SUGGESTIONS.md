@@ -33,7 +33,11 @@ Rules for automated runs:
 | --- | --- | --- | --- | --- |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
-| F-16 | Plan builder saves each day, and an unsaved program survives leaving the page | planned | coach feedback | M |
+| B-07 | Continue Workout started a new, empty workout, so sets looked lost (PR #74) | building | bug | S |
+| F-16 | Plan builder saves each day, and an unsaved program survives leaving the page (PR #73) | building | coach feedback | M |
+| F-30 | Athletes show by name, not email, and can change their own name | planned | me | S |
+| F-31 | Edit and delete a team | planned | me | S |
+| F-32 | Copy a program to another team | planned | me | S |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
 | F-18 | Coach's own note on each exercise in a program | planned | coach feedback | S |
@@ -69,7 +73,14 @@ Rules for automated runs:
 
 ### Bugs
 
-No open bug rows.
+- **B-07. Continue Workout looked like it lost the workout.** Jayden
+  (2026-10-10): "when I leave a workout and push Continue it rarely saves."
+  Every set was saved as it was logged. The dashboard's Continue Workout
+  button went to `/workout`, where a large Start Workout button under a
+  small Resume banner began a second, empty session; and resuming always
+  opened on the first exercise with an empty form. #74 links Continue
+  straight to the open session and opens it on the exercise the athlete
+  had reached.
 
 ### Film
 
@@ -317,6 +328,33 @@ No open bug rows.
 - **F-20. Copy a day, fold the rest.** "Copy to..." on each day in the
   builder, and only the day being edited stays open. Found while reading
   the builder for F-16.
+- **F-30. Athletes show by name, not email, and can change their name.**
+  Jayden (2026-10-10). Two causes to fix:
+  - On sign-up the name is only saved when Supabase returns a session
+    straight away (`src/app/login/page.tsx`). With email confirmation on,
+    there is no session yet, so the typed name is dropped and the roster
+    falls back to the email. Send the name with sign-up
+    (`options.data`) and write it to `profiles.display_name` on the first
+    sign-in. Check this against the live project before building; it is
+    read from the code, not reproduced.
+  - An athlete has no place to change their own name. A coach can rename a
+    member (`set_team_member_name`, schema v41). Add "Your name" to
+    Settings, saved to the profile and to the athlete's team member row.
+    If the existing function only lets a coach do that, it needs a schema
+    file.
+- **F-31. Edit and delete a team.** Jayden (2026-10-10). `delete_team` has
+  existed in the database since schema v23/v26 but no screen calls it, and
+  nothing renames a team. Add "Rename team" and "Delete team" to the
+  coach's team settings. Deleting asks the coach to type the team name
+  first, like account deletion does. Renaming needs a small function or an
+  update policy on `teams` for the coach (schema file).
+- **F-32. Copy a program to another team.** Jayden (2026-10-10): take a
+  plan made for one team and put it in a new team. A coach can run several
+  teams (schema v26), but programs belong to one team. Add "Copy to
+  another team" on a program, listing the coach's other teams. It copies
+  the program, not its assignments or groups. No SQL if the existing
+  insert policy on `team_programs` covers any team the coach owns; check
+  before building.
 - **F-07. Only the athlete can set their program start date.**
   `profiles.program_start_date` (schema v44) is set on an athlete's first
   workout or from the week selector. A coach starting a new block for the
