@@ -34,6 +34,10 @@ Rules for automated runs:
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
+| F-21 | Plan builder remembers a coach's own exercises | building | me | S |
+| F-23 | A warm-up the coach writes once and adds to every training day | planned | me | M |
+| F-24 | A team on two programs (practice days and other days) | planned | me | M |
+| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
@@ -103,6 +107,41 @@ Rules for automated runs:
   - their film stats (F-01).
 
   It would give coaches something to link to and room for the film numbers.
+- **F-21. The plan builder forgets a coach's own exercises.** Jayden
+  (2026-10-10, from Taichi's onboarding call): a coach who types an exercise
+  that isn't in the library shouldn't have to retype it every time. The
+  builder's suggestions were the library only. Now they also list every
+  non-library exercise in the program being built and in the team's saved
+  programs, marked "(yours)", and picking one brings back the sets and reps
+  it had last time. No SQL: it reads the programs already loaded.
+- **F-22. A coach's own exercises in the Exercise Library.** Jayden asked
+  for this with F-21. `/library` and Workout Mode read the built-in list in
+  `src/data/exercises.ts`, so a coach's exercise has no page, cues or video
+  link, and athletes can't look it up. Needs a `team_exercises` table (name,
+  cues, optional video link, measure) with `is_team_coach` RLS, an "Add
+  exercise" form for coaches, and the library and `getExercise` reading both
+  lists. Needs a schema file. Build F-18 (a note on one exercise) first; it
+  covers most of the need with no SQL.
+- **F-23. Warm-ups.** Jayden (2026-10-10): Taichi should be able to add his
+  warm-up to every single day. A program day is one flat exercise list, so a
+  warm-up has to be retyped on each day. Add an optional warm-up block the
+  coach writes once per program, with a "use on every training day" switch
+  and a per-day override. Athletes see it above the first exercise on their
+  day and at the start of Workout Mode. No SQL if it is stored inside
+  `team_programs.days`.
+- **F-24. A team on two programs.** Jayden (2026-10-10): a team that
+  practices Monday, Wednesday and Friday and does something else Tuesday and
+  Thursday wants a second plan for those days. Today each team, group or
+  athlete has exactly one program (`pickAssignedProgramId` returns one id,
+  and `team_program_assignments` has one row per team, per group and per
+  athlete by unique index). Two ways, simplest first:
+  1. **No SQL:** "Add days from another program" in the builder copies the
+     chosen days of a second program into this one, so one program holds
+     both splits. Pair it with F-20 (copy a day).
+  2. **With SQL:** let an assignment name a second program and merge by day
+     (the first program's training days win; the second fills the days the
+     first rests). Only worth it if coaches want to swap one half without
+     touching the other.
 - **F-07. Only the athlete can set their program start date.**
   `profiles.program_start_date` (schema v44) is set on an athlete's first
   workout or from the week selector. A coach starting a new block for the
