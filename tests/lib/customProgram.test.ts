@@ -1,20 +1,29 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  applyWarmup,
   blankProgram,
+  dayExercises,
+  dayWarmup,
   exerciseFromPrescription,
   formatTarget,
   getExerciseTarget,
   hasStartingTargets,
+  headingsByIndex,
   isFinished,
   newProgramExercise,
   ownExercises,
   parseProgramDays,
   parseProgramDraft,
   pickAssignedProgramId,
+  plainSections,
+  ProgramDay,
+  ProgramSection,
+  programWarmup,
   ProgramAssignment,
   programFromRecommended,
   programToWorkoutDays,
+  sectionAt,
   storedProgramDays,
   unfinishedWeek,
   validateProgram,
@@ -31,10 +40,10 @@ const program = {
       ? {
           ...day,
           title: "Lower",
-          exercises: [
+          sections: plainSections([
             { name: "Back Squat", sets: 4, reps: "5", seconds: null },
             { name: "Planks", sets: 3, reps: null, seconds: 45 }
-          ]
+          ])
         }
       : day
   )
@@ -69,7 +78,7 @@ describe("programFromRecommended", () => {
     const copy = programFromRecommended(1);
     const plan = getWorkoutDays(1);
     expect(copy.days.map((d) => d.day)).toEqual(plan.map((d) => d.day));
-    copy.days.forEach((day, i) => expect(day.exercises.map((e) => e.name)).toEqual(plan[i].exercises));
+    copy.days.forEach((day, i) => expect(dayExercises(day).map((e) => e.name)).toEqual(plan[i].exercises));
     expect(validateProgram(copy)).toEqual([]);
   });
 });
@@ -138,10 +147,10 @@ describe("validateProgram", () => {
         day.day === "Monday"
           ? {
               ...day,
-              exercises: [
+              sections: plainSections([
                 { name: "Squat", sets: 3, reps: "", seconds: null },
                 { name: "squat", sets: 3, reps: "5", seconds: null }
-              ]
+              ])
             }
           : day
       )
@@ -174,7 +183,7 @@ describe("parseProgramDays", () => {
         notes: "",
         minutes: "",
         rest: false,
-        exercises: [{ name: "Planks", sets: 3, reps: null, seconds: 45 }]
+        sections: [{ name: "", exercises: [{ name: "Planks", sets: 3, reps: null, seconds: 45 }] }]
       }
     ]);
     expect(parseProgramDays(null)).toEqual([]);
@@ -184,7 +193,7 @@ describe("parseProgramDays", () => {
 describe("ownExercises", () => {
   const library = ["Back Squat", "Planks"];
   const day = (name: string, exercises: { name: string; sets: number; reps: string | null; seconds: number | null }[]) => ({
-    days: [{ day: name, title: "Training", notes: "", minutes: "45", rest: false, exercises }]
+    days: [{ day: name, title: "Training", notes: "", minutes: "45", rest: false, sections: plainSections(exercises) }]
   });
 
   it("returns names that aren't in the library, with their targets", () => {
@@ -259,7 +268,7 @@ describe("hasStartingTargets", () => {
 describe("saving day by day (drafts)", () => {
   const finishedWeek = program.days;
   const halfBuilt = blankProgram().days.map((day) =>
-    day.day === "Tuesday" ? { ...day, title: "Upper", exercises: [newProgramExercise("Push-Ups")] } : day
+    day.day === "Tuesday" ? { ...day, title: "Upper", sections: plainSections([newProgramExercise("Push-Ups")]) } : day
   );
 
   it("keeps the draft out of what athletes read", () => {
@@ -282,7 +291,7 @@ describe("saving day by day (drafts)", () => {
   it("has no draft for programs saved before drafts existed, or once finished", () => {
     expect(parseProgramDraft(finishedWeek)).toBeNull();
     expect(parseProgramDraft(storedProgramDays(finishedWeek, null))).toBeNull();
-    expect(storedProgramDays(finishedWeek, null)).toEqual(finishedWeek);
+    expect(parseProgramDays(storedProgramDays(finishedWeek, null))).toEqual(finishedWeek);
     expect(parseProgramDraft(null)).toBeNull();
   });
 
@@ -293,5 +302,142 @@ describe("saving day by day (drafts)", () => {
     // What a program saved day by day but never finished publishes: nobody trains from it.
     expect(isFinished({ name: "New program", days: unfinishedWeek() })).toBe(false);
     expect(programToWorkoutDays({ days: unfinishedWeek() }).every((day) => day.rest && day.exercises.length === 0)).toBe(true);
+  });
+});
+
+describe("sections in a day", () => {
+  const squat = { name: "Back Squat", sets: 4, reps: "5", seconds: null };
+  const plank = { name: "Planks", sets: 3, reps: null, seconds: 30 };
+  const skips = { name: "A-Skips", sets: 2, reps: "20 yd", seconds: null };
+  const lunge = { name: "Walking Lunges", sets: 2, reps: "10", seconds: null };
+  const trainingDay = (day: string, sections: ProgramSection[]): ProgramDay => ({
+    day,
+    title: "Lift",
+    notes: "",
+    minutes: "60",
+    rest: false,
+    sections
+  });
+
+  it("reads a day saved before sections as one unnamed section", () => {
+    const [monday] = parseProgramDays([{ day: "Monday", title: "Lift", rest: false, exercises: [squat, plank] }]);
+    expect(monday.sections).toEqual([{ name: "", exercises: [squat, plank] }]);
+    // And athletes see exactly what they saw before: no headings.
+    const [workout] = programToWorkoutDays({ days: [monday] });
+    expect(workout.exercises).toEqual(["Back Squat", "Planks"]);
+    expect(workout.sections).toBeUndefined();
+  });
+
+  it("stores sections plus the flat list older readers expect, and reads them back", () => {
+    const monday = trainingDay("Monday", [
+      { name: "Warm-up", kind: "warmup", shared: true, exercises: [skips] },
+      { name: "", exercises: [squat] },
+      { name: "Abs", exercises: [plank] }
+    ]);
+    const stored = JSON.parse(JSON.stringify(storedProgramDays([monday], null)));
+    expect(stored[0].exercises.map((e: { name: string }) => e.name)).toEqual(["A-Skips", "Back Squat", "Planks"]);
+    expect(parseProgramDays(stored)).toEqual([monday]);
+  });
+
+  it("ignores section kinds it doesn't know", () => {
+    const [monday] = parseProgramDays([
+      { day: "Monday", rest: false, sections: [{ name: "Odd", kind: "mystery", exercises: [squat] }] }
+    ]);
+    expect(monday.sections).toEqual([{ name: "Odd", exercises: [squat] }]);
+  });
+
+  it("gives athletes the flat list in order plus headings, warm-up first, skipping empty sections", () => {
+    const monday = trainingDay("Monday", [
+      { name: "", kind: "warmup", shared: true, exercises: [skips] },
+      { name: "Lifts", exercises: [squat] },
+      { name: "Empty", exercises: [] },
+      { name: "Abs", exercises: [plank] }
+    ]);
+    const [workout] = programToWorkoutDays({ days: [monday] });
+    expect(workout.exercises).toEqual(["A-Skips", "Back Squat", "Planks"]);
+    expect(workout.sections).toEqual([
+      { heading: "Warm-up", kind: "warmup", exercises: ["A-Skips"] },
+      { heading: "Lifts", exercises: ["Back Squat"] },
+      { heading: "Abs", exercises: ["Planks"] }
+    ]);
+    expect([...headingsByIndex(workout).entries()].map(([i, s]) => [i, s.heading])).toEqual([
+      [0, "Warm-up"],
+      [1, "Lifts"],
+      [2, "Abs"]
+    ]);
+    expect(sectionAt(workout, 2)?.heading).toBe("Abs");
+    expect(sectionAt(workout, 3)).toBeUndefined();
+  });
+
+  it("keeps headings when an athlete swaps an exercise", () => {
+    const [monday] = programToWorkoutDays({ days: [trainingDay("Monday", [{ name: "Lifts", exercises: [squat] }])] });
+    const team: TeamOverrideData = {
+      planTier: "pilot",
+      exerciseDefaults: {},
+      dayOverrides: {},
+      customProgram: { id: "p", name: "P", days: [trainingDay("Monday", [{ name: "Lifts", exercises: [squat] }])] }
+    };
+    const resolved = resolveWorkoutDays([], 1, team, { "Back Squat": "Goblet Squat" }).find((d) => d.day === "Monday");
+    expect(monday.sections?.[0].exercises).toEqual(["Back Squat"]);
+    expect(resolved?.exercises).toEqual(["Goblet Squat"]);
+    expect(resolved?.sections?.[0]).toEqual({ heading: "Lifts", exercises: ["Goblet Squat"] });
+    expect(resolved?.targets?.["Goblet Squat"]).toBe("4x5");
+  });
+
+  it("counts the warm-up when checking a day for duplicates", () => {
+    const monday = trainingDay("Monday", [
+      { name: "", kind: "warmup", shared: true, exercises: [plank] },
+      { name: "", exercises: [squat, plank] }
+    ]);
+    expect(validateProgram({ name: "P", days: [monday] })).toContain("Monday lists the same exercise twice.");
+  });
+
+  describe("the program warm-up", () => {
+    const warmup: ProgramSection = { name: "Warm-up", kind: "warmup", shared: true, exercises: [skips] };
+    const week = [
+      trainingDay("Monday", plainSections([squat])),
+      trainingDay("Wednesday", plainSections([plank])),
+      { ...trainingDay("Saturday", plainSections([])), rest: true }
+    ];
+
+    it("goes first on every training day and never on rest days", () => {
+      const days = applyWarmup(week, warmup, true);
+      expect(days.map((d) => d.sections.map((s) => s.kind ?? "plain"))).toEqual([
+        ["warmup", "plain"],
+        ["warmup", "plain"],
+        ["plain"]
+      ]);
+      expect(programWarmup(days)?.exercises).toEqual([skips]);
+    });
+
+    it("written once: editing it updates every day that uses it", () => {
+      const days = applyWarmup(applyWarmup(week, warmup, true), { ...warmup, exercises: [skips, lunge] }, true);
+      expect(days.filter((d) => !d.rest).map((d) => dayWarmup(d)?.exercises.length)).toEqual([2, 2]);
+    });
+
+    it("comes off every day when switched off", () => {
+      const days = applyWarmup(applyWarmup(week, warmup, true), warmup, false);
+      expect(days.every((d) => dayWarmup(d) === undefined)).toBe(true);
+      expect(programWarmup(days)).toBeNull();
+    });
+
+    it("leaves a day's own warm-up alone, including an empty one that skips it", () => {
+      const withOwn = [
+        trainingDay("Monday", [{ name: "Warm-up", kind: "warmup", exercises: [lunge] }, ...plainSections([squat])]),
+        trainingDay("Wednesday", [{ name: "Warm-up", kind: "warmup", exercises: [] }, ...plainSections([plank])]),
+        trainingDay("Friday", plainSections([squat]))
+      ];
+      const days = applyWarmup(withOwn, warmup, true);
+      expect(dayWarmup(days[0])?.exercises).toEqual([lunge]);
+      expect(dayWarmup(days[1])?.exercises).toEqual([]);
+      expect(dayWarmup(days[2])).toMatchObject({ shared: true, exercises: [skips] });
+      // The skipped day shows no warm-up to athletes.
+      expect(programToWorkoutDays({ days }).find((d) => d.day === "Wednesday")?.exercises).toEqual(["Planks"]);
+    });
+
+    it("isn't added anywhere while it's empty", () => {
+      const days = applyWarmup(week, { ...warmup, exercises: [] }, true);
+      expect(days.every((d) => dayWarmup(d) === undefined)).toBe(true);
+    });
   });
 });

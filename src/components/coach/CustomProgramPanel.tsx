@@ -147,8 +147,148 @@ function ExerciseRow({
   );
 }
 
+/** One section's exercises, with its name box when the day has more than one section. */
+function SectionEditor({
+  section,
+  dayName,
+  showName,
+  remembered,
+  onTyping,
+  onChange,
+  onRemove
+}: {
+  section: ProgramSection;
+  dayName: string;
+  showName: boolean;
+  remembered: ProgramExercise[];
+  onTyping: (name: string | null) => void;
+  onChange: (next: ProgramSection) => void;
+  /** Absent when the section can't be removed (a day's only section). */
+  onRemove?: () => void;
+}) {
+  function updateExercise(index: number, next: ProgramExercise) {
+    onChange({ ...section, exercises: section.exercises.map((exercise, i) => (i === index ? next : exercise)) });
+  }
+
+  function moveExercise(index: number, direction: -1 | 1) {
+    const target = index + direction;
+    if (target < 0 || target >= section.exercises.length) return;
+    const exercises = [...section.exercises];
+    [exercises[index], exercises[target]] = [exercises[target], exercises[index]];
+    onChange({ ...section, exercises });
+  }
+
+  return (
+    <div className="custom-program-section">
+      {showName && (
+        <div className="custom-program-section-header">
+          <input
+            aria-label={`Section name on ${dayName}`}
+            placeholder="Section name, e.g. Abs"
+            value={section.name}
+            // A section just added has no name yet: put the cursor there.
+            autoFocus={section.name === "" && section.exercises.length === 0}
+            onChange={(event) => onChange({ ...section, name: event.target.value })}
+          />
+          {onRemove && (
+            <button
+              type="button"
+              className="ghost danger-button"
+              onClick={onRemove}
+              aria-label={`Remove section ${section.name || "with no name"} on ${dayName}`}
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
+      )}
+
+      <ul className="custom-program-exercises">
+        {section.exercises.map((exercise, index) => (
+          <ExerciseRow
+            key={index}
+            exercise={exercise}
+            index={index}
+            count={section.exercises.length}
+            remembered={remembered}
+            onTyping={onTyping}
+            onChange={(next) => updateExercise(index, next)}
+            onMove={(direction) => moveExercise(index, direction)}
+            onRemove={() => onChange({ ...section, exercises: section.exercises.filter((_, i) => i !== index) })}
+          />
+        ))}
+      </ul>
+
+      <button
+        type="button"
+        className="ghost"
+        onClick={() => onChange({ ...section, exercises: [...section.exercises, newProgramExercise("")] })}
+      >
+        <Plus size={14} /> Add exercise
+      </button>
+    </div>
+  );
+}
+
+/** The warm-up written once for the whole program, at the top of the editor. */
+function WarmupEditor({
+  warmup,
+  everyDay,
+  remembered,
+  onTyping,
+  onChange,
+  onEveryDayChange
+}: {
+  warmup: ProgramSection;
+  everyDay: boolean;
+  remembered: ProgramExercise[];
+  onTyping: (name: string | null) => void;
+  onChange: (next: ProgramSection) => void;
+  onEveryDayChange: (everyDay: boolean) => void;
+}) {
+  // Closed until there's something in it, so a coach without a warm-up sees one button.
+  const [open, setOpen] = useState(warmup.exercises.length > 0);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        className="ghost custom-program-add-warmup"
+        onClick={() => {
+          setOpen(true);
+          onChange({ ...warmup, exercises: [newProgramExercise("")] });
+        }}
+      >
+        <Plus size={14} /> Add a warm-up for every day
+      </button>
+    );
+  }
+
+  return (
+    <div className="panel custom-program-day custom-program-warmup">
+      <div className="custom-program-day-header">
+        <h4>Warm-up</h4>
+        <label className="custom-program-rest-toggle">
+          <input type="checkbox" checked={everyDay} onChange={(event) => onEveryDayChange(event.target.checked)} />
+          On every training day
+        </label>
+      </div>
+      <p className="muted">Write it once. It goes first on each training day. Change it or skip it on any one day below.</p>
+      <SectionEditor
+        section={warmup}
+        dayName="the warm-up"
+        showName={false}
+        remembered={remembered}
+        onTyping={onTyping}
+        onChange={onChange}
+      />
+    </div>
+  );
+}
+
 function DayEditor({
   day,
+  hasProgramWarmup,
   remembered,
   saveState,
   onTyping,
@@ -156,6 +296,8 @@ function DayEditor({
   onSave
 }: {
   day: ProgramDay;
+  /** True when the program has a warm-up with exercises in it. */
+  hasProgramWarmup: boolean;
   remembered: ProgramExercise[];
   /** "saving" while this day's save runs, "saved" once it has and nothing changed since. */
   saveState: "saving" | "saved" | null;
@@ -164,16 +306,29 @@ function DayEditor({
   /** Saves the whole program as it stands, without finishing it. */
   onSave: () => void;
 }) {
-  function updateExercise(index: number, next: ProgramExercise) {
-    onChange({ ...day, exercises: day.exercises.map((exercise, i) => (i === index ? next : exercise)) });
+  const warmup = dayWarmup(day);
+  const parts = day.sections.filter((section) => section !== warmup);
+  // One plain list looks just like a day did before sections; names appear once there are two.
+  const showNames = parts.length > 1 || parts.some((section) => section.name.trim() !== "");
+
+  function setSections(sections: ProgramSection[]) {
+    onChange({ ...day, sections });
   }
 
-  function moveExercise(index: number, direction: -1 | 1) {
-    const target = index + direction;
-    if (target < 0 || target >= day.exercises.length) return;
-    const exercises = [...day.exercises];
-    [exercises[index], exercises[target]] = [exercises[target], exercises[index]];
-    onChange({ ...day, exercises });
+  function replaceSection(before: ProgramSection, after: ProgramSection) {
+    setSections(day.sections.map((section) => (section === before ? after : section)));
+  }
+
+  function removeSection(section: ProgramSection) {
+    if (section.exercises.length > 0 && !window.confirm(`Remove ${section.name.trim() || "this section"} and its exercises?`)) {
+      return;
+    }
+    setSections(day.sections.filter((s) => s !== section));
+  }
+
+  /** Drops this day's own warm-up, so the program's comes back (or none, if there isn't one). */
+  function useProgramWarmup() {
+    setSections(parts);
   }
 
   return (
@@ -220,28 +375,78 @@ function DayEditor({
             onChange={(event) => onChange({ ...day, notes: event.target.value })}
           />
 
-          <ul className="custom-program-exercises">
-            {day.exercises.map((exercise, index) => (
-              <ExerciseRow
-                key={index}
-                exercise={exercise}
-                index={index}
-                count={day.exercises.length}
+          {warmup?.shared && (
+            <div className="custom-program-warmup-line">
+              <span className="muted">
+                Warm-up: {warmup.exercises.length} exercise{warmup.exercises.length === 1 ? "" : "s"} from the program
+                warm-up
+              </span>
+              <div className="custom-program-row-controls">
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => replaceSection(warmup, { name: warmup.name, kind: "warmup", exercises: [...warmup.exercises] })}
+                >
+                  Change for {day.day}
+                </button>
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => replaceSection(warmup, { name: warmup.name, kind: "warmup", exercises: [] })}
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          )}
+          {warmup && !warmup.shared && warmup.exercises.length === 0 && (
+            <div className="custom-program-warmup-line">
+              <span className="muted">No warm-up on {day.day}.</span>
+              <button type="button" className="ghost" onClick={useProgramWarmup}>
+                Use the program warm-up
+              </button>
+            </div>
+          )}
+          {warmup && !warmup.shared && warmup.exercises.length > 0 && (
+            <div className="custom-program-own-warmup">
+              <div className="custom-program-warmup-line">
+                <strong>{day.day} warm-up</strong>
+                {hasProgramWarmup && (
+                  <button type="button" className="ghost" onClick={useProgramWarmup}>
+                    Use the program warm-up
+                  </button>
+                )}
+              </div>
+              <SectionEditor
+                section={warmup}
+                dayName={day.day}
+                showName={false}
                 remembered={remembered}
                 onTyping={onTyping}
-                onChange={(next) => updateExercise(index, next)}
-                onMove={(direction) => moveExercise(index, direction)}
-                onRemove={() => onChange({ ...day, exercises: day.exercises.filter((_, i) => i !== index) })}
+                onChange={(next) => replaceSection(warmup, next)}
               />
-            ))}
-          </ul>
+            </div>
+          )}
+
+          {parts.map((section, index) => (
+            <SectionEditor
+              key={index}
+              section={section}
+              dayName={day.day}
+              showName={showNames}
+              remembered={remembered}
+              onTyping={onTyping}
+              onChange={(next) => replaceSection(section, next)}
+              onRemove={parts.length > 1 ? () => removeSection(section) : undefined}
+            />
+          ))}
 
           <button
             type="button"
-            className="ghost"
-            onClick={() => onChange({ ...day, exercises: [...day.exercises, newProgramExercise("")] })}
+            className="ghost custom-program-add-section"
+            onClick={() => setSections([...day.sections, { name: "", exercises: [] }])}
           >
-            <Plus size={14} /> Add exercise
+            <Plus size={14} /> Add section
           </button>
         </>
       )}

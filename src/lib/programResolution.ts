@@ -23,15 +23,18 @@ export function dayOverrideKey(phase: PhaseSlug, day: string) {
 }
 
 function applySubstitutions(day: WorkoutDay, substitutions: Record<string, string>): WorkoutDay {
-  const exercises = day.exercises.map((exercise) => substitutions[exercise] ?? exercise);
-  if (!day.targets) return { ...day, exercises };
+  const swap = (exercise: string) => substitutions[exercise] ?? exercise;
+  const exercises = day.exercises.map(swap);
+  // Section lists name the same exercises, so a swap keeps its heading.
+  const sections = day.sections?.map((section) => ({ ...section, exercises: section.exercises.map(swap) }));
+  if (!day.targets) return { ...day, exercises, ...(sections ? { sections } : {}) };
   // Keep the coach's target attached to the exercise the athlete swapped in.
   const targets: Record<string, string> = {};
   day.exercises.forEach((exercise, index) => {
     const target = day.targets?.[exercise];
     if (target) targets[exercises[index]] = target;
   });
-  return { ...day, exercises, targets };
+  return { ...day, exercises, targets, ...(sections ? { sections } : {}) };
 }
 
 /**
