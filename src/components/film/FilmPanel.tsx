@@ -12,6 +12,7 @@ import { FilmResult, FilmTag, FilmTagType, TeamFilm } from "@/types";
 
 import { AddTagControls } from "./AddTagControls";
 import { CommentBox } from "./CommentBox";
+import { FilmStats } from "./FilmStats";
 import { FilmToast, FilmToastMessage } from "./FilmToast";
 import { HotkeyOverlay } from "./HotkeyOverlay";
 import { QuickTagger } from "./QuickTagger";
@@ -32,7 +33,8 @@ export function FilmPanel({
   onAddTag,
   onDeleteTag,
   onUndoTag,
-  seekRequest
+  seekRequest,
+  statsAthleteId = null
 }: {
   film: TeamFilm;
   tags: FilmTag[];
@@ -47,11 +49,14 @@ export function FilmPanel({
   onUndoTag: (id: string) => void;
   /** Jump the player to a time, e.g. when an athlete opens one of their clips. A new id seeks again. */
   seekRequest?: { seconds: number; id: number } | null;
+  /** Athlete view: the passing and blocking stats show only this athlete. Leave out for the coach. */
+  statsAthleteId?: string | null;
 }) {
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const noteRef = useRef<HTMLInputElement>(null);
   const [activeFilter, setActiveFilter] = useState<FilmTagType | null>(null);
   const [athleteFilter, setAthleteFilter] = useState<string>("");
+  const [view, setView] = useState<"tags" | "stats">("tags");
 
   const [draft, setDraft] = useState<TagDraft | null>(null);
   const [note, setNote] = useState("");
@@ -391,31 +396,56 @@ export function FilmPanel({
         </>
       )}
 
-      <div className="film-filter-bar">
-        <TagFilterChips tags={tags} activeFilter={activeFilter} onChange={setActiveFilter} />
-        {athletes.length > 0 && (
-          <label className="film-athlete-filter">
-            <span className="sr-only">Filter by athlete</span>
-            <select value={athleteFilter} onChange={(event) => setAthleteFilter(event.target.value)}>
-              <option value="">All athletes</option>
-              {athletes.map((athlete) => (
-                <option key={athlete.userId} value={athlete.userId}>
-                  {athlete.displayName}
-                </option>
-              ))}
-              {hasUnassigned && <option value={UNASSIGNED}>No athlete</option>}
-            </select>
-          </label>
-        )}
+      <div className="film-view-toggle" role="group" aria-label="Show tags or stats">
+        <button
+          type="button"
+          className={view === "tags" ? "" : "ghost"}
+          aria-pressed={view === "tags"}
+          onClick={() => setView("tags")}
+        >
+          Tags ({tags.length})
+        </button>
+        <button
+          type="button"
+          className={view === "stats" ? "" : "ghost"}
+          aria-pressed={view === "stats"}
+          onClick={() => setView("stats")}
+        >
+          Stats
+        </button>
       </div>
 
-      <TagList
-        tags={visibleTags}
-        isCoach={isCoach}
-        athleteName={athleteName}
-        onSeek={handleSeek}
-        onDelete={onDeleteTag}
-      />
+      {view === "stats" ? (
+        <FilmStats tags={tags} athleteName={athleteName} onlyAthleteId={statsAthleteId} />
+      ) : (
+        <>
+          <div className="film-filter-bar">
+            <TagFilterChips tags={tags} activeFilter={activeFilter} onChange={setActiveFilter} />
+            {athletes.length > 0 && (
+              <label className="film-athlete-filter">
+                <span className="sr-only">Filter by athlete</span>
+                <select value={athleteFilter} onChange={(event) => setAthleteFilter(event.target.value)}>
+                  <option value="">All athletes</option>
+                  {athletes.map((athlete) => (
+                    <option key={athlete.userId} value={athlete.userId}>
+                      {athlete.displayName}
+                    </option>
+                  ))}
+                  {hasUnassigned && <option value={UNASSIGNED}>No athlete</option>}
+                </select>
+              </label>
+            )}
+          </div>
+
+          <TagList
+            tags={visibleTags}
+            isCoach={isCoach}
+            athleteName={athleteName}
+            onSeek={handleSeek}
+            onDelete={onDeleteTag}
+          />
+        </>
+      )}
 
       {showHelp && <HotkeyOverlay onClose={() => setShowHelp(false)} />}
       {toast && <FilmToast toast={toast} onDismiss={dismissToast} />}

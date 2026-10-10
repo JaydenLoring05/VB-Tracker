@@ -1,0 +1,176 @@
+/* F-01: film stats from tags. Used on the film page and in the coach's athlete drill-down. */
+
+.film-view-toggle {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.film-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.film-stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.film-stats-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.film-stats-head :is(h3, h4) {
+  margin: 0;
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-micro);
+  color: var(--gold);
+}
+
+.film-stats-head p,
+.film-stats-empty,
+.film-stats-note {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.film-stats-head strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* width 0 + min-width 100% keeps a wide table from stretching the page: the box fills its
+   parent but adds nothing to the parent's minimum width, so the table scrolls in here instead. */
+.film-stats-scroll {
+  width: 0;
+  min-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.film-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.film-stats-table th,
+.film-stats-table td {
+  padding: var(--sp-2) var(--sp-3);
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.film-stats-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.film-stats-table thead th {
+  color: var(--muted);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The name column stays put while the numbers scroll under it on a narrow screen. */
+.film-stats-table tr > :first-child {
+  position: sticky;
+  left: 0;
+  background: var(--surface-2);
+}
+
+.film-stats-table tbody th {
+  min-width: 120px;
+  font-weight: 600;
+}
+
+.film-stats-table tbody tr {
+  border-top: 1px solid var(--border);
+}
+
+/* The set map: six zones laid out like the court, net at the top. */
+
+.set-court {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  max-width: 420px;
+}
+
+.set-court-net {
+  border-bottom: 2px solid var(--border-strong);
+  padding-bottom: 2px;
+  text-align: center;
+  color: var(--faint);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+}
+
+.set-court-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.set-court-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklch, var(--gold) var(--zone-fill, 0%), var(--surface-2));
+}
+
+.set-court-zone-name {
+  color: var(--muted);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.set-court-zone-share {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.set-court-zone-count {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+.set-court-zone.is-empty .set-court-zone-share {
+  color: var(--faint);
+}
+
+/* On a tinted zone the small labels use the full text color to keep their contrast. */
+.set-court-zone:not(.is-empty) .set-court-zone-name,
+.set-court-zone:not(.is-empty) .set-court-zone-count {
+  color: var(--text);
+}
+
+/* Film tab of the coach's athlete drill-down. */
+
+.athlete-film-stats {
+  margin-top: var(--sp-5);
+}

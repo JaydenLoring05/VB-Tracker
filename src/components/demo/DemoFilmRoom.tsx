@@ -54,6 +54,8 @@ export function DemoFilmRoom({
         note: input.note || null,
         athlete_id: input.athleteId ?? null,
         ...detailsForTag(input.tag, input.details ?? {}),
+        // Three-tap tags carry a result; the tag list and the film stats both read it.
+        ...(input.result ? { result: input.result } : {}),
         created_by: "demo-coach",
         created_at: new Date().toISOString()
       };

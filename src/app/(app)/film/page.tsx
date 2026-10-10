@@ -164,6 +164,7 @@ export default function FilmPage() {
             onDeleteTag={setPendingDeleteTag}
             onUndoTag={deleteTag}
             seekRequest={seekRequest}
+            statsAthleteId={isCoach ? null : userId}
           />
         ) : (
           <p className="muted">Select a film to review.</p>
