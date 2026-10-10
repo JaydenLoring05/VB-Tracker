@@ -773,6 +773,35 @@ html:has(dialog[open]) {
   min-height: 32px;
 }
 
+.custom-program-day-save {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border);
+}
+
+.custom-program-day-save button {
+  width: auto;
+}
+
+.custom-program-resume {
+  margin: 0 0 var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.custom-program-resume p {
+  margin: 0 0 var(--sp-2);
+}
+
+.custom-program-status {
+  color: var(--warn);
+  font-size: var(--fs-sm);
+}
+
 @media (max-width: 520px) {
   .custom-program-day-fields {
     grid-template-columns: 1fr;

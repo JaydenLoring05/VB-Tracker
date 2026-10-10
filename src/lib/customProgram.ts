@@ -28,12 +28,28 @@ export type ProgramDay = {
   exercises: ProgramExercise[];
 };
 
+/** A program saved part-way through editing ("Save Monday"). Athletes never see it. */
+export type ProgramDraft = {
+  name: string;
+  days: ProgramDay[];
+};
+
 export type CustomProgram = {
   id: string;
   name: string;
+  /** The finished week athletes follow. */
   days: ProgramDay[];
+  /** Work in progress saved day by day, if the coach hasn't finished it yet. */
+  draft?: ProgramDraft | null;
   updatedAt?: string;
 };
+
+/**
+ * The draft is stored as one extra element in team_programs.days. Its `day`
+ * isn't a weekday, so parseProgramDays (and so every athlete-side reader)
+ * skips it, and assigned athletes keep the last finished week.
+ */
+const DRAFT_DAY = "draft";
 
 export type ProgramAssignment = {
   programId: string;
@@ -203,6 +219,35 @@ export function validateProgram(program: Pick<CustomProgram, "name" | "days">): 
     }
   }
   return problems;
+}
+
+/**
+ * True when the program has a full week athletes can follow. A program saved
+ * day by day but never finished has an all-rest week, so it isn't, and it
+ * can't be assigned until the coach presses "Save program".
+ */
+export function isFinished(program: Pick<CustomProgram, "name" | "days">): boolean {
+  return validateProgram(program).length === 0;
+}
+
+/** The draft saved with a program ("Save Monday"), or null if there isn't one. */
+export function parseProgramDraft(raw: unknown): ProgramDraft | null {
+  if (!Array.isArray(raw)) return null;
+  const stored = raw.find(
+    (item): item is Record<string, unknown> => typeof item === "object" && item !== null && item.day === DRAFT_DAY
+  );
+  if (!stored) return null;
+  return { name: String(stored.name ?? ""), days: parseProgramDays(stored.days) };
+}
+
+/** The week stored for a program saved day by day but never finished: all rest, so nobody trains from it. */
+export function unfinishedWeek(): ProgramDay[] {
+  return WEEKDAYS.map((day) => ({ day, title: "Rest", notes: "", minutes: "", rest: true, exercises: [] }));
+}
+
+/** What goes in team_programs.days: the finished week, plus the draft when there is one. */
+export function storedProgramDays(days: ProgramDay[], draft: ProgramDraft | null): unknown[] {
+  return draft ? [...days, { day: DRAFT_DAY, name: draft.name, days: draft.days }] : days;
 }
 
 /** Clean up loosely-typed jsonb from the database into a ProgramDay[]. */

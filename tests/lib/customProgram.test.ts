@@ -6,13 +6,17 @@ import {
   formatTarget,
   getExerciseTarget,
   hasStartingTargets,
+  isFinished,
   newProgramExercise,
   ownExercises,
   parseProgramDays,
+  parseProgramDraft,
   pickAssignedProgramId,
   ProgramAssignment,
   programFromRecommended,
   programToWorkoutDays,
+  storedProgramDays,
+  unfinishedWeek,
   validateProgram,
   WEEKDAYS
 } from "@/lib/customProgram";
@@ -249,5 +253,45 @@ describe("hasStartingTargets", () => {
     expect(hasStartingTargets({ ...newProgramExercise(""), sets: 4 })).toBe(false);
     expect(hasStartingTargets({ ...newProgramExercise(""), reps: "10" })).toBe(false);
     expect(hasStartingTargets({ ...newProgramExercise("Planks"), seconds: 45 })).toBe(false);
+  });
+});
+
+describe("saving day by day (drafts)", () => {
+  const finishedWeek = program.days;
+  const halfBuilt = blankProgram().days.map((day) =>
+    day.day === "Tuesday" ? { ...day, title: "Upper", exercises: [newProgramExercise("Push-Ups")] } : day
+  );
+
+  it("keeps the draft out of what athletes read", () => {
+    const stored = storedProgramDays(finishedWeek, { name: "Pins Split v2", days: halfBuilt });
+    expect(parseProgramDays(stored)).toEqual(finishedWeek);
+    expect(programToWorkoutDays({ days: parseProgramDays(stored) })).toEqual(programToWorkoutDays(program));
+  });
+
+  it("reads the draft back for the builder", () => {
+    const stored = storedProgramDays(finishedWeek, { name: "Pins Split v2", days: halfBuilt });
+    expect(parseProgramDraft(stored)).toEqual({ name: "Pins Split v2", days: halfBuilt });
+  });
+
+  it("survives the jsonb round trip", () => {
+    const stored = JSON.parse(JSON.stringify(storedProgramDays(finishedWeek, { name: "v2", days: halfBuilt })));
+    expect(parseProgramDays(stored)).toEqual(finishedWeek);
+    expect(parseProgramDraft(stored)?.days).toEqual(halfBuilt);
+  });
+
+  it("has no draft for programs saved before drafts existed, or once finished", () => {
+    expect(parseProgramDraft(finishedWeek)).toBeNull();
+    expect(parseProgramDraft(storedProgramDays(finishedWeek, null))).toBeNull();
+    expect(storedProgramDays(finishedWeek, null)).toEqual(finishedWeek);
+    expect(parseProgramDraft(null)).toBeNull();
+  });
+
+  it("treats a program never finished as not assignable", () => {
+    const mondayOnly = program.days.map((day) => (day.day === "Monday" ? day : { ...day, rest: true, title: "Rest" }));
+    expect(isFinished({ name: "Pins Split", days: mondayOnly })).toBe(true);
+    expect(isFinished({ name: "Half", days: halfBuilt })).toBe(false);
+    // What a program saved day by day but never finished publishes: nobody trains from it.
+    expect(isFinished({ name: "New program", days: unfinishedWeek() })).toBe(false);
+    expect(programToWorkoutDays({ days: unfinishedWeek() }).every((day) => day.rest && day.exercises.length === 0)).toBe(true);
   });
 });
