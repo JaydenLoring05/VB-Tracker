@@ -1,46 +1,33 @@
 # Tasks
 
-Refreshed on Thursday 8 October 2026. Everything through #61 is merged, along
-with B-03 (#67). Five pull requests are open and all of them pass their
-checks. The launch steps (database, accounts, dry run) are in
+Refreshed on Saturday 10 October 2026, after the onboarding call with
+Taichi, the first pilot coach. Everything through #71 is merged, including
+the three fixes from his call (#68, #69, #70), film stats (#63) and the
+morning email fix (#65). The launch steps (database, accounts, dry run) are in
 [docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md).
 
 ## Open pull requests
 
-They can be merged in any order. None of them conflicts with another.
-The order below is the suggested one.
-
-| Order | PR | What | Needs SQL | Waiting on |
-| --- | --- | --- | --- | --- |
-| 1 | #66 | B-04: the browser test no longer fails on rest days | No | Your merge |
-| 2 | #62 | B-02: film hotkeys work while the YouTube player is still loading | No | Your merge |
-| 3 | #65 | B-05: the daily coach summary email fails with `text = date` | **Yes**, `schema_v54_daily_summary_date_fix.sql` | You to run the SQL, then merge |
-| 4 | #63 | F-01: film stats from tags (passing average, set distribution, block outcomes) | No | You to try the preview, then merge. Questions for you are in the PR description |
-| 5 | This PR | Housekeeping: this file and two new backlog rows | No | Your merge |
-
-#62 carries #66's change and #63 carries both, because they edit the same
-browser test. SUGGESTIONS.md is edited only by this PR, which marks B-02,
-B-04, B-05 and F-01 `building`. The weekly update moves each one to Shipped
-once its PR is merged.
-
-The bug-fix PRs were not merged automatically on 8 October: the session
-that updated them was not allowed to merge. They are ready when you are.
+| PR | What | Needs SQL | Waiting on |
+| --- | --- | --- | --- |
+| This PR | Backlog: seven rows moved to Shipped, max day (F-28) added, and the plan builder brief | No | Your merge |
 
 ## Needs you
 
 Not checked against the live project. Tick these off as you confirm them.
 
-- [ ] Merge #66 and #62 (neither needs SQL).
-- [ ] Run `supabase/schema_v54_daily_summary_date_fix.sql` in the Supabase
-      SQL Editor, then merge #65. Until the SQL is run the morning coach
-      email fails every day at 13:00 UTC. It has failed every day since
-      4 October.
-- [ ] Open the #63 preview at `/demo` → Film room → Stats, then merge #63.
-- [ ] Mark the next rows `planned` in SUGGESTIONS.md. After F-01 no row is
-      `planned`, so Sunday's update builds nothing until one is. Worth a
-      look first with a pilot team starting: F-12 (pilot clock starts at
-      the first athlete workout), F-15 (three-tap sets record the zone) and
-      F-04 (per-athlete overview page).
+- [ ] Confirm `supabase/schema_v54_daily_summary_date_fix.sql` was run in
+      the Supabase SQL Editor. #65 is merged, but the morning coach email
+      only starts working once that file has been run. It has failed every
+      day since 4 October.
+- [ ] Start the plan builder work: open Claude Code in this repo and tell
+      it to read `docs/PLAN_BUILDER_BRIEF.md` and do what it says.
+- [ ] Ask Taichi whether he needs weights worked out from each athlete's
+      max in the app (F-27), or whether a repeating week plus a max day
+      (F-28) covers him for now.
+- [ ] Taichi is still at Demo in the Notion Leads table. Confirm his
+      players have the team code and his start day, then move him to Pilot.
+- [ ] Try film stats on the live site: Film room → Stats.
 - [ ] F-06 (solo plan): you set the week of 5 October to revisit it before
       marking it `planned`.
 - [ ] Confirm `schema_v49` to `schema_v53` were run in the Supabase SQL
@@ -58,12 +45,21 @@ Not checked against the live project. Tick these off as you confirm them.
 ## Next up
 
 SUGGESTIONS.md is the backlog. The weekly update builds its top `planned`
-rows; the daily bug check fixes at most one bug a day.
+rows; the daily bug check fixes at most one bug a day. Eight rows are
+`planned`, all plan builder work from Taichi's call, in this order:
 
-| Row | Size | Status | What it needs |
-| --- | --- | --- | --- |
-| F-12 Pilot clock starts at the first athlete workout | S | `new` | You to mark it `planned` |
-| F-15 Three-tap sets record the zone | S | `new` | You to mark it `planned`; builds on F-01 |
-| F-04 Per-athlete overview page for coaches | M | `new` | You to mark it `planned`; builds on F-01 |
-| F-03 Film links that aren't YouTube | M | `new` | You to mark it `planned` |
-| F-05 Jump tracking over time | M | `new` | You to mark it `planned`; needs SQL when built |
+| Row | Size | What it needs |
+| --- | --- | --- |
+| F-16 Save each day; an unsaved program survives leaving the page | M | Nothing |
+| F-23 Sections in a day, starting with a reusable warm-up | M | Nothing |
+| F-17 Bring in an existing plan (paste, upload, or a Google Sheets link) | L | Nothing; Taichi's three sheets are the test |
+| F-18 Coach's own note on each exercise | S | Nothing |
+| F-24 A day built from more than one program | M | Part 1 only |
+| F-28 Max day that feeds the PR board | M | Part 2 needs SQL |
+| F-19 Supersets | M | Nothing |
+| F-22 A coach's own exercises in the Exercise Library | M | SQL when built |
+
+Still `new`, waiting for you to mark them `planned`: F-26 ("pick one"
+groups, which Taichi's warm-up and abs sections use), F-27 (programs that
+change by week, weight targets), F-20 (copy a day), F-12 (pilot clock) and
+F-15 (three-tap sets record the zone).
