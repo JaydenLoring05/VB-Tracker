@@ -22,9 +22,10 @@ Not checked against the live project. Tick these off as you confirm them.
       day since 4 October.
 - [ ] Start the plan builder work: open Claude Code in this repo and tell
       it to read `docs/PLAN_BUILDER_BRIEF.md` and do what it says.
-- [ ] Ask Taichi whether he needs weights worked out from each athlete's
-      max in the app (F-27), or whether a repeating week plus a max day
-      (F-28) covers him for now.
+- [ ] Ask Taichi what percent of max each set is in his barbell plan
+      (warm-up set and sets 1 to 5). F-27 works weights out from each
+      athlete's max and needs those numbers; his sheet shows 0 there until
+      a max is typed in.
 - [ ] Taichi is still at Demo in the Notion Leads table. Confirm his
       players have the team code and his start day, then move him to Pilot.
 - [ ] Try film stats on the live site: Film room → Stats.
@@ -45,7 +46,7 @@ Not checked against the live project. Tick these off as you confirm them.
 ## Next up
 
 SUGGESTIONS.md is the backlog. The weekly update builds its top `planned`
-rows; the daily bug check fixes at most one bug a day. Eight rows are
+rows; the daily bug check fixes at most one bug a day. Nine rows are
 `planned`, all plan builder work from Taichi's call, in this order:
 
 | Row | Size | What it needs |
@@ -56,10 +57,11 @@ rows; the daily bug check fixes at most one bug a day. Eight rows are
 | F-18 Coach's own note on each exercise | S | Nothing |
 | F-24 A day built from more than one program | M | Part 1 only |
 | F-28 Max day that feeds the PR board | M | Part 2 needs SQL |
+| F-27 Weights worked out from each athlete's max | M | Taichi's percents per set |
 | F-19 Supersets | M | Nothing |
 | F-22 A coach's own exercises in the Exercise Library | M | SQL when built |
 
 Still `new`, waiting for you to mark them `planned`: F-26 ("pick one"
-groups, which Taichi's warm-up and abs sections use), F-27 (programs that
-change by week, weight targets), F-20 (copy a day), F-12 (pilot clock) and
-F-15 (three-tap sets record the zone).
+groups, which Taichi's warm-up and abs sections use), F-29 (programs that
+change by week), F-20 (copy a day), F-12 (pilot clock) and F-15 (three-tap
+sets record the zone).

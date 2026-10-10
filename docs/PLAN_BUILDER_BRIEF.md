@@ -18,7 +18,7 @@ start. They are the spec.
 
 ## Before you start
 
-Check `main`. `SUGGESTIONS.md` should have rows F-16 to F-28. If it
+Check `main`. `SUGGESTIONS.md` should have rows F-16 to F-29. If it
 doesn't, a backlog PR is still open: tell Jayden which one and stop.
 
 ## What to build
@@ -32,10 +32,11 @@ numbered part where a row is split.
 4. F-18: a note on each exercise
 5. F-24: a day built from more than one program (part 1 only)
 6. F-28: max day (part 1; part 2 needs SQL, so it is its own PR)
-7. F-19: supersets
-8. F-22: a coach's own exercises in the Exercise Library (needs SQL)
+7. F-27: weights worked out from each athlete's max
+8. F-19: supersets
+9. F-22: a coach's own exercises in the Exercise Library (needs SQL)
 
-Don't build F-20, F-26 or F-27. They are `new`.
+Don't build F-20, F-26 or F-29. They are `new`.
 
 ## Things that matter
 

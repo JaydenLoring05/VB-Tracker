@@ -39,10 +39,11 @@ Rules for automated runs:
 | F-18 | Coach's own note on each exercise in a program | planned | coach feedback | S |
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
 | F-28 | Max day: athletes test a one-rep max and it lands on the PR board | planned | me | M |
+| F-27 | Weights worked out from each athlete's max | planned | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
-| F-27 | Programs that change by week (a rest week, a new block) and weight targets from the max | new | your idea | L |
+| F-29 | Programs that change by week (a rest week, a new block) | new | your idea | M |
 | F-20 | Copy a program day to other days, and fold the days not being edited | new | your idea | S |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
@@ -106,7 +107,7 @@ No open bug rows.
   - their film stats (F-01).
 
   It would give coaches something to link to and room for the film numbers.
-- **Plan builder rows from Taichi's onboarding call (F-16 to F-28).**
+- **Plan builder rows from Taichi's onboarding call (F-16 to F-29).**
   Taichi (the first founding pilot coach) built his
   own program in the app on 2026-10-10 and found it long and hard. Jayden
   the same day: make planning as simple as possible for any coach, and work
@@ -264,7 +265,7 @@ No open bug rows.
      the athlete's usual workout. Needs a schema file (the event has
      nowhere to keep the lifts), so it is a separate PR.
 
-  Tested maxes are what F-27's weight targets would be worked out from.
+  Tested maxes are what F-27's weights are worked out from.
 - **F-19. Supersets.** Taichi wants to pair exercises as a superset. With
   sections (F-23), a superset is a section marked "superset". Two PRs:
   1. mark and unmark a section as a superset in the builder, and show its
@@ -285,15 +286,34 @@ No open bug rows.
   one": the athlete's day shows the options, they tap the one they did,
   and the day counts as complete with one done. Without it his plans
   import with every option as a required exercise.
-- **F-27. Programs that change by week, and weight targets.** Not asked
-  for yet. Taichi's barbell plan is five weeks of 5x5, a max-test week
-  (F-28), then a week of active rest, with a weight for each set next to
-  the athlete's max. A coach-built program is one repeating week with no
-  weight target. If a coach asks, split it:
-  1. per-week overrides on a program (week 7 is rest), keyed to the program
-     start date (F-07);
-  2. a weight or percent-of-max target per exercise, filled from the
-     athlete's tested max (F-28).
+- **F-27. Weights worked out from each athlete's max.** Jayden
+  (2026-10-10): work from the athlete's max. Taichi's barbell sheet does
+  this by hand: one max per lift, then a weight for the warm-up set and for
+  each of five sets. In the app:
+  - **Coach:** an exercise can carry a percent of max, one number for
+    every set or one per set for a ramp ("60, 70, 80, 85, 90").
+  - **Athlete:** their day and Workout Mode show their own weight, "5 x 5
+    at 185 lbs (80% of 230)", rounded to the nearest 5 lbs, and Workout
+    Mode fills that weight in for each set so logging is one tap.
+  - **Where the max comes from:** the athlete's latest tested max for that
+    lift (F-28). With no tested max, use their heaviest logged set and say
+    so ("estimated from your best set"). With neither, show the percent and
+    "Log a max to see your weight".
+  - A new tested max changes every later workout's weights on its own. The
+    coach doesn't edit the program.
+
+  No SQL: the percent lives in `team_programs.days`, and Workout Mode
+  already loads each athlete's best weight per exercise
+  (`bestMarksByExercise`). Put the maths in a pure function in `src/lib`
+  with tests for rounding, a missing max and a per-set ramp. Build after
+  F-28 part 1. Question for Taichi: what percent of max is each of his
+  sets? His sheet shows 0 in those cells until a max is typed in, so the
+  percents couldn't be read from it.
+- **F-29. Programs that change by week.** Not asked for yet. Taichi's
+  barbell plan is five weeks of 5x5, a max-test week (F-28), then a week of
+  active rest. A coach-built program is one repeating week. If a coach
+  asks: per-week overrides on a program (week 7 is rest), keyed to the
+  program start date (F-07).
 - **F-20. Copy a day, fold the rest.** "Copy to..." on each day in the
   builder, and only the day being edited stays open. Found while reading
   the builder for F-16.
