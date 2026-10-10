@@ -31,10 +31,25 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
-| F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
+| B-02 | Film hotkeys ignore key presses right after the player loads (PR #62) | building | bug | S |
+| B-04 | The Workout Mode browser test fails on rest days, turning CI red (PR #66) | building | bug | S |
+| B-05 | Daily coach summary email fails with `text = date` (PR #65, needs SQL) | building | bug | S |
+| F-01 | Film stats from tags (set distribution, pass average, block outcomes) (PR #63) | building | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
+| B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |
+| F-25 | Show password and confirm password on sign-up (PR #68) | building | coach feedback | S |
+| F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
+| F-16 | Plan builder saves each day, and an unsaved program survives leaving the page | planned | coach feedback | M |
+| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
+| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
+| F-18 | Coach's own note on each exercise in a program | planned | coach feedback | S |
+| F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
+| F-19 | Supersets in coach-built programs | planned | coach feedback | M |
+| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
+| F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
+| F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
+| F-20 | Copy a program day to other days, and fold the days not being edited | new | your idea | S |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
@@ -49,9 +64,11 @@ Rules for automated runs:
 | R-03 | Automated tests for row-level security | new | your idea | M |
 | R-04 | Several screens only see the first 100 athletes of a roster | new | your idea | S |
 | R-05 | Reminder timing depends on GitHub's scheduler | new | your idea | S |
+| R-06 | README setup steps leave out `schema_v53` | new | your idea | S |
 | A-01 | Split `TrackerContext.tsx` into smaller providers | new | your idea | L |
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
+| F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
 
 ## Details
 
@@ -64,6 +81,21 @@ Rules for automated runs:
   Attach the window keydown listener immediately or queue keys until the
   player is ready, so a coach who starts tagging right away doesn't lose
   presses.
+- **B-04. The Workout Mode browser test fails on rest days.**
+  `e2e/demo-workout-and-film.spec.ts` clicked "Start Today's Workout" on the
+  demo athlete view. On a rest day (every Sunday) `DashboardCards` shows
+  "Want to train anyway? Pick a workout" in its place, so the test timed
+  out and the `e2e` check went red on every PR opened that day (#62, #63
+  and #64 on 2026-10-04). The app was never at fault. #66 makes the test
+  click whichever label the dashboard shows.
+- **B-05. The daily coach summary email fails every morning.** Vercel logs
+  `daily-summary: could not load summary data operator does not exist:
+  text = date` from `/api/daily-summary` each day at 13:26 UTC since
+  2026-10-04. `daily_summary_data` (schema v47) compares
+  `team_calendar_events.date`, a text column, with `p_today`, a date, so
+  Postgres rejects the query and no coach gets the email. #65 adds
+  `schema_v54_daily_summary_date_fix.sql`, which compares text with text.
+  The email stays broken until that file is run in the SQL Editor.
 
 ### Film
 
@@ -92,6 +124,14 @@ Rules for automated runs:
   $7.99/month or $59/year, and raise new signups to about $14.99/month or
   $99/year once AI film ships. Split into smaller rows before building.
 
+- **F-15. Three-tap sets record the zone.** The three-tap flow saves a set
+  as Good / Hittable / Error (`QUICK_RESULTS` in `src/lib/filmQuickTag.ts`)
+  and leaves `set_zone` empty, so the set distribution in film stats (F-01)
+  only counts sets tagged through "Detailed tags" or by voice. A fourth tap
+  for the zone on sets only (six buttons laid out like the court, with a
+  "Skip") would fill it from the flow coaches use most. No schema change:
+  `set_zone` exists since v36.
+
 ### Coach experience
 
 - **F-04. A per-athlete overview page.** `AthleteStatsModal` splits one
@@ -103,6 +143,190 @@ Rules for automated runs:
   - their film stats (F-01).
 
   It would give coaches something to link to and room for the film numbers.
+- **Plan builder rows from Taichi's onboarding call (B-06, F-16 to F-25).**
+  Taichi Watanabe (UNLV men's club, first founding pilot coach) built his
+  own program in the app on 2026-10-10 and found it long and hard. Jayden
+  the same day: make planning as simple as possible for any coach, and work
+  through all of Taichi's feedback. The table has the build order.
+  None needs SQL unless it says so (`team_programs.days` is jsonb). What
+  made the builder slow, in `src/components/coach/CustomProgramPanel.tsx`:
+  - nothing is saved until "Save program" at the very bottom, and that
+    button refuses while any training day is still empty, so leaving the
+    page on Wednesday loses Monday and Tuesday;
+  - every exercise is added one row at a time, so a five-day plan with six
+    exercises a day is 30 rows and over 100 fields;
+  - a day can't be copied to another day, and all seven days are open at
+    once, which is a long scroll on a phone.
+- **B-06. Sets and seconds boxes couldn't be cleared and retyped.** Taichi
+  couldn't backspace and type a two-digit number, so he used the arrows. In
+  `ExerciseRow` the sets box turned an empty value straight back into 1, so
+  clearing "3" and typing "12" gave "112". #69 adds `WholeNumberInput`.
+- **F-25. Show password and confirm password.** Taichi couldn't see what he
+  typed on the sign-up screen and wanted a second field that has to match.
+  #68 adds a show/hide button to every password field and a confirm field
+  on sign-up.
+- **F-21. The plan builder forgot a coach's own exercises.** A coach who
+  types an exercise that isn't in the library shouldn't retype it every
+  time. #70 adds every non-library exercise from the program being built
+  and the team's saved programs to the suggestions, marked "(yours)", and
+  picking one brings back the sets and reps it had last time.
+- **F-16. Save each day.** Taichi asked for a save after every day (do
+  Monday, save; do Tuesday, save) so an accidental exit doesn't cost the
+  whole week. Two parts:
+  - a "Save Monday" button on each day that saves the program as it stands.
+    Days not filled in yet must not block it, so save them as rest days or
+    add a draft flag, and keep the full `validateProgram` check for
+    assigning the program to athletes;
+  - keep the open draft in the browser on every change and offer "Pick up
+    where you left off" when the coach comes back, so even an unsaved day
+    survives a closed tab.
+- **What Taichi's three plans look like (read 2026-10-10).** Three Google
+  Sheets, shared by link: an in-season accessory and mobility plan, an
+  8-week barbell plan, and an 8-week strength plan. This settles the open
+  question about his "three programs for one team":
+  - **They all train the same days** (Monday, Wednesday, Thursday; one adds
+    Friday). They are not different programs for different days.
+  - **A day is made of sections:** a warm-up, the day's lifts, accessory
+    work and abs. The warm-up and abs sections are the same every day. The
+    barbell sheet puts the barbell lifts and the accessory work for the
+    same day side by side.
+  - **Some sections are "pick one":** three plyometric options or three ab
+    exercises, and the athlete does one.
+  - **The barbell plan changes by week:** five weeks of the same 5x5, then
+    a week of one-rep max tests, then active rest, with a column for the
+    weight of each set and one for the athlete's max.
+  - **Reps are free text:** "8", "3-10", "15 reps each leg", "1 min per
+    side", "30 secs each side", "WU + 5 x 5", and often blank.
+
+  **Build F-23, F-24, F-19 and F-26 on one thing: sections inside a day.**
+  A warm-up is a section reused on every training day. A day from several
+  programs is sections filled from different saved programs. A superset is
+  a section whose exercises alternate. Pick one is a section where the
+  athlete does one row. Four separate bolt-ons would give the builder four
+  sets of controls. Keep the stored shape backwards compatible: a day with
+  no sections is one unnamed section, `parseProgramDays` still reads
+  programs saved before this, and `programToWorkoutDays` still returns the
+  flat exercise list the rest of the app reads.
+- **F-23. Sections, starting with the warm-up.** Taichi should be able to
+  add his warm-up to every single day. A program day is one flat exercise
+  list, so a warm-up has to be retyped on each day. Add named sections to
+  a day, and a warm-up section the coach writes once per program with a
+  "use on every training day" switch and a per-day override. Athletes see
+  section names as headings on their day and in Workout Mode, warm-up
+  first. Store it inside `team_programs.days`. This is the foundation for
+  F-24, F-19 and F-26, so it comes before them.
+- **F-17. Bring in a plan the coach already has.** Jayden: coaches should
+  be able to upload their workouts from a doc or a sheet and have the
+  program fill itself in. Always show a preview the coach can edit before
+  anything is added. Files are read in the browser and never stored. Split
+  into three PRs:
+  1. **Paste.** A text box where one line is one exercise:
+     `Back squat 3x8`, `Plank 3x30 sec`, `RDL - 4 x 8-10`, with a day name
+     on its own line starting a new day. A pure `parseProgramText` in
+     `src/lib/customProgram.ts` turns it into rows.
+  2. **Upload a file:** `.csv` and `.txt` with no new dependency, then
+     `.xlsx` and `.docx` with a maintained parser loaded only when the
+     coach opens the import.
+  3. **Paste a Google Sheets link.** A sheet shared as "Anyone with the
+     link" can be read as CSV with no Google sign-in
+     (`https://docs.google.com/spreadsheets/d/<id>/gviz/tq?tqx=out:csv&gid=<gid>`,
+     checked on Taichi's three sheets). Add a small API route for signed-in
+     coaches that accepts only `docs.google.com` spreadsheet links with a
+     well-formed id, fetches that CSV server-side with a size cap and a
+     timeout, and hands it to the same reader. A private sheet gets a plain
+     message: share it with "Anyone with the link", or download it and
+     upload the file.
+
+  **How to read a sheet.** Taichi's sheets are not one table with one
+  header row, so don't look for one. Each has three blocks side by side
+  with an empty column between them, and each block is three columns:
+  exercise, sets, reps. Rules that fit all three:
+  - scan every row for a text cell followed by a small whole number and
+    then one more cell (name, sets, reps), and group the hits by the column
+    they start in;
+  - a cell that is only a weekday name or abbreviation starts that day for
+    its column group: "Monday:", "Wednesday", "Wed", "Thurs",
+    "Thursday/ Day 3". Skip sub-header rows such as "Exercise Movements"
+    and header cells such as "Sets" and "Reps";
+  - a block with no weekday above it (warm-ups, abs) is a section for every
+    training day (F-23), and a label in the name column such as
+    "Warm-Ups - Legs" names the section;
+  - rows under a label ending "- Pick One" are a pick-one group (F-26).
+    Until F-26 exists, bring them in as ordinary rows with "Pick one" in
+    the section name;
+  - a single "Sets x Reps" cell such as "WU + 5 x 5" splits into 5 sets of
+    5 with "warm-up set first" in the note (F-18);
+  - keep reps as written ("15 reps each leg", "1 min per side"). A blank
+    reps cell must not block the import: bring the row in and mark it for
+    the coach to fill.
+
+  Build a made-up fixture in this shape for the tests. Don't commit
+  Taichi's plans.
+- **F-18. A coach can't leave a note on one exercise.** Taichi wants to
+  write his own note next to an exercise; his example was a step-up
+  variation of his own. Typing any exercise name already works, but a typed
+  exercise has no coaching cues in Workout Mode (`getExercise(...)?.cues`
+  is empty) and the only note field is one per day. Add an optional `note`
+  to `ProgramExercise`, a small "Add note" under each row in the builder,
+  and show it under the exercise in `DayCard` and where the cues show in
+  `ActiveWorkoutView`. Carry the note along when F-21 brings an exercise
+  back. His sheets carry notes like "land on the balls of your feet" and
+  "one set of standing pancake as well", which belong here.
+- **F-24. A day built from more than one program.** Jayden: a team that
+  practices Monday, Wednesday and Friday and does something else Tuesday
+  and Thursday needs a second plan for those days, and Taichi has three
+  programs for one team. Taichi's three all train the same days (see
+  above), so his need is one day made of parts from more than one plan:
+  barbell lifts from one, accessory work from another. Today each team,
+  group or athlete follows exactly one program (`pickAssignedProgramId`
+  returns one id, and `team_program_assignments` has one row per team, per
+  group and per athlete by unique index). Different athletes on different
+  programs already works, through groups or a per-athlete override. Build
+  the version with no SQL first:
+  1. **"Add from another program."** In the builder, a weekday can take a
+     whole day or a section from any saved program, added to what is
+     already there, not replacing it ("Monday: Barbell day 1, then
+     In-season Monday"). Jayden's case is the same control used on
+     different weekdays. It copies, so later edits to the source program
+     don't follow.
+  2. **Only if coaches need the parts to stay linked:** let an assignment
+     list several programs and build the athlete's day from all of them.
+     Needs a schema file (drop the one-row unique indexes) and changes to
+     `pickAssignedProgramId` and `resolveWorkoutDays`. Don't build this
+     until a coach asks for it.
+- **F-19. Supersets.** Taichi wants to pair exercises as a superset. With
+  sections (F-23), a superset is a section marked "superset". Two PRs:
+  1. mark and unmark a section as a superset in the builder, and show its
+     exercises bracketed (A1, A2) on the athlete's day;
+  2. Workout Mode alternates the paired exercises set by set and rests
+     after the pair, not after each exercise.
+- **F-22. A coach's own exercises in the Exercise Library.** Jayden asked
+  for this with F-21. `/library` and Workout Mode read the built-in list in
+  `src/data/exercises.ts`, so a coach's exercise has no page, cues or video
+  link, and athletes can't look it up. Needs a `team_exercises` table (name,
+  cues, optional video link, measure) with `is_team_coach` RLS, an "Add
+  exercise" form for coaches, and the library and `getExercise` reading both
+  lists. Needs a schema file. F-18 covers most of the need with no SQL, so
+  it comes first.
+- **F-26. "Pick one" groups.** Not asked for, but Taichi's warm-up and abs
+  sections are written this way: "Abs (Obliques) - Pick One" over two or
+  three exercises. With sections (F-23) this is a section marked "pick
+  one": the athlete's day shows the options, they tap the one they did,
+  and the day counts as complete with one done. Without it his plans
+  import with every option as a required exercise.
+- **F-27. Programs that change by week, and weight targets.** Not asked
+  for, but Taichi's barbell plan needs it to be followed in the app: five
+  weeks of 5x5, a week of one-rep max tests, a week of active rest, and a
+  weight for each set next to the athlete's max. A coach-built
+  program is one repeating week with no weight target. Ask Taichi first
+  whether the repeating week plus a note covers him. If not, split it:
+  1. per-week overrides on a program (week 6 is the max test, week 7 is
+     rest), keyed to the program start date (F-07);
+  2. a weight or percent-of-max target per exercise, filled from the
+     athlete's best on the PR board.
+- **F-20. Copy a day, fold the rest.** "Copy to..." on each day in the
+  builder, and only the day being edited stays open. Found while reading
+  the builder for F-16.
 - **F-07. Only the athlete can set their program start date.**
   `profiles.program_start_date` (schema v44) is set on an athlete's first
   workout or from the week selector. A coach starting a new block for the
@@ -203,6 +427,13 @@ Rules for automated runs:
   only allows daily crons. GitHub can run late at busy times. Moving the
   trigger to an hourly Vercel cron (Pro) or Supabase `pg_cron` + `pg_net`
   would make the timing exact. The Vercel option costs money.
+
+- **R-06. The README's setup steps leave out `schema_v53`.** Step 3 of the
+  README lists every schema file to run and stops at
+  `schema_v52_guardian_info.sql`. `schema_v53_film_quick_tags.sql` (F-02,
+  #58) is missing, so a fresh install following the README has no
+  `film_tags.result` column and three-tap tags fail to save.
+  `docs/LAUNCH_CHECKLIST.md` already lists v53. Add it to the README list.
 
 ### Architecture
 
