@@ -31,6 +31,12 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
+| F-15 | Show password and confirm password on sign-up | building | coach feedback | S |
+| F-16 | Plan builder saves each day, and an unsaved program survives leaving the page | planned | coach feedback | M |
+| F-17 | Bring in a plan a coach already has (paste it, or upload a sheet) | planned | coach feedback | M |
+| F-18 | Coach's own note on each exercise in a program | new | coach feedback | S |
+| F-19 | Supersets in coach-built programs | new | coach feedback | M |
+| F-20 | Copy a program day to other days, and fold the days not being edited | new | your idea | S |
 | B-02 | Film hotkeys ignore key presses right after the player loads | planned | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) | planned | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
@@ -125,6 +131,76 @@ Rules for automated runs:
   (falling back to `created_at` when there is none) gives every pilot a fair
   30 days of real use before the "Continue for $29/month" banner. Keep the
   same date in the Notion Teams table's Pilot start.
+
+- **F-15. Show password and confirm password.** Taichi (UNLV, onboarding
+  call 2026-10-10) couldn't see what he typed on the sign-up screen and
+  wanted a second field that has to match. `/login` had one hidden password
+  field; only `/auth/reset-password` asked twice. Jayden asked for this in
+  chat on 2026-10-10, so it went straight to `building`.
+- **F-16 and F-17. The plan builder is too long for a coach who already
+  has a plan.** Taichi has his own program and found moving it into NextRep
+  long and hard. Jayden (2026-10-10) wants simplifying the plan builder to
+  be the focus of the next update, so these two sit at the top as
+  `planned`. What makes it slow today, in
+  `src/components/coach/CustomProgramPanel.tsx`:
+  - nothing is saved until "Save program" at the very bottom, and that
+    button refuses while any training day is still empty, so leaving the
+    page on Wednesday loses Monday and Tuesday;
+  - every exercise is added one row at a time ("Add exercise", type the
+    name, set sets, reps, Reps/Sec), so a five-day plan with six exercises a
+    day is 30 rows and over 100 fields;
+  - a day can't be copied to another day, and all seven days are open at
+    once, which is a long scroll on a phone.
+
+  Neither row needs SQL (`team_programs.days` is jsonb).
+- **F-16. Save each day.** Taichi asked for a save after every day (do
+  Monday, save; do Tuesday, save) so an accidental exit doesn't cost the
+  whole week. Two parts:
+  - a "Save Monday" button on each day that saves the program as it stands.
+    Days not filled in yet must not block it, so save them as rest days or
+    add a draft flag, and keep the full `validateProgram` check for
+    assigning the program to athletes;
+  - keep the open draft in the browser on every change and offer "Pick up
+    where you left off" when the coach comes back, so even an unsaved day
+    survives a closed tab.
+- **F-17. Bring in a plan the coach already has.** Taichi keeps his plan in
+  a doc or a Google Sheet and wants to upload it and have the program fill
+  itself in. Build in this order:
+  1. **Paste.** A text box where one line is one exercise:
+     `Back squat 3x8`, `Plank 3x30 sec`, `RDL - 4 x 8-10`, with a day name
+     on its own line starting a new day. A pure `parseProgramText` in
+     `src/lib/customProgram.ts` turns it into rows the coach can still
+     edit; a line with no target gets the usual 3x8 or 3x30 sec. Show a
+     preview before adding. A Google Doc pastes straight in.
+  2. **Upload a sheet as .csv** (Google Sheets and Excel both export it),
+     read in the browser with the same parser. No new dependency.
+  3. Later rows, not this one: reading .xlsx or .docx files directly, a
+     Google Sheets link (needs Google sign-in permissions), and a photo or
+     PDF of a plan (needs AI).
+
+  Ask Taichi for his plan as he keeps it before building the parser, so it
+  reads his format first.
+- **F-18. A coach can't leave a note on one exercise.** Taichi wants to
+  write his own note next to an exercise; his example was a step-up
+  variation of his own that isn't in the library. Typing any exercise name
+  already works (`ExerciseRow` is free text with the library as
+  suggestions), but a typed exercise has no coaching cues in Workout Mode
+  (`getExercise(...)?.cues` is empty) and the only note field is one per
+  day. Add an optional `note` to `ProgramExercise`, a small "Add note" under
+  each row in the builder, and show it under the exercise in `DayCard` and
+  where the cues show in `ActiveWorkoutView`. No SQL: it lives in the same
+  jsonb. A saved "My exercises" list for the team would be a later row.
+- **F-19. Supersets.** Taichi wants to pair exercises as a superset. A
+  program day is a flat list today. Add an optional group label to
+  `ProgramExercise` ("A", "B"); neighbours with the same label are one
+  superset. No SQL. Split before building:
+  1. link and unlink neighbours in the builder, and show the pair bracketed
+     (A1, A2) on the athlete's day;
+  2. Workout Mode alternates the paired exercises set by set and rests
+     after the pair, not after each exercise.
+- **F-20. Copy a day, fold the rest.** "Copy to..." on each day in the
+  builder, and only the day being edited stays open. Found while reading
+  the builder for F-16.
 
 ### Athlete experience
 

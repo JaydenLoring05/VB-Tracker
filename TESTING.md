@@ -58,6 +58,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Notion sync flag | `tests/lib/notionSyncFlag.test.ts` | Off by default, on for a deployment already set up, explicit flag wins, no Notion values exposed, the trigger stays silent while off |
 | Monitoring and analytics | `tests/lib/monitoring.test.ts` | Off without a DSN or flag, Sentry events lose identity, cookies, bodies and query strings, health fields redacted anywhere, typed-input breadcrumbs dropped, page-view URLs without codes or ids |
 | Guardian step | `tests/lib/guardian.test.ts` | Answer required, adults need nothing else, under 18 needs name, valid email and confirmation, saved fields, roster "missing" status |
+| New password check | `tests/lib/passwordForm.test.ts` | Minimum length, length reported before a mismatch, exact comparison (case and spaces), live match state for the confirm field |
 | Feedback | `tests/lib/feedback.test.ts` | Message validation and control characters, same-site page only, short device label, app version, escaped notification email |
 | `POST /api/feedback` | `tests/api/feedbackRoute.test.ts` | Signed in only, same-origin, empty rejected, role and team from the database (not the browser), emails only when Resend is set, save failure sends nothing |
 | Check-in reminders | `tests/lib/checkInReminders.test.ts` | Email content (first name, escaped team, check-in link, unsubscribe link and one-click headers, no health data), token validation, hour and time-zone options, headers passed to Resend |

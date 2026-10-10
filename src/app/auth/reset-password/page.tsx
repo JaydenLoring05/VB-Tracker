@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { Brand } from "@/components/shared/Brand";
+import { PasswordField } from "@/components/shared/PasswordField";
 import { authErrorMessage } from "@/lib/authErrors";
+import { MIN_PASSWORD_LENGTH, newPasswordProblem } from "@/lib/passwordForm";
 import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
@@ -28,14 +30,9 @@ export default function ResetPasswordPage() {
 
     // Validation errors are set and cleared in the same tick, so the effect above would not see a
     // change on a repeat attempt; focus the field directly here.
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      passwordRef.current?.focus();
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords don't match.");
+    const problem = newPasswordProblem(password, confirmPassword);
+    if (problem) {
+      setError(problem);
       passwordRef.current?.focus();
       return;
     }
@@ -63,41 +60,32 @@ export default function ResetPasswordPage() {
         <h1>Set a new password</h1>
 
         <form className="auth-form" onSubmit={handleSubmit} aria-busy={loading}>
-          <div className="auth-field">
-            <label htmlFor="reset-password">New password</label>
-            <input
-              id="reset-password"
-              ref={passwordRef}
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-              aria-invalid={error ? true : undefined}
-              aria-describedby={error ? "reset-error" : "reset-password-hint"}
-            />
+          <PasswordField
+            id="reset-password"
+            label="New password"
+            value={password}
+            onChange={setPassword}
+            autoComplete="new-password"
+            inputRef={passwordRef}
+            invalid={Boolean(error)}
+            describedBy={error ? "reset-error" : "reset-password-hint"}
+          >
             {!error && (
               <p className="auth-hint" id="reset-password-hint">
-                At least 6 characters.
+                At least {MIN_PASSWORD_LENGTH} characters.
               </p>
             )}
-          </div>
+          </PasswordField>
 
-          <div className="auth-field">
-            <label htmlFor="reset-confirm">Confirm new password</label>
-            <input
-              id="reset-confirm"
-              type="password"
-              required
-              minLength={6}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="new-password"
-              aria-invalid={error ? true : undefined}
-              aria-describedby={error ? "reset-error" : undefined}
-            />
-          </div>
+          <PasswordField
+            id="reset-confirm"
+            label="Confirm new password"
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            autoComplete="new-password"
+            invalid={Boolean(error)}
+            describedBy={error ? "reset-error" : undefined}
+          />
 
           {error && (
             <p className="auth-error" id="reset-error" role="alert">
