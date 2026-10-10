@@ -2,25 +2,9 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
-export type YouTubePlayerHandle = {
-  getCurrentTime: () => number;
-  seekTo: (seconds: number) => void;
-  seekBy: (deltaSeconds: number) => void;
-  togglePlay: () => void;
-};
+import { createPlayerHandle, YouTubePlayerHandle, YTPlayer } from "@/lib/youtubePlayerHandle";
 
-type YTPlayer = {
-  getCurrentTime: () => number;
-  seekTo: (seconds: number, allowSeekAhead: boolean) => void;
-  playVideo: () => void;
-  pauseVideo: () => void;
-  getPlayerState: () => number;
-  destroy: () => void;
-};
-
-// YT.PlayerState values from the IFrame API.
-const YT_PLAYING = 1;
-const YT_BUFFERING = 3;
+export type { YouTubePlayerHandle };
 
 declare global {
   interface Window {
@@ -103,25 +87,14 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, { videoId: string }
 
   useImperativeHandle(
     ref,
-    () => ({
-      getCurrentTime: () => (readyRef.current ? playerRef.current?.getCurrentTime() ?? 0 : 0),
-      seekTo: (seconds: number) => {
-        if (readyRef.current) playerRef.current?.seekTo(seconds, true);
-        else pendingSeekRef.current = seconds;
-      },
-      seekBy: (deltaSeconds: number) => {
-        const player = playerRef.current;
-        if (!player || !readyRef.current) return;
-        player.seekTo(Math.max(0, player.getCurrentTime() + deltaSeconds), true);
-      },
-      togglePlay: () => {
-        const player = playerRef.current;
-        if (!player || !readyRef.current) return;
-        const state = player.getPlayerState();
-        if (state === YT_PLAYING || state === YT_BUFFERING) player.pauseVideo();
-        else player.playVideo();
-      }
-    }),
+    () =>
+      createPlayerHandle({
+        getPlayer: () => playerRef.current,
+        isReady: () => readyRef.current,
+        queueSeek: (seconds) => {
+          pendingSeekRef.current = seconds;
+        }
+      }),
     []
   );
 
