@@ -4,7 +4,16 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useDemo } from "@/context/DemoContext";
 import { useSupabase } from "@/hooks/useSupabase";
-import { CustomProgram, parseProgramDays, ProgramAssignment } from "@/lib/customProgram";
+import {
+  CustomProgram,
+  isFinished,
+  parseProgramDays,
+  parseProgramDraft,
+  ProgramAssignment,
+  ProgramDraft,
+  storedProgramDays,
+  unfinishedWeek
+} from "@/lib/customProgram";
 import { Team } from "@/types";
 
 export type TeamGroup = { id: string; name: string; memberIds: string[] };
@@ -21,13 +30,14 @@ export function useCustomPrograms(team: Team) {
   const [groups, setGroups] = useState<TeamGroup[]>([]);
   const [assignments, setAssignments] = useState<ProgramAssignment[]>([]);
 
-  const load = useCallback(async () => {
+  /** quiet: refresh without the loading state, so an open editor stays mounted. */
+  const load = useCallback(async (quiet = false) => {
     if (demo) {
       setLoading(false);
       return;
     }
 
-    setLoading(true);
+    if (!quiet) setLoading(true);
     setError(null);
 
     const [programsRes, groupsRes, membersRes, assignmentsRes] = await Promise.all([
@@ -56,6 +66,7 @@ export function useCustomPrograms(team: Team) {
         id: row.id,
         name: row.name,
         days: parseProgramDays(row.days),
+        draft: parseProgramDraft(row.days),
         updatedAt: row.updated_at
       }))
     );
@@ -87,7 +98,11 @@ export function useCustomPrograms(team: Team) {
     return true;
   }
 
-  /** Creates the program when it has no id yet. Returns the saved program's id, or null on failure. */
+  /**
+   * Finishes the program: the edited week becomes what assigned athletes
+   * follow, and any draft is cleared. Creates the program when it has no id
+   * yet. Returns the saved program's id, or null on failure.
+   */
   async function saveProgram(program: Omit<CustomProgram, "id"> & { id?: string }): Promise<string | null> {
     if (blockedInDemo("Building your own program")) return null;
     setError(null);
@@ -111,6 +126,65 @@ export function useCustomPrograms(team: Team) {
 
     await load();
     return result.data.id as string;
+  }
+
+  /**
+   * Saves the program as it stands without finishing it ("Save Monday").
+   * Empty days don't block it. Athletes on an already-finished program keep
+   * the last finished week, and its name, until it's finished again. A
+   * program that was never finished keeps an all-rest week, so it can't be
+   * assigned yet. Returns the program's id, or null on failure.
+   */
+  async function saveDraft(program: Omit<CustomProgram, "id"> & { id?: string }): Promise<string | null> {
+    if (blockedInDemo("Building your own program")) return null;
+    setError(null);
+
+    const draft: ProgramDraft = { name: program.name, days: program.days };
+    const saved = program.id ? programs.find((p) => p.id === program.id) : undefined;
+    const finished = saved != null && isFinished(saved);
+    const name = program.name.trim() || "New program";
+    const days = storedProgramDays(saved && finished ? saved.days : unfinishedWeek(), draft);
+    const updatedAt = new Date().toISOString();
+
+    const result = saved
+      ? await supabase
+          .from("team_programs")
+          .update(finished ? { days, updated_at: updatedAt } : { name, days, updated_at: updatedAt })
+          .eq("id", saved.id)
+          .eq("team_id", team.id)
+          .select("id")
+          .single()
+      : await supabase
+          .from("team_programs")
+          .insert({ team_id: team.id, name, days, updated_at: updatedAt })
+          .select("id")
+          .single();
+
+    if (result.error) {
+      console.error("Failed to save program draft", result.error);
+      setError("Couldn't save. Check your connection and try again.");
+      return null;
+    }
+
+    await load(true);
+    return result.data.id as string;
+  }
+
+  /** Drops a finished program's draft, back to the week athletes follow. */
+  async function discardDraft(program: CustomProgram) {
+    if (blockedInDemo("Building your own program")) return false;
+    setError(null);
+    const { error: updateError } = await supabase
+      .from("team_programs")
+      .update({ days: storedProgramDays(program.days, null) })
+      .eq("id", program.id)
+      .eq("team_id", team.id);
+    if (updateError) {
+      setError("Couldn't discard the draft. Try again.");
+      return false;
+    }
+    await load();
+    return true;
   }
 
   async function deleteProgram(programId: string) {
@@ -214,8 +288,10 @@ export function useCustomPrograms(team: Team) {
     programs,
     groups,
     assignments,
-    reload: load,
+    reload: () => load(),
     saveProgram,
+    saveDraft,
+    discardDraft,
     deleteProgram,
     createGroup,
     deleteGroup,
