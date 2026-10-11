@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { WholeNumberInput } from "@/components/shared/WholeNumberInput";
 import { useTrackerContext } from "@/context/TrackerContext";
@@ -11,17 +11,24 @@ import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { TeamGroup, useCustomPrograms } from "@/hooks/useCustomPrograms";
 import { getExerciseMeasure } from "@/lib/exerciseMeasure";
 import {
+  applyWarmup,
   blankProgram,
   CustomProgram,
+  dayExercises,
+  dayWarmup,
   exerciseKey,
   formatTarget,
   hasStartingTargets,
+  isFinished,
   newProgramExercise,
   ownExercises,
+  parseProgramDays,
   pickAssignedProgramId,
   ProgramDay,
   ProgramExercise,
   programFromRecommended,
+  ProgramSection,
+  programWarmup,
   validateProgram
 } from "@/lib/customProgram";
 import { RosterAthlete, Team } from "@/types";
@@ -145,27 +152,193 @@ function ExerciseRow({
   );
 }
 
-function DayEditor({
-  day,
+/** One section's exercises, with its name box when the day has more than one section. */
+function SectionEditor({
+  section,
+  dayName,
+  showName,
+  namePlaceholder = "Section name, e.g. Abs",
   remembered,
   onTyping,
-  onChange
+  onChange,
+  onRemove
 }: {
-  day: ProgramDay;
+  section: ProgramSection;
+  dayName: string;
+  showName: boolean;
+  /** What an empty name box shows: what athletes will see as its heading, or an example. */
+  namePlaceholder?: string;
   remembered: ProgramExercise[];
   onTyping: (name: string | null) => void;
-  onChange: (next: ProgramDay) => void;
+  onChange: (next: ProgramSection) => void;
+  /** Absent when the section can't be removed (a day's only section). */
+  onRemove?: () => void;
 }) {
   function updateExercise(index: number, next: ProgramExercise) {
-    onChange({ ...day, exercises: day.exercises.map((exercise, i) => (i === index ? next : exercise)) });
+    onChange({ ...section, exercises: section.exercises.map((exercise, i) => (i === index ? next : exercise)) });
   }
 
   function moveExercise(index: number, direction: -1 | 1) {
     const target = index + direction;
-    if (target < 0 || target >= day.exercises.length) return;
-    const exercises = [...day.exercises];
+    if (target < 0 || target >= section.exercises.length) return;
+    const exercises = [...section.exercises];
     [exercises[index], exercises[target]] = [exercises[target], exercises[index]];
-    onChange({ ...day, exercises });
+    onChange({ ...section, exercises });
+  }
+
+  return (
+    <div className="custom-program-section">
+      {showName && (
+        <div className="custom-program-section-header">
+          <input
+            aria-label={`Section name on ${dayName}`}
+            placeholder={namePlaceholder}
+            value={section.name}
+            // A section just added has no name yet: put the cursor there.
+            autoFocus={section.name === "" && section.exercises.length === 0}
+            onChange={(event) => onChange({ ...section, name: event.target.value })}
+          />
+          {onRemove && (
+            <button
+              type="button"
+              className="ghost danger-button"
+              onClick={onRemove}
+              aria-label={`Remove section ${section.name || "with no name"} on ${dayName}`}
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
+      )}
+
+      <ul className="custom-program-exercises">
+        {section.exercises.map((exercise, index) => (
+          <ExerciseRow
+            key={index}
+            exercise={exercise}
+            index={index}
+            count={section.exercises.length}
+            remembered={remembered}
+            onTyping={onTyping}
+            onChange={(next) => updateExercise(index, next)}
+            onMove={(direction) => moveExercise(index, direction)}
+            onRemove={() => onChange({ ...section, exercises: section.exercises.filter((_, i) => i !== index) })}
+          />
+        ))}
+      </ul>
+
+      <button
+        type="button"
+        className="ghost"
+        onClick={() => onChange({ ...section, exercises: [...section.exercises, newProgramExercise("")] })}
+      >
+        <Plus size={14} /> Add exercise
+      </button>
+    </div>
+  );
+}
+
+/** The warm-up written once for the whole program, at the top of the editor. */
+function WarmupEditor({
+  warmup,
+  everyDay,
+  remembered,
+  onTyping,
+  onChange,
+  onEveryDayChange
+}: {
+  warmup: ProgramSection;
+  everyDay: boolean;
+  remembered: ProgramExercise[];
+  onTyping: (name: string | null) => void;
+  onChange: (next: ProgramSection) => void;
+  onEveryDayChange: (everyDay: boolean) => void;
+}) {
+  // Closed until there's something in it, so a coach without a warm-up sees one button.
+  const [open, setOpen] = useState(warmup.exercises.length > 0);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        className="ghost custom-program-add-warmup"
+        onClick={() => {
+          setOpen(true);
+          onChange({ ...warmup, exercises: [newProgramExercise("")] });
+        }}
+      >
+        <Plus size={14} /> Add a warm-up for every day
+      </button>
+    );
+  }
+
+  return (
+    <div className="panel custom-program-day custom-program-warmup">
+      <div className="custom-program-day-header">
+        <h4>Warm-up</h4>
+        <label className="custom-program-rest-toggle">
+          <input type="checkbox" checked={everyDay} onChange={(event) => onEveryDayChange(event.target.checked)} />
+          On every training day
+        </label>
+      </div>
+      <p className="muted">Write it once. It goes first on each training day. Change it or skip it on any one day below.</p>
+      <SectionEditor
+        section={warmup}
+        dayName="the warm-up"
+        showName={false}
+        remembered={remembered}
+        onTyping={onTyping}
+        onChange={onChange}
+      />
+    </div>
+  );
+}
+
+function DayEditor({
+  day,
+  hasProgramWarmup,
+  remembered,
+  saveState,
+  onTyping,
+  onChange,
+  onSave
+}: {
+  day: ProgramDay;
+  /** True when the program has a warm-up with exercises in it. */
+  hasProgramWarmup: boolean;
+  remembered: ProgramExercise[];
+  /** "saving" while this day's save runs, "saved" once it has and nothing changed since. */
+  saveState: "saving" | "saved" | null;
+  onTyping: (name: string | null) => void;
+  onChange: (next: ProgramDay) => void;
+  /** Saves the whole program as it stands, without finishing it. */
+  onSave: () => void;
+}) {
+  const stored = dayWarmup(day);
+  // A switched-off program warm-up is kept on the day but isn't this day's warm-up.
+  const warmup = stored?.off ? undefined : stored;
+  const parts = day.sections.filter((section) => section !== stored);
+  // One plain list looks just like a day did before sections; names appear once there are two.
+  const showNames = parts.length > 1 || parts.some((section) => section.name.trim() !== "");
+
+  function setSections(sections: ProgramSection[]) {
+    onChange({ ...day, sections });
+  }
+
+  function replaceSection(before: ProgramSection, after: ProgramSection) {
+    setSections(day.sections.map((section) => (section === before ? after : section)));
+  }
+
+  function removeSection(section: ProgramSection) {
+    if (section.exercises.length > 0 && !window.confirm(`Remove ${section.name.trim() || "this section"} and its exercises?`)) {
+      return;
+    }
+    setSections(day.sections.filter((s) => s !== section));
+  }
+
+  /** Drops this day's own warm-up, so the program's comes back (or none, if there isn't one). */
+  function useProgramWarmup() {
+    setSections(parts);
   }
 
   return (
@@ -212,50 +385,172 @@ function DayEditor({
             onChange={(event) => onChange({ ...day, notes: event.target.value })}
           />
 
-          <ul className="custom-program-exercises">
-            {day.exercises.map((exercise, index) => (
-              <ExerciseRow
-                key={index}
-                exercise={exercise}
-                index={index}
-                count={day.exercises.length}
+          {warmup?.shared && (
+            <div className="custom-program-warmup-line">
+              <span className="muted">
+                Warm-up: {warmup.exercises.length} exercise{warmup.exercises.length === 1 ? "" : "s"} from the program
+                warm-up
+              </span>
+              <div className="custom-program-row-controls">
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => replaceSection(warmup, { name: warmup.name, kind: "warmup", exercises: [...warmup.exercises] })}
+                >
+                  Change for {day.day}
+                </button>
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => replaceSection(warmup, { name: warmup.name, kind: "warmup", exercises: [] })}
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          )}
+          {warmup && !warmup.shared && warmup.exercises.length === 0 && (
+            <div className="custom-program-warmup-line">
+              <span className="muted">No warm-up on {day.day}.</span>
+              <button type="button" className="ghost" onClick={useProgramWarmup}>
+                Use the program warm-up
+              </button>
+            </div>
+          )}
+          {warmup && !warmup.shared && warmup.exercises.length > 0 && (
+            <div className="custom-program-own-warmup">
+              <div className="custom-program-warmup-line">
+                <strong>{day.day} warm-up</strong>
+                {hasProgramWarmup && (
+                  <button type="button" className="ghost" onClick={useProgramWarmup}>
+                    Use the program warm-up
+                  </button>
+                )}
+              </div>
+              <SectionEditor
+                section={warmup}
+                dayName={day.day}
+                showName={false}
                 remembered={remembered}
                 onTyping={onTyping}
-                onChange={(next) => updateExercise(index, next)}
-                onMove={(direction) => moveExercise(index, direction)}
-                onRemove={() => onChange({ ...day, exercises: day.exercises.filter((_, i) => i !== index) })}
+                onChange={(next) => replaceSection(warmup, next)}
               />
-            ))}
-          </ul>
+            </div>
+          )}
+
+          {parts.map((section, index) => (
+            <SectionEditor
+              key={index}
+              section={section}
+              dayName={day.day}
+              showName={showNames}
+              // An unnamed first list shows to athletes as "Main" (see programToWorkoutDays).
+              namePlaceholder={index === 0 ? "Main" : undefined}
+              remembered={remembered}
+              onTyping={onTyping}
+              onChange={(next) => replaceSection(section, next)}
+              onRemove={parts.length > 1 ? () => removeSection(section) : undefined}
+            />
+          ))}
 
           <button
             type="button"
-            className="ghost"
-            onClick={() => onChange({ ...day, exercises: [...day.exercises, newProgramExercise("")] })}
+            className="ghost custom-program-add-section"
+            onClick={() => setSections([...day.sections, { name: "", exercises: [] }])}
           >
-            <Plus size={14} /> Add exercise
+            <Plus size={14} /> Add section
           </button>
         </>
       )}
+
+      <div className="custom-program-day-save">
+        <button type="button" className="ghost" onClick={onSave} disabled={saveState === "saving"}>
+          {saveState === "saving" ? "Saving…" : `Save ${day.day}`}
+        </button>
+        {saveState === "saved" && (
+          <span className="muted" role="status">
+            Saved
+          </span>
+        )}
+      </div>
     </div>
   );
 }
 
+/**
+ * The open draft is also kept in this browser on every change, so a closed
+ * tab or a dead battery doesn't lose what hasn't been saved yet. It stays on
+ * the device and is cleared once the program is saved.
+ */
+type LocalCopy = { draft: Draft; savedAt: number };
+
+function readLocalCopy(key: string): LocalCopy | null {
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.draft || !Array.isArray(parsed.draft.days)) return null;
+    return {
+      draft: {
+        ...(typeof parsed.draft.id === "string" ? { id: parsed.draft.id } : {}),
+        name: String(parsed.draft.name ?? ""),
+        days: parseProgramDays(parsed.draft.days)
+      },
+      savedAt: Number(parsed.savedAt) || 0
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalCopy(key: string, draft: Draft) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify({ draft: { id: draft.id, name: draft.name, days: draft.days }, savedAt: Date.now() }));
+  } catch {
+    // Private browsing or a full disk: the per-day save still works.
+  }
+}
+
+function clearLocalCopy(key: string) {
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Nothing to clear.
+  }
+}
+
 function ProgramEditorForm({
   initial,
+  startsUnsaved,
+  finishedBefore,
+  storageKey,
   savedPrograms,
   saving,
   onSave,
+  onSaveDraft,
   onCancel
 }: {
   initial: Draft;
+  /** True when `initial` came from this browser's copy and isn't saved anywhere else yet. */
+  startsUnsaved: boolean;
+  /** True when athletes can already be on this program (it was finished before). */
+  finishedBefore: boolean;
+  /** Where this browser keeps the open draft. */
+  storageKey: string;
   /** Every program this team already has, newest first. */
   savedPrograms: CustomProgram[];
   saving: boolean;
   onSave: (draft: Draft) => void;
+  /** Saves without finishing. Resolves to the program's id, or null on failure. */
+  onSaveDraft: (draft: Draft) => Promise<string | null>;
   onCancel: () => void;
 }) {
   const [draft, setDraft] = useState<Draft>(initial);
+  // The draft as it was last saved to the database. Anything else is unsaved.
+  const [lastSaved, setLastSaved] = useState<Draft | null>(startsUnsaved ? null : initial);
+  const [savingDay, setSavingDay] = useState<string | null>(null);
+  const [savedDay, setSavedDay] = useState<string | null>(null);
+  const unsaved = draft !== lastSaved;
   const [showProblems, setShowProblems] = useState(false);
   const problems = validateProgram(draft);
   // Text of the exercise name box being typed in, so its own half-typed text isn't offered back.
@@ -267,8 +562,52 @@ function ProgramEditorForm({
     [draft, savedPrograms]
   );
 
+  useEffect(() => {
+    if (unsaved) writeLocalCopy(storageKey, draft);
+  }, [draft, unsaved, storageKey]);
+
+  // The warm-up written once for the program. Each training day carries a copy of it
+  // (see applyWarmup), so it's read back from the days rather than stored on its own.
+  const [warmup, setWarmup] = useState<ProgramSection>(() => {
+    const found = programWarmup(initial.days);
+    return { name: found?.name ?? "Warm-up", kind: "warmup", shared: true, exercises: found?.exercises ?? [] };
+  });
+  const [warmupEveryDay, setWarmupEveryDay] = useState(() => !programWarmup(initial.days)?.off);
+
   function updateDay(next: ProgramDay) {
-    setDraft((current) => ({ ...current, days: current.days.map((day) => (day.day === next.day ? next : day)) }));
+    // A day just made a training day, or one that dropped its own warm-up, picks up the program's.
+    setDraft((current) => ({
+      ...current,
+      days: applyWarmup(
+        current.days.map((day) => (day.day === next.day ? next : day)),
+        warmup,
+        warmupEveryDay
+      )
+    }));
+  }
+
+  function updateWarmup(next: ProgramSection) {
+    setWarmup(next);
+    setDraft((current) => ({ ...current, days: applyWarmup(current.days, next, warmupEveryDay) }));
+  }
+
+  function updateWarmupEveryDay(everyDay: boolean) {
+    setWarmupEveryDay(everyDay);
+    setDraft((current) => ({ ...current, days: applyWarmup(current.days, warmup, everyDay) }));
+  }
+
+  async function handleSaveDay(dayName: string) {
+    const snapshot = draft;
+    setSavingDay(dayName);
+    const id = await onSaveDraft(snapshot);
+    setSavingDay(null);
+    if (!id) return;
+    // A new program has an id from its first save on, so later saves update it.
+    const withId = snapshot.id ? snapshot : { ...snapshot, id };
+    clearLocalCopy(storageKey);
+    setDraft((current) => (current === snapshot ? withId : { ...current, id }));
+    setLastSaved(withId);
+    setSavedDay(dayName);
   }
 
   function handleSave() {
@@ -278,6 +617,14 @@ function ProgramEditorForm({
     }
     onSave(draft);
   }
+
+  function handleCancel() {
+    if (unsaved && !window.confirm("Leave without saving? Changes since your last save will be lost.")) return;
+    clearLocalCopy(storageKey);
+    onCancel();
+  }
+
+  const busy = saving || savingDay != null;
 
   return (
     <div className="custom-program-editor">
@@ -303,8 +650,26 @@ function ProgramEditorForm({
         suggestions next time, and picking one brings back its sets and reps.
       </p>
 
+      <WarmupEditor
+        warmup={warmup}
+        everyDay={warmupEveryDay}
+        remembered={remembered}
+        onTyping={setTyping}
+        onChange={updateWarmup}
+        onEveryDayChange={updateWarmupEveryDay}
+      />
+
       {draft.days.map((day) => (
-        <DayEditor key={day.day} day={day} remembered={remembered} onTyping={setTyping} onChange={updateDay} />
+        <DayEditor
+          key={day.day}
+          day={day}
+          hasProgramWarmup={warmupEveryDay && warmup.exercises.length > 0}
+          remembered={remembered}
+          saveState={savingDay === day.day ? "saving" : !unsaved && savedDay === day.day ? "saved" : null}
+          onTyping={setTyping}
+          onChange={updateDay}
+          onSave={() => handleSaveDay(day.day)}
+        />
       ))}
 
       {showProblems && problems.length > 0 && (
@@ -315,11 +680,17 @@ function ProgramEditorForm({
         </ul>
       )}
 
+      <p className="muted">
+        {finishedBefore
+          ? "Saving a day keeps your work. Athletes keep the last finished week until you press Save program."
+          : "Saving a day keeps your work, even with days still empty. Save program checks the whole week, and then you can assign it."}
+      </p>
+
       <div className="program-full-editor-actions">
-        <button type="button" onClick={handleSave} disabled={saving}>
+        <button type="button" onClick={handleSave} disabled={busy}>
           {saving ? "Saving…" : "Save program"}
         </button>
-        <button type="button" className="ghost" onClick={onCancel} disabled={saving}>
+        <button type="button" className="ghost" onClick={handleCancel} disabled={busy}>
           Cancel
         </button>
       </div>
@@ -345,7 +716,8 @@ function ProgramSelect({
   return (
     <select aria-label={label} value={value ?? RECOMMENDED} onChange={(event) => onChange(event.target.value || null)}>
       <option value={RECOMMENDED}>{fallbackLabel}</option>
-      {programs.map((program) => (
+      {/* A program saved day by day but never finished can't be assigned yet. */}
+      {programs.filter((program) => isFinished(program) || program.id === value).map((program) => (
         <option key={program.id} value={program.id}>
           {program.name}
         </option>
@@ -416,6 +788,8 @@ export function CustomProgramPanel({ team }: { team: Team }) {
     groups,
     assignments,
     saveProgram,
+    saveDraft,
+    discardDraft,
     deleteProgram,
     createGroup,
     deleteGroup,
@@ -424,8 +798,18 @@ export function CustomProgramPanel({ team }: { team: Team }) {
   } = useCustomPrograms(team);
 
   const [editing, setEditing] = useState<Draft | null>(null);
+  // True when the open draft came from this browser's copy rather than the database.
+  const [pickedUp, setPickedUp] = useState(false);
   const [saving, setSaving] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
+  const storageKey = `nextrep:program-draft:${team.id}`;
+  // Unsaved work this browser kept from last time, offered as "Pick up where you left off".
+  const [leftOver, setLeftOver] = useState<LocalCopy | null>(null);
+
+  useEffect(() => {
+    // Read after mount: the server render has no localStorage.
+    if (!editing) setLeftOver(readLocalCopy(storageKey));
+  }, [editing, storageKey]);
 
   const teamProgramId = assignments.find((a) => a.scope === "team")?.programId ?? null;
   const programName = useMemo(() => new Map(programs.map((p) => [p.id, p.name])), [programs]);
@@ -454,7 +838,34 @@ export function CustomProgramPanel({ team }: { team: Team }) {
     setSaving(true);
     const id = await saveProgram(draft);
     setSaving(false);
-    if (id) setEditing(null);
+    if (id) {
+      clearLocalCopy(storageKey);
+      setEditing(null);
+    }
+  }
+
+  function startEditing(draft: Draft, fromThisBrowser = false) {
+    setPickedUp(fromThisBrowser);
+    setEditing(draft);
+  }
+
+  /** What the editor opens: the saved draft if there is one, else the finished week. */
+  function draftOf(program: CustomProgram): Draft {
+    return program.draft
+      ? { id: program.id, name: program.draft.name, days: program.draft.days }
+      : { id: program.id, name: program.name, days: program.days };
+  }
+
+  function pickUp(copy: LocalCopy) {
+    // The program may have been deleted since; then this saves as a new one.
+    const stillThere = copy.draft.id != null && programs.some((p) => p.id === copy.draft.id);
+    startEditing(stillThere ? copy.draft : { name: copy.draft.name, days: copy.draft.days }, true);
+  }
+
+  async function handleDiscardDraft(program: CustomProgram) {
+    if (window.confirm(`Discard the unfinished changes to "${program.name}"? Athletes keep the week they have now.`)) {
+      await discardDraft(program);
+    }
   }
 
   async function handleDelete(program: CustomProgram) {
@@ -466,14 +877,19 @@ export function CustomProgramPanel({ team }: { team: Team }) {
 
   if (editing) {
     const newestFirst = [...programs].sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
+    const saved = editing.id ? programs.find((p) => p.id === editing.id) : undefined;
     return (
       <section className="panel custom-program-panel">
         <h3>{editing.id ? `Edit ${editing.name}` : "New program"}</h3>
         <ProgramEditorForm
           initial={editing}
+          startsUnsaved={pickedUp}
+          finishedBefore={saved != null && isFinished(saved)}
+          storageKey={storageKey}
           savedPrograms={newestFirst}
           saving={saving}
           onSave={handleSave}
+          onSaveDraft={saveDraft}
           onCancel={() => setEditing(null)}
         />
         {error && <p className="muted">{error}</p>}
@@ -493,11 +909,34 @@ export function CustomProgramPanel({ team }: { team: Team }) {
 
       {error && <p className="program-guardrail-warning">{error}</p>}
 
+      {leftOver && (
+        <div className="custom-program-resume" role="status">
+          <p>
+            <strong>{leftOver.draft.name.trim() || "Your program"}</strong> has changes that weren&apos;t saved.
+          </p>
+          <div className="custom-program-row-controls">
+            <button type="button" onClick={() => pickUp(leftOver)}>
+              Pick up where you left off
+            </button>
+            <button
+              type="button"
+              className="ghost"
+              onClick={() => {
+                clearLocalCopy(storageKey);
+                setLeftOver(null);
+              }}
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="custom-program-new">
-        <button type="button" onClick={() => setEditing(programFromRecommended(week, "My program"))}>
+        <button type="button" onClick={() => startEditing(programFromRecommended(week, "My program"))}>
           <Plus size={14} /> Start from recommended
         </button>
-        <button type="button" className="ghost" onClick={() => setEditing(blankProgram("My program"))}>
+        <button type="button" className="ghost" onClick={() => startEditing(blankProgram("My program"))}>
           <Plus size={14} /> Start blank
         </button>
         <select
@@ -506,7 +945,7 @@ export function CustomProgramPanel({ team }: { team: Team }) {
           onChange={(e) => {
             const template = POSITION_PROGRAMS[e.target.value as StartingProgramKey];
             // A copy, so editing never changes the shared template.
-            if (template) setEditing(structuredClone(template.program));
+            if (template) startEditing(structuredClone(template.program));
           }}
         >
           <option value="">Start from a position template...</option>
@@ -521,11 +960,20 @@ export function CustomProgramPanel({ team }: { team: Team }) {
       {programs.length > 0 && (
         <ul className="custom-program-list">
           {programs.map((program) => {
-            const trainingDays = program.days.filter((day) => !day.rest);
+            const finished = isFinished(program);
+            // A program never finished has only its draft to show.
+            const shownDays = finished ? program.days : program.draft?.days ?? program.days;
+            const trainingDays = shownDays.filter((day) => !day.rest);
             return (
               <li key={program.id}>
                 <div>
                   <strong>{program.name}</strong>
+                  {!finished && <p className="custom-program-status">Not finished yet. Finish it to assign it.</p>}
+                  {finished && program.draft && (
+                    <p className="custom-program-status">
+                      Unfinished changes saved. Athletes see the last finished week.
+                    </p>
+                  )}
                   <p className="muted">
                     {trainingDays.length} training day{trainingDays.length === 1 ? "" : "s"}:{" "}
                     {trainingDays.map((day) => `${day.day.slice(0, 3)} ${day.title}`).join(" · ")}
@@ -535,15 +983,22 @@ export function CustomProgramPanel({ team }: { team: Team }) {
                     {trainingDays.map((day) => (
                       <p key={day.day} className="muted">
                         <strong>{day.day}:</strong>{" "}
-                        {day.exercises.map((exercise) => `${exercise.name} ${formatTarget(exercise)}`).join(", ")}
+                        {dayExercises(day)
+                          .map((exercise) => `${exercise.name} ${formatTarget(exercise)}`)
+                          .join(", ")}
                       </p>
                     ))}
                   </details>
                 </div>
                 <div className="custom-program-row-controls">
-                  <button type="button" className="ghost" onClick={() => setEditing(program)}>
-                    Edit
+                  <button type="button" className="ghost" onClick={() => startEditing(draftOf(program))}>
+                    {finished ? "Edit" : "Keep going"}
                   </button>
+                  {finished && program.draft && (
+                    <button type="button" className="ghost" onClick={() => handleDiscardDraft(program)}>
+                      Discard changes
+                    </button>
+                  )}
                   <button type="button" className="ghost danger-button" onClick={() => handleDelete(program)}>
                     Delete
                   </button>

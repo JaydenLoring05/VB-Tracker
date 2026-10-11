@@ -1,4 +1,4 @@
-import type { CustomProgram, ProgramDay, ProgramExercise } from "@/lib/customProgram";
+import { type CustomProgram, plainSections, type ProgramDay, type ProgramExercise } from "@/lib/customProgram";
 
 /**
  * Position-based starting programs: one repeating week per position group, in
@@ -29,10 +29,10 @@ const training = (day: string, title: string, notes: string, exercises: ProgramE
   notes,
   minutes: "45-60",
   rest: false,
-  exercises
+  sections: plainSections(exercises)
 });
 
-const rest = (day: string): ProgramDay => ({ day, title: "Rest", notes: "", minutes: "", rest: true, exercises: [] });
+const rest = (day: string): ProgramDay => ({ day, title: "Rest", notes: "", minutes: "", rest: true, sections: plainSections([]) });
 
 const recovery = (day: string): ProgramDay => ({
   day,
@@ -40,7 +40,7 @@ const recovery = (day: string): ProgramDay => ({
   notes: "Optional. Easy movement only.",
   minutes: "15-20",
   rest: true,
-  exercises: [hold("Full-Body Mobility Flow", 1, 600), hold("Foam Roll", 1, 300)]
+  sections: plainSections([hold("Full-Body Mobility Flow", 1, 600), hold("Foam Roll", 1, 300)])
 });
 
 function week(days: Partial<Record<string, ProgramDay>>): ProgramDay[] {
