@@ -14,6 +14,29 @@ export const PLAN_FILE_TYPES = ".csv,.tsv,.txt,.xlsx,.docx";
 
 export class PlanFileError extends Error {}
 
+/**
+ * A Google Sheets link the coach pasted, read through /api/import-sheet (the
+ * sheet must be shared as "Anyone with the link"). The CSV comes back to the
+ * browser and is read here like an uploaded file; nothing is stored.
+ */
+export async function readSheetLink(link: string): Promise<ImportedPlan> {
+  let response: Response;
+  try {
+    response = await fetch("/api/import-sheet", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ url: link.trim() })
+    });
+  } catch {
+    throw new PlanFileError("Couldn't reach NextRep. Check your connection and try again.");
+  }
+  const body = (await response.json().catch(() => null)) as { ok?: boolean; csv?: string; error?: string } | null;
+  if (!response.ok || !body?.ok || typeof body.csv !== "string") {
+    throw new PlanFileError(body?.error ?? "Couldn't read that sheet. Download it as .csv and upload the file.");
+  }
+  return readProgramSheet(parseCsv(body.csv));
+}
+
 /** Text a coach pasted: copied spreadsheet cells (tab-separated) or lines of exercises. */
 export function readPastedPlan(text: string): ImportedPlan {
   return text.includes("\t") ? readProgramSheet(parseTabs(text)) : parseProgramText(text);

@@ -243,8 +243,8 @@ function DayEditor({
               section={section}
               dayName={day.day}
               showName={showNames}
-              // An unnamed first list shows to athletes as "Main" (see programToWorkoutDays).
-              namePlaceholder={index === 0 ? "Main" : undefined}
+              // The first unnamed list shows to athletes as "Main" (see programToWorkoutDays).
+              namePlaceholder={index === parts.findIndex((part) => part.name.trim() === "") ? "Main" : undefined}
               remembered={remembered}
               onTyping={onTyping}
               onChange={(next) => replaceSection(section, next)}

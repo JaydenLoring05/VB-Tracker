@@ -12,7 +12,8 @@ import {
   WEEKDAYS,
   type Weekday
 } from "@/lib/customProgram";
-import { PLAN_FILE_TYPES, PlanFileError, readPastedPlan, readPlanFile } from "@/lib/planFiles";
+import { PLAN_FILE_TYPES, PlanFileError, readPastedPlan, readPlanFile, readSheetLink } from "@/lib/planFiles";
+import { isSheetLink } from "@/lib/sheetLink";
 
 const EXAMPLE = `Monday
 Back squat 3x8
@@ -57,17 +58,17 @@ export function ProgramImport({
     if (!empty && suggested) setName(suggested.slice(0, 80));
   }
 
-  async function readFile(file: File) {
+  /** Reads a file or a sheet link, which take a moment, showing the preview or what went wrong. */
+  async function readAsync(read: () => Promise<ImportedPlan>, from: string, fallbackName?: string) {
     setReading(true);
     setProblem(null);
     try {
-      // A program named after its file is easier to find later.
-      show(await readPlanFile(file), file.name, file.name.replace(/\.[a-z]+$/i, ""));
+      show(await read(), from, fallbackName);
     } catch (error) {
       setProblem(
         error instanceof PlanFileError
           ? error.message
-          : "Couldn't read that file. Save it as .csv, or copy the cells and paste them here."
+          : "Couldn't read that. Save it as .csv and upload it, or copy the cells and paste them here."
       );
     } finally {
       setReading(false);
@@ -76,13 +77,19 @@ export function ProgramImport({
     }
   }
 
+  function readText() {
+    // A Google Sheets link on its own is read from the sheet; anything else is the plan itself.
+    if (isSheetLink(text)) readAsync(() => readSheetLink(text), "that sheet");
+    else show(readPastedPlan(text), "what you pasted");
+  }
+
   if (!plan) {
     return (
       <div className="custom-program-import">
         <p className="muted">
           Paste your plan from a doc, a note or an email, or copy the cells from your spreadsheet. One exercise per
-          line, like &quot;Back squat 3x8&quot;, with a day name on its own line to start that day. Or upload the
-          file. You&apos;ll check everything before it&apos;s added.
+          line, like &quot;Back squat 3x8&quot;, with a day name on its own line to start that day. Or paste a Google
+          Sheets link, or upload the file. You&apos;ll check everything before it&apos;s added.
         </p>
         <textarea
           aria-label="Your plan"
@@ -98,7 +105,7 @@ export function ProgramImport({
         <div className="custom-program-import-actions">
           <button
             type="button"
-            onClick={() => show(readPastedPlan(text), "what you pasted")}
+            onClick={readText}
             disabled={!text.trim() || reading}
           >
             Read my plan
@@ -114,7 +121,8 @@ export function ProgramImport({
             hidden
             onChange={(event) => {
               const file = event.target.files?.[0];
-              if (file) readFile(file);
+              // A program named after its file is easier to find later.
+              if (file) readAsync(() => readPlanFile(file), file.name, file.name.split(".").slice(0, -1).join("."));
             }}
           />
           <button type="button" className="ghost" onClick={onCancel}>
@@ -174,7 +182,7 @@ export function ProgramImport({
         {missingReps > 0 &&
           ` ${missingReps} exercise${missingReps === 1 ? " has" : "s have"} no reps yet; ${
             missingReps === 1 ? "it's" : "they're"
-          } marked.`}
+          } marked. Fill ${missingReps === 1 ? "it" : "them"} here: an every-day one is filled once here, but on each day in the builder.`}
       </p>
 
       {plan.leftOut.length > 0 && (
