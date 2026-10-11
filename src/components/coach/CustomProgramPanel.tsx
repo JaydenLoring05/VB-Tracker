@@ -11,8 +11,11 @@ import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { TeamGroup, useCustomPrograms } from "@/hooks/useCustomPrograms";
 import { getExerciseMeasure } from "@/lib/exerciseMeasure";
 import {
+  applyWarmup,
   blankProgram,
   CustomProgram,
+  dayExercises,
+  dayWarmup,
   exerciseKey,
   formatTarget,
   hasStartingTargets,
@@ -24,6 +27,8 @@ import {
   ProgramDay,
   ProgramExercise,
   programFromRecommended,
+  ProgramSection,
+  programWarmup,
   validateProgram
 } from "@/lib/customProgram";
 import { RosterAthlete, Team } from "@/types";
@@ -152,6 +157,7 @@ function SectionEditor({
   section,
   dayName,
   showName,
+  namePlaceholder = "Section name, e.g. Abs",
   remembered,
   onTyping,
   onChange,
@@ -160,6 +166,8 @@ function SectionEditor({
   section: ProgramSection;
   dayName: string;
   showName: boolean;
+  /** What an empty name box shows: what athletes will see as its heading, or an example. */
+  namePlaceholder?: string;
   remembered: ProgramExercise[];
   onTyping: (name: string | null) => void;
   onChange: (next: ProgramSection) => void;
@@ -184,7 +192,7 @@ function SectionEditor({
         <div className="custom-program-section-header">
           <input
             aria-label={`Section name on ${dayName}`}
-            placeholder="Section name, e.g. Abs"
+            placeholder={namePlaceholder}
             value={section.name}
             // A section just added has no name yet: put the cursor there.
             autoFocus={section.name === "" && section.exercises.length === 0}
@@ -306,8 +314,10 @@ function DayEditor({
   /** Saves the whole program as it stands, without finishing it. */
   onSave: () => void;
 }) {
-  const warmup = dayWarmup(day);
-  const parts = day.sections.filter((section) => section !== warmup);
+  const stored = dayWarmup(day);
+  // A switched-off program warm-up is kept on the day but isn't this day's warm-up.
+  const warmup = stored?.off ? undefined : stored;
+  const parts = day.sections.filter((section) => section !== stored);
   // One plain list looks just like a day did before sections; names appear once there are two.
   const showNames = parts.length > 1 || parts.some((section) => section.name.trim() !== "");
 
@@ -434,6 +444,8 @@ function DayEditor({
               section={section}
               dayName={day.day}
               showName={showNames}
+              // An unnamed first list shows to athletes as "Main" (see programToWorkoutDays).
+              namePlaceholder={index === 0 ? "Main" : undefined}
               remembered={remembered}
               onTyping={onTyping}
               onChange={(next) => replaceSection(section, next)}
@@ -554,8 +566,34 @@ function ProgramEditorForm({
     if (unsaved) writeLocalCopy(storageKey, draft);
   }, [draft, unsaved, storageKey]);
 
+  // The warm-up written once for the program. Each training day carries a copy of it
+  // (see applyWarmup), so it's read back from the days rather than stored on its own.
+  const [warmup, setWarmup] = useState<ProgramSection>(() => {
+    const found = programWarmup(initial.days);
+    return { name: found?.name ?? "Warm-up", kind: "warmup", shared: true, exercises: found?.exercises ?? [] };
+  });
+  const [warmupEveryDay, setWarmupEveryDay] = useState(() => !programWarmup(initial.days)?.off);
+
   function updateDay(next: ProgramDay) {
-    setDraft((current) => ({ ...current, days: current.days.map((day) => (day.day === next.day ? next : day)) }));
+    // A day just made a training day, or one that dropped its own warm-up, picks up the program's.
+    setDraft((current) => ({
+      ...current,
+      days: applyWarmup(
+        current.days.map((day) => (day.day === next.day ? next : day)),
+        warmup,
+        warmupEveryDay
+      )
+    }));
+  }
+
+  function updateWarmup(next: ProgramSection) {
+    setWarmup(next);
+    setDraft((current) => ({ ...current, days: applyWarmup(current.days, next, warmupEveryDay) }));
+  }
+
+  function updateWarmupEveryDay(everyDay: boolean) {
+    setWarmupEveryDay(everyDay);
+    setDraft((current) => ({ ...current, days: applyWarmup(current.days, warmup, everyDay) }));
   }
 
   async function handleSaveDay(dayName: string) {
@@ -612,10 +650,20 @@ function ProgramEditorForm({
         suggestions next time, and picking one brings back its sets and reps.
       </p>
 
+      <WarmupEditor
+        warmup={warmup}
+        everyDay={warmupEveryDay}
+        remembered={remembered}
+        onTyping={setTyping}
+        onChange={updateWarmup}
+        onEveryDayChange={updateWarmupEveryDay}
+      />
+
       {draft.days.map((day) => (
         <DayEditor
           key={day.day}
           day={day}
+          hasProgramWarmup={warmupEveryDay && warmup.exercises.length > 0}
           remembered={remembered}
           saveState={savingDay === day.day ? "saving" : !unsaved && savedDay === day.day ? "saved" : null}
           onTyping={setTyping}
@@ -935,7 +983,9 @@ export function CustomProgramPanel({ team }: { team: Team }) {
                     {trainingDays.map((day) => (
                       <p key={day.day} className="muted">
                         <strong>{day.day}:</strong>{" "}
-                        {day.exercises.map((exercise) => `${exercise.name} ${formatTarget(exercise)}`).join(", ")}
+                        {dayExercises(day)
+                          .map((exercise) => `${exercise.name} ${formatTarget(exercise)}`)
+                          .join(", ")}
                       </p>
                     ))}
                   </details>

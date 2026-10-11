@@ -36,6 +36,12 @@ export type ProgramSection = {
    * itself; an empty one means "no warm-up on this day".
    */
   shared?: boolean;
+  /**
+   * On a shared warm-up: the coach switched "On every training day" off. The
+   * copy is kept so switching it back on brings the warm-up back, but nobody
+   * trains from it: athletes, validation and the stored flat list skip it.
+   */
+  off?: boolean;
   exercises: ProgramExercise[];
 };
 
@@ -124,9 +130,14 @@ export function newProgramExercise(name: string): ProgramExercise {
     : { name, sets: 3, reps: "8", seconds: null };
 }
 
+/** The sections athletes do, in order: everything but a switched-off warm-up. */
+export function liveSections(day: Pick<ProgramDay, "sections">): ProgramSection[] {
+  return day.sections.filter((section) => !section.off);
+}
+
 /** A day's exercises in the order athletes do them, every section in turn. */
 export function dayExercises(day: Pick<ProgramDay, "sections">): ProgramExercise[] {
-  return day.sections.flatMap((section) => section.exercises);
+  return liveSections(day).flatMap((section) => section.exercises);
 }
 
 /** A day's sections, as one plain unnamed list holding these exercises. */
@@ -157,19 +168,27 @@ export function programWarmup(days: ProgramDay[]): ProgramSection | null {
 }
 
 /**
- * Puts the program's warm-up first on each training day (everyDay) or takes
- * it off every day. A day that changed its warm-up for itself keeps its own,
- * including an empty one, which means "no warm-up on this day". Rest days
- * never carry the shared warm-up. An empty warm-up isn't added anywhere.
+ * Puts the program's warm-up first on each training day. With everyDay
+ * false the copies stay but are switched off, so the coach's warm-up is kept
+ * for later and athletes don't see it. A day that changed its warm-up for
+ * itself keeps its own, including an empty one, which means "no warm-up on
+ * this day". Rest days never carry the shared warm-up, and an empty warm-up
+ * isn't added anywhere.
  */
 export function applyWarmup(days: ProgramDay[], warmup: ProgramSection | null, everyDay: boolean): ProgramDay[] {
-  const use = everyDay && warmup != null && warmup.exercises.length > 0;
+  const use = warmup != null && warmup.exercises.length > 0;
   return days.map((day) => {
     const own = dayWarmup(day);
     if (own && !own.shared) return day;
     const rest = day.sections.filter((section) => section !== own);
     if (!use || day.rest) return own ? { ...day, sections: rest } : day;
-    const copy: ProgramSection = { name: warmup.name, kind: "warmup", shared: true, exercises: warmup.exercises };
+    const copy: ProgramSection = {
+      name: warmup.name,
+      kind: "warmup",
+      shared: true,
+      ...(everyDay ? {} : { off: true }),
+      exercises: warmup.exercises
+    };
     return { ...day, sections: [copy, ...rest] };
   });
 }
@@ -233,7 +252,7 @@ export function programToWorkoutDays(program: Pick<CustomProgram, "days">): Work
     if (!day) {
       return { day: weekday, title: "Rest", minutes: "", notes: "", rest: true, exercises: [], targets: {} };
     }
-    const sections: WorkoutSection[] = day.sections
+    const sections: WorkoutSection[] = liveSections(day)
       .map((section) => ({
         heading: sectionHeading(section),
         ...(section.kind ? { kind: section.kind } : {}),
@@ -241,6 +260,12 @@ export function programToWorkoutDays(program: Pick<CustomProgram, "days">): Work
       }))
       // An empty section (a skipped warm-up, a heading with nothing under it) shows nothing.
       .filter((section) => section.exercises.length > 0);
+    // Once anything on the day has a heading, an unnamed list needs one too, or it reads
+    // as part of the section above it (the lifts under "Warm-up").
+    const headed = sections.some((section) => section.heading !== "");
+    const named = headed
+      ? sections.map((section) => (section.heading === "" ? { ...section, heading: "Main" } : section))
+      : sections;
     const exercises = dayExercises(day).filter((exercise) => exercise.name.trim() !== "");
     return {
       day: weekday,
@@ -251,7 +276,7 @@ export function programToWorkoutDays(program: Pick<CustomProgram, "days">): Work
       exercises: exercises.map((exercise) => exercise.name),
       targets: Object.fromEntries(exercises.map((exercise) => [exercise.name, formatTarget(exercise)])),
       // Only days with a heading to show carry sections, so plain days render exactly as before.
-      ...(sections.some((section) => section.heading !== "") ? { sections } : {})
+      ...(headed ? { sections: named } : {})
     };
   });
 }
@@ -391,6 +416,7 @@ function parseSections(day: Record<string, unknown>): ProgramSection[] {
         name: String(section.name ?? ""),
         ...(kind ? { kind } : {}),
         ...(section.shared === true ? { shared: true } : {}),
+        ...(section.off === true ? { off: true } : {}),
         exercises: parseExercises(section.exercises)
       };
     });

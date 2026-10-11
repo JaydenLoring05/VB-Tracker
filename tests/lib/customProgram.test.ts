@@ -369,6 +369,15 @@ describe("sections in a day", () => {
     expect(sectionAt(workout, 3)).toBeUndefined();
   });
 
+  it("heads an unnamed list 'Main' once the day has other headings, so lifts don't read as warm-up", () => {
+    const monday = trainingDay("Monday", [
+      { name: "Warm-up", kind: "warmup", shared: true, exercises: [skips] },
+      { name: "", exercises: [squat] },
+      { name: "Abs", exercises: [plank] }
+    ]);
+    expect(programToWorkoutDays({ days: [monday] })[0].sections?.map((s) => s.heading)).toEqual(["Warm-up", "Main", "Abs"]);
+  });
+
   it("keeps headings when an athlete swaps an exercise", () => {
     const [monday] = programToWorkoutDays({ days: [trainingDay("Monday", [{ name: "Lifts", exercises: [squat] }])] });
     const team: TeamOverrideData = {
@@ -415,10 +424,18 @@ describe("sections in a day", () => {
       expect(days.filter((d) => !d.rest).map((d) => dayWarmup(d)?.exercises.length)).toEqual([2, 2]);
     });
 
-    it("comes off every day when switched off", () => {
-      const days = applyWarmup(applyWarmup(week, warmup, true), warmup, false);
-      expect(days.every((d) => dayWarmup(d) === undefined)).toBe(true);
-      expect(programWarmup(days)).toBeNull();
+    it("switched off: athletes don't get it, but it's kept and comes back when switched on", () => {
+      const off = applyWarmup(applyWarmup(week, warmup, true), warmup, false);
+      expect(programToWorkoutDays({ days: off }).map((d) => d.exercises)).toEqual(
+        programToWorkoutDays({ days: week }).map((d) => d.exercises)
+      );
+      expect(validateProgram({ name: "P", days: off.slice(0, 2) })).toEqual([]);
+      const stored = JSON.parse(JSON.stringify(storedProgramDays(off, null)));
+      expect(stored[0].exercises.map((e: { name: string }) => e.name)).toEqual(["Back Squat"]);
+      const reread = parseProgramDays(stored);
+      expect(programWarmup(reread)).toMatchObject({ off: true, exercises: [skips] });
+      const backOn = applyWarmup(reread, programWarmup(reread), true);
+      expect(programToWorkoutDays({ days: backOn })[0].exercises).toEqual(["A-Skips", "Back Squat"]);
     });
 
     it("leaves a day's own warm-up alone, including an empty one that skips it", () => {

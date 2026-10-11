@@ -786,6 +786,54 @@ html:has(dialog[open]) {
   width: auto;
 }
 
+/* Sections inside a day (F-23). */
+.custom-program-section + .custom-program-section {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-2);
+  border-top: 1px dashed var(--border);
+}
+
+.custom-program-section-header {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.custom-program-section-header input {
+  flex: 1;
+  font-weight: 700;
+}
+
+.custom-program-section-header button,
+.custom-program-warmup-line button,
+.custom-program-add-section,
+.custom-program-add-warmup {
+  width: auto;
+}
+
+.custom-program-add-section {
+  margin-top: var(--sp-2);
+}
+
+.custom-program-add-warmup {
+  margin-top: var(--sp-3);
+}
+
+.custom-program-warmup-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0;
+}
+
+.custom-program-own-warmup {
+  margin-bottom: var(--sp-3);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px dashed var(--border);
+}
+
 .custom-program-resume {
   margin: 0 0 var(--sp-3);
   padding: var(--sp-3);

@@ -110,7 +110,8 @@ export function useCustomPrograms(team: Team) {
     const payload = {
       team_id: team.id,
       name: program.name.trim(),
-      days: program.days,
+      // Finishing drops any draft and stores each day with the flat list older readers use.
+      days: storedProgramDays(program.days, null),
       updated_at: new Date().toISOString()
     };
 
