@@ -1,9 +1,9 @@
 "use client";
 
 import { ChevronDown, ChevronRight, Repeat } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
-import { getExerciseTarget } from "@/lib/customProgram";
+import { getExerciseTarget, headingsByIndex } from "@/lib/customProgram";
 import { useExerciseLibrary } from "@/hooks/useExerciseLibrary";
 import { getSubstitutionCandidates, useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { useWorkoutLogs } from "@/hooks/useWorkoutLogs";
@@ -23,6 +23,8 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
   const [expanded, setExpanded] = useState(isToday);
 
   const noteKey = `${week}-${day.day}-notes`;
+  // Coach-built days split into headed sections (warm-up, lifts, abs).
+  const headings = headingsByIndex(day);
 
   const resolvedExercises = day.exercises.map(resolveExercise);
   const completedCount = resolvedExercises.filter(
@@ -66,7 +68,7 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
       <h4>{day.title}</h4>
       <p className="muted">⏱ {day.minutes}</p>
 
-      {day.exercises.map((originalExercise) => {
+      {day.exercises.map((originalExercise, index) => {
         const exercise = resolveExercise(originalExercise);
         const isSubstituted = exercise !== originalExercise;
         const key = `${week}-${day.day}-${exercise}`;
@@ -74,75 +76,80 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
         const candidates = getSubstitutionCandidates(originalExercise);
         const swapOpen = swapOpenFor === originalExercise;
 
+        const heading = headings.get(index);
+
         return (
-          <div key={originalExercise} className="exercise-log-block">
-            <label className="exercise-row">
-              <input
-                type="checkbox"
-                checked={Boolean(checked[key])}
-                onChange={() => toggleExercise(day.day, exercise)}
-              />
+          <Fragment key={originalExercise}>
+            {heading && <h5 className="micro day-section-heading">{heading.heading}</h5>}
+            <div className="exercise-log-block">
+              <label className="exercise-row">
+                <input
+                  type="checkbox"
+                  checked={Boolean(checked[key])}
+                  onChange={() => toggleExercise(day.day, exercise)}
+                />
 
-              <span>
-                <button
-                  type="button"
-                  className="exercise-name-button"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    openExerciseFromWorkout(exercise);
-                  }}
-                >
-                  {exercise}
-                </button>
-                : {getExerciseTarget(day, week, exercise)}
-                {isSubstituted && <span className="substituted-badge">swapped</span>}
-              </span>
+                <span>
+                  <button
+                    type="button"
+                    className="exercise-name-button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      openExerciseFromWorkout(exercise);
+                    }}
+                  >
+                    {exercise}
+                  </button>
+                  : {getExerciseTarget(day, week, exercise)}
+                  {isSubstituted && <span className="substituted-badge">swapped</span>}
+                </span>
 
-              {candidates.length > 0 && (
-                <button
-                  type="button"
-                  className="ghost swap-toggle"
-                  aria-label={`Swap ${originalExercise}`}
-                  onClick={() => setSwapOpenFor(swapOpen ? null : originalExercise)}
-                >
-                  <Repeat size={14} aria-hidden="true" />
-                </button>
+                {candidates.length > 0 && (
+                  <button
+                    type="button"
+                    className="ghost swap-toggle"
+                    aria-label={`Swap ${originalExercise}`}
+                    onClick={() => setSwapOpenFor(swapOpen ? null : originalExercise)}
+                  >
+                    <Repeat size={14} aria-hidden="true" />
+                  </button>
+                )}
+              </label>
+
+              {swapOpen && (
+                <div className="swap-picker">
+                  <select
+                    aria-label={`Swap ${originalExercise} for another exercise`}
+                    value={exercise}
+                    onChange={(event) => {
+                      const chosen = event.target.value;
+                      if (chosen === originalExercise) {
+                        clearSubstitution(originalExercise);
+                      } else {
+                        setSubstitution(originalExercise, chosen);
+                      }
+                      setSwapOpenFor(null);
+                    }}
+                  >
+                    <option value={originalExercise}>{originalExercise} (default)</option>
+                    {candidates.map((candidate) => (
+                      <option key={candidate.name} value={candidate.name}>
+                        {candidate.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               )}
-            </label>
 
-            {swapOpen && (
-              <div className="swap-picker">
-                <select
-                  aria-label={`Swap ${originalExercise} for another exercise`}
-                  value={exercise}
-                  onChange={(event) => {
-                    const chosen = event.target.value;
-                    if (chosen === originalExercise) {
-                      clearSubstitution(originalExercise);
-                    } else {
-                      setSubstitution(originalExercise, chosen);
-                    }
-                    setSwapOpenFor(null);
-                  }}
-                >
-                  <option value={originalExercise}>{originalExercise} (default)</option>
-                  {candidates.map((candidate) => (
-                    <option key={candidate.name} value={candidate.name}>
-                      {candidate.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <input
-              className="exercise-log-input"
-              aria-label={`Log for ${exercise}`}
-              value={workoutLogs[logKey] || ""}
-              onChange={(event) => updateWorkoutLog(day.day, exercise, event.target.value)}
-              placeholder="Log: weight x reps, jump height, pain level, speed..."
-            />
-          </div>
+              <input
+                className="exercise-log-input"
+                aria-label={`Log for ${exercise}`}
+                value={workoutLogs[logKey] || ""}
+                onChange={(event) => updateWorkoutLog(day.day, exercise, event.target.value)}
+                placeholder="Log: weight x reps, jump height, pain level, speed..."
+              />
+            </div>
+          </Fragment>
         );
       })}
 
