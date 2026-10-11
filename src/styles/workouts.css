@@ -241,3 +241,8 @@
   gap: var(--sp-2);
   margin: var(--sp-2) 0 var(--sp-4);
 }
+
+/* Section headings on a coach-built day (Warm-up, Lifts, Abs). */
+.day-section-heading {
+  margin: var(--sp-3) 0 var(--sp-1);
+}

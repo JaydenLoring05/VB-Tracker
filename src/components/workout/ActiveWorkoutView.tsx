@@ -8,7 +8,7 @@ import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
 import { getExercise } from "@/data/exercises";
 import { getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
-import { getExerciseTarget } from "@/lib/customProgram";
+import { getExerciseTarget, sectionAt } from "@/lib/customProgram";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
@@ -248,6 +248,10 @@ export function WorkoutModeView({
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
   const lastTime = previousSets[exercise];
   const cues = getExercise(originalExercise)?.cues ?? [];
+  // Coach-built days name their sections (Warm-up, Lifts, Abs); show which one this exercise is in.
+  const section = sectionAt(day, exerciseIndex);
+  // A coach who wrote a warm-up for this day replaces the standard one.
+  const coachWarmup = day.sections?.some((s) => s.kind === "warmup") ?? false;
   const prescription = getExerciseTarget(day, session.week, exercise);
   const isTimed = getExerciseMeasure(exercise) === "time";
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
@@ -343,19 +347,21 @@ export function WorkoutModeView({
         <div className="workout-elapsed">{formatDuration(elapsedSeconds)}</div>
       </div>
 
-      <div className="panel workout-warm-up">
-        <button type="button" className="ghost warm-up-toggle" onClick={() => setShowWarmUp((current) => !current)}>
-          {showWarmUp ? "Hide warm-up" : "Show warm-up"}
-        </button>
+      {!coachWarmup && (
+        <div className="panel workout-warm-up">
+          <button type="button" className="ghost warm-up-toggle" onClick={() => setShowWarmUp((current) => !current)}>
+            {showWarmUp ? "Hide warm-up" : "Show warm-up"}
+          </button>
 
-        {showWarmUp && (
-          <ul className="warm-up-list">
-            {STANDARD_WARM_UP.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ul>
-        )}
-      </div>
+          {showWarmUp && (
+            <ul className="warm-up-list">
+              {STANDARD_WARM_UP.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       <div className="exercise-dots">
         {resolvedExercises.map((name, index) => (
@@ -374,6 +380,7 @@ export function WorkoutModeView({
       </div>
 
       <div className="panel">
+        {section?.heading && <p className="micro">{section.heading}</p>}
         <h3>{exercise}</h3>
         <p className="muted">Target: {prescription}</p>
         {lastTime && <p className="muted last-time">Last time: {formatSetValue(lastTime)}</p>}

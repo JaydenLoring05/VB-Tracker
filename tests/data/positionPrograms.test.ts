@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { getExercise } from "@/data/exercises";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
-import { WEEKDAYS, validateProgram } from "@/lib/customProgram";
+import { dayExercises, WEEKDAYS, validateProgram } from "@/lib/customProgram";
 import { getExerciseMeasure } from "@/lib/exerciseMeasure";
 
 describe("position starting programs", () => {
@@ -28,7 +28,7 @@ describe("position starting programs", () => {
 
       it("only uses exercises from the library, timed ones with seconds and rep ones with reps", () => {
         for (const day of template.program.days) {
-          for (const exercise of day.exercises) {
+          for (const exercise of dayExercises(day)) {
             expect(getExercise(exercise.name), `${key} ${day.day} ${exercise.name}`).toBeDefined();
             const timed = getExerciseMeasure(exercise.name) === "time";
             expect(exercise.seconds != null, `${exercise.name} timed`).toBe(timed);
