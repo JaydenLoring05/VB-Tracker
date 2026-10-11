@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getWorkoutDays } from "@/data/workoutPlan";
-import type { ProgramDay } from "@/lib/customProgram";
+import { plainSections, type ProgramDay } from "@/lib/customProgram";
 import { missedAssignedWorkouts } from "@/lib/missedWorkouts";
 
 const day = (name: string, rest: boolean): ProgramDay => ({
@@ -10,7 +10,7 @@ const day = (name: string, rest: boolean): ProgramDay => ({
   notes: "",
   minutes: "",
   rest,
-  exercises: rest ? [] : [{ name: "Box Jumps", sets: 3, reps: "5", seconds: null }]
+  sections: plainSections(rest ? [] : [{ name: "Box Jumps", sets: 3, reps: "5", seconds: null }])
 });
 
 describe("missedAssignedWorkouts", () => {

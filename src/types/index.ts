@@ -33,6 +33,22 @@ export type WorkoutDay = {
   exercises: string[];
   /** Coach-set targets per exercise ("3x8", "3x45 sec"). Only on coach-built programs. */
   targets?: Record<string, string>;
+  /**
+   * How `exercises` splits into headed parts (warm-up, lifts, abs), in order.
+   * Only on coach-built days with at least one named section; `exercises`
+   * stays the full flat list.
+   */
+  sections?: WorkoutSection[];
+};
+
+/** What kind of section a coach-built day part is. No kind is a plain list. */
+export type SectionKind = "warmup";
+
+export type WorkoutSection = {
+  /** Heading shown to athletes; empty for a plain unnamed list. */
+  heading: string;
+  kind?: SectionKind;
+  exercises: string[];
 };
 
 export type StatEntry = {
