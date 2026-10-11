@@ -76,19 +76,34 @@ describe("parseProgramText", () => {
     expect(plan.days[0].day).toBe("Monday");
   });
 
+  it("reads a first line with no target, before any day, as the plan's title", () => {
+    const plan = parseProgramText("Fall plan\nTuesday - Speed\nSprint starts 6x20 yd\nFriday\nHang clean 4x3");
+    expect(plan.title).toBe("Fall plan");
+    expect(plan.everyDay).toEqual([]);
+    expect(plan.days.map((d) => d.day)).toEqual(["Tuesday", "Friday"]);
+    // A first line that is an exercise or a heading isn't a title.
+    expect(parseProgramText("Warm-up:\nSkips 2x20\nMonday\nSquat 3x5").title).toBeUndefined();
+    expect(parseProgramText("Jump rope 3x1 min\nMonday\nSquat 3x5").title).toBeUndefined();
+  });
+
   it("reads 'Day 2' as the second weekday", () => {
     expect(parseProgramText("Day 1\nSquat 3x5\nDay 2\nBench 3x5").days.map((d) => d.day)).toEqual(["Monday", "Tuesday"]);
   });
 
-  it("names sections, and puts lines before the first day on every day, warm-ups first", () => {
+  it("keeps lines before the first day once, for every day, and copies them on: warm-ups first", () => {
     const plan = parseProgramText(
       ["Warm-up:", "A-Skips 2x20", "Abs:", "Dead Bug 3x10", "Monday", "Back squat 3x8", "Thursday", "Bench 3x8"].join("\n")
     );
-    for (const day of plan.days) {
+    // Held once, so a coach fixes a warm-up row once, not on every day.
+    expect(plan.everyDay.map((s) => s.name)).toEqual(["Warm-up", "Abs"]);
+    expect(plan.days.map((d) => d.sections.map((s) => s.name))).toEqual([[""], [""]]);
+
+    const days = programFromImport(plan).days.filter((d) => !d.rest);
+    for (const day of days) {
       expect(day.sections.map((s) => s.name)).toEqual(["Warm-up", "", "Abs"]);
     }
-    // Copies, so editing Monday's warm-up in the preview doesn't change Thursday's.
-    expect(plan.days[0].sections[0]).not.toBe(plan.days[1].sections[0]);
+    // Copies, so editing Monday's warm-up in the builder doesn't change Thursday's.
+    expect(days[0].sections[0]).not.toBe(days[1].sections[0]);
   });
 
   it("keeps a note with the exercise above it", () => {

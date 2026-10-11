@@ -539,11 +539,19 @@ function cleanName(text: string): string {
 
 /** What reading a plan found: the days to fill, the notes beside exercises, and what it left out. */
 export type ImportedPlan = {
+  /** Each training day with its own work. */
   days: ProgramDay[];
-  /** Notes found next to exercises, by weekday then exercise name. */
-  notes: Partial<Record<Weekday, Record<string, string>>>;
+  /**
+   * Sections for every training day (warm-ups, abs), kept once so the coach
+   * fixes them once; programFromImport puts a copy on each day.
+   */
+  everyDay: ProgramSection[];
+  /** Notes found next to exercises, by weekday (or "every day") then exercise name. */
+  notes: ImportNotes;
   /** Things the reader saw but didn't bring in, in words for the coach. */
   leftOut: string[];
+  /** The plan's own title ("Fall plan"), when it starts with one: a name to suggest. */
+  title?: string;
 };
 
 /** Where an imported day's parts are collected before they become ProgramDays. */
@@ -567,9 +575,10 @@ function readDayLine(line: string): { day: Weekday; title: string } | null {
 /** Notes found on every-day exercises are filed under this key, then copied to each day. */
 const EVERY_DAY = "every day";
 
-type NoteBook = Record<string, Record<string, string>>;
+/** Notes found beside exercises, by weekday (or "every day") then exercise name. */
+export type ImportNotes = Record<string, Record<string, string>>;
 
-function addNote(notes: NoteBook, day: Weekday | null, exercise: string, note: string) {
+export function addImportNote(notes: ImportNotes, day: Weekday | null, exercise: string, note: string) {
   const key = day ?? EVERY_DAY;
   notes[key] = notes[key] ?? {};
   notes[key][exercise] = notes[key][exercise] ? `${notes[key][exercise]} ${note.trim()}` : note.trim();
@@ -588,9 +597,16 @@ export function parseProgramText(text: string): ImportedPlan {
     .map((line) => line.trim())
     .filter((line) => line !== "");
   const hasDays = lines.some((line) => readDayLine(line) != null);
+  // A doc or note often starts with its title ("Fall plan"): a first line before any day,
+  // with no target and no colon, names the plan rather than being an exercise.
+  const first = lines[0];
+  const title =
+    hasDays && first && !readDayLine(first) && !readTarget(first) && !readLabel(first) && !/^(\*|note:)/i.test(first)
+      ? lines.shift()
+      : undefined;
   const everyDay: ProgramSection[] = [];
   const byDay: ImportedDays = new Map();
-  const notes: NoteBook = {};
+  const notes: ImportNotes = {};
   const leftOut: string[] = [];
   let day: Weekday | null = null;
   let sections = everyDay;
@@ -609,7 +625,7 @@ export function parseProgramText(text: string): ImportedPlan {
 
     const note = line.match(/^(?:\*+|note:)\s*(.+)$/i);
     if (note) {
-      if (last) addNote(notes, day, last, note[1]);
+      if (last) addImportNote(notes, day, last, note[1]);
       else leftOut.push(`A note with no exercise above it: "${note[1]}"`);
       continue;
     }
@@ -624,11 +640,12 @@ export function parseProgramText(text: string): ImportedPlan {
     if (sections.length === 0) sections.push({ name: "", exercises: [] });
     sections[sections.length - 1].exercises.push(exercise);
     last = exercise.name;
-    if (exerciseNote) addNote(notes, day, exercise.name, exerciseNote);
+    if (exerciseNote) addImportNote(notes, day, exercise.name, exerciseNote);
   }
 
   if (!hasDays) byDay.set("Monday", { title: "", sections: everyDay.splice(0) });
-  return { days: planDays(byDay, everyDay, notes), notes, leftOut };
+  const plan = importedPlan(byDay, everyDay, notes, leftOut);
+  return title ? { ...plan, title } : plan;
 }
 
 /** A warm-up-ish heading goes before the day's own work; anything else (abs, cool-down) after. */
@@ -637,48 +654,57 @@ function isWarmupName(name: string): boolean {
 }
 
 /**
- * The imported days in weekday order, each with the every-day sections put
- * around its own work: warm-ups first, the rest after. Notes on every-day
- * exercises are copied to each day. Days with nothing in them are dropped.
+ * The plan as read: the days that have their own work, in weekday order, and
+ * the every-day sections. Empty sections are dropped.
  */
-export function planDays(byDay: ImportedDays, everyDay: ProgramSection[], notes: NoteBook): ProgramDay[] {
+export function importedPlan(
+  byDay: ImportedDays,
+  everyDay: ProgramSection[],
+  notes: ImportNotes,
+  leftOut: string[]
+): ImportedPlan {
   const filled = (sections: ProgramSection[]) => sections.filter((section) => section.exercises.length > 0);
-  const copy = (sections: ProgramSection[]) =>
-    sections.map((section) => ({ ...section, exercises: section.exercises.map((exercise) => ({ ...exercise })) }));
-  const before = filled(everyDay).filter((section) => isWarmupName(section.name));
-  const after = filled(everyDay).filter((section) => !isWarmupName(section.name));
+  const days = WEEKDAYS.filter((weekday) => filled(byDay.get(weekday)?.sections ?? []).length > 0).map((weekday) => ({
+    day: weekday,
+    title: byDay.get(weekday)!.title,
+    notes: "",
+    minutes: "",
+    rest: false,
+    sections: filled(byDay.get(weekday)!.sections)
+  }));
+  return { days, everyDay: filled(everyDay), notes, leftOut };
+}
 
-  return WEEKDAYS.filter((weekday) => filled(byDay.get(weekday)?.sections ?? []).length > 0).map((weekday) => {
-    const entry = byDay.get(weekday)!;
-    if (notes[EVERY_DAY]) notes[weekday] = { ...notes[EVERY_DAY], ...notes[weekday] };
-    return {
-      day: weekday,
-      title: entry.title,
-      notes: "",
-      minutes: "",
-      rest: false,
-      sections: [...copy(before), ...filled(entry.sections), ...copy(after)]
-    };
-  });
+/** Notes for one imported day: the every-day ones, then its own. */
+export function importedDayNotes(plan: Pick<ImportedPlan, "notes">, weekday: string): [string, string][] {
+  return Object.entries({ ...plan.notes[EVERY_DAY], ...plan.notes[weekday] });
 }
 
 /**
  * A program from an imported plan, ready to open in the builder: the imported
- * days as training days, every other day rest. Each exercise's note goes in
- * its day's notes ("Depth Jumps: land on the balls of your feet").
+ * days as training days, every other day rest. Each day gets its own copy of
+ * the every-day sections, warm-ups before its work and the rest (abs) after.
+ * Each exercise's note goes in its day's notes ("Depth Jumps: land on the
+ * balls of your feet").
  */
 export function programFromImport(plan: ImportedPlan, name = "My program"): Omit<CustomProgram, "id"> {
+  const copy = (sections: ProgramSection[]) =>
+    sections.map((section) => ({ ...section, exercises: section.exercises.map((exercise) => ({ ...exercise })) }));
+  const before = plan.everyDay.filter((section) => isWarmupName(section.name));
+  const after = plan.everyDay.filter((section) => !isWarmupName(section.name));
+
   return {
     name,
     days: WEEKDAYS.map((weekday) => {
       const day = plan.days.find((d) => d.day === weekday);
       if (!day) return { day: weekday, title: "Rest", notes: "", minutes: "", rest: true, sections: plainSections([]) };
-      const dayNotes = Object.entries(plan.notes[weekday] ?? {}).map(([exercise, note]) => `${exercise}: ${note}`);
+      const dayNotes = importedDayNotes(plan, weekday).map(([exercise, note]) => `${exercise}: ${note}`);
       return {
         ...day,
         title: day.title || "Training",
         minutes: day.minutes || "45-60",
-        notes: [day.notes, ...dayNotes].filter(Boolean).join("\n")
+        notes: [day.notes, ...dayNotes].filter(Boolean).join("\n"),
+        sections: [...copy(before), ...day.sections, ...copy(after)]
       };
     })
   };

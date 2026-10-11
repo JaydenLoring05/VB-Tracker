@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { ExerciseSuggestions, SectionEditor } from "@/components/coach/ProgramSectionEditor";
 import {
   CustomProgram,
   dayExercises,
   ImportedPlan,
-  parseProgramText,
   ProgramDay,
   ProgramExercise,
   programFromImport,
+  ProgramSection,
   WEEKDAYS,
   type Weekday
 } from "@/lib/customProgram";
+import { PLAN_FILE_TYPES, PlanFileError, readPastedPlan, readPlanFile } from "@/lib/planFiles";
 
 const EXAMPLE = `Monday
 Back squat 3x8
@@ -24,8 +25,9 @@ Abs:
 Dead bug 3x10`;
 
 /**
- * Bring in a plan the coach already has: paste it, read it, check and fix
- * the preview, then open it in the builder. Nothing is saved or added until
+ * Bring in a plan the coach already has: paste it (lines, or cells copied
+ * from a sheet) or pick a file, check and fix the preview, then open it in
+ * the builder. Files are read in the browser and never uploaded. Nothing is saved or added until
  * the coach presses "Use this plan", and even then it's an unsaved program.
  */
 export function ProgramImport({
@@ -41,21 +43,46 @@ export function ProgramImport({
   const [text, setText] = useState("");
   const [plan, setPlan] = useState<ImportedPlan | null>(null);
   const [name, setName] = useState("My program");
-  const [nothingFound, setNothingFound] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
+  const [reading, setReading] = useState(false);
   const [typing, setTyping] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
 
-  function read(source: string) {
-    const found = parseProgramText(source);
-    setNothingFound(found.days.length === 0);
-    setPlan(found.days.length > 0 ? found : null);
+  /** fallbackName: what to call the program when the plan has no title of its own. */
+  function show(found: ImportedPlan, from: string, fallbackName?: string) {
+    const empty = found.days.length === 0;
+    setProblem(empty ? `No exercises found in ${from}. Put one exercise on each line, like "Back squat 3x8".` : null);
+    setPlan(empty ? null : found);
+    const suggested = found.title ?? fallbackName;
+    if (!empty && suggested) setName(suggested.slice(0, 80));
+  }
+
+  async function readFile(file: File) {
+    setReading(true);
+    setProblem(null);
+    try {
+      // A program named after its file is easier to find later.
+      show(await readPlanFile(file), file.name, file.name.replace(/\.[a-z]+$/i, ""));
+    } catch (error) {
+      setProblem(
+        error instanceof PlanFileError
+          ? error.message
+          : "Couldn't read that file. Save it as .csv, or copy the cells and paste them here."
+      );
+    } finally {
+      setReading(false);
+      // Lets the same file be picked again after fixing it.
+      if (fileInput.current) fileInput.current.value = "";
+    }
   }
 
   if (!plan) {
     return (
       <div className="custom-program-import">
         <p className="muted">
-          Paste your plan from a doc, a note or an email. One exercise per line, like &quot;Back squat 3x8&quot;. Put
-          a day name on its own line to start that day. You&apos;ll check everything before it&apos;s added.
+          Paste your plan from a doc, a note or an email, or copy the cells from your spreadsheet. One exercise per
+          line, like &quot;Back squat 3x8&quot;, with a day name on its own line to start that day. Or upload the
+          file. You&apos;ll check everything before it&apos;s added.
         </p>
         <textarea
           aria-label="Your plan"
@@ -63,15 +90,33 @@ export function ProgramImport({
           value={text}
           onChange={(event) => setText(event.target.value)}
         />
-        {nothingFound && (
+        {problem && (
           <p className="program-guardrail-warning" role="alert">
-            No exercises found. Put one exercise on each line, like &quot;Back squat 3x8&quot;.
+            {problem}
           </p>
         )}
         <div className="custom-program-import-actions">
-          <button type="button" onClick={() => read(text)} disabled={!text.trim()}>
+          <button
+            type="button"
+            onClick={() => show(readPastedPlan(text), "what you pasted")}
+            disabled={!text.trim() || reading}
+          >
             Read my plan
           </button>
+          <button type="button" className="ghost" onClick={() => fileInput.current?.click()} disabled={reading}>
+            {reading ? "Reading…" : "Upload a file"}
+          </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept={PLAN_FILE_TYPES}
+            aria-label="Plan file (.csv, .xlsx, .docx or .txt)"
+            hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) readFile(file);
+            }}
+          />
           <button type="button" className="ghost" onClick={onCancel}>
             Cancel
           </button>
@@ -80,11 +125,18 @@ export function ProgramImport({
     );
   }
 
-  const exerciseCount = plan.days.reduce((count, day) => count + dayExercises(day).length, 0);
-  const missingReps = plan.days.reduce(
+  // Every-day sections count once: they're fixed once and copied on at the end.
+  const parts = [...plan.days, { sections: plan.everyDay }];
+  const exerciseCount = parts.reduce((count, day) => count + dayExercises(day).length, 0);
+  const missingReps = parts.reduce(
     (count, day) => count + dayExercises(day).filter((e) => e.seconds == null && !e.reps?.trim()).length,
     0
   );
+  const everyDayNotes = Object.entries(plan.notes["every day"] ?? {});
+
+  function updateEveryDay(sections: ProgramSection[]) {
+    setPlan((current) => current && { ...current, everyDay: sections });
+  }
 
   function updateDay(index: number, next: ProgramDay) {
     setPlan((current) => current && { ...current, days: current.days.map((day, i) => (i === index ? next : day)) });
@@ -133,6 +185,37 @@ export function ProgramImport({
               <li key={item}>{item}</li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {plan.everyDay.length > 0 && (
+        <div className="panel custom-program-day">
+          <h4>Every training day</h4>
+          <p className="muted">Goes on each day below: warm-ups first, the rest (like abs) after.</p>
+          {plan.everyDay.map((section, sectionIndex) => (
+            <SectionEditor
+              key={sectionIndex}
+              section={section}
+              dayName="every day"
+              showName
+              remembered={remembered}
+              onTyping={setTyping}
+              onChange={(next) => updateEveryDay(plan.everyDay.map((s, i) => (i === sectionIndex ? next : s)))}
+              onRemove={() => updateEveryDay(plan.everyDay.filter((_, i) => i !== sectionIndex))}
+            />
+          ))}
+          {everyDayNotes.length > 0 && (
+            <div className="muted">
+              <p className="micro">Notes, added to each day&apos;s notes</p>
+              <ul>
+                {everyDayNotes.map(([exercise, note]) => (
+                  <li key={exercise}>
+                    {exercise}: {note}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
