@@ -442,3 +442,244 @@ export function parseProgramDays(raw: unknown): ProgramDay[] {
 export function getExerciseTarget(day: WorkoutDay | undefined, week: number, exercise: string): string {
   return day?.targets?.[exercise] ?? getPrescription(week, exercise);
 }
+
+/* ------------------------------ Bringing in a plan (F-17) ------------------------------ */
+
+export type Weekday = (typeof WEEKDAYS)[number];
+
+const WEEKDAY_WORDS: Record<string, Weekday> = {
+  mon: "Monday",
+  monday: "Monday",
+  tue: "Tuesday",
+  tues: "Tuesday",
+  tuesday: "Tuesday",
+  wed: "Wednesday",
+  weds: "Wednesday",
+  wednesday: "Wednesday",
+  thu: "Thursday",
+  thur: "Thursday",
+  thurs: "Thursday",
+  thursday: "Thursday",
+  fri: "Friday",
+  friday: "Friday",
+  sat: "Saturday",
+  saturday: "Saturday",
+  sun: "Sunday",
+  sunday: "Sunday"
+};
+
+/**
+ * The weekday a cell or line starts with ("Monday:", "Wed", "Thursday/ Day 3",
+ * "Monday - Lower"), and whatever follows it. Null unless it starts with a
+ * whole weekday word, so "Saturation" or "Sunflower stretch" aren't days.
+ */
+export function readWeekday(text: string): { day: Weekday; rest: string } | null {
+  const match = text.trim().match(/^([a-z]+)\.?(?![a-z])(.*)$/i);
+  const day = match ? WEEKDAY_WORDS[match[1].toLowerCase()] : undefined;
+  return day && match ? { day, rest: match[2].replace(/^[\s:\-–—/|,]+/, "").trim() } : null;
+}
+
+/** "3x8", "4 x 8-10", "3x30 sec", "WU + 5 x 5", "3 sets of 10", at the end of a line. */
+const TARGET = /(?:^|[\s\-–—:,(])(?:(wu|warm[\s-]?up)\s*\+\s*)?(\d{1,2})\s*(?:[x×*]|sets?\s+(?:of|x)\s*)\s*(.+?)\s*\)?$/i;
+
+/** A rep text that is really a time: "30 sec", "45s", "1 min", "90 seconds". */
+function readSeconds(text: string): number | null {
+  const match = text.trim().match(/^(\d{1,4})\s*(s|secs?|seconds?|m|mins?|minutes?)$/i);
+  if (!match) return null;
+  const amount = Number(match[1]);
+  return /^m/i.test(match[2]) ? amount * 60 : amount;
+}
+
+/**
+ * An exercise brought in from a pasted plan or a sheet. Reps can be empty
+ * (the row comes in marked for the coach to fill), and a note found next to
+ * it is kept with it.
+ */
+export type ImportedExercise = ProgramExercise & { note?: string };
+
+/** An exercise from a sets count and the reps as the coach wrote them ("15 reps each leg"). */
+export function exerciseFromCells(name: string, sets: number, reps: string): ImportedExercise {
+  const seconds = readSeconds(reps);
+  return seconds != null ? { name, sets, reps: null, seconds } : { name, sets, reps: reps.trim(), seconds: null };
+}
+
+/**
+ * Sets and reps from one "sets x reps" text: "3x8", "4 x 8-10", "3x30 sec".
+ * "WU + 5 x 5" is 5 sets of 5 with a warm-up set first. Null when there's no
+ * target in it, or the sets aren't between 1 and 20.
+ */
+export function readTarget(text: string): { sets: number; reps: string; warmupSet: boolean; at: number } | null {
+  const match = text.match(TARGET);
+  if (!match || match.index == null) return null;
+  const sets = Number(match[2]);
+  if (sets < 1 || sets > 20) return null;
+  const at = match.index + (match[0].length - match[0].replace(/^[\s\-–—:,(]/, "").length);
+  return { sets, reps: match[3], warmupSet: Boolean(match[1]), at };
+}
+
+/**
+ * One line of a pasted plan as an exercise: "Back squat 3x8", "Plank 3x30 sec",
+ * "RDL - 4 x 8-10", "Cleans WU + 5 x 5". A line with no target keeps the whole
+ * line as the name, 3 sets and empty reps for the coach to fill.
+ */
+export function readExerciseLine(line: string): ImportedExercise {
+  const target = readTarget(line);
+  const name = cleanName(target ? line.slice(0, target.at) : line);
+  if (!target || !name) return { name: cleanName(line), sets: 3, reps: "", seconds: null };
+  const exercise = exerciseFromCells(name, target.sets, target.reps);
+  return target.warmupSet ? { ...exercise, note: "Warm-up set first." } : exercise;
+}
+
+function cleanName(text: string): string {
+  return text
+    .replace(/^\s*(?:[-•*–]|\d+[.)])\s+/, "")
+    .replace(/[\s\-–—:,(]+$/, "")
+    .trim();
+}
+
+/** What reading a plan found: the days to fill, the notes beside exercises, and what it left out. */
+export type ImportedPlan = {
+  days: ProgramDay[];
+  /** Notes found next to exercises, by weekday then exercise name. */
+  notes: Partial<Record<Weekday, Record<string, string>>>;
+  /** Things the reader saw but didn't bring in, in words for the coach. */
+  leftOut: string[];
+};
+
+/** Where an imported day's parts are collected before they become ProgramDays. */
+export type ImportedDays = Map<Weekday, { title: string; sections: ProgramSection[] }>;
+
+/** A heading line: "Warm-up:", "Abs -". Short, ends in a colon or dash, no target. */
+function readLabel(line: string): string | null {
+  if (!/[:\-–—]$/.test(line.trim()) || readTarget(line)) return null;
+  const name = cleanName(line);
+  return name && name.split(/\s+/).length <= 6 ? name : null;
+}
+
+/** A day line in a pasted plan: a weekday ("Monday", "Wed - Upper") or "Day 2" (Tuesday). */
+function readDayLine(line: string): { day: Weekday; title: string } | null {
+  const weekday = readWeekday(line);
+  if (weekday && !readTarget(weekday.rest)) return { day: weekday.day, title: weekday.rest };
+  const numbered = line.match(/^day\s*([1-7])(?!\d)[\s:\-–—]*(.*)$/i);
+  return numbered ? { day: WEEKDAYS[Number(numbered[1]) - 1], title: numbered[2].trim() } : null;
+}
+
+/** Notes found on every-day exercises are filed under this key, then copied to each day. */
+const EVERY_DAY = "every day";
+
+type NoteBook = Record<string, Record<string, string>>;
+
+function addNote(notes: NoteBook, day: Weekday | null, exercise: string, note: string) {
+  const key = day ?? EVERY_DAY;
+  notes[key] = notes[key] ?? {};
+  notes[key][exercise] = notes[key][exercise] ? `${notes[key][exercise]} ${note.trim()}` : note.trim();
+}
+
+/**
+ * Turns a pasted plan into days. One line is one exercise. A day name on its
+ * own line ("Monday", "Wed - Upper", "Day 2") starts a new day; a short line
+ * ending in ":" starts a named section. Lines before the first day are a
+ * section for every training day. A line starting with "*" or "Note:" is a
+ * note on the exercise above it. With no day names at all, it's one Monday.
+ */
+export function parseProgramText(text: string): ImportedPlan {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
+  const hasDays = lines.some((line) => readDayLine(line) != null);
+  const everyDay: ProgramSection[] = [];
+  const byDay: ImportedDays = new Map();
+  const notes: NoteBook = {};
+  const leftOut: string[] = [];
+  let day: Weekday | null = null;
+  let sections = everyDay;
+  let last: string | null = null;
+
+  for (const line of lines) {
+    const dayLine = hasDays ? readDayLine(line) : null;
+    if (dayLine) {
+      const entry = byDay.get(dayLine.day) ?? { title: dayLine.title, sections: [] };
+      byDay.set(dayLine.day, entry);
+      day = dayLine.day;
+      sections = entry.sections;
+      last = null;
+      continue;
+    }
+
+    const note = line.match(/^(?:\*+|note:)\s*(.+)$/i);
+    if (note) {
+      if (last) addNote(notes, day, last, note[1]);
+      else leftOut.push(`A note with no exercise above it: "${note[1]}"`);
+      continue;
+    }
+
+    const label = readLabel(line);
+    if (label) {
+      sections.push({ name: label, exercises: [] });
+      continue;
+    }
+
+    const { note: exerciseNote, ...exercise } = readExerciseLine(line);
+    if (sections.length === 0) sections.push({ name: "", exercises: [] });
+    sections[sections.length - 1].exercises.push(exercise);
+    last = exercise.name;
+    if (exerciseNote) addNote(notes, day, exercise.name, exerciseNote);
+  }
+
+  if (!hasDays) byDay.set("Monday", { title: "", sections: everyDay.splice(0) });
+  return { days: planDays(byDay, everyDay, notes), notes, leftOut };
+}
+
+/** A warm-up-ish heading goes before the day's own work; anything else (abs, cool-down) after. */
+function isWarmupName(name: string): boolean {
+  return /warm|prep|activation|mobility/i.test(name);
+}
+
+/**
+ * The imported days in weekday order, each with the every-day sections put
+ * around its own work: warm-ups first, the rest after. Notes on every-day
+ * exercises are copied to each day. Days with nothing in them are dropped.
+ */
+export function planDays(byDay: ImportedDays, everyDay: ProgramSection[], notes: NoteBook): ProgramDay[] {
+  const filled = (sections: ProgramSection[]) => sections.filter((section) => section.exercises.length > 0);
+  const copy = (sections: ProgramSection[]) =>
+    sections.map((section) => ({ ...section, exercises: section.exercises.map((exercise) => ({ ...exercise })) }));
+  const before = filled(everyDay).filter((section) => isWarmupName(section.name));
+  const after = filled(everyDay).filter((section) => !isWarmupName(section.name));
+
+  return WEEKDAYS.filter((weekday) => filled(byDay.get(weekday)?.sections ?? []).length > 0).map((weekday) => {
+    const entry = byDay.get(weekday)!;
+    if (notes[EVERY_DAY]) notes[weekday] = { ...notes[EVERY_DAY], ...notes[weekday] };
+    return {
+      day: weekday,
+      title: entry.title,
+      notes: "",
+      minutes: "",
+      rest: false,
+      sections: [...copy(before), ...filled(entry.sections), ...copy(after)]
+    };
+  });
+}
+
+/**
+ * A program from an imported plan, ready to open in the builder: the imported
+ * days as training days, every other day rest. Each exercise's note goes in
+ * its day's notes ("Depth Jumps: land on the balls of your feet").
+ */
+export function programFromImport(plan: ImportedPlan, name = "My program"): Omit<CustomProgram, "id"> {
+  return {
+    name,
+    days: WEEKDAYS.map((weekday) => {
+      const day = plan.days.find((d) => d.day === weekday);
+      if (!day) return { day: weekday, title: "Rest", notes: "", minutes: "", rest: true, sections: plainSections([]) };
+      const dayNotes = Object.entries(plan.notes[weekday] ?? {}).map(([exercise, note]) => `${exercise}: ${note}`);
+      return {
+        ...day,
+        title: day.title || "Training",
+        minutes: day.minutes || "45-60",
+        notes: [day.notes, ...dayNotes].filter(Boolean).join("\n")
+      };
+    })
+  };
+}

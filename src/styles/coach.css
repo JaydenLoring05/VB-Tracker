@@ -786,6 +786,56 @@ html:has(dialog[open]) {
   width: auto;
 }
 
+/* A rep box still waiting for a target (an imported row, or a cleared one). */
+/* Reps are free text ("15 reps each leg"), so that box grows to fit the row. */
+.custom-program-target input.custom-program-reps {
+  flex: 1;
+  min-width: 72px;
+}
+
+.custom-program-target input.needs-target {
+  border-color: var(--warn);
+}
+
+/* Bringing in a plan (F-17). */
+.custom-program-import textarea {
+  width: 100%;
+  min-height: 180px;
+  font-family: inherit;
+}
+
+.custom-program-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.custom-program-import-actions button {
+  width: auto;
+}
+
+.custom-program-import-day-header {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.custom-program-import-day-header select {
+  width: auto;
+  flex-shrink: 0;
+}
+
+.custom-program-import-day-header input {
+  flex: 1;
+  min-width: 0;
+}
+
+.custom-program-import-day-header button {
+  width: auto;
+  flex-shrink: 0;
+}
+
 /* Sections inside a day (F-23). */
 .custom-program-section + .custom-program-section {
   margin-top: var(--sp-3);

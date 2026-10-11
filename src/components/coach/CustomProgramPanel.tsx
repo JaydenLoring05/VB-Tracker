@@ -1,24 +1,22 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import { WholeNumberInput } from "@/components/shared/WholeNumberInput";
+import { ProgramImport } from "@/components/coach/ProgramImport";
+import { ExerciseSuggestions, SectionEditor } from "@/components/coach/ProgramSectionEditor";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { exercises as exerciseCatalog } from "@/data/exercises";
 import { POSITION_PROGRAMS, type StartingProgramKey } from "@/data/positionPrograms";
 import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { TeamGroup, useCustomPrograms } from "@/hooks/useCustomPrograms";
-import { getExerciseMeasure } from "@/lib/exerciseMeasure";
 import {
   applyWarmup,
   blankProgram,
   CustomProgram,
   dayExercises,
   dayWarmup,
-  exerciseKey,
   formatTarget,
-  hasStartingTargets,
   isFinished,
   newProgramExercise,
   ownExercises,
@@ -38,205 +36,6 @@ type Draft = Omit<CustomProgram, "id"> & { id?: string };
 const RECOMMENDED = "";
 
 /* ------------------------------ Program editor ------------------------------ */
-
-function ExerciseRow({
-  exercise,
-  index,
-  count,
-  remembered,
-  onTyping,
-  onChange,
-  onMove,
-  onRemove
-}: {
-  exercise: ProgramExercise;
-  index: number;
-  count: number;
-  /** The coach's own exercises from this and earlier programs. */
-  remembered: ProgramExercise[];
-  /** The name box that has focus and its text, or null when none does. */
-  onTyping: (name: string | null) => void;
-  onChange: (next: ProgramExercise) => void;
-  onMove: (direction: -1 | 1) => void;
-  onRemove: () => void;
-}) {
-  const timed = exercise.seconds != null;
-
-  return (
-    <li className="custom-program-exercise">
-      <input
-        className="custom-program-exercise-name"
-        list="custom-program-exercise-library"
-        aria-label="Exercise"
-        placeholder="Exercise name"
-        value={exercise.name}
-        onFocus={() => onTyping(exercise.name)}
-        onBlur={() => onTyping(null)}
-        onChange={(event) => {
-          const name = event.target.value;
-          onTyping(name);
-          // One of the coach's own exercises picked from the suggestions (the text arrives in
-          // one jump, not one letter): bring back the sets and reps it had last time, unless
-          // this row's targets were already changed. Typing letter by letter never does this,
-          // so "Step-up" on the way to "Step-up lateral" doesn't pull in the wrong targets.
-          const picked = Math.abs(name.length - exercise.name.length) > 1;
-          const before = remembered.find((r) => exerciseKey(r.name) === exerciseKey(name));
-          if (picked && before && hasStartingTargets(exercise)) {
-            onChange({ ...before, name });
-            return;
-          }
-          // Follow the name's usual measure (Planks -> seconds) unless the
-          // coach already switched this row away from its default.
-          const followsDefault = timed === (getExerciseMeasure(exercise.name) === "time");
-          const nextTimed = getExerciseMeasure(name) === "time";
-          if (followsDefault && nextTimed !== timed) {
-            onChange(nextTimed ? { ...exercise, name, seconds: 30, reps: null } : { ...exercise, name, seconds: null, reps: "8" });
-          } else {
-            onChange({ ...exercise, name });
-          }
-        }}
-      />
-      <div className="custom-program-target">
-        <WholeNumberInput
-          aria-label={`Sets for ${exercise.name || "exercise"}`}
-          value={exercise.sets}
-          onCommit={(sets) => onChange({ ...exercise, sets })}
-        />
-        <span aria-hidden="true">sets ×</span>
-        {timed ? (
-          <WholeNumberInput
-            aria-label={`Seconds for ${exercise.name || "exercise"}`}
-            value={exercise.seconds}
-            onCommit={(seconds) => onChange({ ...exercise, seconds })}
-          />
-        ) : (
-          <input
-            inputMode="numeric"
-            aria-label={`Reps for ${exercise.name || "exercise"}`}
-            placeholder="8-10"
-            value={exercise.reps ?? ""}
-            onChange={(event) => onChange({ ...exercise, reps: event.target.value })}
-          />
-        )}
-        <div className="custom-program-measure" role="group" aria-label="Measure">
-          <button
-            type="button"
-            className={timed ? "ghost" : ""}
-            aria-pressed={!timed}
-            onClick={() => onChange({ ...exercise, seconds: null, reps: exercise.reps ?? "8" })}
-          >
-            Reps
-          </button>
-          <button
-            type="button"
-            className={timed ? "" : "ghost"}
-            aria-pressed={timed}
-            onClick={() => onChange({ ...exercise, seconds: exercise.seconds ?? 30, reps: null })}
-          >
-            Sec
-          </button>
-        </div>
-      </div>
-      <div className="custom-program-row-controls">
-        <button type="button" className="ghost" onClick={() => onMove(-1)} disabled={index === 0} aria-label="Move up">
-          <ArrowUp size={14} />
-        </button>
-        <button type="button" className="ghost" onClick={() => onMove(1)} disabled={index === count - 1} aria-label="Move down">
-          <ArrowDown size={14} />
-        </button>
-        <button type="button" className="ghost danger-button" onClick={onRemove} aria-label={`Remove ${exercise.name || "exercise"}`}>
-          <Trash2 size={14} />
-        </button>
-      </div>
-    </li>
-  );
-}
-
-/** One section's exercises, with its name box when the day has more than one section. */
-function SectionEditor({
-  section,
-  dayName,
-  showName,
-  namePlaceholder = "Section name, e.g. Abs",
-  remembered,
-  onTyping,
-  onChange,
-  onRemove
-}: {
-  section: ProgramSection;
-  dayName: string;
-  showName: boolean;
-  /** What an empty name box shows: what athletes will see as its heading, or an example. */
-  namePlaceholder?: string;
-  remembered: ProgramExercise[];
-  onTyping: (name: string | null) => void;
-  onChange: (next: ProgramSection) => void;
-  /** Absent when the section can't be removed (a day's only section). */
-  onRemove?: () => void;
-}) {
-  function updateExercise(index: number, next: ProgramExercise) {
-    onChange({ ...section, exercises: section.exercises.map((exercise, i) => (i === index ? next : exercise)) });
-  }
-
-  function moveExercise(index: number, direction: -1 | 1) {
-    const target = index + direction;
-    if (target < 0 || target >= section.exercises.length) return;
-    const exercises = [...section.exercises];
-    [exercises[index], exercises[target]] = [exercises[target], exercises[index]];
-    onChange({ ...section, exercises });
-  }
-
-  return (
-    <div className="custom-program-section">
-      {showName && (
-        <div className="custom-program-section-header">
-          <input
-            aria-label={`Section name on ${dayName}`}
-            placeholder={namePlaceholder}
-            value={section.name}
-            // A section just added has no name yet: put the cursor there.
-            autoFocus={section.name === "" && section.exercises.length === 0}
-            onChange={(event) => onChange({ ...section, name: event.target.value })}
-          />
-          {onRemove && (
-            <button
-              type="button"
-              className="ghost danger-button"
-              onClick={onRemove}
-              aria-label={`Remove section ${section.name || "with no name"} on ${dayName}`}
-            >
-              <Trash2 size={14} />
-            </button>
-          )}
-        </div>
-      )}
-
-      <ul className="custom-program-exercises">
-        {section.exercises.map((exercise, index) => (
-          <ExerciseRow
-            key={index}
-            exercise={exercise}
-            index={index}
-            count={section.exercises.length}
-            remembered={remembered}
-            onTyping={onTyping}
-            onChange={(next) => updateExercise(index, next)}
-            onMove={(direction) => moveExercise(index, direction)}
-            onRemove={() => onChange({ ...section, exercises: section.exercises.filter((_, i) => i !== index) })}
-          />
-        ))}
-      </ul>
-
-      <button
-        type="button"
-        className="ghost"
-        onClick={() => onChange({ ...section, exercises: [...section.exercises, newProgramExercise("")] })}
-      >
-        <Plus size={14} /> Add exercise
-      </button>
-    </div>
-  );
-}
 
 /** The warm-up written once for the whole program, at the top of the editor. */
 function WarmupEditor({
@@ -628,16 +427,7 @@ function ProgramEditorForm({
 
   return (
     <div className="custom-program-editor">
-      <datalist id="custom-program-exercise-library">
-        {exerciseCatalog.map((exercise) => (
-          <option key={exercise.name} value={exercise.name} />
-        ))}
-        {remembered
-          .filter((exercise) => typing == null || exerciseKey(exercise.name) !== exerciseKey(typing))
-          .map((exercise) => (
-            <option key={`own-${exercise.name}`} value={exercise.name} label={`${exercise.name} (yours)`} />
-          ))}
-      </datalist>
+      <ExerciseSuggestions remembered={remembered} typing={typing} />
 
       <label className="custom-program-name">
         <span className="micro">Program name</span>
@@ -800,6 +590,8 @@ export function CustomProgramPanel({ team }: { team: Team }) {
   const [editing, setEditing] = useState<Draft | null>(null);
   // True when the open draft came from this browser's copy rather than the database.
   const [pickedUp, setPickedUp] = useState(false);
+  // Bringing in a plan the coach already has (pasted, for now).
+  const [importing, setImporting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const storageKey = `nextrep:program-draft:${team.id}`;
@@ -844,8 +636,9 @@ export function CustomProgramPanel({ team }: { team: Team }) {
     }
   }
 
-  function startEditing(draft: Draft, fromThisBrowser = false) {
-    setPickedUp(fromThisBrowser);
+  /** unsaved: the draft exists only here so far (picked up from this browser, or just brought in). */
+  function startEditing(draft: Draft, unsaved = false) {
+    setPickedUp(unsaved);
     setEditing(draft);
   }
 
@@ -873,6 +666,22 @@ export function CustomProgramPanel({ team }: { team: Team }) {
       return;
     }
     await deleteProgram(program.id);
+  }
+
+  if (importing) {
+    return (
+      <section className="panel custom-program-panel">
+        <h3>Bring in a plan</h3>
+        <ProgramImport
+          remembered={ownExercises(programs, exerciseCatalog.map((exercise) => exercise.name))}
+          onUse={(program) => {
+            setImporting(false);
+            startEditing(program, true);
+          }}
+          onCancel={() => setImporting(false)}
+        />
+      </section>
+    );
   }
 
   if (editing) {
@@ -938,6 +747,9 @@ export function CustomProgramPanel({ team }: { team: Team }) {
         </button>
         <button type="button" className="ghost" onClick={() => startEditing(blankProgram("My program"))}>
           <Plus size={14} /> Start blank
+        </button>
+        <button type="button" className="ghost" onClick={() => setImporting(true)}>
+          <Plus size={14} /> Bring in a plan
         </button>
         <select
           aria-label="Start from a position template"
