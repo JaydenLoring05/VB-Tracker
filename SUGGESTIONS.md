@@ -49,7 +49,7 @@ Rules for automated runs:
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
-| F-20 | Copy a program day to other days, and fold the days not being edited (PR #NN) | building | your idea | S |
+| F-20 | Copy a program day to other days, and fold the days not being edited (PR #80) | building | your idea | S |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
