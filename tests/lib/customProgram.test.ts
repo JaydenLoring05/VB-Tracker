@@ -8,6 +8,7 @@ import {
   getExerciseNote,
   getExerciseTarget,
   hasStartingTargets,
+  isProgramComplete,
   newProgramExercise,
   ownExercises,
   parseProgramDays,
@@ -15,6 +16,7 @@ import {
   ProgramAssignment,
   programFromRecommended,
   programToWorkoutDays,
+  validateDraft,
   validateProgram,
   WEEKDAYS
 } from "@/lib/customProgram";
@@ -334,5 +336,47 @@ describe("copyDay", () => {
   it("ignores the source day and an unknown day", () => {
     expect(copyDay(days, "Monday", ["Monday"])).toEqual(days);
     expect(copyDay(days, "Funday", ["Tuesday"])).toBe(days);
+  });
+});
+
+describe("validateDraft", () => {
+  const halfBuilt = {
+    name: "In-season",
+    days: blankProgram().days.map((day) =>
+      day.day === "Monday" ? { ...day, exercises: [{ name: "Back Squat", sets: 3, reps: "5", seconds: null }] } : day
+    )
+  };
+
+  it("lets a program with days still empty be saved, but not assigned", () => {
+    expect(validateDraft(halfBuilt)).toEqual([]);
+    expect(validateProgram(halfBuilt)).toContain("Tuesday has no exercises. Add some or make it a rest day.");
+    expect(isProgramComplete(halfBuilt)).toBe(false);
+  });
+
+  it("still blocks a missing name and anything already typed that doesn't make sense", () => {
+    const broken = {
+      name: " ",
+      days: halfBuilt.days.map((day) =>
+        day.day === "Tuesday"
+          ? {
+              ...day,
+              exercises: [
+                { name: "", sets: 3, reps: "8", seconds: null },
+                { name: "Lunge", sets: 0, reps: "", seconds: null }
+              ]
+            }
+          : day
+      )
+    };
+    expect(validateDraft(broken)).toEqual([
+      "Give the program a name.",
+      "Tuesday has an exercise with no name.",
+      "Lunge on Tuesday needs at least 1 set.",
+      "Lunge on Tuesday needs a rep target."
+    ]);
+  });
+
+  it("calls a fully filled program complete", () => {
+    expect(isProgramComplete(programFromRecommended(1))).toBe(true);
   });
 });
