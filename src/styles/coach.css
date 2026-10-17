@@ -864,3 +864,15 @@ html:has(dialog[open]) {
   color: var(--text);
   font-size: var(--fs-sm);
 }
+
+.custom-program-add-note {
+  justify-self: start;
+  width: auto;
+  padding: 4px 10px;
+  min-height: 32px;
+  font-size: 0.85rem;
+}
+
+.custom-program-exercise-note {
+  width: 100%;
+}
