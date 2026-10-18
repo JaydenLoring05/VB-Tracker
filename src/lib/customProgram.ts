@@ -162,6 +162,89 @@ export function copyDay(days: ProgramDay[], from: string, to: string[]): Program
   );
 }
 
+export type ProgramDayChoice = { programId: string; programName: string; day: ProgramDay };
+
+/**
+ * The days a coach can add from their other saved programs: every training
+ * day with at least one named exercise, in program order then week order.
+ * The program being edited is left out (Copy to... covers its own days).
+ */
+export function daysToAddFrom(programs: CustomProgram[], editingId: string | null | undefined): ProgramDayChoice[] {
+  return programs
+    .filter((program) => program.id !== editingId)
+    .flatMap((program) =>
+      WEEKDAYS.flatMap((weekday) => {
+        const day = program.days.find((d) => d.day === weekday);
+        if (!day || day.rest || !day.exercises.some((exercise) => exercise.name.trim() !== "")) return [];
+        return [{ programId: program.id, programName: program.name.trim() || "Untitled program", day }];
+      })
+    );
+}
+
+export type AddFromProgramResult = {
+  days: ProgramDay[];
+  /** Exercises copied onto the day. */
+  added: number;
+  /** Names left out because the day already lists them (a day can't list one exercise twice). */
+  skipped: string[];
+};
+
+/**
+ * Adds a day from another saved program to the end of one day of this
+ * program (F-24): "Monday: Barbell day 1, then In-season Monday". It copies,
+ * so later edits to the source program don't follow. A day with no
+ * exercises yet also takes the source's name and length; otherwise its own
+ * stay. Source notes are added under the day's own notes.
+ */
+export function addFromProgram(days: ProgramDay[], to: string, source: ProgramDay): AddFromProgramResult {
+  const target = days.find((day) => day.day === to);
+  if (!target) return { days, added: 0, skipped: [] };
+
+  const onDay = new Set(target.exercises.map((exercise) => exerciseKey(exercise.name)));
+  const copies: ProgramExercise[] = [];
+  const skipped: string[] = [];
+  for (const exercise of source.exercises) {
+    const key = exerciseKey(exercise.name);
+    if (key === "") continue;
+    if (onDay.has(key)) {
+      skipped.push(exercise.name.trim());
+      continue;
+    }
+    onDay.add(key);
+    copies.push({ ...exercise, name: exercise.name.trim() });
+  }
+
+  if (copies.length === 0) return { days, added: 0, skipped };
+
+  const wasEmpty = target.exercises.length === 0;
+  const sourceNotes = source.notes.trim();
+  const notes =
+    sourceNotes === "" || target.notes.includes(sourceNotes)
+      ? target.notes
+      : [target.notes.trim(), sourceNotes].filter(Boolean).join("\n");
+  const next: ProgramDay = {
+    ...target,
+    rest: false,
+    title: wasEmpty && source.title.trim() ? source.title : target.title,
+    minutes: wasEmpty && source.minutes.trim() ? source.minutes : target.minutes,
+    notes,
+    exercises: [...target.exercises, ...copies]
+  };
+  return {
+    days: days.map((day) => (day.day === to ? next : day)),
+    added: copies.length,
+    skipped
+  };
+}
+
+/** "Added 4 exercises from Barbell, Monday. Already on Wednesday: Back squat." */
+export function addFromProgramMessage(choice: ProgramDayChoice, result: AddFromProgramResult, dayName: string): string {
+  const source = `${choice.programName}, ${choice.day.day}`;
+  const already = result.skipped.length > 0 ? ` Already on ${dayName}: ${result.skipped.join(", ")}.` : "";
+  if (result.added === 0) return `Nothing added from ${source}: ${dayName} already has all of it.`;
+  return `Added ${result.added} exercise${result.added === 1 ? "" : "s"} from ${source}.${already}`;
+}
+
 /** Program days in the shape the rest of the app already renders. */
 export function programToWorkoutDays(program: Pick<CustomProgram, "days">): WorkoutDay[] {
   return WEEKDAYS.map((weekday) => {

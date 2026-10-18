@@ -891,6 +891,19 @@ html:has(dialog[open]) {
   width: auto;
 }
 
+.custom-program-add-from {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.custom-program-add-from select {
+  width: auto;
+  max-width: 100%;
+}
+
 .custom-program-day-save {
   display: flex;
   align-items: center;
