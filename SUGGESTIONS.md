@@ -31,22 +31,14 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| B-02 | Film hotkeys ignore key presses right after the player loads (PR #62) | building | bug | S |
-| B-04 | The Workout Mode browser test fails on rest days, turning CI red (PR #66) | building | bug | S |
-| B-05 | Daily coach summary email fails with `text = date` (PR #65, needs SQL) | building | bug | S |
-| F-01 | Film stats from tags (set distribution, pass average, block outcomes) (PR #63) | building | me | M |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
-| B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |
-| F-25 | Show password and confirm password on sign-up (PR #68) | building | coach feedback | S |
-| F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
-| F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
@@ -67,7 +59,6 @@ Rules for automated runs:
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
 | F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
-| F-30 | Phone push reminders players turn on themselves (PR #85, needs SQL and keys) | building | me | L |
 
 ## Details
 
@@ -465,6 +456,15 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Phone push reminders players turn on themselves (F-30; needs `schema_v55` run, see #86) | me | #85 |
+| One font across the whole app (F-29) | me | #84 |
+| Plan builder remembers a coach's own exercises (F-21) | me | #70 |
+| Show password and confirm password on sign-up (F-25) | coach feedback | #68 |
+| Plan builder sets and seconds boxes can be cleared and retyped (B-06) | bug | #69 |
+| Film stats from tags: set distribution, pass average, block outcomes (F-01) | me | #63 |
+| Daily coach summary email `text = date` fix (B-05, schema v54) | bug | #65 |
+| Workout Mode browser test passes on rest days (B-04) | bug | #66 |
+| Film hotkeys work while the YouTube player loads (B-02) | bug | #62 |
 | Plan builder saves each day; unsaved changes survive a closed tab; unfinished programs can't be assigned (F-16) | coach feedback | #81 |
 | Copy a program day to other days, and fold the days not being edited (F-20) | your idea | #80 |
 | Coach's own note on each exercise in a program (F-18) | coach feedback | #79 |
