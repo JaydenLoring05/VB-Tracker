@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 
+import { estimatedMaxByExercise } from "@/lib/percentOfMax";
 import type { DemoWorkout } from "@/data/demoData";
 import type { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { WorkoutSession, WorkoutSet } from "@/types";
@@ -42,6 +43,13 @@ export function useDemoWorkoutSession(workout: DemoWorkout): WorkoutSessionContr
   });
 
   const previousSets = useMemo(() => workout.previousSets, [workout]);
+  const estimatedMax = useMemo(
+    () =>
+      estimatedMaxByExercise(
+        Object.entries(workout.previousSets).map(([exercise, set]) => ({ exercise, weight: set.weight, reps: set.reps }))
+      ),
+    [workout]
+  );
 
   async function logSet(exercise: string, weight: number | null, reps: number | null, seconds: number | null = null) {
     const isWeightPR = weight != null && weight > (best.current.weight[exercise] ?? 0);
@@ -96,6 +104,7 @@ export function useDemoWorkoutSession(workout: DemoWorkout): WorkoutSessionContr
     session,
     sets,
     previousSets,
+    estimatedMax,
     logSet,
     deleteSet,
     finishWorkout,

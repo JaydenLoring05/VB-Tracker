@@ -247,3 +247,17 @@
   font-size: 0.9rem;
   font-style: italic;
 }
+
+.percent-of-max {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin: 4px 0 0;
+}
+
+.percent-of-max button {
+  width: auto;
+  min-height: 32px;
+  padding: 4px 10px;
+}

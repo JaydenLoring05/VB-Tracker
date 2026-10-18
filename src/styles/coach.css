@@ -913,3 +913,13 @@ html:has(dialog[open]) {
 .custom-program-unfinished {
   display: block;
 }
+
+.custom-program-percent {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.custom-program-target .custom-program-percent input {
+  width: 56px;
+}

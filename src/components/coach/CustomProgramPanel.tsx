@@ -117,6 +117,22 @@ function ExerciseRow({
             onChange={(event) => onChange({ ...exercise, reps: event.target.value })}
           />
         )}
+        {!timed && (
+          <label className="custom-program-percent">
+            <span aria-hidden="true">@</span>
+            <input
+              inputMode="numeric"
+              aria-label={`Percent of max for ${exercise.name || "exercise"}`}
+              placeholder="—"
+              value={exercise.percent ?? ""}
+              onChange={(event) => {
+                const digits = event.target.value.replace(/\D/g, "").slice(0, 3);
+                onChange({ ...exercise, percent: digits === "" ? null : Number(digits) });
+              }}
+            />
+            <span aria-hidden="true">% max</span>
+          </label>
+        )}
         <div className="custom-program-measure" role="group" aria-label="Measure">
           <button
             type="button"
@@ -130,7 +146,7 @@ function ExerciseRow({
             type="button"
             className={timed ? "" : "ghost"}
             aria-pressed={timed}
-            onClick={() => onChange({ ...exercise, seconds: exercise.seconds ?? 30, reps: null })}
+            onClick={() => onChange({ ...exercise, seconds: exercise.seconds ?? 30, reps: null, percent: null })}
           >
             Sec
           </button>
@@ -444,7 +460,8 @@ function ProgramEditorForm({
       <p className="muted">
         Save each day as you finish it. This week repeats every week. Pick training days, name them, and set each
         exercise as sets × reps or sets × seconds. Type any exercise, or pick one from the library, and add a note
-        under any exercise for your athletes. Exercises you add yourself show up in the suggestions next time, and
+        under any exercise for your athletes. Fill in &ldquo;% max&rdquo; to give each athlete their own weight, worked out from
+        their best logged set. Exercises you add yourself show up in the suggestions next time, and
         picking one brings back its sets, reps and note.
       </p>
 
