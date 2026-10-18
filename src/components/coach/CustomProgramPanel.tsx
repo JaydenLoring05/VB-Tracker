@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, MessageSquarePlus, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { WholeNumberInput } from "@/components/shared/WholeNumberInput";
@@ -54,6 +54,8 @@ function ExerciseRow({
   onRemove: () => void;
 }) {
   const timed = exercise.seconds != null;
+  const [noteOpen, setNoteOpen] = useState(false);
+  const showNote = noteOpen || Boolean(exercise.note);
 
   return (
     <li className="custom-program-exercise">
@@ -141,6 +143,26 @@ function ExerciseRow({
           <Trash2 size={14} />
         </button>
       </div>
+      {showNote ? (
+        <input
+          className="custom-program-exercise-note"
+          aria-label={`Note for ${exercise.name || "exercise"}`}
+          placeholder="Note for athletes, e.g. land on the balls of your feet"
+          autoFocus={noteOpen && !exercise.note}
+          value={exercise.note ?? ""}
+          onChange={(event) => onChange({ ...exercise, note: event.target.value })}
+          onBlur={() => {
+            if (!exercise.note?.trim()) {
+              setNoteOpen(false);
+              if (exercise.note != null) onChange({ ...exercise, note: undefined });
+            }
+          }}
+        />
+      ) : (
+        <button type="button" className="ghost custom-program-add-note" onClick={() => setNoteOpen(true)}>
+          <MessageSquarePlus size={14} /> Add note
+        </button>
+      )}
     </li>
   );
 }
@@ -299,8 +321,9 @@ function ProgramEditorForm({
 
       <p className="muted">
         This week repeats every week. Pick training days, name them, and set each exercise as sets × reps or sets ×
-        seconds. Type any exercise, or pick one from the library. Exercises you add yourself show up in the
-        suggestions next time, and picking one brings back its sets and reps.
+        seconds. Type any exercise, or pick one from the library, and add a note under any exercise for your athletes.
+        Exercises you add yourself show up in the suggestions next time, and picking one brings back its sets, reps
+        and note.
       </p>
 
       {draft.days.map((day) => (
@@ -535,7 +558,9 @@ export function CustomProgramPanel({ team }: { team: Team }) {
                     {trainingDays.map((day) => (
                       <p key={day.day} className="muted">
                         <strong>{day.day}:</strong>{" "}
-                        {day.exercises.map((exercise) => `${exercise.name} ${formatTarget(exercise)}`).join(", ")}
+                        {day.exercises
+                          .map((exercise) => `${exercise.name} ${formatTarget(exercise)}${exercise.note ? ` (${exercise.note})` : ""}`)
+                          .join(", ")}
                       </p>
                     ))}
                   </details>

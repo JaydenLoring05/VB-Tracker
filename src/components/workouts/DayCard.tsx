@@ -3,7 +3,7 @@
 import { ChevronDown, ChevronRight, Repeat } from "lucide-react";
 import { useState } from "react";
 
-import { getExerciseTarget } from "@/lib/customProgram";
+import { getExerciseNote, getExerciseTarget } from "@/lib/customProgram";
 import { useExerciseLibrary } from "@/hooks/useExerciseLibrary";
 import { getSubstitutionCandidates, useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { useWorkoutLogs } from "@/hooks/useWorkoutLogs";
@@ -109,6 +109,10 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
                 </button>
               )}
             </label>
+
+            {getExerciseNote(day, originalExercise) && (
+              <p className="muted exercise-coach-note">Coach: {getExerciseNote(day, originalExercise)}</p>
+            )}
 
             {swapOpen && (
               <div className="swap-picker">

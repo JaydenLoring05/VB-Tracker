@@ -241,3 +241,9 @@
   gap: var(--sp-2);
   margin: var(--sp-2) 0 var(--sp-4);
 }
+
+.exercise-coach-note {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  font-style: italic;
+}

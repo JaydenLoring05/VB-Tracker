@@ -4,6 +4,7 @@ import {
   blankProgram,
   exerciseFromPrescription,
   formatTarget,
+  getExerciseNote,
   getExerciseTarget,
   hasStartingTargets,
   newProgramExercise,
@@ -249,5 +250,53 @@ describe("hasStartingTargets", () => {
     expect(hasStartingTargets({ ...newProgramExercise(""), sets: 4 })).toBe(false);
     expect(hasStartingTargets({ ...newProgramExercise(""), reps: "10" })).toBe(false);
     expect(hasStartingTargets({ ...newProgramExercise("Planks"), seconds: 45 })).toBe(false);
+  });
+});
+
+describe("exercise notes", () => {
+  const withNote = {
+    days: blankProgram().days.map((day) =>
+      day.day === "Monday"
+        ? {
+            ...day,
+            rest: false,
+            exercises: [
+              { name: "Lateral step-up", sets: 3, reps: "8", seconds: null, note: " Drive through the front heel " },
+              { name: "Back Squat", sets: 3, reps: "5", seconds: null, note: "   " },
+              { name: "Plank", sets: 3, reps: null, seconds: 30 }
+            ]
+          }
+        : day
+    )
+  };
+
+  it("gives athletes the trimmed note and skips blank ones", () => {
+    const monday = programToWorkoutDays(withNote).find((day) => day.day === "Monday");
+    expect(monday?.exerciseNotes).toEqual({ "Lateral step-up": "Drive through the front heel" });
+    expect(getExerciseNote(monday, "Lateral step-up")).toBe("Drive through the front heel");
+    expect(getExerciseNote(monday, "Plank")).toBe("");
+    expect(getExerciseNote(undefined, "Plank")).toBe("");
+  });
+
+  it("keeps a note through a save and load, and drops blank or non-text ones", () => {
+    const days = parseProgramDays([
+      {
+        day: "Monday",
+        exercises: [
+          { name: "A", sets: 3, reps: "8", note: "Slow down" },
+          { name: "B", sets: 3, reps: "8", note: "  " },
+          { name: "C", sets: 3, reps: "8", note: 5 },
+          { name: "D", sets: 3, reps: "8" }
+        ]
+      }
+    ]);
+    expect(days[0].exercises.map((exercise) => exercise.note)).toEqual(["Slow down", undefined, undefined, undefined]);
+  });
+
+  it("remembers a coach's own exercise with its note", () => {
+    const own = ownExercises([withNote], ["Back Squat", "Plank"]);
+    expect(own).toEqual([
+      { name: "Lateral step-up", sets: 3, reps: "8", seconds: null, note: " Drive through the front heel " }
+    ]);
   });
 });

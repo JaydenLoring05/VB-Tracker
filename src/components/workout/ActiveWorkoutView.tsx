@@ -8,7 +8,7 @@ import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
 import { getExercise } from "@/data/exercises";
 import { getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
-import { getExerciseTarget } from "@/lib/customProgram";
+import { getExerciseNote, getExerciseTarget } from "@/lib/customProgram";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
@@ -249,6 +249,7 @@ export function WorkoutModeView({
   const lastTime = previousSets[exercise];
   const cues = getExercise(originalExercise)?.cues ?? [];
   const prescription = getExerciseTarget(day, session.week, exercise);
+  const coachNote = getExerciseNote(day, originalExercise);
   const isTimed = getExerciseMeasure(exercise) === "time";
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
   currentExerciseRef.current = exercise ?? null;
@@ -376,6 +377,7 @@ export function WorkoutModeView({
       <div className="panel">
         <h3>{exercise}</h3>
         <p className="muted">Target: {prescription}</p>
+        {coachNote && <p className="exercise-coach-note">Coach: {coachNote}</p>}
         {lastTime && <p className="muted last-time">Last time: {formatSetValue(lastTime)}</p>}
 
         {cues.length > 0 && (

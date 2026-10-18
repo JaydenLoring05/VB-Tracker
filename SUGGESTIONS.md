@@ -43,7 +43,7 @@ Rules for automated runs:
 | F-16 | Plan builder saves each day, and an unsaved program survives leaving the page | planned | coach feedback | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
-| F-18 | Coach's own note on each exercise in a program | planned | coach feedback | S |
+| F-18 | Coach's own note on each exercise in a program (PR #79) | building | coach feedback | S |
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |

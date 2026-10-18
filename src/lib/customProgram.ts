@@ -17,6 +17,8 @@ export type ProgramExercise = {
   reps: string | null;
   /** Hold time per set for timed exercises (planks, stretches). Null for rep exercises. */
   seconds: number | null;
+  /** The coach's own note for this exercise, shown to athletes under it. */
+  note?: string;
 };
 
 export type ProgramDay = {
@@ -153,7 +155,12 @@ export function programToWorkoutDays(program: Pick<CustomProgram, "days">): Work
       notes: day.notes,
       rest: day.rest,
       exercises: exercises.map((exercise) => exercise.name),
-      targets: Object.fromEntries(exercises.map((exercise) => [exercise.name, formatTarget(exercise)]))
+      targets: Object.fromEntries(exercises.map((exercise) => [exercise.name, formatTarget(exercise)])),
+      exerciseNotes: Object.fromEntries(
+        exercises
+          .filter((exercise) => exercise.note?.trim())
+          .map((exercise) => [exercise.name, (exercise.note ?? "").trim()])
+      )
     };
   });
 }
@@ -222,7 +229,8 @@ export function parseProgramDays(raw: unknown): ProgramDay[] {
           name: String(exercise.name ?? ""),
           sets: Number(exercise.sets) || 1,
           reps: exercise.reps == null ? null : String(exercise.reps),
-          seconds: exercise.seconds == null ? null : Number(exercise.seconds) || null
+          seconds: exercise.seconds == null ? null : Number(exercise.seconds) || null,
+          ...(typeof exercise.note === "string" && exercise.note.trim() ? { note: exercise.note } : {})
         }))
     }))
     .filter((day) => (WEEKDAYS as readonly string[]).includes(day.day));
@@ -231,4 +239,9 @@ export function parseProgramDays(raw: unknown): ProgramDay[] {
 /** The target to show for an exercise: the coach's, if they set one, else the plan's. */
 export function getExerciseTarget(day: WorkoutDay | undefined, week: number, exercise: string): string {
   return day?.targets?.[exercise] ?? getPrescription(week, exercise);
+}
+
+/** The coach's note for an exercise on this day, or "" when there isn't one. */
+export function getExerciseNote(day: WorkoutDay | undefined, exercise: string): string {
+  return day?.exerciseNotes?.[exercise] ?? "";
 }
