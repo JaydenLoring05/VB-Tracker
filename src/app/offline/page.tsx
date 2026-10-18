@@ -41,7 +41,7 @@ const styles = `
 }
 .offline-brand {
   margin: 12px 0 0;
-  font-family: var(--font-barlow), "Arial Narrow", Arial, sans-serif;
+  font-family: var(--font-manrope), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -49,7 +49,7 @@ const styles = `
 }
 .offline-title {
   margin: 0;
-  font-family: var(--font-barlow), "Arial Narrow", Arial, sans-serif;
+  font-family: var(--font-manrope), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 44px;
   line-height: 1;
   font-weight: 700;
