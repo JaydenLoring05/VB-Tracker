@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed, Manrope } from "next/font/google";
+import { Manrope } from "next/font/google";
 
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { SkipLink } from "@/components/shared/SkipLink";
@@ -8,19 +8,10 @@ import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site"
 
 import "./globals.css";
 
-// Body/UI face. One variable file covers every weight.
+// The one face for the whole app: body, headlines and big numbers. One variable file covers every weight.
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
-  display: "swap"
-});
-
-// Display face for headlines, card titles and big numbers. The design only ever sets this face
-// at 700, so that is the only weight downloaded.
-const barlow = Barlow_Condensed({
-  subsets: ["latin"],
-  weight: ["700"],
-  variable: "--font-barlow",
   display: "swap"
 });
 
@@ -68,7 +59,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${manrope.variable} ${barlow.variable}`}>
+    <html lang="en" className={manrope.variable}>
       <body>
         <SkipLink />
         {children}
