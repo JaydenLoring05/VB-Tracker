@@ -140,6 +140,28 @@ export function programFromRecommended(week: number, name = "My program"): Omit<
   };
 }
 
+/**
+ * Copies one day's name, length, notes and exercises onto other days, which
+ * become training days. Returns new days; the source day is never a target.
+ */
+export function copyDay(days: ProgramDay[], from: string, to: string[]): ProgramDay[] {
+  const source = days.find((day) => day.day === from);
+  if (!source) return days;
+  const targets = new Set(to.filter((day) => day !== from));
+  return days.map((day) =>
+    targets.has(day.day)
+      ? {
+          ...day,
+          title: source.title,
+          minutes: source.minutes,
+          notes: source.notes,
+          rest: source.rest,
+          exercises: source.exercises.map((exercise) => ({ ...exercise }))
+        }
+      : day
+  );
+}
+
 /** Program days in the shape the rest of the app already renders. */
 export function programToWorkoutDays(program: Pick<CustomProgram, "days">): WorkoutDay[] {
   return WEEKDAYS.map((weekday) => {

@@ -876,3 +876,17 @@ html:has(dialog[open]) {
 .custom-program-exercise-note {
   width: 100%;
 }
+
+.custom-program-day-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: var(--sp-2);
+  text-align: left;
+}
+
+.custom-program-copy {
+  margin-top: var(--sp-2);
+  width: auto;
+}

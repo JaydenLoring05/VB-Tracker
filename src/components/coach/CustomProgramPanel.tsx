@@ -12,6 +12,7 @@ import { TeamGroup, useCustomPrograms } from "@/hooks/useCustomPrograms";
 import { getExerciseMeasure } from "@/lib/exerciseMeasure";
 import {
   blankProgram,
+  copyDay,
   CustomProgram,
   exerciseKey,
   formatTarget,
@@ -167,17 +168,42 @@ function ExerciseRow({
   );
 }
 
+const EVERY_OTHER_TRAINING_DAY = "__every_other_training_day__";
+
 function DayEditor({
   day,
+  open,
+  otherDays,
   remembered,
+  onOpen,
+  onCopy,
   onTyping,
   onChange
 }: {
   day: ProgramDay;
+  /** Only the day being edited is open, so the week isn't one long scroll on a phone. */
+  open: boolean;
+  otherDays: ProgramDay[];
   remembered: ProgramExercise[];
+  onOpen: () => void;
+  onCopy: (to: string[]) => void;
   onTyping: (name: string | null) => void;
   onChange: (next: ProgramDay) => void;
 }) {
+  function handleCopy(choice: string) {
+    const to =
+      choice === EVERY_OTHER_TRAINING_DAY ? otherDays.filter((other) => !other.rest).map((other) => other.day) : [choice];
+    if (to.length === 0) return;
+    const overwritten = otherDays.filter((other) => to.includes(other.day) && other.exercises.length > 0);
+    if (
+      overwritten.length > 0 &&
+      !window.confirm(`Replace what's on ${overwritten.map((other) => other.day).join(", ")} with ${day.day}?`)
+    ) {
+      return;
+    }
+    onCopy(to);
+  }
+
   function updateExercise(index: number, next: ProgramExercise) {
     onChange({ ...day, exercises: day.exercises.map((exercise, i) => (i === index ? next : exercise)) });
   }
@@ -191,26 +217,36 @@ function DayEditor({
   }
 
   return (
-    <div className={`panel custom-program-day${day.rest ? " is-rest" : ""}`}>
+    <div className={`panel custom-program-day${day.rest ? " is-rest" : ""}${open ? " is-open" : ""}`}>
       <div className="custom-program-day-header">
         <h4>{day.day}</h4>
         <label className="custom-program-rest-toggle">
           <input
             type="checkbox"
             checked={!day.rest}
-            onChange={(event) =>
+            onChange={(event) => {
               onChange({
                 ...day,
                 rest: !event.target.checked,
                 title: !event.target.checked ? "Rest" : day.title === "Rest" ? "Training" : day.title
-              })
-            }
+              });
+              if (event.target.checked) onOpen();
+            }}
           />
           Training day
         </label>
       </div>
 
-      {!day.rest && (
+      {!day.rest && !open && (
+        <button type="button" className="ghost custom-program-day-summary" onClick={onOpen}>
+          <span>
+            {day.title || "Training"} · {day.exercises.length} exercise{day.exercises.length === 1 ? "" : "s"}
+          </span>
+          <span className="micro">Edit</span>
+        </button>
+      )}
+
+      {!day.rest && open && (
         <>
           <div className="custom-program-day-fields">
             <input
@@ -257,6 +293,26 @@ function DayEditor({
           >
             <Plus size={14} /> Add exercise
           </button>
+
+          {day.exercises.length > 0 && (
+            <select
+              className="custom-program-copy"
+              aria-label={`Copy ${day.day} to another day`}
+              value=""
+              onChange={(event) => handleCopy(event.target.value)}
+            >
+              <option value="">Copy {day.day} to...</option>
+              {otherDays.some((other) => !other.rest) && (
+                <option value={EVERY_OTHER_TRAINING_DAY}>Every other training day</option>
+              )}
+              {otherDays.map((other) => (
+                <option key={other.day} value={other.day}>
+                  {other.day}
+                  {other.rest ? " (rest now)" : other.exercises.length > 0 ? " (replaces it)" : ""}
+                </option>
+              ))}
+            </select>
+          )}
         </>
       )}
     </div>
@@ -280,6 +336,8 @@ function ProgramEditorForm({
   const [draft, setDraft] = useState<Draft>(initial);
   const [showProblems, setShowProblems] = useState(false);
   const problems = validateProgram(draft);
+  // The one day being edited. Starts on the first training day.
+  const [openDay, setOpenDay] = useState<string | null>(() => initial.days.find((day) => !day.rest)?.day ?? null);
   // Text of the exercise name box being typed in, so its own half-typed text isn't offered back.
   const [typing, setTyping] = useState<string | null>(null);
   // The coach's own exercises, from this draft first and then saved programs, so one
@@ -327,7 +385,17 @@ function ProgramEditorForm({
       </p>
 
       {draft.days.map((day) => (
-        <DayEditor key={day.day} day={day} remembered={remembered} onTyping={setTyping} onChange={updateDay} />
+        <DayEditor
+          key={day.day}
+          day={day}
+          open={openDay === day.day}
+          otherDays={draft.days.filter((other) => other.day !== day.day)}
+          remembered={remembered}
+          onOpen={() => setOpenDay(day.day)}
+          onCopy={(to) => setDraft((current) => ({ ...current, days: copyDay(current.days, day.day, to) }))}
+          onTyping={setTyping}
+          onChange={updateDay}
+        />
       ))}
 
       {showProblems && problems.length > 0 && (

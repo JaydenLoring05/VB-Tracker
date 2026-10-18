@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   blankProgram,
+  copyDay,
   exerciseFromPrescription,
   formatTarget,
   getExerciseNote,
@@ -298,5 +299,40 @@ describe("exercise notes", () => {
     expect(own).toEqual([
       { name: "Lateral step-up", sets: 3, reps: "8", seconds: null, note: " Drive through the front heel " }
     ]);
+  });
+});
+
+describe("copyDay", () => {
+  const days = blankProgram().days.map((day) =>
+    day.day === "Monday"
+      ? {
+          ...day,
+          title: "Lower",
+          notes: "Warm up first",
+          exercises: [{ name: "Back Squat", sets: 5, reps: "5", seconds: null }]
+        }
+      : day.day === "Wednesday"
+        ? { ...day, title: "Upper", exercises: [{ name: "Bench Press", sets: 3, reps: "8", seconds: null }] }
+        : day
+  );
+
+  it("copies a day onto others, including rest days, which start training", () => {
+    const copied = copyDay(days, "Monday", ["Wednesday", "Saturday"]);
+    for (const name of ["Wednesday", "Saturday"]) {
+      const day = copied.find((d) => d.day === name)!;
+      expect(day).toMatchObject({ title: "Lower", notes: "Warm up first", rest: false });
+      expect(day.exercises).toEqual([{ name: "Back Squat", sets: 5, reps: "5", seconds: null }]);
+    }
+    expect(copied.find((d) => d.day === "Tuesday")).toEqual(days.find((d) => d.day === "Tuesday"));
+  });
+
+  it("gives each day its own exercises, so editing one doesn't change the other", () => {
+    const copied = copyDay(days, "Monday", ["Tuesday"]);
+    expect(copied.find((d) => d.day === "Tuesday")!.exercises[0]).not.toBe(copied[0].exercises[0]);
+  });
+
+  it("ignores the source day and an unknown day", () => {
+    expect(copyDay(days, "Monday", ["Monday"])).toEqual(days);
+    expect(copyDay(days, "Funday", ["Tuesday"])).toBe(days);
   });
 });
