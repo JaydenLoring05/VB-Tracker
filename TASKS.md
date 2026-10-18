@@ -14,7 +14,7 @@ the branch is brought up to date with `main`.
 | --- | --- | --- | --- | --- |
 | #86 | B-08 row: push reminders fail until `schema_v55` is run | No (but see below) | Merges cleanly | Your merge |
 | #87 | F-24: "Add from another program" puts a day from another saved program under a day in the builder | No | Merges cleanly | You to try it, then merge |
-| This PR | Housekeeping: nine rows to Shipped, this file | No | Merges cleanly | Your merge |
+| #88 | Housekeeping: nine rows to Shipped, this file | No | Merges cleanly | Your merge |
 | #83 | F-28: weight targets as a percent of each athlete's max | No | Merges cleanly, but its row (F-28) only exists in #72 | Decide on #72 first |
 | #75 | F-23: sections in a day, warm-up written once | No | **Conflicts** (branched before #81 shipped F-16) | Rebuild on `main` |
 | #76, #77, #78 | F-17 parts 1-3: bring in a plan by paste, file, Google Sheets link | No | **Conflict** (each stacked on #75) | #75 first, then each in order |
@@ -34,7 +34,7 @@ Not checked against the live project. Tick these off as you confirm them.
 - [ ] Confirm `schema_v49` to `schema_v53` were run (check queries are in the
       launch checklist). v53 came with F-02 (#58); without it three-tap film
       tags don't save.
-- [ ] Merge #86 and this PR.
+- [ ] Merge #86 and #88.
 - [ ] Try #87 in the preview (Coach → Programs, two saved programs), then
       merge. Its one question is in the PR description.
 - [ ] The F-23 / F-17 stack (#75 → #76 → #77 → #78) can't merge as it is.
