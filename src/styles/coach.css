@@ -875,6 +875,8 @@ html:has(dialog[open]) {
 
 .custom-program-exercise-note {
   width: 100%;
+}
+
 .custom-program-day-summary {
   display: flex;
   justify-content: space-between;

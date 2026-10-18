@@ -299,6 +299,9 @@ describe("exercise notes", () => {
     expect(own).toEqual([
       { name: "Lateral step-up", sets: 3, reps: "8", seconds: null, note: " Drive through the front heel " }
     ]);
+  });
+});
+
 describe("copyDay", () => {
   const days = blankProgram().days.map((day) =>
     day.day === "Monday"
