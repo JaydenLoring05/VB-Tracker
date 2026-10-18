@@ -218,17 +218,40 @@ export function validateProgram(program: Pick<CustomProgram, "name" | "days">): 
 
   for (const day of trainingDays) {
     if (day.exercises.length === 0) problems.push(`${day.day} has no exercises. Add some or make it a rest day.`);
-    const names = day.exercises.map((exercise) => exercise.name.trim().toLowerCase());
-    if (names.some((name) => name === "")) problems.push(`${day.day} has an exercise with no name.`);
-    if (new Set(names).size !== names.length) problems.push(`${day.day} lists the same exercise twice.`);
-    for (const exercise of day.exercises) {
-      if (exercise.sets < 1) problems.push(`${exercise.name || "An exercise"} on ${day.day} needs at least 1 set.`);
-      if (exercise.seconds == null && !exercise.reps?.trim()) {
-        problems.push(`${exercise.name || "An exercise"} on ${day.day} needs a rep target.`);
-      }
-      if (exercise.seconds != null && exercise.seconds < 1) {
-        problems.push(`${exercise.name || "An exercise"} on ${day.day} needs a time target.`);
-      }
+    problems.push(...dayExerciseProblems(day));
+  }
+  return problems;
+}
+
+/**
+ * Problems that block saving a program that's still being built (F-16). Days
+ * not filled in yet don't block it; anything already typed must make sense.
+ * Assigning the program still needs validateProgram to pass.
+ */
+export function validateDraft(program: Pick<CustomProgram, "name" | "days">): string[] {
+  const problems: string[] = [];
+  if (!program.name.trim()) problems.push("Give the program a name.");
+  for (const day of program.days.filter((d) => !d.rest)) problems.push(...dayExerciseProblems(day));
+  return problems;
+}
+
+/** True when the program is finished enough to give to athletes. */
+export function isProgramComplete(program: Pick<CustomProgram, "name" | "days">): boolean {
+  return validateProgram(program).length === 0;
+}
+
+function dayExerciseProblems(day: ProgramDay): string[] {
+  const problems: string[] = [];
+  const names = day.exercises.map((exercise) => exercise.name.trim().toLowerCase());
+  if (names.some((name) => name === "")) problems.push(`${day.day} has an exercise with no name.`);
+  if (new Set(names).size !== names.length) problems.push(`${day.day} lists the same exercise twice.`);
+  for (const exercise of day.exercises) {
+    if (exercise.sets < 1) problems.push(`${exercise.name || "An exercise"} on ${day.day} needs at least 1 set.`);
+    if (exercise.seconds == null && !exercise.reps?.trim()) {
+      problems.push(`${exercise.name || "An exercise"} on ${day.day} needs a rep target.`);
+    }
+    if (exercise.seconds != null && exercise.seconds < 1) {
+      problems.push(`${exercise.name || "An exercise"} on ${day.day} needs a time target.`);
     }
   }
   return problems;

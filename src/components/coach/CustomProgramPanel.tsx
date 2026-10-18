@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowDown, ArrowUp, MessageSquarePlus, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowDown, ArrowUp, MessageSquarePlus, Plus, Save, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { WholeNumberInput } from "@/components/shared/WholeNumberInput";
 import { useTrackerContext } from "@/context/TrackerContext";
@@ -17,14 +17,17 @@ import {
   exerciseKey,
   formatTarget,
   hasStartingTargets,
+  isProgramComplete,
   newProgramExercise,
   ownExercises,
   pickAssignedProgramId,
   ProgramDay,
   ProgramExercise,
   programFromRecommended,
+  validateDraft,
   validateProgram
 } from "@/lib/customProgram";
+import { clearProgramDraft, loadProgramDraft, saveProgramDraft, StoredProgramDraft } from "@/lib/programDraftStorage";
 import { RosterAthlete, Team } from "@/types";
 
 type Draft = Omit<CustomProgram, "id"> & { id?: string };
@@ -177,6 +180,9 @@ function DayEditor({
   remembered,
   onOpen,
   onCopy,
+  saving,
+  status,
+  onSaveDay,
   onTyping,
   onChange
 }: {
@@ -187,6 +193,10 @@ function DayEditor({
   remembered: ProgramExercise[];
   onOpen: () => void;
   onCopy: (to: string[]) => void;
+  saving: boolean;
+  /** "Monday saved at 4:52 PM", shown under this day's save button. */
+  status: string | null;
+  onSaveDay: () => void;
   onTyping: (name: string | null) => void;
   onChange: (next: ProgramDay) => void;
 }) {
@@ -313,6 +323,16 @@ function DayEditor({
               ))}
             </select>
           )}
+          <div className="custom-program-day-save">
+            <button type="button" onClick={onSaveDay} disabled={saving}>
+              <Save size={14} /> {saving ? "Saving…" : `Save ${day.day}`}
+            </button>
+            {status && (
+              <span className="muted" role="status">
+                {status}
+              </span>
+            )}
+          </div>
         </>
       )}
     </div>
@@ -321,23 +341,44 @@ function DayEditor({
 
 function ProgramEditorForm({
   initial,
+  restored,
+  teamId,
+  assigned,
   savedPrograms,
   saving,
   onSave,
+  onSaveDay,
   onCancel
 }: {
   initial: Draft;
+  /** True when the draft came back from this browser and has unsaved changes. */
+  restored: boolean;
+  teamId: string;
+  /** Athletes are on this program, so every save has to leave it complete. */
+  assigned: boolean;
   /** Every program this team already has, newest first. */
   savedPrograms: CustomProgram[];
   saving: boolean;
+  /** Saves and closes. */
   onSave: (draft: Draft) => void;
+  /** Saves and stays open. Returns the program's id, or null when it failed. */
+  onSaveDay: (draft: Draft) => Promise<string | null>;
   onCancel: () => void;
 }) {
   const [draft, setDraft] = useState<Draft>(initial);
-  const [showProblems, setShowProblems] = useState(false);
+  const [shownProblems, setShownProblems] = useState<string[]>([]);
   const problems = validateProgram(draft);
   // The one day being edited. Starts on the first training day.
   const [openDay, setOpenDay] = useState<string | null>(() => initial.days.find((day) => !day.rest)?.day ?? null);
+  // What the database has, so only real changes are kept in the browser.
+  const [savedJson, setSavedJson] = useState<string | null>(() => (restored ? null : JSON.stringify(initial)));
+  const dirty = JSON.stringify(draft) !== savedJson;
+  const [dayStatus, setDayStatus] = useState<{ day: string; text: string } | null>(null);
+
+  // Keep every unsaved change on this device, so a closed tab doesn't lose a day.
+  useEffect(() => {
+    if (dirty) saveProgramDraft(teamId, draft);
+  }, [dirty, draft, teamId]);
   // Text of the exercise name box being typed in, so its own half-typed text isn't offered back.
   const [typing, setTyping] = useState<string | null>(null);
   // The coach's own exercises, from this draft first and then saved programs, so one
@@ -353,10 +394,29 @@ function ProgramEditorForm({
 
   function handleSave() {
     if (problems.length > 0) {
-      setShowProblems(true);
+      setShownProblems(problems);
       return;
     }
     onSave(draft);
+  }
+
+  async function handleSaveDay(dayName: string) {
+    // Days not filled in yet don't block this save, unless athletes are already on the program.
+    const blocking = assigned ? problems : validateDraft(draft);
+    if (blocking.length > 0) {
+      setShownProblems(blocking);
+      setDayStatus(null);
+      return;
+    }
+    setShownProblems([]);
+    const id = await onSaveDay(draft);
+    if (!id) return;
+    const saved = { ...draft, id };
+    setDraft(saved);
+    setSavedJson(JSON.stringify(saved));
+    clearProgramDraft(teamId);
+    const time = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    setDayStatus({ day: dayName, text: `${dayName} saved at ${time}` });
   }
 
   return (
@@ -377,11 +437,15 @@ function ProgramEditorForm({
         <input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
       </label>
 
+      {dirty && draft.id == null && (
+        <p className="micro">Not saved yet. Your changes are kept on this device until you save.</p>
+      )}
+
       <p className="muted">
-        This week repeats every week. Pick training days, name them, and set each exercise as sets × reps or sets ×
-        seconds. Type any exercise, or pick one from the library, and add a note under any exercise for your athletes.
-        Exercises you add yourself show up in the suggestions next time, and picking one brings back its sets, reps
-        and note.
+        Save each day as you finish it. This week repeats every week. Pick training days, name them, and set each
+        exercise as sets × reps or sets × seconds. Type any exercise, or pick one from the library, and add a note
+        under any exercise for your athletes. Exercises you add yourself show up in the suggestions next time, and
+        picking one brings back its sets, reps and note.
       </p>
 
       {draft.days.map((day) => (
@@ -393,14 +457,17 @@ function ProgramEditorForm({
           remembered={remembered}
           onOpen={() => setOpenDay(day.day)}
           onCopy={(to) => setDraft((current) => ({ ...current, days: copyDay(current.days, day.day, to) }))}
+          saving={saving}
+          status={dayStatus?.day === day.day && !dirty ? dayStatus.text : null}
+          onSaveDay={() => handleSaveDay(day.day)}
           onTyping={setTyping}
           onChange={updateDay}
         />
       ))}
 
-      {showProblems && problems.length > 0 && (
+      {shownProblems.length > 0 && (
         <ul className="program-guardrail-warning" role="alert">
-          {problems.map((problem) => (
+          {shownProblems.map((problem) => (
             <li key={problem}>{problem}</li>
           ))}
         </ul>
@@ -411,7 +478,7 @@ function ProgramEditorForm({
           {saving ? "Saving…" : "Save program"}
         </button>
         <button type="button" className="ghost" onClick={onCancel} disabled={saving}>
-          Cancel
+          {dirty ? "Cancel" : "Close"}
         </button>
       </div>
     </div>
@@ -436,11 +503,15 @@ function ProgramSelect({
   return (
     <select aria-label={label} value={value ?? RECOMMENDED} onChange={(event) => onChange(event.target.value || null)}>
       <option value={RECOMMENDED}>{fallbackLabel}</option>
-      {programs.map((program) => (
-        <option key={program.id} value={program.id}>
-          {program.name}
-        </option>
-      ))}
+      {programs.map((program) => {
+        const unfinished = !isProgramComplete(program);
+        return (
+          <option key={program.id} value={program.id} disabled={unfinished && program.id !== value}>
+            {program.name}
+            {unfinished ? " (unfinished)" : ""}
+          </option>
+        );
+      })}
     </select>
   );
 }
@@ -515,7 +586,10 @@ export function CustomProgramPanel({ team }: { team: Team }) {
   } = useCustomPrograms(team);
 
   const [editing, setEditing] = useState<Draft | null>(null);
+  const [restored, setRestored] = useState(false);
   const [saving, setSaving] = useState(false);
+  // A program left half-built in this browser, offered back when the coach returns.
+  const [storedDraft, setStoredDraft] = useState<StoredProgramDraft | null>(() => loadProgramDraft(team.id));
   const [newGroupName, setNewGroupName] = useState("");
 
   const teamProgramId = assignments.find((a) => a.scope === "team")?.programId ?? null;
@@ -541,11 +615,31 @@ export function CustomProgramPanel({ team }: { team: Team }) {
     );
   }
 
+  function startEditing(draft: Draft, fromDevice = false) {
+    setRestored(fromDevice);
+    setEditing(draft);
+  }
+
+  function stopEditing() {
+    setEditing(null);
+    setStoredDraft(loadProgramDraft(team.id));
+  }
+
   async function handleSave(draft: Draft) {
     setSaving(true);
     const id = await saveProgram(draft);
     setSaving(false);
-    if (id) setEditing(null);
+    if (id) {
+      clearProgramDraft(team.id);
+      stopEditing();
+    }
+  }
+
+  async function handleSaveDay(draft: Draft) {
+    setSaving(true);
+    const id = await saveProgram(draft);
+    setSaving(false);
+    return id;
   }
 
   async function handleDelete(program: CustomProgram) {
@@ -562,10 +656,14 @@ export function CustomProgramPanel({ team }: { team: Team }) {
         <h3>{editing.id ? `Edit ${editing.name}` : "New program"}</h3>
         <ProgramEditorForm
           initial={editing}
+          restored={restored}
+          teamId={team.id}
+          assigned={editing.id != null && assignments.some((a) => a.programId === editing.id)}
           savedPrograms={newestFirst}
           saving={saving}
           onSave={handleSave}
-          onCancel={() => setEditing(null)}
+          onSaveDay={handleSaveDay}
+          onCancel={stopEditing}
         />
         {error && <p className="muted">{error}</p>}
       </section>
@@ -584,11 +682,45 @@ export function CustomProgramPanel({ team }: { team: Team }) {
 
       {error && <p className="program-guardrail-warning">{error}</p>}
 
+      {storedDraft && (
+        <div className="custom-program-resume" role="status">
+          <p>
+            You have unsaved changes to <strong>{storedDraft.draft.name || "a program"}</strong>
+            {storedDraft.changedAt
+              ? ` from ${new Date(storedDraft.changedAt).toLocaleString([], {
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit"
+                })}`
+              : ""}
+            .
+          </p>
+          <div className="custom-program-row-controls">
+            <button type="button" onClick={() => startEditing(storedDraft.draft, true)}>
+              Pick up where you left off
+            </button>
+            <button
+              type="button"
+              className="ghost"
+              onClick={() => {
+                if (window.confirm("Throw away these unsaved changes?")) {
+                  clearProgramDraft(team.id);
+                  setStoredDraft(null);
+                }
+              }}
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="custom-program-new">
-        <button type="button" onClick={() => setEditing(programFromRecommended(week, "My program"))}>
+        <button type="button" onClick={() => startEditing(programFromRecommended(week, "My program"))}>
           <Plus size={14} /> Start from recommended
         </button>
-        <button type="button" className="ghost" onClick={() => setEditing(blankProgram("My program"))}>
+        <button type="button" className="ghost" onClick={() => startEditing(blankProgram("My program"))}>
           <Plus size={14} /> Start blank
         </button>
         <select
@@ -597,7 +729,7 @@ export function CustomProgramPanel({ team }: { team: Team }) {
           onChange={(e) => {
             const template = POSITION_PROGRAMS[e.target.value as StartingProgramKey];
             // A copy, so editing never changes the shared template.
-            if (template) setEditing(structuredClone(template.program));
+            if (template) startEditing(structuredClone(template.program));
           }}
         >
           <option value="">Start from a position template...</option>
@@ -617,6 +749,9 @@ export function CustomProgramPanel({ team }: { team: Team }) {
               <li key={program.id}>
                 <div>
                   <strong>{program.name}</strong>
+                  {!isProgramComplete(program) && (
+                    <span className="micro custom-program-unfinished"> Unfinished: fill every training day to assign it</span>
+                  )}
                   <p className="muted">
                     {trainingDays.length} training day{trainingDays.length === 1 ? "" : "s"}:{" "}
                     {trainingDays.map((day) => `${day.day.slice(0, 3)} ${day.title}`).join(" · ")}
@@ -634,7 +769,7 @@ export function CustomProgramPanel({ team }: { team: Team }) {
                   </details>
                 </div>
                 <div className="custom-program-row-controls">
-                  <button type="button" className="ghost" onClick={() => setEditing(program)}>
+                  <button type="button" className="ghost" onClick={() => startEditing(program)}>
                     Edit
                   </button>
                   <button type="button" className="ghost danger-button" onClick={() => handleDelete(program)}>

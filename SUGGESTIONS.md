@@ -40,7 +40,7 @@ Rules for automated runs:
 | B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |
 | F-25 | Show password and confirm password on sign-up (PR #68) | building | coach feedback | S |
 | F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
-| F-16 | Plan builder saves each day, and an unsaved program survives leaving the page | planned | coach feedback | M |
+| F-16 | Plan builder saves each day, and an unsaved program survives leaving the page (PR #81) | building | coach feedback | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
 | F-18 | Coach's own note on each exercise in a program (PR #79) | building | coach feedback | S |

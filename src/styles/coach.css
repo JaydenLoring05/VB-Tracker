@@ -890,3 +890,26 @@ html:has(dialog[open]) {
   margin-top: var(--sp-2);
   width: auto;
 }
+
+.custom-program-day-save {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-top: var(--sp-2);
+}
+
+.custom-program-day-save button {
+  width: auto;
+}
+
+.custom-program-resume {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--sp-3);
+  margin: var(--sp-3) 0;
+}
+
+.custom-program-unfinished {
+  display: block;
+}
