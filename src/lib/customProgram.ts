@@ -19,6 +19,8 @@ export type ProgramExercise = {
   seconds: number | null;
   /** The coach's own note for this exercise, shown to athletes under it. */
   note?: string;
+  /** Weight as a percent of the athlete's estimated max, e.g. 75. Rep exercises only. */
+  percent?: number | null;
 };
 
 export type ProgramDay = {
@@ -48,7 +50,8 @@ export type ProgramAssignment = {
 export function formatTarget(exercise: ProgramExercise): string {
   const sets = Math.max(1, exercise.sets);
   if (exercise.seconds != null) return `${sets}x${exercise.seconds} sec`;
-  return `${sets}x${exercise.reps?.trim() || "?"}`;
+  const percent = exercise.percent ? ` @ ${exercise.percent}%` : "";
+  return `${sets}x${exercise.reps?.trim() || "?"}${percent}`;
 }
 
 /**
@@ -253,6 +256,9 @@ function dayExerciseProblems(day: ProgramDay): string[] {
     if (exercise.seconds != null && exercise.seconds < 1) {
       problems.push(`${exercise.name || "An exercise"} on ${day.day} needs a time target.`);
     }
+    if (exercise.percent != null && (exercise.percent < 1 || exercise.percent > 120)) {
+      problems.push(`${exercise.name || "An exercise"} on ${day.day} needs a percent of max between 1 and 120.`);
+    }
   }
   return problems;
 }
@@ -275,7 +281,8 @@ export function parseProgramDays(raw: unknown): ProgramDay[] {
           sets: Number(exercise.sets) || 1,
           reps: exercise.reps == null ? null : String(exercise.reps),
           seconds: exercise.seconds == null ? null : Number(exercise.seconds) || null,
-          ...(typeof exercise.note === "string" && exercise.note.trim() ? { note: exercise.note } : {})
+          ...(typeof exercise.note === "string" && exercise.note.trim() ? { note: exercise.note } : {}),
+          ...(Number(exercise.percent) > 0 ? { percent: Number(exercise.percent) } : {})
         }))
     }))
     .filter((day) => (WEEKDAYS as readonly string[]).includes(day.day));

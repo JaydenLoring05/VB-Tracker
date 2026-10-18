@@ -9,6 +9,7 @@ import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
 import { getExercise } from "@/data/exercises";
 import { getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
 import { getExerciseNote, getExerciseTarget } from "@/lib/customProgram";
+import { parseTargetPercent, weightForPercent } from "@/lib/percentOfMax";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
@@ -60,6 +61,7 @@ export function WorkoutModeView({
     session,
     sets,
     previousSets,
+    estimatedMax,
     logSet,
     deleteSet,
     finishWorkout,
@@ -250,6 +252,10 @@ export function WorkoutModeView({
   const cues = getExercise(originalExercise)?.cues ?? [];
   const prescription = getExerciseTarget(day, session.week, exercise);
   const coachNote = getExerciseNote(day, originalExercise);
+  // "5x5 @ 75%": this athlete's own weight, from their best logged set.
+  const targetPercent = parseTargetPercent(prescription);
+  const exerciseMax = estimatedMax[exercise];
+  const percentWeight = targetPercent != null && exerciseMax ? weightForPercent(exerciseMax, targetPercent) : null;
   const isTimed = getExerciseMeasure(exercise) === "time";
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
   currentExerciseRef.current = exercise ?? null;
@@ -377,6 +383,27 @@ export function WorkoutModeView({
       <div className="panel">
         <h3>{exercise}</h3>
         <p className="muted">Target: {prescription}</p>
+        {targetPercent != null && (
+          <p className="percent-of-max">
+            {percentWeight != null ? (
+              <>
+                Today: <strong>{percentWeight}</strong>{" "}
+                <span className="muted">
+                  ({targetPercent}% of your estimated max, {Math.round(exerciseMax)})
+                </span>{" "}
+                {weight !== String(percentWeight) && (
+                  <button type="button" className="ghost" onClick={() => setWeight(String(percentWeight))}>
+                    Use {percentWeight}
+                  </button>
+                )}
+              </>
+            ) : (
+              <span className="muted">
+                {targetPercent}% of your max. No max yet: log a heavy set today and next time this fills in.
+              </span>
+            )}
+          </p>
+        )}
         {coachNote && <p className="exercise-coach-note">Coach: {coachNote}</p>}
         {lastTime && <p className="muted last-time">Last time: {formatSetValue(lastTime)}</p>}
 

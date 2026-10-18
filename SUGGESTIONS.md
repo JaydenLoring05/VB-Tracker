@@ -47,7 +47,8 @@ Rules for automated runs:
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-29 | One font across the whole app (PR #84) | building | me | S |
-| F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
+| F-27 | Programs that change by week (a max-test week, a rest week) | new | your idea | L |
+| F-28 | Weight targets as a percent of each athlete's estimated max (PR #83) | building | coach feedback | M |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
@@ -321,7 +322,18 @@ Rules for automated runs:
   1. per-week overrides on a program (week 6 is the max test, week 7 is
      rest), keyed to the program start date (F-07);
   2. a weight or percent-of-max target per exercise, filled from the
-     athlete's best on the PR board.
+     athlete's best on the PR board. Taichi asked for this one, so it is
+     now F-28.
+- **F-28. Percent-of-max weight targets.** Taichi asked for weights as a
+  percent of each athlete's max (2026-10-17). The coach fills in "% max"
+  on a rep exercise and the target reads "5x5 @ 75%". In Workout Mode each
+  athlete sees their own weight, rounded to 5, with a "Use" button that
+  fills the weight box. Jayden chose an estimated max over the heaviest
+  weight lifted, because the PR board keeps the heaviest weight and a 5-rep
+  best isn't a 1-rep max: Epley (weight x (1 + reps / 30)) over earlier
+  sets of 1 to 12 reps, in `src/lib/percentOfMax.ts`. An athlete with no
+  usable set is told to log a heavy set. No SQL (`team_programs.days` is
+  jsonb). Later: show the estimated max on the PR board.
 - **F-20. Copy a day, fold the rest.** "Copy to..." on each day in the
   builder, and only the day being edited stays open. Found while reading
   the builder for F-16.
