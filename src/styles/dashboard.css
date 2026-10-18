@@ -268,3 +268,30 @@
   flex: 0 0 auto;
   color: var(--gold);
 }
+
+/* Phone reminder card on Today (schema_v55): same look as the check-in card, plus a close button. */
+.push-nudge {
+  position: relative;
+  border-color: var(--border);
+}
+
+.push-nudge-link {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.push-nudge-close {
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.push-nudge-close svg {
+  color: var(--muted);
+}

@@ -59,3 +59,33 @@
 .feedback-panel button[type="submit"] {
   min-height: 48px;
 }
+
+/* Phone reminders */
+.phone-reminders h2 {
+  display: flex;
+  align-items: center;
+}
+
+.phone-reminders-hint {
+  border-left: 3px solid var(--gold);
+  padding-left: var(--sp-3);
+}
+
+.phone-reminders-on {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.phone-reminders-on select {
+  max-width: 200px;
+}
+
+.phone-reminders-actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.phone-reminders-actions button {
+  width: auto;
+}

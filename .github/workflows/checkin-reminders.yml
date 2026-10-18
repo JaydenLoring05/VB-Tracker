@@ -1,6 +1,6 @@
 name: Check-in reminders
 
-# Calls /api/checkin-reminders once an hour. The route sends each team's
+# Calls /api/checkin-reminders, then /api/push-reminders, once an hour. The route sends each team's
 # reminder at the hour the coach picked (in the team's time zone) to athletes
 # who haven't checked in yet that day. An hourly Vercel cron isn't available
 # on the Hobby plan, so GitHub's scheduler triggers it instead.
@@ -37,3 +37,19 @@ jobs:
           curl --fail-with-body --silent --show-error --max-time 60 \
             -H "Authorization: Bearer $CRON_SECRET" \
             "$SITE_URL/api/checkin-reminders"
+      - name: Call the phone reminder endpoint
+        # Runs even if the email step failed, so one doesn't block the other.
+        if: ${{ !cancelled() }}
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://volleyball-tracker-beta.vercel.app' }}
+        # Phone push reminders (schema_v55). The endpoint skips itself until the
+        # VAPID variables are set in Vercel.
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "CRON_SECRET is not set; phone reminders are off."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --max-time 60 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$SITE_URL/api/push-reminders"
