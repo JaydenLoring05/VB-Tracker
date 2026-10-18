@@ -67,6 +67,7 @@ Rules for automated runs:
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
 | F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
+| F-30 | Phone push reminders players turn on themselves (PR #NN, needs SQL and keys) | building | me | L |
 
 ## Details
 
