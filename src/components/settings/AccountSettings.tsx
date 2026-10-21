@@ -7,6 +7,7 @@ import { useAccountData } from "@/hooks/useAccountData";
 import { DELETE_CONFIRMATION_PHRASE, isDeleteConfirmed } from "@/lib/accountData";
 import { GuardianPrompt } from "@/components/guardian/GuardianPrompt";
 
+import { AthletePlan } from "./AthletePlan";
 import { PhoneReminders } from "./PhoneReminders";
 import { ReminderPreference } from "./ReminderPreference";
 
@@ -24,6 +25,8 @@ export function AccountSettings() {
   return (
     <div className="settings-page">
       <h1>Settings</h1>
+
+      <AthletePlan />
 
       <PhoneReminders />
       <ReminderPreference />
