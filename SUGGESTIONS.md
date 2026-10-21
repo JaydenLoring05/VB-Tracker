@@ -54,7 +54,7 @@ Rules for automated runs:
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
-| F-06 | Athletes with no team (solo plan) and a setup quiz | planned | me | L |
+| F-06 | Athletes with no team (solo plan) and a setup quiz | building | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
 | F-08 | Skill radar history (overlay last month on this month) | new | your idea | M |
 | F-09 | Morning email at each coach's local time | new | your idea | M |

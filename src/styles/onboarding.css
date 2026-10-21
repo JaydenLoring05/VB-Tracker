@@ -108,3 +108,30 @@
   margin: 0;
   color: var(--red);
 }
+
+/* Setup quiz and solo option (F-06). */
+.onboarding-quiz {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.onboarding-quiz legend {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.onboarding-quiz .muted {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+}
+
+.onboarding-solo {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.onboarding-solo p {
+  margin: 0 0 10px;
+}

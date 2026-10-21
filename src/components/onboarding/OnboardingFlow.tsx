@@ -9,9 +9,18 @@ import { validateGuardianAnswer, type GuardianAnswer } from "@/lib/guardian";
 import { createClient as createGuardianClient } from "@/lib/supabase/client";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
+import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { useTeam } from "@/hooks/useTeam";
 import { pendingInviteFrom, PENDING_INVITE_KEY } from "@/lib/invite";
 import { startingProgramKeyForPosition } from "@/lib/positionProgram";
+import {
+  AGE_GROUPS,
+  AgeGroup,
+  INJURY_AREAS,
+  InjuryArea,
+  TRAINING_LEVELS,
+  TrainingLevel
+} from "@/lib/trainingProfile";
 import { createClient } from "@/lib/supabase/client";
 
 type Role = "coach" | "athlete";
@@ -45,6 +54,7 @@ export function OnboardingFlow() {
   const { updateProfile } = useProfile();
   const { setStartingProgram } = useTrackerContext();
   const { createTeam, joinTeam, error: teamError } = useTeam();
+  const { setProfile: setTrainingProfile } = useTrainingProfile();
 
   const [step, setStep] = useState(1);
   const [role, setRole] = useState<Role | null>(null);
@@ -60,6 +70,11 @@ export function OnboardingFlow() {
 
   const [position, setPosition] = useState(POSITIONS[0]);
   const [goals, setGoals] = useState<string[]>(POSITION_DEFAULT_GOALS[POSITIONS[0]] ?? []);
+  // Setup quiz (F-06): the plan adapts to these from the first workout.
+  const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(null);
+  const [trainingLevel, setTrainingLevel] = useState<TrainingLevel>("intermediate");
+  const [soreAreas, setSoreAreas] = useState<InjuryArea[]>([]);
+  const [solo, setSolo] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
   // From an invite link (/join/<code>): this browser's saved code, else the
   // one stored on the account at sign-up.
@@ -156,6 +171,7 @@ export function OnboardingFlow() {
         athletes_expected: athletesExpected ? Number(athletesExpected) : null
       });
     } else {
+      setTrainingProfile({ level: trainingLevel, injuries: soreAreas, ageGroup });
       await updateProfile({ position, training_goals: goals });
       // Saved separately so a missing column (before schema_v45) can't block
       // the position and goals above. A coach program still replaces it.
@@ -187,6 +203,15 @@ export function OnboardingFlow() {
     setSaving(false);
     if (ok && role === "athlete" && pendingInvite) await clearPendingInvite();
     if (ok) setStep(4);
+  }
+
+  function trainSolo() {
+    setSolo(true);
+    setStep(4);
+  }
+
+  function toggleSoreArea(area: InjuryArea) {
+    setSoreAreas((current) => (current.includes(area) ? current.filter((item) => item !== area) : [...current, area]));
   }
 
   function finish() {
@@ -293,6 +318,60 @@ export function OnboardingFlow() {
             </p>
           )}
 
+          <fieldset className="onboarding-quiz">
+            <legend>Age</legend>
+            <div className="filter-row">
+              {AGE_GROUPS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={ageGroup === option.value ? "" : "ghost"}
+                  aria-pressed={ageGroup === option.value}
+                  onClick={() => setAgeGroup(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="onboarding-quiz">
+            <legend>Training experience</legend>
+            <div className="filter-row">
+              {TRAINING_LEVELS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={trainingLevel === option.value ? "" : "ghost"}
+                  aria-pressed={trainingLevel === option.value}
+                  title={option.hint}
+                  onClick={() => setTrainingLevel(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="muted">{TRAINING_LEVELS.find((option) => option.value === trainingLevel)?.hint}</p>
+          </fieldset>
+
+          <fieldset className="onboarding-quiz">
+            <legend>Anything sore or injured? (optional)</legend>
+            <div className="filter-row">
+              {INJURY_AREAS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={soreAreas.includes(option.value) ? "" : "ghost"}
+                  aria-pressed={soreAreas.includes(option.value)}
+                  onClick={() => toggleSoreArea(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="muted">Your workouts swap to joint-friendly versions and add rehab work. Change it any time.</p>
+          </fieldset>
+
           <fieldset className="onboarding-goals">
             <legend>Training goals (pick 1-2)</legend>
             {TRAINING_GOAL_OPTIONS.map((goal) => (
@@ -341,7 +420,7 @@ export function OnboardingFlow() {
 
       {step === 3 && role === "athlete" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleTeamStep}>
-          <h2>Join your team</h2>
+          <h2>Join your team, or train solo</h2>
           {pendingInvite && saving && <p className="muted">Joining your team from the invite link…</p>}
           <label>
             Invite code from your coach
@@ -364,6 +443,13 @@ export function OnboardingFlow() {
           <button type="submit" disabled={!inviteCode.trim() || saving}>
             {saving ? "Joining..." : "Join Team"}
           </button>
+
+          <div className="onboarding-solo">
+            <p className="muted">No team or no code? NextRep works on your own: your plan, check-ins and progress.</p>
+            <button type="button" className="secondary" onClick={trainSolo} disabled={saving}>
+              Train solo
+            </button>
+          </div>
         </form>
       )}
 
@@ -373,7 +459,9 @@ export function OnboardingFlow() {
           <p className="muted">
             {role === "coach"
               ? "Your team is ready. Share your invite code with athletes from the coach dashboard."
-              : "You're on the roster. Your dashboard is ready."}
+              : solo
+                ? "Your plan is set up around you. Start today's workout from the dashboard, and join a team any time."
+                : "You're on the roster. Your dashboard is ready."}
           </p>
           <button type="button" onClick={finish}>
             Go to {role === "coach" ? "Coach Dashboard" : "Dashboard"}
