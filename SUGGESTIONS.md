@@ -48,7 +48,6 @@ Rules for automated runs:
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
-| F-32 | Workouts tab: an open day card gets its own full-width row instead of a 140px column | new | me | S |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
@@ -487,6 +486,7 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Workouts tab: an open day card gets the full row, exercises side by side on wide screens (F-32) | me | #91 |
 | Plan fits the athlete: level and sore areas swap exercises and add rehab work (F-31) | me | #89 |
 | Plan builder saves each day; unsaved changes survive a closed tab; unfinished programs can't be assigned (F-16) | coach feedback | #81 |
 | Copy a program day to other days, and fold the days not being edited (F-20) | your idea | #80 |
