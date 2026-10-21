@@ -45,7 +45,6 @@ Rules for automated runs:
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
-| F-31 | Plan fits the athlete: level (beginner/intermediate/advanced) and sore areas (knee, shoulder, lower back, ankle) swap exercises and add rehab work (PR #89) | building | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
@@ -461,6 +460,14 @@ Rules for automated runs:
 
 ### Plan fit
 
+- **F-32. An open day card is squeezed into one narrow column.** On
+  Workouts, `.workout-grid` in `src/styles/workouts.css` is
+  `repeat(7, minmax(140px, 1fr))`, so today's expanded card (and any day a
+  player opens) is one-seventh of the width: exercise names wrap to three
+  lines and the F-31 swap notes ("Knee-friendly swap for Box Jumps") stack
+  awkwardly. Seen on desktop Chrome on 2026-10-21. Let the expanded card
+  span the full row (`grid-column: 1 / -1`) with the collapsed days staying
+  as a row of chips above or below it, and check phone width too.
 - **F-31. The plan fits the athlete (level and sore areas).** Jayden asked
   for it on 2026-10-21 as the core of NextRep's move to individual athletes
   and youth: a beginner shouldn't get the same lifts as an advanced player,
@@ -479,6 +486,8 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Workouts tab: an open day card gets the full row, exercises side by side on wide screens (F-32) | me | #91 |
+| Plan fits the athlete: level and sore areas swap exercises and add rehab work (F-31) | me | #89 |
 | Plan builder saves each day; unsaved changes survive a closed tab; unfinished programs can't be assigned (F-16) | coach feedback | #81 |
 | Copy a program day to other days, and fold the days not being edited (F-20) | your idea | #80 |
 | Coach's own note on each exercise in a program (F-18) | coach feedback | #79 |
