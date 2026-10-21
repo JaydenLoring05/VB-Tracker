@@ -45,6 +45,7 @@ Rules for automated runs:
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
+| F-31 | Plan fits the athlete: level (beginner/intermediate/advanced) and sore areas (knee, shoulder, lower back, ankle) swap exercises and add rehab work (PR #89) | building | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
@@ -457,6 +458,19 @@ Rules for automated runs:
   for now). A small shared `useQuery`-style hook (or SWR/TanStack Query)
   would remove the duplication, clear the warnings, and give every screen
   the same retry behavior.
+
+### Plan fit
+
+- **F-31. The plan fits the athlete (level and sore areas).** Jayden asked
+  for it on 2026-10-21 as the core of NextRep's move to individual athletes
+  and youth: a beginner shouldn't get the same lifts as an advanced player,
+  and a sore knee or shoulder should change the workout. A picker on
+  Workouts and Start a Workout sets level and sore areas (kept on the
+  device for now). `src/lib/trainingProfile.ts` swaps exercises by level,
+  then by injury, adds two rehab exercises per sore area on training days,
+  and scales sets by level; coach-built programs keep their lifts and
+  targets but still get injury swaps. Next step: save the profile to the
+  athlete's account so coaches and parents can see it.
 
 ## Shipped
 

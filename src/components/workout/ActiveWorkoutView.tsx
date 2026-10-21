@@ -13,6 +13,7 @@ import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { formatSetValue, getExerciseMeasure, parseTargetSeconds } from "@/lib/exerciseMeasure";
 import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
 import { formatDuration } from "@/lib/time";
@@ -89,15 +90,16 @@ export function WorkoutModeView({
 
   const { resolveExercise, setSubstitution } = useExerciseSubstitutions();
   const { teamOverride, substitutions, stats } = useTrackerContext();
+  const { profile: trainingProfile } = useTrainingProfile();
 
   const day = useMemo(
     () =>
       session
-        ? resolveWorkoutDays(getWorkoutDays(session.week), session.week, teamOverride, substitutions).find(
+        ? resolveWorkoutDays(getWorkoutDays(session.week), session.week, teamOverride, substitutions, trainingProfile).find(
             (d) => d.day === session.day
           )
         : undefined,
-    [session, teamOverride, substitutions]
+    [session, teamOverride, substitutions, trainingProfile]
   );
 
   const resolvedExercises = useMemo(
@@ -250,6 +252,7 @@ export function WorkoutModeView({
   const cues = getExercise(originalExercise)?.cues ?? [];
   const prescription = getExerciseTarget(day, session.week, exercise);
   const coachNote = getExerciseNote(day, originalExercise);
+  const adaptNote = day.adaptNotes?.[originalExercise] ?? "";
   const isTimed = getExerciseMeasure(exercise) === "time";
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
   currentExerciseRef.current = exercise ?? null;
@@ -377,6 +380,7 @@ export function WorkoutModeView({
       <div className="panel">
         <h3>{exercise}</h3>
         <p className="muted">Target: {prescription}</p>
+        {adaptNote && <p className="exercise-adapt-note">{adaptNote}</p>}
         {coachNote && <p className="exercise-coach-note">Coach: {coachNote}</p>}
         {lastTime && <p className="muted last-time">Last time: {formatSetValue(lastTime)}</p>}
 
