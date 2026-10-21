@@ -35,6 +35,7 @@ Rules for automated runs:
 | B-04 | The Workout Mode browser test fails on rest days, turning CI red (PR #66) | building | bug | S |
 | B-05 | Daily coach summary email fails with `text = date` (PR #65, needs SQL) | building | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) (PR #63) | building | me | M |
+| B-07 | Results card adds an inch mark to approach touch logged in feet (11.4") | building | bug | S |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |

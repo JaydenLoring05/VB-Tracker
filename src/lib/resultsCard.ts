@@ -11,7 +11,9 @@ export type ResultMetric = "vertical" | "approach" | "pullups";
 
 export const RESULT_METRICS: { key: ResultMetric; label: string; unit: string }[] = [
   { key: "vertical", label: "Vertical", unit: '"' },
-  { key: "approach", label: "Approach touch", unit: '"' },
+  // The stats form has no unit, and athletes log approach touch in feet
+  // (11.4) or inches (136), so show it exactly as logged (B-07).
+  { key: "approach", label: "Approach touch", unit: "" },
   { key: "pullups", label: "Pull-ups", unit: "" }
 ];
 
