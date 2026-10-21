@@ -1,14 +1,15 @@
 "use client";
 
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
-import { INJURY_AREAS, InjuryArea, TRAINING_LEVELS } from "@/lib/trainingProfile";
+import { INJURY_AREAS, InjuryArea, injuryLabel, TRAINING_LEVELS } from "@/lib/trainingProfile";
 
 /**
  * Level and sore-area picker (F-31). The plan everywhere in the app
  * (Workouts, Start a Workout, the dashboard) adapts to what's picked here.
  */
 export function TrainingProfileCard({ adaptedCount }: { adaptedCount?: number }) {
-  const { profile, setProfile } = useTrainingProfile();
+  const { profile, checkInAreas, setProfile } = useTrainingProfile();
+  const checkInOnly = checkInAreas.filter((area) => !profile.injuries.includes(area));
 
   const toggleInjury = (area: InjuryArea) => {
     const injuries = profile.injuries.includes(area)
@@ -58,6 +59,13 @@ export function TrainingProfileCard({ adaptedCount }: { adaptedCount?: number })
           );
         })}
       </div>
+
+      {checkInOnly.length > 0 && (
+        <p className="training-profile-checkin" role="status">
+          Today&apos;s check-in flagged {checkInOnly.map((area) => injuryLabel(area).toLowerCase()).join(" and ")} pain, so
+          that&apos;s on for today too. It turns off tomorrow unless you pick it above.
+        </p>
+      )}
 
       {typeof adaptedCount === "number" && adaptedCount > 0 && (
         <p className="muted training-profile-summary">

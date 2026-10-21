@@ -1,11 +1,15 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 
+import { useTrackerContext } from "@/context/TrackerContext";
+import { todayISO } from "@/lib/storage";
 import {
+  checkInSoreAreas,
   DEFAULT_TRAINING_PROFILE,
   parseTrainingProfile,
-  TrainingProfile
+  TrainingProfile,
+  withCheckInAreas
 } from "@/lib/trainingProfile";
 
 // Kept on this device for the first version (F-31). A later row can move it
@@ -67,5 +71,12 @@ export function useTrainingProfile() {
     listeners.forEach((listener) => listener());
   }, []);
 
-  return { profile, setProfile };
+  // Today's check-in can turn on an area for the day (F-33) without changing
+  // what the athlete saved.
+  const { stats } = useTrackerContext();
+  const today = todayISO();
+  const checkInAreas = useMemo(() => checkInSoreAreas(stats, today), [stats, today]);
+  const effectiveProfile = useMemo(() => withCheckInAreas(profile, checkInAreas), [profile, checkInAreas]);
+
+  return { profile, effectiveProfile, checkInAreas, setProfile };
 }

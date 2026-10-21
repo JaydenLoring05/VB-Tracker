@@ -14,7 +14,7 @@ import { TrainingProfileCard } from "@/components/workouts/TrainingProfileCard";
 
 export function StartWorkoutScreen() {
   const { week, teamOverride, substitutions } = useTrackerContext();
-  const { profile: trainingProfile } = useTrainingProfile();
+  const { effectiveProfile: trainingProfile } = useTrainingProfile();
   const { loading, starting, openSession, startWorkout, resumeWorkout } = useStartWorkout();
   const [selectedDay, setSelectedDay] = useState(todayName());
 

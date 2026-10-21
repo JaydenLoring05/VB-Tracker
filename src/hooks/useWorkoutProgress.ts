@@ -7,7 +7,7 @@ import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 
 export function useWorkoutProgress() {
   const { week, setWeek, checked, toggleExercise, teamOverride, substitutions } = useTrackerContext();
-  const { profile: trainingProfile } = useTrainingProfile();
+  const { effectiveProfile: trainingProfile } = useTrainingProfile();
 
   const workoutDays = useMemo(
     () => resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions, trainingProfile),

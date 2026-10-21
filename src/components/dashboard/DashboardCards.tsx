@@ -34,7 +34,7 @@ const RECOVERY_COLOR: Record<string, string> = {
 export function DashboardCards() {
   const today = todayName();
   const { workoutStreak, teamOverride, substitutions } = useTrackerContext();
-  const { profile: trainingProfile } = useTrainingProfile();
+  const { effectiveProfile: trainingProfile } = useTrainingProfile();
 
   const { recovery, status, hasLoggedStats, readinessExplanation, history } = useRecoveryStats();
   const needsCheckIn = !checkedInToday(history);
