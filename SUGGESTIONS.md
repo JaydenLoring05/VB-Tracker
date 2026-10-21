@@ -45,7 +45,7 @@ Rules for automated runs:
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
-| F-31 | Plan fits the athlete: level (beginner/intermediate/advanced) and sore areas (knee, shoulder, lower back, ankle) swap exercises and add rehab work | building | me | M |
+| F-31 | Plan fits the athlete: level (beginner/intermediate/advanced) and sore areas (knee, shoulder, lower back, ankle) swap exercises and add rehab work (PR #89) | building | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
