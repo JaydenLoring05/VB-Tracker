@@ -90,7 +90,7 @@ export function WorkoutModeView({
 
   const { resolveExercise, setSubstitution } = useExerciseSubstitutions();
   const { teamOverride, substitutions, stats } = useTrackerContext();
-  const { profile: trainingProfile } = useTrainingProfile();
+  const { effectiveProfile: trainingProfile } = useTrainingProfile();
 
   const day = useMemo(
     () =>

@@ -4,10 +4,12 @@ import { getWorkoutDays } from "@/data/workoutPlan";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import {
   adaptWorkoutDays,
+  checkInSoreAreas,
   countAdaptations,
   DEFAULT_TRAINING_PROFILE,
   parseTrainingProfile,
-  scaleTargetForLevel
+  scaleTargetForLevel,
+  withCheckInAreas
 } from "@/lib/trainingProfile";
 import type { WorkoutDay } from "@/types";
 
@@ -150,5 +152,44 @@ describe("resolveWorkoutDays with a profile", () => {
     const team = { planTier: "pilot" as const, exerciseDefaults: { "Hip Thrust": "Box Jumps" }, dayOverrides: {} };
     const result = resolveWorkoutDays([day(["Hip Thrust"])], 1, team, {}, { level: "intermediate", injuries: ["knee"] });
     expect(result[0].exercises).not.toContain("Box Jumps");
+  });
+});
+
+describe("check-in sore areas (F-33)", () => {
+  const stats = (overrides: Record<string, unknown> = {}) => ({
+    date: "2026-10-21",
+    kneePain: 0 as number | "",
+    shoulderPain: 0 as number | "",
+    lowerBackPain: 0 as number | "",
+    anklePain: 0 as number | "",
+    ...overrides
+  });
+
+  it("flags areas at or above the threshold on today's check-in", () => {
+    expect(checkInSoreAreas(stats({ kneePain: 4, anklePain: 7, shoulderPain: 3 }), "2026-10-21")).toEqual([
+      "knee",
+      "ankle"
+    ]);
+  });
+
+  it("ignores a check-in from another day and blank answers", () => {
+    expect(checkInSoreAreas(stats({ kneePain: 9 }), "2026-10-22")).toEqual([]);
+    expect(checkInSoreAreas(stats({ kneePain: "" }), "2026-10-21")).toEqual([]);
+    expect(checkInSoreAreas(null, "2026-10-21")).toEqual([]);
+  });
+
+  it("adds check-in areas without dropping saved ones or duplicating", () => {
+    const saved = { level: "advanced" as const, injuries: ["knee" as const] };
+    expect(withCheckInAreas(saved, ["knee", "shoulder"])).toEqual({
+      level: "advanced",
+      injuries: ["knee", "shoulder"]
+    });
+    expect(withCheckInAreas(saved, ["knee"])).toBe(saved);
+  });
+
+  it("makes the plan adapt even from the default profile", () => {
+    const profile = withCheckInAreas(DEFAULT_TRAINING_PROFILE, ["knee"]);
+    const [result] = adaptWorkoutDays([day(["Box Jumps"])], 1, profile);
+    expect(result.exercises[0]).toBe("Hip Thrust");
   });
 });

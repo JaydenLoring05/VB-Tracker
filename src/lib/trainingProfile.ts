@@ -1,5 +1,5 @@
 import { getPrescription } from "@/data/workoutPlan";
-import { WorkoutDay } from "@/types";
+import { StatEntry, WorkoutDay } from "@/types";
 
 /**
  * Training profile (F-31): the athlete's level and any sore or injured
@@ -295,6 +295,42 @@ export function adaptWorkoutDays(
       ...(Object.keys(adaptNotes).length > 0 ? { adaptNotes } : {})
     };
   });
+}
+
+/** Pain at or above this on today's check-in turns that area on for the day (F-33). */
+export const CHECK_IN_PAIN_THRESHOLD = 4;
+
+const PAIN_FIELD: Record<InjuryArea, "kneePain" | "shoulderPain" | "lowerBackPain" | "anklePain"> = {
+  knee: "kneePain",
+  shoulder: "shoulderPain",
+  lowerBack: "lowerBackPain",
+  ankle: "anklePain"
+};
+
+/** Areas today's check-in reported as sore. A check-in from another day counts for nothing. */
+export function checkInSoreAreas(
+  stats: Pick<StatEntry, "date" | "kneePain" | "shoulderPain" | "lowerBackPain" | "anklePain"> | null | undefined,
+  today: string
+): InjuryArea[] {
+  if (!stats || stats.date !== today) return [];
+  return INJURY_AREAS.map((option) => option.value).filter(
+    (area) => Number(stats[PAIN_FIELD[area]]) >= CHECK_IN_PAIN_THRESHOLD
+  );
+}
+
+/** The profile the plan uses today: the athlete's saved areas plus anything today's check-in flagged. */
+export function withCheckInAreas(profile: TrainingProfile, areas: InjuryArea[]): TrainingProfile {
+  const extra = areas.filter((area) => !profile.injuries.includes(area));
+  if (extra.length === 0) return profile;
+  const injuries = INJURY_AREAS.map((option) => option.value).filter(
+    (area) => profile.injuries.includes(area) || extra.includes(area)
+  );
+  return { ...profile, injuries };
+}
+
+/** Display label for an area ("Lower back"). */
+export function injuryLabel(area: InjuryArea): string {
+  return INJURY_AREAS.find((option) => option.value === area)?.label ?? area;
 }
 
 /** How many exercises the profile changed or added across the week. */

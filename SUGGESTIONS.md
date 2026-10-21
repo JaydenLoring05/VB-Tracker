@@ -40,6 +40,11 @@ Rules for automated runs:
 | B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |
 | F-25 | Show password and confirm password on sign-up (PR #68) | building | coach feedback | S |
 | F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
+| F-33 | Today's check-in pain (4+) turns on that sore area in the plan for the day | building | me | S |
+| F-34 | Save the training profile (level, sore areas, age group) to the athlete's account (needs SQL) | planned | me | M |
+| F-35 | Youth version for athletes under 14: no heavy barbell or depth jumps, more landing and bodyweight work | planned | me | M |
+| F-36 | 4-week results card: retest vertical and approach touch, before/after card to share | planned | me | M |
+| F-37 | Payments: $14.99/month athlete plan with a 7-day free trial (Stripe; stays off until keys are set) | planned | me | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
@@ -49,7 +54,7 @@ Rules for automated runs:
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
-| F-06 | Athletes with no team (solo plan) | new | me | L |
+| F-06 | Athletes with no team (solo plan) and a setup quiz | planned | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
 | F-08 | Skill radar history (overlay last month on this month) | new | your idea | M |
 | F-09 | Morning email at each coach's local time | new | your idea | M |
@@ -460,6 +465,17 @@ Rules for automated runs:
 
 ### Plan fit
 
+- **F-33. Check-in turns on injury mode.** When today's daily check-in
+  reports knee, shoulder, lower-back or ankle pain at 4 or more (the same
+  threshold as the discomfort nudge), that area is added to the athlete's
+  profile for today only, so the plan swaps exercises and adds rehab work
+  without the athlete touching settings. The saved profile doesn't change.
+- **F-34 to F-37.** Asked for by Jayden on 2026-10-21 as the athlete-first
+  build: the profile follows the athlete across devices (F-34), an under-14
+  version (F-35), a 4-week retest and results card (F-36), and a paid
+  individual plan at $14.99/month with a 7-day trial (F-37). Parent-facing
+  items (a weekly parent email, a parent landing page) were deliberately
+  left out: NextRep stays focused on the athlete.
 - **F-32. An open day card is squeezed into one narrow column.** On
   Workouts, `.workout-grid` in `src/styles/workouts.css` is
   `repeat(7, minmax(140px, 1fr))`, so today's expanded card (and any day a

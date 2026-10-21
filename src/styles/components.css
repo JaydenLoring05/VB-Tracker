@@ -483,3 +483,9 @@
   margin: 4px 0 0;
   font-size: 0.85rem;
 }
+
+.training-profile-checkin {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: var(--gold);
+}

@@ -17,7 +17,7 @@ export type PreviousSet = { weight: number | null; reps: number | null; seconds:
 
 export function useActiveWorkoutSession(sessionId: string) {
   const { userId, setExerciseChecked, addPR, reportSyncError, teamOverride, substitutions } = useTrackerContext();
-  const { profile: trainingProfile } = useTrainingProfile();
+  const { effectiveProfile: trainingProfile } = useTrainingProfile();
   const { resolveExercise } = useExerciseSubstitutions();
   const supabase = useMemo(() => createClient(), []);
 
