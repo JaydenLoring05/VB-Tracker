@@ -40,6 +40,7 @@ Rules for automated runs:
 | B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |
 | F-25 | Show password and confirm password on sign-up (PR #68) | building | coach feedback | S |
 | F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
+| F-38 | Weekly auto-adjust: lighter week after poor recovery, repeated pain on all week, repeat a missed week, practice/lift-elsewhere days, games (needs SQL) | building | me | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
@@ -459,6 +460,14 @@ Rules for automated runs:
 
 ### Plan fit
 
+- **F-38. Weekly auto-adjust.** Jayden's call on 2026-10-21: keep the
+  20-week plan as the skeleton and bend each week around the athlete.
+  Inputs: the last 7 days of check-ins (average recovery under 55% with 3+
+  check-ins means one set fewer all week; pain 4+ on 2+ check-ins keeps that
+  area on all week), last week's completion (under 50% suggests repeating
+  it), the athlete's own week (practice days lose the jumping; days they lift
+  elsewhere are rehab, core and mobility), and games from their calendar
+  (game day is a loosen-up day, the day before has no jumping or heavy legs).
 - **F-33. Check-in turns on injury mode.** When today's daily check-in
   reports knee, shoulder, lower-back or ankle pain at 4 or more (the same
   threshold as the discomfort nudge), that area is added to the athlete's
