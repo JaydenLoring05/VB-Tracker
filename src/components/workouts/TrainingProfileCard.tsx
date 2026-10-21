@@ -1,7 +1,7 @@
 "use client";
 
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
-import { INJURY_AREAS, InjuryArea, injuryLabel, TRAINING_LEVELS } from "@/lib/trainingProfile";
+import { AGE_GROUPS, INJURY_AREAS, InjuryArea, injuryLabel, TRAINING_LEVELS } from "@/lib/trainingProfile";
 
 /**
  * Level and sore-area picker (F-31). The plan everywhere in the app
@@ -25,6 +25,26 @@ export function TrainingProfileCard({ adaptedCount }: { adaptedCount?: number })
         Pick your level and anything that hurts. Exercises swap to safer or better-fitting versions and rehab work
         gets added.
       </p>
+
+      <p className="training-profile-label">Age</p>
+      <div className="filter-row" role="group" aria-label="Age group">
+        {AGE_GROUPS.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={profile.ageGroup === option.value ? "" : "ghost"}
+            aria-pressed={profile.ageGroup === option.value}
+            onClick={() => setProfile({ ...profile, ageGroup: option.value })}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      {profile.ageGroup === "under14" && (
+        <p className="muted training-profile-summary">
+          Under 14: no heavy barbell lifts or depth jumps, lighter sets, and landing practice on every jump day.
+        </p>
+      )}
 
       <p className="training-profile-label">Level</p>
       <div className="filter-row" role="group" aria-label="Training level">
