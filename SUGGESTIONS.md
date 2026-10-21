@@ -42,7 +42,7 @@ Rules for automated runs:
 | F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
 | F-33 | Today's check-in pain (4+) turns on that sore area in the plan for the day | building | me | S |
 | F-34 | Save the training profile (level, sore areas, age group) to the athlete's account (needs SQL) | building | me | M |
-| F-35 | Youth version for athletes under 14: no heavy barbell or depth jumps, more landing and bodyweight work | planned | me | M |
+| F-35 | Youth version for athletes under 14: no heavy barbell or depth jumps, more landing and bodyweight work | building | me | M |
 | F-36 | 4-week results card: retest vertical and approach touch, before/after card to share | planned | me | M |
 | F-37 | Payments: $14.99/month athlete plan with a 7-day free trial (Stripe; stays off until keys are set) | planned | me | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |

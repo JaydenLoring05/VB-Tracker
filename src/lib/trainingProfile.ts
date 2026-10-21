@@ -81,6 +81,40 @@ const LEVEL_SWAPS: Record<TrainingLevel, SwapTable> = {
   }
 };
 
+// Under 14 (F-35): growing bones and tendons get bodyweight, light-implement
+// and landing work instead of heavy barbell lifts and high-impact depth jumps.
+const YOUTH_SWAPS: SwapTable = {
+  "Front Squat": ["Goblet Squat"],
+  "Heel-Elevated Goblet Squat": ["Goblet Squat"],
+  "Trap Bar Deadlift or RDL": ["Kettlebell Deadlift", "Glute Bridge"],
+  RDL: ["Kettlebell Deadlift", "Glute Bridge"],
+  "Romanian Deadlift": ["Kettlebell Deadlift", "Glute Bridge"],
+  "Bulgarian Split Squat": ["Split Squat", "Reverse Lunges"],
+  "Nordic Hamstring Curl": ["Swiss Ball Curl"],
+  "Push Press": ["Med Ball Chest Pass"],
+  Dips: ["Push-Ups"],
+  "Hanging Leg Raises": ["Hanging Knee Raises"],
+  "Ab Wheel Rollout": ["Stability Ball Rollout", "Dead Bugs"],
+  "L-Sit Practice": ["Hollow Hold"],
+  "Depth Drops": ["Snap Downs"],
+  "Drop Jumps": ["Snap Downs"]
+};
+
+/** Jumping days for youth always include landing practice. */
+const JUMP_WORK = new Set([
+  "Box Jumps",
+  "Broad Jumps",
+  "Approach Jumps",
+  "Pogo Hops",
+  "Squat Jumps",
+  "Standing Vertical Jumps",
+  "Lateral Bounds",
+  "Bounds",
+  "Skater Jumps",
+  "Line Hops",
+  "Snap Downs"
+]);
+
 const INJURY_SWAPS: Record<InjuryArea, SwapTable> = {
   // Jumper's knee: cut the high-impact jumping and deep loaded knee bends,
   // keep the hips working and lean on slow, controlled knee work.
@@ -255,7 +289,10 @@ export function adaptWorkoutDays(
   options: { coachProgram?: boolean } = {}
 ): WorkoutDay[] {
   if (isDefaultProfile(profile)) return days;
+  const youth = profile.ageGroup === "under14";
   const applyLevel = !options.coachProgram && profile.level !== "intermediate";
+  // Youth sets follow the beginner rule (low end of the range) whatever the level.
+  const setLevel: TrainingLevel | null = options.coachProgram ? null : youth ? "beginner" : applyLevel ? profile.level : null;
 
   return days.map((day) => {
     if (day.rest || day.exercises.length === 0) return day;
@@ -290,9 +327,20 @@ export function adaptWorkoutDays(
       runSwaps(LEVEL_SWAPS[profile.level], (from) => `${LEVEL_LABEL[profile.level]} version of ${from}`);
     }
 
+    if (youth) {
+      runSwaps(YOUTH_SWAPS, (from) => `Under-14 version of ${from}`);
+    }
+
     profile.injuries.forEach((area) => {
       runSwaps(INJURY_SWAPS[area], (from) => `${AREA_LABEL[area]}-friendly swap for ${from}`);
     });
+
+    if (youth && isTrainingDay(day) && exercises.some((exercise) => JUMP_WORK.has(exercise))) {
+      if (!exercises.includes("Landing Mechanics Drill")) {
+        exercises.push("Landing Mechanics Drill");
+        notes["Landing Mechanics Drill"] = "Added: landing practice for under-14 athletes";
+      }
+    }
 
     if (isTrainingDay(day)) {
       profile.injuries.forEach((area) => {
@@ -309,7 +357,7 @@ export function adaptWorkoutDays(
       const source = sourceOf[exercise];
       const existing = day.targets?.[exercise] ?? (source ? day.targets?.[source] : undefined);
       const target = existing ?? getPrescription(week, exercise);
-      targets[exercise] = applyLevel ? scaleTargetForLevel(target, profile.level) : target;
+      targets[exercise] = setLevel ? scaleTargetForLevel(target, setLevel) : target;
     });
 
     const adaptNotes: Record<string, string> = {};

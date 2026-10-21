@@ -215,3 +215,27 @@ describe("profile on the account (F-34)", () => {
     ]);
   });
 });
+
+describe("youth version (F-35)", () => {
+  it("swaps heavy lifts and depth jumps and adds landing practice", () => {
+    const [result] = adaptWorkoutDays([day(["Front Squat", "Depth Drops", "Box Jumps"])], 1, {
+      level: "intermediate",
+      injuries: [],
+      ageGroup: "under14"
+    });
+    expect(result.exercises).toEqual(["Goblet Squat", "Snap Downs", "Box Jumps", "Landing Mechanics Drill"]);
+    expect(result.adaptNotes?.["Goblet Squat"]).toBe("Under-14 version of Front Squat");
+  });
+
+  it("keeps youth sets at the low end even for advanced", () => {
+    const [result] = adaptWorkoutDays([day(["Goblet Squat"])], 1, { level: "advanced", injuries: [], ageGroup: "under14" });
+    // Advanced upgrades Goblet Squat to Front Squat; youth brings it back.
+    expect(result.exercises[0]).toBe("Goblet Squat");
+    expect(result.targets?.["Goblet Squat"]).toBe("2x10");
+  });
+
+  it("changes nothing for 14 and up at the default level", () => {
+    const days = [day(["Front Squat"])];
+    expect(adaptWorkoutDays(days, 1, { level: "intermediate", injuries: [], ageGroup: "14to17" })).toBe(days);
+  });
+});
