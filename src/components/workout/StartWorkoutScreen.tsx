@@ -58,6 +58,7 @@ export function StartWorkoutScreen() {
         <div className="workout-mode-preview">
           <h3>{day.title}</h3>
           <p className="muted">⏱ {day.minutes}</p>
+          {day.adjustNote && <p className="day-adjust-note">{day.adjustNote}</p>}
 
           <ul>
             {day.exercises.map((exercise) => (

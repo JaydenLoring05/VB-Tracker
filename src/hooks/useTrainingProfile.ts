@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
+import { getWorkoutDays } from "@/data/workoutPlan";
 import { createClient } from "@/lib/supabase/client";
 import { todayISO } from "@/lib/storage";
 import {
@@ -16,6 +17,7 @@ import {
   TrainingProfileRow,
   withCheckInAreas
 } from "@/lib/trainingProfile";
+import { buildWeekAdjust, weekCompletion } from "@/lib/weeklyAdjust";
 
 // The account (profiles, schema_v56) is the source of truth (F-34). This
 // browser keeps a copy so the plan shows instantly and still works before
@@ -88,7 +90,7 @@ let syncedFor: string | null = null;
 async function syncFromAccount(userId: string) {
   const { data, error } = await createClient()
     .from("profiles")
-    .select("training_level, sore_areas, age_group")
+    .select("*")
     .eq("user_id", userId)
     .maybeSingle();
   if (error) return; // columns missing (SQL not run yet) or offline
@@ -104,7 +106,7 @@ async function syncFromAccount(userId: string) {
 
 export function useTrainingProfile() {
   const profile = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const { stats, userId } = useTrackerContext();
+  const { stats, userId, history, calendarEvents, checked, week } = useTrackerContext();
 
   useEffect(() => {
     if (!userId || syncedFor === userId) return;
@@ -126,7 +128,26 @@ export function useTrainingProfile() {
   // what the athlete saved.
   const today = todayISO();
   const checkInAreas = useMemo(() => checkInSoreAreas(stats, today), [stats, today]);
-  const effectiveProfile = useMemo(() => withCheckInAreas(profile, checkInAreas), [profile, checkInAreas]);
 
-  return { profile, effectiveProfile, checkInAreas, setProfile };
+  // This week's adjustments (F-38): recovery, repeated pain, last week's
+  // completion, the athlete's own week and games.
+  const weekAdjust = useMemo(() => {
+    const lastWeek = week - 1;
+    const planned = lastWeek >= 1 ? getWorkoutDays(lastWeek).reduce((sum, day) => sum + day.exercises.length, 0) : 0;
+    return buildWeekAdjust({
+      history: history ?? [],
+      today,
+      schedule: profile.weekly ?? {},
+      gameDates: (calendarEvents ?? []).filter((event) => event.type === "game").map((event) => event.date),
+      completionLastWeek: lastWeek >= 1 ? weekCompletion(checked ?? {}, lastWeek, planned) : null
+    });
+  }, [history, today, profile.weekly, calendarEvents, checked, week]);
+
+  const effectiveProfile = useMemo(() => {
+    const withWeek = withCheckInAreas(profile, weekAdjust.extraAreas);
+    const withToday = withCheckInAreas(withWeek, checkInAreas);
+    return { ...withToday, adjust: { deload: weekAdjust.deload, days: weekAdjust.days } };
+  }, [profile, weekAdjust, checkInAreas]);
+
+  return { profile, effectiveProfile, checkInAreas, weekAdjust, setProfile };
 }

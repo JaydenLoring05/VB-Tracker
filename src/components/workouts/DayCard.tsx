@@ -65,6 +65,7 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
       </div>
       <h4>{day.title}</h4>
       <p className="muted">⏱ {day.minutes}</p>
+      {day.adjustNote && <p className="day-adjust-note">{day.adjustNote}</p>}
 
       {day.exercises.map((originalExercise) => {
         const exercise = resolveExercise(originalExercise);

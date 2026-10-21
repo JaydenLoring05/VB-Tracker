@@ -1,15 +1,46 @@
 "use client";
 
+import { useState } from "react";
+
+import { useTrackerContext } from "@/context/TrackerContext";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
-import { AGE_GROUPS, INJURY_AREAS, InjuryArea, injuryLabel, TRAINING_LEVELS } from "@/lib/trainingProfile";
+import { startDateForWeek } from "@/lib/programSchedule";
+import { todayISO } from "@/lib/storage";
+import {
+  AGE_GROUPS,
+  DAY_ROLES,
+  DayRole,
+  INJURY_AREAS,
+  InjuryArea,
+  injuryLabel,
+  TRAINING_LEVELS,
+  Weekday,
+  WEEKDAYS
+} from "@/lib/trainingProfile";
 
 /**
  * Level and sore-area picker (F-31). The plan everywhere in the app
  * (Workouts, Start a Workout, the dashboard) adapts to what's picked here.
  */
 export function TrainingProfileCard({ adaptedCount }: { adaptedCount?: number }) {
-  const { profile, checkInAreas, setProfile } = useTrainingProfile();
+  const { profile, checkInAreas, weekAdjust, setProfile } = useTrainingProfile();
+  const { week, setWeek, setProgramStartDate } = useTrackerContext();
+  const [repeating, setRepeating] = useState(false);
   const checkInOnly = checkInAreas.filter((area) => !profile.injuries.includes(area));
+
+  const setDayRole = (day: Weekday, role: DayRole | "off") => {
+    const weekly = { ...(profile.weekly ?? {}) };
+    if (role === "off") delete weekly[day];
+    else weekly[day] = role;
+    setProfile({ ...profile, weekly });
+  };
+
+  async function repeatLastWeek() {
+    setRepeating(true);
+    const previous = Math.max(1, week - 1);
+    if (await setProgramStartDate(startDateForWeek(previous, todayISO()))) setWeek(previous);
+    setRepeating(false);
+  }
 
   const toggleInjury = (area: InjuryArea) => {
     const injuries = profile.injuries.includes(area)
@@ -79,6 +110,48 @@ export function TrainingProfileCard({ adaptedCount }: { adaptedCount?: number })
           );
         })}
       </div>
+
+      <details className="training-profile-week">
+        <summary>My week: what you already do outside NextRep</summary>
+        <p className="muted">
+          On practice days the jumping comes out (you get it at practice). On days you lift somewhere else, NextRep is
+          rehab, core and mobility only.
+        </p>
+        <div className="training-profile-week-grid">
+          {WEEKDAYS.map((day) => (
+            <label key={day}>
+              <span>{day.slice(0, 3)}</span>
+              <select
+                value={profile.weekly?.[day] ?? "off"}
+                onChange={(event) => setDayRole(day, event.target.value as DayRole | "off")}
+                aria-label={`What you do on ${day}`}
+              >
+                {DAY_ROLES.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      </details>
+
+      {weekAdjust.reasons.length > 0 && (
+        <div className="training-profile-this-week" role="status">
+          <p className="training-profile-label">This week</p>
+          <ul>
+            {weekAdjust.reasons.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+          {weekAdjust.repeatWeek && week > 1 && (
+            <button type="button" className="secondary" onClick={repeatLastWeek} disabled={repeating}>
+              {repeating ? "Saving…" : `Repeat week ${week - 1}`}
+            </button>
+          )}
+        </div>
+      )}
 
       {checkInOnly.length > 0 && (
         <p className="training-profile-checkin" role="status">
