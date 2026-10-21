@@ -60,3 +60,13 @@ describe("helpers", () => {
     expect(formatShortDate("2026-10-21")).toBe("Oct 21");
   });
 });
+
+describe("units (B-07)", () => {
+  it("shows approach touch as logged, with no inch mark", () => {
+    const results = buildResults(
+      [entry("2026-10-02", { approach: 11.4 }), entry("2026-10-06", { approach: 11.5 })],
+      "2026-10-21"
+    );
+    expect(results.metrics[0]).toMatchObject({ key: "approach", unit: "", from: 11.4, to: 11.5, change: 0.1 });
+  });
+});
