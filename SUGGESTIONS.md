@@ -45,7 +45,6 @@ Rules for automated runs:
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
-| F-31 | Plan fits the athlete: level (beginner/intermediate/advanced) and sore areas (knee, shoulder, lower back, ankle) swap exercises and add rehab work (PR #89) | building | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
@@ -479,6 +478,7 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Plan fits the athlete: level and sore areas swap exercises and add rehab work (F-31) | me | #89 |
 | Plan builder saves each day; unsaved changes survive a closed tab; unfinished programs can't be assigned (F-16) | coach feedback | #81 |
 | Copy a program day to other days, and fold the days not being edited (F-20) | your idea | #80 |
 | Coach's own note on each exercise in a program (F-18) | coach feedback | #79 |
