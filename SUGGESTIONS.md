@@ -35,17 +35,11 @@ Rules for automated runs:
 | B-04 | The Workout Mode browser test fails on rest days, turning CI red (PR #66) | building | bug | S |
 | B-05 | Daily coach summary email fails with `text = date` (PR #65, needs SQL) | building | bug | S |
 | F-01 | Film stats from tags (set distribution, pass average, block outcomes) (PR #63) | building | me | M |
-| B-07 | Results card adds an inch mark to approach touch logged in feet (11.4") | building | bug | S |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |
 | F-25 | Show password and confirm password on sign-up (PR #68) | building | coach feedback | S |
 | F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
-| F-33 | Today's check-in pain (4+) turns on that sore area in the plan for the day | building | me | S |
-| F-34 | Save the training profile (level, sore areas, age group) to the athlete's account (needs SQL) | building | me | M |
-| F-35 | Youth version for athletes under 14: no heavy barbell or depth jumps, more landing and bodyweight work | building | me | M |
-| F-36 | 4-week results card: retest vertical and approach touch, before/after card to share | planned | me | M |
-| F-37 | Payments: $14.99/month athlete plan with a 7-day free trial (Stripe; stays off until keys are set) | planned | me | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
 | F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
@@ -55,7 +49,6 @@ Rules for automated runs:
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
-| F-06 | Athletes with no team (solo plan) and a setup quiz | building | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
 | F-08 | Skill radar history (overlay last month on this month) | new | your idea | M |
 | F-09 | Morning email at each coach's local time | new | your idea | M |
@@ -503,6 +496,13 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Results card shows approach touch as logged, no inch mark (B-07) | bug | #98 |
+| Athlete plan payments: $14.99/month after a 7-day trial (off until Stripe keys are set) (F-37) | me | #97 |
+| Train solo at signup, plus a setup quiz (age, experience, sore areas) (F-06) | me | #96 |
+| 4-week results card with a shareable before/after image (F-36) | me | #95 |
+| Under-14 youth version of the plan (F-35) | me | #94 |
+| Training profile (level, sore areas, age group) saved to the athlete's account (F-34) | me | #93 |
+| Today's check-in pain (4+) turns on that sore area in the plan for the day (F-33) | me | #92 |
 | Workouts tab: an open day card gets the full row, exercises side by side on wide screens (F-32) | me | #91 |
 | Plan fits the athlete: level and sore areas swap exercises and add rehab work (F-31) | me | #89 |
 | Plan builder saves each day; unsaved changes survive a closed tab; unfinished programs can't be assigned (F-16) | coach feedback | #81 |
