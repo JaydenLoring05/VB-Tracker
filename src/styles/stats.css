@@ -421,3 +421,67 @@
   color: var(--red);
   font-size: var(--fs-sm);
 }
+
+/* 4-week results card (F-36). */
+.results-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.results-card-header h2 {
+  margin: 0;
+}
+
+.results-card-header button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.results-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.results-metric strong {
+  font-size: 1.4rem;
+}
+
+.results-up {
+  color: var(--gold);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.results-down {
+  color: var(--red, #f87171);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.results-dates {
+  font-size: 0.8rem;
+}
+
+.results-retest,
+.results-retest-due {
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+}
+
+.results-retest-due {
+  color: var(--gold);
+}
