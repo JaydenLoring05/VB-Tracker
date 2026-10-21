@@ -7,14 +7,18 @@ import { getExerciseTarget } from "@/lib/customProgram";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { todayName } from "@/lib/storage";
+import { countAdaptations } from "@/lib/trainingProfile";
+import { TrainingProfileCard } from "@/components/workouts/TrainingProfileCard";
 
 export function StartWorkoutScreen() {
   const { week, teamOverride, substitutions } = useTrackerContext();
+  const { profile: trainingProfile } = useTrainingProfile();
   const { loading, starting, openSession, startWorkout, resumeWorkout } = useStartWorkout();
   const [selectedDay, setSelectedDay] = useState(todayName());
 
-  const workoutDays = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions);
+  const workoutDays = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions, trainingProfile);
   const day = workoutDays.find((d) => d.day === selectedDay) ?? workoutDays[0];
 
   return (
@@ -32,6 +36,8 @@ export function StartWorkoutScreen() {
           </button>
         </div>
       )}
+
+      <TrainingProfileCard adaptedCount={countAdaptations(workoutDays)} />
 
       <div className="panel">
         <h2>Start a Workout</h2>
@@ -57,6 +63,7 @@ export function StartWorkoutScreen() {
             {day.exercises.map((exercise) => (
               <li key={exercise}>
                 {exercise}: {getExerciseTarget(day, week, exercise)}
+                {day.adaptNotes?.[exercise] && <span className="muted exercise-adapt-note"> ({day.adaptNotes[exercise]})</span>}
               </li>
             ))}
           </ul>

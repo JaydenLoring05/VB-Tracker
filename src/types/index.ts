@@ -35,6 +35,8 @@ export type WorkoutDay = {
   targets?: Record<string, string>;
   /** Coach's own note per exercise ("land on the balls of your feet"). Only on coach-built programs. */
   exerciseNotes?: Record<string, string>;
+  /** Why the athlete's training profile changed or added an exercise ("Knee-friendly swap for Box Jumps"). */
+  adaptNotes?: Record<string, string>;
 };
 
 export type StatEntry = {

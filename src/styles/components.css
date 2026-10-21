@@ -461,3 +461,25 @@
     padding: 3px 9px;
   }
 }
+
+/* Training profile (F-31): level and sore-area picker, and swap notes. */
+.training-profile-card {
+  margin-bottom: 16px;
+}
+
+.training-profile-label {
+  margin: 12px 0 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.training-profile-summary,
+.training-profile-disclaimer {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+}
+
+.exercise-adapt-note {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+}

@@ -110,6 +110,10 @@ export function DayCard({ day, isToday }: { day: WorkoutDay; isToday: boolean })
               )}
             </label>
 
+            {day.adaptNotes?.[originalExercise] && (
+              <p className="muted exercise-adapt-note">{day.adaptNotes[originalExercise]}</p>
+            )}
+
             {getExerciseNote(day, originalExercise) && (
               <p className="muted exercise-coach-note">Coach: {getExerciseNote(day, originalExercise)}</p>
             )}

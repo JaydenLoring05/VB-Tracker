@@ -8,6 +8,7 @@ import { TeamNudge } from "@/components/dashboard/TeamNudge";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { statusTone } from "@/components/shared/StatusLabel";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
 import { usePRs } from "@/hooks/usePRs";
@@ -33,6 +34,7 @@ const RECOVERY_COLOR: Record<string, string> = {
 export function DashboardCards() {
   const today = todayName();
   const { workoutStreak, teamOverride, substitutions } = useTrackerContext();
+  const { profile: trainingProfile } = useTrainingProfile();
 
   const { recovery, status, hasLoggedStats, readinessExplanation, history } = useRecoveryStats();
   const needsCheckIn = !checkedInToday(history);
@@ -40,7 +42,7 @@ export function DashboardCards() {
   const { prs } = usePRs();
   const { openSession } = useStartWorkout();
 
-  const weekDays = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions);
+  const weekDays = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions, trainingProfile);
   const todayWorkout = weekDays.find((day) => day.day === today);
   // Phone reminders only say "time to train" on days this plan trains.
   usePushTrainingDays(weekDays.filter((day) => !day.rest && day.exercises.length > 0).map((day) => day.day));

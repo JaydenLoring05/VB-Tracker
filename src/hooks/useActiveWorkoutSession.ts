@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { activeSecondsAfterWindow, buildActiveTimeFlushRequest } from "@/lib/activeTimeFlush";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
@@ -16,6 +17,7 @@ export type PreviousSet = { weight: number | null; reps: number | null; seconds:
 
 export function useActiveWorkoutSession(sessionId: string) {
   const { userId, setExerciseChecked, addPR, reportSyncError, teamOverride, substitutions } = useTrackerContext();
+  const { profile: trainingProfile } = useTrainingProfile();
   const { resolveExercise } = useExerciseSubstitutions();
   const supabase = useMemo(() => createClient(), []);
 
@@ -108,7 +110,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     if (!session) return;
 
     let cancelled = false;
-    const day = resolveWorkoutDays(getWorkoutDays(session.week), session.week, teamOverride, substitutions).find(
+    const day = resolveWorkoutDays(getWorkoutDays(session.week), session.week, teamOverride, substitutions, trainingProfile).find(
       (d) => d.day === session.day
     );
     if (!day) return;
@@ -144,7 +146,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     return () => {
       cancelled = true;
     };
-  }, [supabase, session, sessionId, userId, resolveExercise, teamOverride, substitutions]);
+  }, [supabase, session, sessionId, userId, resolveExercise, teamOverride, substitutions, trainingProfile]);
 
   // Tracks only the time this screen was actually open (not wall-clock time
   // since the workout was started), so navigating away and coming back
