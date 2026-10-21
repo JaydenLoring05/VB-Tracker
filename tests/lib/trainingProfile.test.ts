@@ -8,6 +8,8 @@ import {
   countAdaptations,
   DEFAULT_TRAINING_PROFILE,
   parseTrainingProfile,
+  profileFromRow,
+  profileToRow,
   scaleTargetForLevel,
   withCheckInAreas
 } from "@/lib/trainingProfile";
@@ -131,9 +133,10 @@ describe("scaleTargetForLevel", () => {
 describe("parseTrainingProfile", () => {
   it("falls back to the default for junk", () => {
     expect(parseTrainingProfile(null)).toEqual(DEFAULT_TRAINING_PROFILE);
-    expect(parseTrainingProfile({ level: "elite", injuries: ["toe", "knee"] })).toEqual({
+    expect(parseTrainingProfile({ level: "elite", injuries: ["toe", "knee"], ageGroup: "baby" })).toEqual({
       level: "intermediate",
-      injuries: ["knee"]
+      injuries: ["knee"],
+      ageGroup: null
     });
   });
 });
@@ -180,7 +183,7 @@ describe("check-in sore areas (F-33)", () => {
 
   it("adds check-in areas without dropping saved ones or duplicating", () => {
     const saved = { level: "advanced" as const, injuries: ["knee" as const] };
-    expect(withCheckInAreas(saved, ["knee", "shoulder"])).toEqual({
+    expect(withCheckInAreas(saved, ["knee", "shoulder"])).toMatchObject({
       level: "advanced",
       injuries: ["knee", "shoulder"]
     });
@@ -191,5 +194,24 @@ describe("check-in sore areas (F-33)", () => {
     const profile = withCheckInAreas(DEFAULT_TRAINING_PROFILE, ["knee"]);
     const [result] = adaptWorkoutDays([day(["Box Jumps"])], 1, profile);
     expect(result.exercises[0]).toBe("Hip Thrust");
+  });
+});
+
+describe("profile on the account (F-34)", () => {
+  it("round-trips through a profiles row", () => {
+    const profile = { level: "advanced" as const, injuries: ["knee" as const, "ankle" as const], ageGroup: "18plus" as const };
+    expect(profileToRow(profile)).toEqual({ training_level: "advanced", sore_areas: ["knee", "ankle"], age_group: "18plus" });
+    expect(profileFromRow(profileToRow(profile))).toEqual(profile);
+  });
+
+  it("treats a row with no level as never set", () => {
+    expect(profileFromRow({ training_level: null, sore_areas: [], age_group: null })).toBeNull();
+    expect(profileFromRow(null)).toBeNull();
+  });
+
+  it("drops values the database wouldn't allow", () => {
+    expect(profileToRow({ level: "beginner", injuries: ["knee", "toe" as never], ageGroup: null }).sore_areas).toEqual([
+      "knee"
+    ]);
   });
 });

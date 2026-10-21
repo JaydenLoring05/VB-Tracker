@@ -13,12 +13,22 @@ import { StatEntry, WorkoutDay } from "@/types";
 export type TrainingLevel = "beginner" | "intermediate" | "advanced";
 export type InjuryArea = "knee" | "shoulder" | "lowerBack" | "ankle";
 
+export type AgeGroup = "under14" | "14to17" | "18plus";
+
 export type TrainingProfile = {
   level: TrainingLevel;
   injuries: InjuryArea[];
+  /** Null until the athlete says; the plan treats unknown like 14 and up. */
+  ageGroup?: AgeGroup | null;
 };
 
-export const DEFAULT_TRAINING_PROFILE: TrainingProfile = { level: "intermediate", injuries: [] };
+export const DEFAULT_TRAINING_PROFILE: TrainingProfile = { level: "intermediate", injuries: [], ageGroup: null };
+
+export const AGE_GROUPS: { value: AgeGroup; label: string }[] = [
+  { value: "under14", label: "Under 14" },
+  { value: "14to17", label: "14-17" },
+  { value: "18plus", label: "18+" }
+];
 
 export const TRAINING_LEVELS: { value: TrainingLevel; label: string; hint: string }[] = [
   { value: "beginner", label: "Beginner", hint: "New to lifting or jump training" },
@@ -167,7 +177,7 @@ const LEVEL_LABEL: Record<TrainingLevel, string> = {
 };
 
 export function isDefaultProfile(profile: TrainingProfile): boolean {
-  return profile.level === "intermediate" && profile.injuries.length === 0;
+  return profile.level === "intermediate" && profile.injuries.length === 0 && profile.ageGroup !== "under14";
 }
 
 /** Reads a stored profile, falling back to the default for anything missing or malformed. */
@@ -180,7 +190,26 @@ export function parseTrainingProfile(raw: unknown): TrainingProfile {
   const injuries = Array.isArray(value.injuries)
     ? INJURY_AREAS.map((option) => option.value).filter((area) => value.injuries!.includes(area))
     : [];
-  return { level, injuries };
+  const ageGroup = AGE_GROUPS.some((option) => option.value === value.ageGroup) ? (value.ageGroup as AgeGroup) : null;
+  return { level, injuries, ageGroup };
+}
+
+/** Columns on public.profiles (schema_v56). */
+export type TrainingProfileRow = {
+  training_level: string | null;
+  sore_areas: string[] | null;
+  age_group: string | null;
+};
+
+/** A profile from the account, or null when the athlete never set one there. */
+export function profileFromRow(row: TrainingProfileRow | null | undefined): TrainingProfile | null {
+  if (!row || !row.training_level) return null;
+  return parseTrainingProfile({ level: row.training_level, injuries: row.sore_areas ?? [], ageGroup: row.age_group });
+}
+
+export function profileToRow(profile: TrainingProfile): TrainingProfileRow {
+  const clean = parseTrainingProfile(profile);
+  return { training_level: clean.level, sore_areas: clean.injuries, age_group: clean.ageGroup ?? null };
 }
 
 /**
