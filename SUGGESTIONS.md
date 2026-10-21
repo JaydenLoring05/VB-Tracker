@@ -48,6 +48,7 @@ Rules for automated runs:
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
+| F-32 | Workouts tab: an open day card gets its own full-width row instead of a 140px column | new | me | S |
 | F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
 | F-06 | Athletes with no team (solo plan) | new | me | L |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
@@ -460,6 +461,14 @@ Rules for automated runs:
 
 ### Plan fit
 
+- **F-32. An open day card is squeezed into one narrow column.** On
+  Workouts, `.workout-grid` in `src/styles/workouts.css` is
+  `repeat(7, minmax(140px, 1fr))`, so today's expanded card (and any day a
+  player opens) is one-seventh of the width: exercise names wrap to three
+  lines and the F-31 swap notes ("Knee-friendly swap for Box Jumps") stack
+  awkwardly. Seen on desktop Chrome on 2026-10-21. Let the expanded card
+  span the full row (`grid-column: 1 / -1`) with the collapsed days staying
+  as a row of chips above or below it, and check phone width too.
 - **F-31. The plan fits the athlete (level and sore areas).** Jayden asked
   for it on 2026-10-21 as the core of NextRep's move to individual athletes
   and youth: a beginner shouldn't get the same lifts as an advanced player,
