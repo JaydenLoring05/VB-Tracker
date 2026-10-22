@@ -39,6 +39,7 @@ Rules for automated runs:
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |
+| B-08 | Phone push reminders fail: `push_reminder_recipients` missing in production (needs SQL) | new | bug | S |
 | F-25 | Show password and confirm password on sign-up (PR #68) | building | coach feedback | S |
 | F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
 | F-38 | Weekly auto-adjust: lighter week after poor recovery, repeated pain on all week, repeat a missed week, practice/lift-elsewhere days, games (needs SQL) | building | me | M |
@@ -96,6 +97,16 @@ Rules for automated runs:
   Postgres rejects the query and no coach gets the email. #65 adds
   `schema_v54_daily_summary_date_fix.sql`, which compares text with text.
   The email stays broken until that file is run in the SQL Editor.
+- **B-08. Phone push reminders fail every hour.** Vercel logs
+  `push-reminders: could not load recipients Could not find the function
+  public.push_reminder_recipients(p_secret) in the schema cache` from
+  `/api/push-reminders` (first 2026-10-18 05:46 UTC, on the #85 deploy).
+  F-30 (#85) merged with `schema_v55_push_reminders.sql`, but that file has
+  not been run on the production database yet, so the function doesn't
+  exist and no player gets a push. The code matches the file (`p_now` has a
+  default), so there is nothing to change in the app: run
+  `schema_v55_push_reminders.sql` in the SQL Editor and the next hourly
+  call should work. Found by the daily bug check.
 
 ### Film
 
