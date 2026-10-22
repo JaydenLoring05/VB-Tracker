@@ -44,7 +44,7 @@ Rules for automated runs:
 | F-38 | Weekly auto-adjust: lighter week after poor recovery, repeated pain on all week, repeat a missed week, practice/lift-elsewhere days, games (needs SQL) | building | me | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
-| F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
+| F-24 | A day built from more than one program (lifts plus accessory work) (PR #87) | building | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
