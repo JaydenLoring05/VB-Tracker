@@ -26,7 +26,7 @@ export function useCalendar() {
   const today = useTodayISO();
 
   const calendarPreview = useMemo(() => {
-    const days = [];
+    const days: { iso: string; day: string; number: number; events: CalendarPreviewEvent[] }[] = [];
     if (!today) return days;
     const start = new Date();
 
