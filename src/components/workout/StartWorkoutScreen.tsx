@@ -8,7 +8,7 @@ import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
-import { todayName } from "@/lib/storage";
+import { useTodayName } from "@/hooks/useToday";
 import { countAdaptations } from "@/lib/trainingProfile";
 import { TrainingProfileCard } from "@/components/workouts/TrainingProfileCard";
 
@@ -16,7 +16,9 @@ export function StartWorkoutScreen() {
   const { week, teamOverride, substitutions } = useTrackerContext();
   const { effectiveProfile: trainingProfile } = useTrainingProfile();
   const { loading, starting, openSession, startWorkout, resumeWorkout } = useStartWorkout();
-  const [selectedDay, setSelectedDay] = useState(todayName());
+  const today = useTodayName();
+  const [pickedDay, setSelectedDay] = useState<string | null>(null);
+  const selectedDay = pickedDay ?? today;
 
   const workoutDays = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions, trainingProfile);
   const day = workoutDays.find((d) => d.day === selectedDay) ?? workoutDays[0];

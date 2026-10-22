@@ -8,6 +8,7 @@ import { TeamNudge } from "@/components/dashboard/TeamNudge";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { statusTone } from "@/components/shared/StatusLabel";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTodayName } from "@/hooks/useToday";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
@@ -18,7 +19,6 @@ import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
 import { checkedInToday } from "@/lib/dailyCheckIn";
 import { todayWorkoutCta } from "@/lib/dashboardCta";
-import { todayName } from "@/lib/storage";
 
 const RECOVERY_COLOR: Record<string, string> = {
   Elite: "var(--green)",
@@ -32,7 +32,7 @@ const RECOVERY_COLOR: Record<string, string> = {
  * Recovery, weekly progress and PRs are one summary line each that expand on tap.
  */
 export function DashboardCards() {
-  const today = todayName();
+  const today = useTodayName();
   const { workoutStreak, teamOverride, substitutions } = useTrackerContext();
   const { effectiveProfile: trainingProfile } = useTrainingProfile();
 

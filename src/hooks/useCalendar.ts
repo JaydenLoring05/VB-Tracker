@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useTeam } from "@/hooks/useTeam";
 import { useTeamCalendar } from "@/hooks/useTeamCalendar";
+import { useTodayISO } from "@/hooks/useToday";
 import { todayISO } from "@/lib/storage";
 import { computeTrainingLoad } from "@/lib/trainingLoad";
 
@@ -21,8 +22,12 @@ export function useCalendar() {
   const { activeTeam } = useTeam();
   const { events: teamEvents } = useTeamCalendar(activeTeam);
 
+  // Empty on the server and during hydration, then the browser's dates (B-08).
+  const today = useTodayISO();
+
   const calendarPreview = useMemo(() => {
     const days = [];
+    if (!today) return days;
     const start = new Date();
 
     for (let i = 0; i < 14; i++) {
@@ -47,7 +52,7 @@ export function useCalendar() {
     }
 
     return days;
-  }, [calendarEvents, teamEvents]);
+  }, [calendarEvents, teamEvents, today]);
 
   // Personal events plus the team calendar; see src/lib/trainingLoad.ts for
   // the weights and how a session on both calendars is counted once.
