@@ -37,6 +37,8 @@ export type WorkoutDay = {
   exerciseNotes?: Record<string, string>;
   /** Why the athlete's training profile changed or added an exercise ("Knee-friendly swap for Box Jumps"). */
   adaptNotes?: Record<string, string>;
+  /** Why this whole day changed this week ("Practice day: ..."), F-38. */
+  adjustNote?: string;
 };
 
 export type StatEntry = {

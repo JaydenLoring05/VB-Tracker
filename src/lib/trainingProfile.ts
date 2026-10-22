@@ -1,3 +1,4 @@
+import { getExercise } from "@/data/exercises";
 import { getPrescription } from "@/data/workoutPlan";
 import { StatEntry, WorkoutDay } from "@/types";
 
@@ -15,11 +16,35 @@ export type InjuryArea = "knee" | "shoulder" | "lowerBack" | "ankle";
 
 export type AgeGroup = "under14" | "14to17" | "18plus";
 
+export const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
+export type Weekday = (typeof WEEKDAYS)[number];
+
+/** What the athlete already does on a day outside NextRep (F-38). */
+export type DayRole = "practice" | "liftClass";
+export type WeeklySchedule = Partial<Record<Weekday, DayRole>>;
+
+export const DAY_ROLES: { value: DayRole | "off"; label: string }[] = [
+  { value: "off", label: "Nothing" },
+  { value: "practice", label: "Practice" },
+  { value: "liftClass", label: "Lift elsewhere" }
+];
+
+/** This week's adjustments (F-38). Worked out fresh each time; never saved. */
+export type DayContext = DayRole | "game" | "preGame";
+export type WeekAdjust = {
+  deload: boolean;
+  days: Partial<Record<Weekday, DayContext>>;
+};
+
 export type TrainingProfile = {
   level: TrainingLevel;
   injuries: InjuryArea[];
   /** Null until the athlete says; the plan treats unknown like 14 and up. */
   ageGroup?: AgeGroup | null;
+  /** The athlete's regular week (F-38). */
+  weekly?: WeeklySchedule;
+  /** This week's adjustments, added by the hook (F-38). */
+  adjust?: WeekAdjust | null;
 };
 
 export const DEFAULT_TRAINING_PROFILE: TrainingProfile = { level: "intermediate", injuries: [], ageGroup: null };
@@ -211,7 +236,24 @@ const LEVEL_LABEL: Record<TrainingLevel, string> = {
 };
 
 export function isDefaultProfile(profile: TrainingProfile): boolean {
-  return profile.level === "intermediate" && profile.injuries.length === 0 && profile.ageGroup !== "under14";
+  return (
+    profile.level === "intermediate" &&
+    profile.injuries.length === 0 &&
+    profile.ageGroup !== "under14" &&
+    Object.keys(profile.weekly ?? {}).length === 0 &&
+    !profile.adjust?.deload &&
+    Object.keys(profile.adjust?.days ?? {}).length === 0
+  );
+}
+
+export function parseWeeklySchedule(raw: unknown): WeeklySchedule {
+  if (!raw || typeof raw !== "object") return {};
+  const weekly: WeeklySchedule = {};
+  WEEKDAYS.forEach((day) => {
+    const role = (raw as Record<string, unknown>)[day];
+    if (role === "practice" || role === "liftClass") weekly[day] = role;
+  });
+  return weekly;
 }
 
 /** Reads a stored profile, falling back to the default for anything missing or malformed. */
@@ -225,7 +267,7 @@ export function parseTrainingProfile(raw: unknown): TrainingProfile {
     ? INJURY_AREAS.map((option) => option.value).filter((area) => value.injuries!.includes(area))
     : [];
   const ageGroup = AGE_GROUPS.some((option) => option.value === value.ageGroup) ? (value.ageGroup as AgeGroup) : null;
-  return { level, injuries, ageGroup };
+  return { level, injuries, ageGroup, weekly: parseWeeklySchedule(value.weekly) };
 }
 
 /** Columns on public.profiles (schema_v56). */
@@ -233,17 +275,29 @@ export type TrainingProfileRow = {
   training_level: string | null;
   sore_areas: string[] | null;
   age_group: string | null;
+  /** schema_v58; missing before that SQL runs. */
+  weekly_schedule?: Record<string, string> | null;
 };
 
 /** A profile from the account, or null when the athlete never set one there. */
 export function profileFromRow(row: TrainingProfileRow | null | undefined): TrainingProfile | null {
   if (!row || !row.training_level) return null;
-  return parseTrainingProfile({ level: row.training_level, injuries: row.sore_areas ?? [], ageGroup: row.age_group });
+  return parseTrainingProfile({
+    level: row.training_level,
+    injuries: row.sore_areas ?? [],
+    ageGroup: row.age_group,
+    weekly: row.weekly_schedule ?? {}
+  });
 }
 
 export function profileToRow(profile: TrainingProfile): TrainingProfileRow {
   const clean = parseTrainingProfile(profile);
-  return { training_level: clean.level, sore_areas: clean.injuries, age_group: clean.ageGroup ?? null };
+  return {
+    training_level: clean.level,
+    sore_areas: clean.injuries,
+    age_group: clean.ageGroup ?? null,
+    weekly_schedule: clean.weekly ?? {}
+  };
 }
 
 /**
@@ -264,6 +318,60 @@ export function scaleTargetForLevel(target: string, level: TrainingLevel): strin
     return `${sets}x${rest}`;
   }
   return `${high ?? low}x${rest}`;
+}
+
+// Movement families for the day rules below (F-38), from the exercise library.
+const JUMPING_CATEGORIES = new Set(["Jump Development", "Landing Mechanics", "Speed & Agility"]);
+const LIGHT_CATEGORIES = new Set(["Knee Strength", "Rotational Core", "Mobility", "Recovery"]);
+// Shoulder prehab only; pull-ups and rows count as lifting.
+const SHOULDER_PREHAB = new Set([
+  "Face Pulls",
+  "Band Pull-Aparts",
+  "External Rotations",
+  "Scap Push-Ups",
+  "Y-T-W Raises",
+  "Cuban Rotations",
+  "Light Shoulder Band Work",
+  "Wall Slides",
+  "Rear Delt Fly"
+]);
+const GAME_DAY = ["Full-Body Mobility Flow", "Light Stretching", "Foam Roll"];
+
+const DAY_CONTEXT_NOTE: Record<DayContext, string> = {
+  practice: "Practice day: the jumping happens at practice, so this is strength and rehab only.",
+  liftClass: "You lift elsewhere today: this is rehab, core and mobility only.",
+  preGame: "Day before a game: no jumping or heavy legs. Stay fresh.",
+  game: "Game day: just loosen up. Win the game."
+};
+
+function categoryOf(exercise: string): string | undefined {
+  return getExercise(exercise)?.category;
+}
+
+function applyDayContext(exercises: string[], context: DayContext | undefined): string[] {
+  if (!context) return exercises;
+  if (context === "game") return [...GAME_DAY];
+  let kept: string[];
+  if (context === "practice") {
+    // Practice already has the jumps; keep landing practice and everything else.
+    kept = exercises.filter((exercise) => !JUMP_WORK.has(exercise) && exercise !== "Sprint Starts");
+  } else if (context === "liftClass") {
+    kept = exercises.filter(
+      (exercise) => LIGHT_CATEGORIES.has(categoryOf(exercise) ?? "") || SHOULDER_PREHAB.has(exercise)
+    );
+  } else {
+    // preGame: nothing that loads the legs or the jump.
+    kept = exercises.filter((exercise) => {
+      const category = categoryOf(exercise) ?? "";
+      return !JUMPING_CATEGORIES.has(category) && !JUMP_WORK.has(exercise);
+    });
+  }
+  return kept.length > 0 ? kept : ["Full-Body Mobility Flow"];
+}
+
+/** One fewer set (never below 2), or the low end of a range: a lighter week. */
+export function deloadTarget(target: string): string {
+  return scaleTargetForLevel(target, "beginner");
 }
 
 function isTrainingDay(day: WorkoutDay): boolean {
@@ -335,14 +443,21 @@ export function adaptWorkoutDays(
       runSwaps(INJURY_SWAPS[area], (from) => `${AREA_LABEL[area]}-friendly swap for ${from}`);
     });
 
-    if (youth && isTrainingDay(day) && exercises.some((exercise) => JUMP_WORK.has(exercise))) {
+    const context = profile.adjust?.days[day.day as Weekday];
+    const beforeContext = exercises.join("|");
+    exercises = applyDayContext(exercises, context);
+    // Only explain a practice or lift-elsewhere day when it actually changed something.
+    const showContext =
+      !!context && (context === "game" || context === "preGame" || exercises.join("|") !== beforeContext);
+
+    if (youth && context !== "game" && isTrainingDay(day) && exercises.some((exercise) => JUMP_WORK.has(exercise))) {
       if (!exercises.includes("Landing Mechanics Drill")) {
         exercises.push("Landing Mechanics Drill");
         notes["Landing Mechanics Drill"] = "Added: landing practice for under-14 athletes";
       }
     }
 
-    if (isTrainingDay(day)) {
+    if (isTrainingDay(day) && context !== "game") {
       profile.injuries.forEach((area) => {
         INJURY_ADDONS[area].forEach((addon) => {
           if (exercises.includes(addon)) return;
@@ -357,7 +472,8 @@ export function adaptWorkoutDays(
       const source = sourceOf[exercise];
       const existing = day.targets?.[exercise] ?? (source ? day.targets?.[source] : undefined);
       const target = existing ?? getPrescription(week, exercise);
-      targets[exercise] = setLevel ? scaleTargetForLevel(target, setLevel) : target;
+      const scaled = setLevel ? scaleTargetForLevel(target, setLevel) : target;
+      targets[exercise] = profile.adjust?.deload && !options.coachProgram ? deloadTarget(scaled) : scaled;
     });
 
     const adaptNotes: Record<string, string> = {};
@@ -365,11 +481,16 @@ export function adaptWorkoutDays(
       if (notes[exercise]) adaptNotes[exercise] = notes[exercise];
     });
 
+    const dayNote = [showContext && context ? DAY_CONTEXT_NOTE[context] : null, profile.adjust?.deload ? "Lighter week: one set fewer to recover." : null]
+      .filter(Boolean)
+      .join(" ");
+
     return {
       ...day,
       exercises,
       targets,
-      ...(Object.keys(adaptNotes).length > 0 ? { adaptNotes } : {})
+      ...(Object.keys(adaptNotes).length > 0 ? { adaptNotes } : {}),
+      ...(dayNote ? { adjustNote: dayNote } : {})
     };
   });
 }

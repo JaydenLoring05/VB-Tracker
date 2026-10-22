@@ -136,7 +136,8 @@ describe("parseTrainingProfile", () => {
     expect(parseTrainingProfile({ level: "elite", injuries: ["toe", "knee"], ageGroup: "baby" })).toEqual({
       level: "intermediate",
       injuries: ["knee"],
-      ageGroup: null
+      ageGroup: null,
+      weekly: {}
     });
   });
 });
@@ -200,8 +201,13 @@ describe("check-in sore areas (F-33)", () => {
 describe("profile on the account (F-34)", () => {
   it("round-trips through a profiles row", () => {
     const profile = { level: "advanced" as const, injuries: ["knee" as const, "ankle" as const], ageGroup: "18plus" as const };
-    expect(profileToRow(profile)).toEqual({ training_level: "advanced", sore_areas: ["knee", "ankle"], age_group: "18plus" });
-    expect(profileFromRow(profileToRow(profile))).toEqual(profile);
+    expect(profileToRow(profile)).toEqual({
+      training_level: "advanced",
+      sore_areas: ["knee", "ankle"],
+      age_group: "18plus",
+      weekly_schedule: {}
+    });
+    expect(profileFromRow(profileToRow(profile))).toEqual({ ...profile, weekly: {} });
   });
 
   it("treats a row with no level as never set", () => {
