@@ -6,15 +6,16 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Celebrate } from "@/components/shared/Celebrate";
 import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
-import { getExercise } from "@/data/exercises";
 import { getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
 import { getExerciseNote, getExerciseTarget } from "@/lib/customProgram";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTeamExercises } from "@/hooks/useTeamExercises";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
-import { formatSetValue, getExerciseMeasure, parseTargetSeconds } from "@/lib/exerciseMeasure";
+import { cuesFor, measureFor, TeamExercise } from "@/lib/teamExercises";
+import { formatSetValue, parseTargetSeconds } from "@/lib/exerciseMeasure";
 import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
 import { formatDuration } from "@/lib/time";
 
@@ -39,8 +40,12 @@ function vibrate(pattern: number | number[]) {
 export type WorkoutSessionController = ReturnType<typeof useActiveWorkoutSession>;
 
 export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
-  return <WorkoutModeView controller={useActiveWorkoutSession(sessionId)} />;
+  const controller = useActiveWorkoutSession(sessionId);
+  const { exercises: teamExercises } = useTeamExercises();
+  return <WorkoutModeView controller={controller} teamExercises={teamExercises} />;
 }
+
+const NO_TEAM_EXERCISES: TeamExercise[] = [];
 
 /**
  * The Workout Mode screen. `onExit` replaces the summary's "Back to
@@ -48,10 +53,13 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
  */
 export function WorkoutModeView({
   controller,
-  onExit
+  onExit,
+  teamExercises = NO_TEAM_EXERCISES
 }: {
   controller: WorkoutSessionController;
   onExit?: () => void;
+  /** The team's own exercises (F-22), for their cues and reps-or-time. The demo has none. */
+  teamExercises?: TeamExercise[];
 }) {
   const {
     loading,
@@ -249,11 +257,11 @@ export function WorkoutModeView({
   const exercise = resolvedExercises[exerciseIndex];
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
   const lastTime = previousSets[exercise];
-  const cues = getExercise(originalExercise)?.cues ?? [];
+  const cues = cuesFor(originalExercise, teamExercises);
   const prescription = getExerciseTarget(day, session.week, exercise);
   const coachNote = getExerciseNote(day, originalExercise);
   const adaptNote = day.adaptNotes?.[originalExercise] ?? "";
-  const isTimed = getExerciseMeasure(exercise) === "time";
+  const isTimed = measureFor(exercise, teamExercises) === "time";
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
   currentExerciseRef.current = exercise ?? null;
 
