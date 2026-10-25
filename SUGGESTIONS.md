@@ -33,13 +33,13 @@ Rules for automated runs:
 | --- | --- | --- | --- | --- |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
+| B-09 | Phone push reminders fail until `schema_v55` is run in production (PR #86, docs only; that PR calls it B-08) | building | bug | S |
+| B-10 | Continue Workout reopens the workout in progress, on the exercise you reached (PR #74; that PR calls it B-07) | building | bug | S |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day (PR #75) | building | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) (PRs #76, #77, #78) | building | coach feedback | L |
 | F-24 | A day built from more than one program (lifts plus accessory work) (PR #87) | building | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (PR #101, needs SQL) | building | me | M |
-| B-09 | Phone push reminders fail until `schema_v55` is run in production (PR #86, docs only; that PR calls it B-08) | building | bug | S |
-| B-10 | Continue Workout reopens the workout in progress, on the exercise you reached (PR #74; that PR calls it B-07) | building | bug | S |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-28 | Weight targets as a percent of each athlete's estimated max (PR #83) | building | coach feedback | M |
