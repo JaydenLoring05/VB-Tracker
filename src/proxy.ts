@@ -9,7 +9,7 @@ const AUTH_PAGES = ["/", "/login"];
 // Reachable without a session, and never bounced for a signed-in user: the pilot
 // application page, legal pages, and the email-link callback (a signed-in user
 // opening a password reset or confirmation link must still be able to finish it).
-const ALWAYS_PUBLIC = ["/pilot", "/privacy", "/terms", "/auth/callback", "/unsubscribe"];
+const ALWAYS_PUBLIC = ["/pilot", "/join", "/privacy", "/terms", "/auth/callback", "/unsubscribe"];
 
 function clearSupabaseCookies(request: NextRequest, response: NextResponse) {
   request.cookies
@@ -115,13 +115,13 @@ export const config = {
   // Skip Next internals and static/metadata/PWA files (robots.txt, sitemap.xml,
   // manifest, service worker, icons, images), generated metadata routes
   // (icon, apple-icon, opengraph-image, twitter-image; Next appends a hash to
-  // their URLs, hence the optional suffix), the public /api/pilot endpoint, the
+  // their URLs, hence the optional suffix), the public /api/pilot and /api/waitlist endpoints, the
   // /api/daily-summary, /api/checkin-reminders and /api/push-reminders cron endpoints (they check
   // their own CRON_SECRET), the one-click /api/reminders/unsubscribe, the Stripe /api/billing/webhook
   // (it checks Stripe's signature), and the
   // static /offline page. Without this they were redirected to /login for
   // signed-out visitors.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw\\.js$|icons/|offline$|(?:icon|apple-icon|opengraph-image|twitter-image)(?:-[a-z0-9]+)?$|api/pilot$|api/daily-summary$|api/checkin-reminders$|api/push-reminders$|api/reminders/unsubscribe$|api/billing/webhook$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw\\.js$|icons/|offline$|(?:icon|apple-icon|opengraph-image|twitter-image)(?:-[a-z0-9]+)?$|api/pilot$|api/waitlist$|api/daily-summary$|api/checkin-reminders$|api/push-reminders$|api/reminders/unsubscribe$|api/billing/webhook$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|map)$).*)"
   ]
 };
