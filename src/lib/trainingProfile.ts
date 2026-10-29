@@ -156,9 +156,12 @@ const INJURY_SWAPS: Record<InjuryArea, SwapTable> = {
     Bounds: ["Monster Walks", "Lateral Band Walks"],
     "Skater Jumps": ["Monster Walks", "Lateral Band Walks"],
     "Line Hops": ["Single-Leg Calf Raise"],
-    "Front Squat": ["Goblet Squat", "Kettlebell Deadlift"],
-    "Heel-Elevated Goblet Squat": ["Goblet Squat", "Kettlebell Deadlift"],
-    "Bulgarian Split Squat": ["Reverse Lunges", "Split Squat"]
+    // Deep loaded knee bends: squat to a box at parallel instead, or hold a wall sit.
+    "Front Squat": ["Box Squat", "Goblet Squat", "Kettlebell Deadlift"],
+    "Heel-Elevated Goblet Squat": ["Box Squat", "Goblet Squat", "Kettlebell Deadlift"],
+    "Goblet Squat": ["Box Squat", "Wall Sit"],
+    "Deep Squat Holds": ["Wall Sit"],
+    "Bulgarian Split Squat": ["Step-Ups", "Reverse Lunges", "Split Squat"]
   },
   // Keep pressing and pulling, but below the head and with the arm supported.
   shoulder: {
@@ -213,6 +216,21 @@ const INJURY_SWAPS: Record<InjuryArea, SwapTable> = {
     "Shuttle Runs": ["Easy Bike"]
   }
 };
+
+/**
+ * Fallback for exercises the swap tables don't know (coach-written names like
+ * "Max approach jumps" or "Overhead press"): keep the exercise, but cut the
+ * sets. Knee: jumping and plyometrics. Shoulder: overhead pressing and
+ * full-power swings. Ankle shares the knee's impact list.
+ */
+const INJURY_REDUCE: Partial<Record<InjuryArea, RegExp>> = {
+  knee: /jump|approach|bound|\bhops?\b|plyo|depth|drop squat/i,
+  ankle: /jump|bound|\bhops?\b|plyo|depth|sprint/i,
+  shoulder: /overhead|snatch|jerk|arm swing|hitting|\bserv(e|es|ing)\b|spik(e|es|ing)|military press|shoulder press|push press|overhead throws?/i
+};
+
+/** Never cut: these are the landing and low-impact work the reductions point people toward. */
+const NEVER_REDUCE = new Set(["Landing Mechanics Drill", "Box Step-Offs", "Snap Downs"]);
 
 /** Rehab work added to every training day for each flagged area. */
 const INJURY_ADDONS: Record<InjuryArea, string[]> = {
@@ -300,24 +318,53 @@ export function profileToRow(profile: TrainingProfile): TrainingProfileRow {
   };
 }
 
+/** Percent-of-max change by level, in percentage points, and the bounds it stays inside. */
+const PERCENT_SHIFT: Record<TrainingLevel, number> = { beginner: -10, intermediate: 0, advanced: 5 };
+const PERCENT_MIN = 40;
+const PERCENT_MAX = 90;
+
+/** Moves any "75%" in a target by the level's shift ("5x5 @ 75%" -> "5x5 @ 65%" for beginners). */
+export function scalePercentForLevel(target: string, level: TrainingLevel): string {
+  const shift = PERCENT_SHIFT[level];
+  if (shift === 0) return target;
+  return target.replace(/(\d+)\s*%/g, (whole, digits: string) => {
+    const value = Number(digits);
+    // Already outside the bounds (a coach's 95% single): only ever move it toward safer.
+    const next = shift < 0 ? Math.max(Math.min(PERCENT_MIN, value), value + shift) : Math.min(Math.max(PERCENT_MAX, value), value + shift);
+    return whole.replace(digits, String(next));
+  });
+}
+
 /**
  * Scales a set-and-rep prescription by level. Beginners take the low end of
- * a set range (or one fewer set, never below 2); advanced athletes take the
- * high end. Reps, seconds and anything after the "x" stay as written.
+ * a set range (or one fewer set, never below 2) and 10 points less of any
+ * percent of max; advanced athletes take the high end and 5 points more
+ * (never past 90%). Reps and seconds stay as written.
  */
 export function scaleTargetForLevel(target: string, level: TrainingLevel): string {
   if (level === "intermediate") return target;
   const match = target.match(/^(\d+)(?:-(\d+))?x(.*)$/);
-  if (!match) return target;
+  if (!match) return scalePercentForLevel(target, level);
   const low = Number(match[1]);
   const high = match[2] ? Number(match[2]) : null;
-  const rest = match[3];
+  const rest = scalePercentForLevel(match[3], level);
 
   if (level === "beginner") {
     const sets = high !== null ? low : Math.max(2, low - 1);
     return `${sets}x${rest}`;
   }
   return `${high ?? low}x${rest}`;
+}
+
+/**
+ * About half the sets (rounded up, never below 2, or the low end of a range),
+ * for movements an injury keeps but cuts back. "5x3" -> "3x3", "4x3" -> "2x3".
+ */
+export function reduceTargetForInjury(target: string): string {
+  const match = target.match(/^(\d+)(?:-(\d+))?x(.*)$/);
+  if (!match) return target;
+  const sets = Math.max(2, Math.ceil(Number(match[1]) / 2));
+  return `${Math.min(sets, Number(match[1]))}x${match[3]}`;
 }
 
 // Movement families for the day rules below (F-38), from the exercise library.
@@ -407,6 +454,7 @@ export function adaptWorkoutDays(
 
     const notes: Record<string, string> = { ...(day.adaptNotes ?? {}) };
     const sourceOf: Record<string, string> = {};
+    const reduced = new Set<string>();
     let exercises = [...day.exercises];
 
     const runSwaps = (table: SwapTable, describe: (from: string) => string) => {
@@ -443,6 +491,17 @@ export function adaptWorkoutDays(
       runSwaps(INJURY_SWAPS[area], (from) => `${AREA_LABEL[area]}-friendly swap for ${from}`);
     });
 
+    // Anything risky the tables didn't know: keep it, but cut the volume.
+    profile.injuries.forEach((area) => {
+      const pattern = INJURY_REDUCE[area];
+      if (!pattern) return;
+      exercises.forEach((exercise) => {
+        if (NEVER_REDUCE.has(exercise) || sourceOf[exercise] || reduced.has(exercise) || !pattern.test(exercise)) return;
+        reduced.add(exercise);
+        notes[exercise] = `Fewer sets for your ${AREA_LABEL[area].toLowerCase()}. Stop if it hurts.`;
+      });
+    });
+
     const context = profile.adjust?.days[day.day as Weekday];
     const beforeContext = exercises.join("|");
     exercises = applyDayContext(exercises, context);
@@ -455,6 +514,15 @@ export function adaptWorkoutDays(
         exercises.push("Landing Mechanics Drill");
         notes["Landing Mechanics Drill"] = "Added: landing practice for under-14 athletes";
       }
+    }
+
+    // Knee: whatever jumping is left (cut back) comes with landing practice.
+    const kneeJumping =
+      profile.injuries.includes("knee") &&
+      exercises.some((exercise) => JUMP_WORK.has(exercise) || reduced.has(exercise));
+    if (kneeJumping && context !== "game" && !exercises.includes("Landing Mechanics Drill")) {
+      exercises.push("Landing Mechanics Drill");
+      notes["Landing Mechanics Drill"] = "Added: landing practice to go with less jumping for your knee";
     }
 
     if (isTrainingDay(day) && context !== "game") {
@@ -473,7 +541,8 @@ export function adaptWorkoutDays(
       const existing = day.targets?.[exercise] ?? (source ? day.targets?.[source] : undefined);
       const target = existing ?? getPrescription(week, exercise);
       const scaled = setLevel ? scaleTargetForLevel(target, setLevel) : target;
-      targets[exercise] = profile.adjust?.deload && !options.coachProgram ? deloadTarget(scaled) : scaled;
+      const cut = reduced.has(exercise) ? reduceTargetForInjury(scaled) : scaled;
+      targets[exercise] = profile.adjust?.deload && !options.coachProgram ? deloadTarget(cut) : cut;
     });
 
     const adaptNotes: Record<string, string> = {};
@@ -494,6 +563,31 @@ export function adaptWorkoutDays(
     };
   });
 }
+
+/** What one exercise becomes for this profile: the pure, single-exercise view of adaptWorkoutDays. */
+export type AdaptedExercise = { exercise: string; target: string; note: string | null };
+
+export function adaptExercise(
+  exercise: string,
+  target: string,
+  profile: TrainingProfile,
+  options: { coachProgram?: boolean } = {}
+): AdaptedExercise {
+  const plain: TrainingProfile = { ...profile, adjust: null };
+  const source: WorkoutDay = { day: "Monday", title: "Training", minutes: "", notes: "", exercises: [exercise], targets: { [exercise]: target } };
+  const [result] = adaptWorkoutDays([source], 1, plain, options);
+  if (result === source || result.exercises.length === 0) return { exercise, target, note: null };
+  const adapted = result.exercises[0];
+  return {
+    exercise: adapted,
+    target: result.targets?.[adapted] ?? target,
+    note: result.adaptNotes?.[adapted] ?? null
+  };
+}
+
+/** Shown wherever the plan changes for a sore area. */
+export const INJURY_DISCLAIMER =
+  "This is not medical advice. These swaps are general, conservative options. If pain persists, gets worse during a set, or comes with swelling, stop and follow your athletic trainer, physio or doctor.";
 
 /** Pain at or above this on today's check-in turns that area on for the day (F-33). */
 export const CHECK_IN_PAIN_THRESHOLD = 4;
