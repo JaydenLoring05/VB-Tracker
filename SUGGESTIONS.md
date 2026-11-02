@@ -69,6 +69,7 @@ Rules for automated runs:
 | F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
 | F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
 | F-30 | Phone push reminders players turn on themselves (PR #85, needs SQL and keys) | building | me | L |
+| F-40 | Injury and level adapt deeper: box squats/step-ups for the knee, cut unknown jump and overhead work, % of max by level, "not medical advice" note | building | me | M |
 
 ## Details
 
@@ -461,6 +462,14 @@ Rules for automated runs:
 
 ### Plan fit
 
+- **F-40. Injury and level adapt deeper.** Jayden asked on 2026-10-29 for
+  injury-adaptive and level-adaptive plans. F-31 already did most of it, so
+  this fills the gaps: knee swaps deep loaded bends for a box squat to
+  parallel, step-ups and wall sits; any jump or overhead/swing exercise the
+  swap tables don't know (coach-written ones) keeps its place with about half
+  the sets; knee days with jumping get landing practice; level moves % of max
+  (beginner -10 points, advanced +5, capped at 90%); a "None" button; and a
+  plain "not medical advice" note. Pure `adaptExercise()` for one exercise.
 - **F-38. Weekly auto-adjust.** Jayden's call on 2026-10-21: keep the
   20-week plan as the skeleton and bend each week around the athlete.
   Inputs: the last 7 days of check-ins (average recovery under 55% with 3+
