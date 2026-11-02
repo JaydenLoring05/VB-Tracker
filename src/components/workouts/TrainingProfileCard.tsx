@@ -11,6 +11,7 @@ import {
   DAY_ROLES,
   DayRole,
   INJURY_AREAS,
+  INJURY_DISCLAIMER,
   InjuryArea,
   injuryLabel,
   TRAINING_LEVELS,
@@ -95,6 +96,14 @@ export function TrainingProfileCard({ adaptedCount }: { adaptedCount?: number })
 
       <p className="training-profile-label">Sore or injured (pick any)</p>
       <div className="filter-row" role="group" aria-label="Sore or injured areas">
+        <button
+          type="button"
+          className={profile.injuries.length === 0 ? "" : "ghost"}
+          aria-pressed={profile.injuries.length === 0}
+          onClick={() => setProfile({ ...profile, injuries: [] })}
+        >
+          None
+        </button>
         {INJURY_AREAS.map((option) => {
           const active = profile.injuries.includes(option.value);
           return (
@@ -165,8 +174,20 @@ export function TrainingProfileCard({ adaptedCount }: { adaptedCount?: number })
           {adaptedCount} {adaptedCount === 1 ? "exercise" : "exercises"} changed or added this week to fit you.
         </p>
       )}
-      <p className="muted training-profile-disclaimer">
-        Sharp pain, swelling, or pain that gets worse during a set means stop and see a doctor or athletic trainer.
+      {profile.injuries.includes("knee") && (
+        <p className="muted training-profile-summary">
+          Knee: less jumping, landing practice on jump days, and squats to a box at parallel, step-ups and wall sits
+          instead of deep loaded knee bends.
+        </p>
+      )}
+      {profile.injuries.includes("shoulder") && (
+        <p className="muted training-profile-summary">
+          Shoulder: no overhead pressing or hanging, landmine presses and rows instead, fewer full-power swings, and
+          rotator cuff and shoulder blade work every training day.
+        </p>
+      )}
+      <p className="muted training-profile-disclaimer" role="note">
+        {INJURY_DISCLAIMER}
       </p>
     </div>
   );

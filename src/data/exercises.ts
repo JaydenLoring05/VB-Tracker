@@ -1053,6 +1053,16 @@ export const exercises: Exercise[] = [
     ["Court Sprints", "Sprint Starts", "Lateral Bounds"]
   ),
   ex(
+    "Box Squat",
+    "Knee Strength",
+    "Beginner",
+    "📦",
+    "A squat to a box set at parallel. The box caps the depth, so the knee never goes into a deep loaded bend. A common pick when deep squats bother the knee.",
+    ["Box high enough that thighs are about parallel when seated.", "Sit back and touch the box under control, don't drop.", "Keep shins fairly vertical and knees over toes.", "Drive up through the whole foot."],
+    ["Crashing onto the box.", "Rocking back to bounce up.", "Using a box so low it becomes a deep squat again."],
+    ["Goblet Squat", "Wall Sit", "Step-Ups"]
+  ),
+  ex(
     "Wall Sit",
     "Knee Strength",
     "Beginner",
