@@ -1,0 +1,189 @@
+/* Athlete sign-up page (/join, F-41). Mobile first; builds on landing.css and pilot.css. */
+
+.join-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.join-hero h1 {
+  margin: var(--sp-4) 0 var(--sp-5);
+  font-size: clamp(36px, 10vw, 58px);
+  line-height: 1;
+}
+
+/* The landing header hides its section links on phones; keep the CTA from crowding the logo. */
+@media (max-width: 380px) {
+  .join-page .landing-header-nav a:first-child {
+    display: none;
+  }
+}
+
+/* Benefits */
+
+.join-cards {
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.join-card {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.join-card h3 {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+.join-card p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.join-card-icon {
+  color: var(--gold);
+}
+
+@media (min-width: 760px) {
+  .join-inner {
+    max-width: 1040px;
+  }
+
+  .join-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* How it works */
+
+.join-steps {
+  display: grid;
+  gap: var(--sp-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.join-step {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: flex-start;
+}
+
+.join-step-number {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: var(--on-gold);
+  font-weight: var(--fw-display);
+}
+
+.join-step h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 4px 0 var(--sp-1);
+  font-size: var(--fs-lg);
+}
+
+.join-step h3 svg {
+  color: var(--gold);
+}
+
+.join-step p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+@media (min-width: 760px) {
+  .join-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Price */
+
+.join-price-card {
+  display: grid;
+  gap: var(--sp-3);
+  max-width: 440px;
+  border-color: color-mix(in oklch, var(--gold) 45%, var(--border));
+}
+
+.join-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+}
+
+.join-price-amount {
+  font-size: 44px;
+  font-weight: var(--fw-display);
+  line-height: 1;
+}
+
+.join-price-trial {
+  margin: 0;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.join-price-card .pilot-points {
+  margin: var(--sp-2) 0;
+}
+
+.join-price-note {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+/* Sign-up */
+
+.join-signup {
+  scroll-margin-top: 64px;
+}
+
+.join-signup .pilot-form,
+.join-signup .pilot-result {
+  max-width: 520px;
+}
+
+.join-signup .pilot-result h3 {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  line-height: 1.1;
+}
+
+.join-signup .pilot-result h3:focus {
+  outline: none;
+}
+
+.join-account-note,
+.join-disclaimer {
+  max-width: 520px;
+  margin: var(--sp-5) 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.join-account-note a,
+.join-signup .pilot-result a:not(.btn) {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.join-disclaimer {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-xs);
+}

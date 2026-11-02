@@ -70,6 +70,7 @@ Rules for automated runs:
 | F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
 | F-30 | Phone push reminders players turn on themselves (PR #85, needs SQL and keys) | building | me | L |
 | F-40 | Injury and level adapt deeper: box squats/step-ups for the knee, cut unknown jump and overhead work, % of max by level, "not medical advice" note | building | me | M |
+| F-41 | Public athlete sign-up page at /join (joinnextrep.com): plan that adapts to you, $14.99/mo with 7-day trial "coming soon", early-access form saved to `waitlist_signups` (needs SQL) | building | me | M |
 
 ## Details
 
@@ -470,6 +471,15 @@ Rules for automated runs:
   the sets; knee days with jumping get landing practice; level moves % of max
   (beginner -10 points, advanced +5, capped at 90%); a "None" button; and a
   plain "not medical advice" note. Pure `adaptExercise()` for one exercise.
+- **F-41. Athlete sign-up page.** Jayden asked on 2026-10-29 for a
+  one-page public sign-up for joinnextrep.com aimed at individual athletes
+  (not coaches or parents). Lives at `/join` so `/` stays the team page and
+  `/join/CODE` invite links keep working. Headline, 3 benefits, 3 steps,
+  $14.99/month with a 7-day free trial shown as "coming soon" (Stripe isn't
+  live), and a form (name, email, optional position and age group) that
+  saves to `waitlist_signups` through `/api/waitlist` (insert-only RLS,
+  `schema_v60`). Links to account sign-up. No testimonials or stats.
+
 - **F-38. Weekly auto-adjust.** Jayden's call on 2026-10-21: keep the
   20-week plan as the skeleton and bend each week around the athlete.
   Inputs: the last 7 days of check-ins (average recovery under 55% with 3+
