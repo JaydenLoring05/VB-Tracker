@@ -438,3 +438,67 @@
   margin-top: var(--sp-2);
   font-size: var(--fs-sm);
 }
+
+/* G-06: weekly challenge and leaderboard. */
+.challenge-body {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.challenge-body p {
+  margin: 0;
+}
+
+.challenge-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 600;
+}
+
+.challenge-title svg {
+  color: var(--gold);
+}
+
+.challenge-optin {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  min-height: 44px;
+  font-size: var(--fs-sm);
+}
+
+.challenge-optin input {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  margin-top: 2px;
+  flex: none;
+}
+
+.challenge-board {
+  display: grid;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.challenge-board li {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.challenge-rank {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.challenge-me {
+  box-shadow: inset 0 0 0 1px var(--gold);
+}

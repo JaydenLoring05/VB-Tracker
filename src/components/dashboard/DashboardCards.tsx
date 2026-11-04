@@ -4,6 +4,7 @@ import { ArrowRight, ClipboardCheck, Flame, Moon, Snowflake } from "lucide-react
 import Link from "next/link";
 
 import { BadgesLine } from "@/components/dashboard/BadgesLine";
+import { ChallengeLine } from "@/components/dashboard/ChallengeLine";
 import { PushReminderNudge } from "@/components/dashboard/PushReminderNudge";
 import { ShareProgressButton } from "@/components/dashboard/ShareProgressButton";
 import { TeamNudge } from "@/components/dashboard/TeamNudge";
@@ -260,6 +261,7 @@ export function DashboardCards() {
           </div>
         </details>
 
+        <ChallengeLine />
         <BadgesLine earned={badges} />
       </div>
     </>
