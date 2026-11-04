@@ -341,3 +341,80 @@
   gap: var(--sp-3);
   font-size: var(--fs-sm);
 }
+
+/* G-03: badges on Today and the unlock celebration. */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge {
+  display: grid;
+  gap: 2px;
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
+}
+
+.badge-icon {
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.badge-locked .badge-icon {
+  filter: grayscale(1);
+  opacity: 0.35;
+}
+
+.badge-unlock {
+  text-align: center;
+}
+
+.badge-unlock-burst {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 96px;
+}
+
+.badge-unlock-icon {
+  font-size: 64px;
+  animation: badge-pop 520ms var(--ease-out) both;
+}
+
+.badge-unlock-list {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 var(--sp-5);
+  padding: 0;
+  list-style: none;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  70% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-unlock-icon {
+    animation: none;
+  }
+}
+
+.badge strong {
+  color: var(--text);
+}
+
+.badge-earned {
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+
+.badge-locked strong {
+  color: var(--muted);
+}

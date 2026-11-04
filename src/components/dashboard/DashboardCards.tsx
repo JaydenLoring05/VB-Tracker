@@ -3,6 +3,7 @@
 import { ArrowRight, ClipboardCheck, Flame, Moon } from "lucide-react";
 import Link from "next/link";
 
+import { BadgesLine } from "@/components/dashboard/BadgesLine";
 import { PushReminderNudge } from "@/components/dashboard/PushReminderNudge";
 import { TeamNudge } from "@/components/dashboard/TeamNudge";
 import { ProgressRing } from "@/components/shared/ProgressRing";
@@ -13,6 +14,7 @@ import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
 import { usePRs } from "@/hooks/usePRs";
+import { useBadges } from "@/hooks/useBadges";
 import { useProgression } from "@/hooks/useProgression";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { usePushTrainingDays } from "@/hooks/usePushTrainingDays";
@@ -50,6 +52,8 @@ export function DashboardCards() {
   const todayWorkout = weekDays.find((day) => day.day === today);
   // Phone reminders only say "time to train" on days this plan trains.
   usePushTrainingDays(weekDays.filter((day) => !day.rest && day.exercises.length > 0).map((day) => day.day));
+  const trainingDays = weekDays.filter((day) => !day.rest && day.exercises.length > 0).length;
+  const badges = useBadges(trainingDays);
   const cta = todayWorkoutCta(todayWorkout, Boolean(openSession));
   const isRestDay = cta.isRestDay;
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";
@@ -234,6 +238,8 @@ export function DashboardCards() {
             )}
           </div>
         </details>
+
+        <BadgesLine earned={badges} />
       </div>
     </>
   );
