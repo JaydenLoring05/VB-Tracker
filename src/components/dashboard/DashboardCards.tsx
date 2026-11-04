@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ClipboardCheck, Flame } from "lucide-react";
+import { ArrowRight, ClipboardCheck, Flame, Moon } from "lucide-react";
 import Link from "next/link";
 
 import { PushReminderNudge } from "@/components/dashboard/PushReminderNudge";
@@ -8,7 +8,7 @@ import { TeamNudge } from "@/components/dashboard/TeamNudge";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { statusTone } from "@/components/shared/StatusLabel";
 import { useTrackerContext } from "@/context/TrackerContext";
-import { useTodayName } from "@/hooks/useToday";
+import { useTodayISO, useTodayName } from "@/hooks/useToday";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
@@ -19,6 +19,7 @@ import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
 import { checkedInToday } from "@/lib/dailyCheckIn";
 import { todayWorkoutCta } from "@/lib/dashboardCta";
+import { exercisePreview, recoveryTipFor } from "@/lib/recoveryTips";
 
 const RECOVERY_COLOR: Record<string, string> = {
   Elite: "var(--green)",
@@ -33,6 +34,7 @@ const RECOVERY_COLOR: Record<string, string> = {
  */
 export function DashboardCards() {
   const today = useTodayName();
+  const todayISO = useTodayISO();
   const { workoutStreak, teamOverride, substitutions } = useTrackerContext();
   const { effectiveProfile: trainingProfile } = useTrainingProfile();
 
@@ -51,23 +53,11 @@ export function DashboardCards() {
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";
   const phase = getPhase(week);
   const recentPRs = prs.slice(0, 3);
+  const preview = exercisePreview(todayWorkout?.exercises ?? []);
+  const restTip = recoveryTipFor(todayISO);
 
   return (
     <>
-      <TeamNudge />
-      <PushReminderNudge />
-
-      {needsCheckIn && (
-        <Link href="/check-in" className="panel today-checkin">
-          <ClipboardCheck size={26} aria-hidden="true" />
-          <span>
-            <strong>Daily check-in</strong>
-            <span className="muted">30 seconds. Sleep, energy, soreness, anything hurting.</span>
-          </span>
-          <ArrowRight size={20} aria-hidden="true" />
-        </Link>
-      )}
-
       <section id="dashboard" className="panel today-hero" aria-labelledby="today-title">
         <p className="micro micro-gold">Today &middot; {today}</p>
         <h2 id="today-title" className="today-title">
@@ -85,6 +75,22 @@ export function DashboardCards() {
           )}
         </p>
 
+        {isRestDay
+          ? restTip && (
+              <p className="today-rest-tip">
+                <Moon size={18} aria-hidden="true" />
+                <span>{restTip}</span>
+              </p>
+            )
+          : preview.shown.length > 0 && (
+              <ul className="today-exercises" aria-label="Today's exercises">
+                {preview.shown.map((name) => (
+                  <li key={name}>{name}</li>
+                ))}
+                {preview.more > 0 && <li className="muted">+{preview.more} more</li>}
+              </ul>
+            )}
+
         {cta.prominent ? (
           <Link href={cta.href} className="btn dashboard-hero-cta">
             {cta.label}
@@ -96,6 +102,20 @@ export function DashboardCards() {
           </Link>
         )}
       </section>
+
+      <TeamNudge />
+      <PushReminderNudge />
+
+      {needsCheckIn && (
+        <Link href="/check-in" className="panel today-checkin">
+          <ClipboardCheck size={26} aria-hidden="true" />
+          <span>
+            <strong>Daily check-in</strong>
+            <span className="muted">30 seconds. Sleep, energy, soreness, anything hurting.</span>
+          </span>
+          <ArrowRight size={20} aria-hidden="true" />
+        </Link>
+      )}
 
       <div className="today-lines">
         <details className="today-line">

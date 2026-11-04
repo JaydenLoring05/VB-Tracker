@@ -295,3 +295,34 @@
 .push-nudge-close svg {
   color: var(--muted);
 }
+
+/* N-02: what today's workout is, and a recovery tip on rest days. */
+.today-exercises {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-5);
+  padding: 0;
+  list-style: none;
+}
+
+.today-exercises li {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
+}
+
+.today-rest-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-5);
+  line-height: 1.45;
+}
+
+.today-rest-tip svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--gold);
+}
