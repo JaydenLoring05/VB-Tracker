@@ -6,7 +6,14 @@ import { isJumpExercise } from "@/lib/exerciseMeasure";
  * inputs only grow.
  */
 
-export type BadgeId = "first-workout" | "streak-7" | "streak-30" | "jump-pr" | "workouts-50" | "perfect-week";
+export type BadgeId =
+  | "first-workout"
+  | "streak-7"
+  | "streak-30"
+  | "jump-pr"
+  | "workouts-50"
+  | "perfect-week"
+  | "recruiter";
 
 export type Badge = { id: BadgeId; name: string; description: string; icon: string };
 
@@ -16,7 +23,8 @@ export const BADGES: readonly Badge[] = [
   { id: "perfect-week", name: "Perfect Week", description: "Do every training day in a week.", icon: "✅" },
   { id: "jump-pr", name: "Sky High", description: "Set a new jump PR.", icon: "🚀" },
   { id: "streak-30", name: "Unstoppable", description: "Train 30 days in a row.", icon: "⚡" },
-  { id: "workouts-50", name: "Half Century", description: "Finish 50 workouts.", icon: "🏆" }
+  { id: "workouts-50", name: "Half Century", description: "Finish 50 workouts.", icon: "🏆" },
+  { id: "recruiter", name: "Recruiter", description: "Get a friend to sign up with your code.", icon: "🤝" }
 ];
 
 const JUMP_PR = /\b(vert(ical)?|approach|touch|reach|jump|broad)\b/i;
@@ -69,12 +77,15 @@ export function isJumpPR(pr: { exercise: string; unit?: string }): boolean {
 export function earnedBadges({
   workoutDates,
   prs,
-  trainingDaysPerWeek
+  trainingDaysPerWeek,
+  referrals = 0
 }: {
   workoutDates: string[];
   prs: { exercise: string; unit?: string }[];
   /** Training days in the athlete's current plan week (rest days not counted). */
   trainingDaysPerWeek: number;
+  /** Friends who signed up with the athlete's code (RF-01). */
+  referrals?: number;
 }): BadgeId[] {
   const streak = bestStreak(workoutDates);
   const earned = new Set<BadgeId>();
@@ -84,6 +95,7 @@ export function earnedBadges({
   if (prs.some(isJumpPR)) earned.add("jump-pr");
   if (workoutDates.length >= 50) earned.add("workouts-50");
   if (hasPerfectWeek(workoutDates, trainingDaysPerWeek)) earned.add("perfect-week");
+  if (referrals >= 1) earned.add("recruiter");
   return BADGES.map((badge) => badge.id).filter((id) => earned.has(id));
 }
 

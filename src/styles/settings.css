@@ -89,3 +89,23 @@
 .phone-reminders-actions button {
   width: auto;
 }
+
+/* RF-01: referral code. */
+.invite-friends {
+  display: grid;
+  gap: var(--sp-3);
+  justify-items: start;
+}
+
+.invite-friends h2,
+.invite-friends p {
+  margin: 0;
+}
+
+.invite-code strong {
+  margin-left: var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}

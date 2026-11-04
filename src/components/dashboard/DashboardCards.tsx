@@ -17,6 +17,7 @@ import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
 import { usePRs } from "@/hooks/usePRs";
 import { useBadges } from "@/hooks/useBadges";
 import { useProgression } from "@/hooks/useProgression";
+import { useReferrals } from "@/hooks/useReferrals";
 import { useStreak } from "@/hooks/useStreak";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { usePushTrainingDays } from "@/hooks/usePushTrainingDays";
@@ -49,14 +50,15 @@ export function DashboardCards() {
   const { week, completedExercises, totalExercises, progress } = useWorkoutProgress();
   const { prs } = usePRs();
   const { openSession } = useStartWorkout();
-  const progression = useProgression();
+  const referrals = useReferrals();
+  const progression = useProgression(referrals.signups);
 
   const weekDays = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions, trainingProfile);
   const todayWorkout = weekDays.find((day) => day.day === today);
   // Phone reminders only say "time to train" on days this plan trains.
   usePushTrainingDays(weekDays.filter((day) => !day.rest && day.exercises.length > 0).map((day) => day.day));
   const trainingDays = weekDays.filter((day) => !day.rest && day.exercises.length > 0).length;
-  const badges = useBadges(trainingDays);
+  const badges = useBadges(trainingDays, referrals.signups);
   const cta = todayWorkoutCta(todayWorkout, Boolean(openSession));
   const isRestDay = cta.isRestDay;
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";

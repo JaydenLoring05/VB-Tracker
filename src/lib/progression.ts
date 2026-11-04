@@ -9,6 +9,8 @@
 
 export const XP_PER_WORKOUT = 100;
 export const XP_PER_PR = 50;
+/** Each friend who signs up with the athlete's referral code (RF-01). */
+export const XP_PER_REFERRAL = 150;
 
 export type Level = { name: string; minXp: number };
 
@@ -20,8 +22,9 @@ export const LEVELS: readonly Level[] = [
   { name: "Pro", minXp: 8000 }
 ];
 
-export function computeXp({ workouts, prs }: { workouts: number; prs: number }): number {
-  return Math.max(0, Math.floor(workouts)) * XP_PER_WORKOUT + Math.max(0, Math.floor(prs)) * XP_PER_PR;
+export function computeXp({ workouts, prs, referrals = 0 }: { workouts: number; prs: number; referrals?: number }): number {
+  const count = (n: number) => Math.max(0, Math.floor(n));
+  return count(workouts) * XP_PER_WORKOUT + count(prs) * XP_PER_PR + count(referrals) * XP_PER_REFERRAL;
 }
 
 export type LevelProgress = {

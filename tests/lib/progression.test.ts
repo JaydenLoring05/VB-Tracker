@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { computeXp, LEVELS, levelProgress, XP_PER_PR, XP_PER_WORKOUT } from "@/lib/progression";
+import { computeXp, LEVELS, levelProgress, XP_PER_PR, XP_PER_REFERRAL, XP_PER_WORKOUT } from "@/lib/progression";
 
 describe("computeXp (G-02)", () => {
   it("gives XP for each workout and each PR", () => {
     expect(computeXp({ workouts: 3, prs: 2 })).toBe(3 * XP_PER_WORKOUT + 2 * XP_PER_PR);
     expect(computeXp({ workouts: 0, prs: 0 })).toBe(0);
+  });
+
+  it("adds XP for each friend who signed up with your code (RF-01)", () => {
+    expect(computeXp({ workouts: 1, prs: 0, referrals: 2 })).toBe(XP_PER_WORKOUT + 2 * XP_PER_REFERRAL);
   });
 
   it("never goes negative or fractional", () => {

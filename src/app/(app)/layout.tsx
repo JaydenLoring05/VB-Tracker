@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { LoadErrorBanner } from "@/components/layout/LoadErrorBanner";
+import { ReferralRedeemer } from "@/components/layout/ReferralRedeemer";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SyncErrorToast } from "@/components/layout/SyncErrorToast";
 import { Topbar } from "@/components/layout/Topbar";
@@ -36,6 +37,7 @@ export default async function AppLayout({
         <main id="main-content" tabIndex={-1} className="main">
           <Topbar userEmail={user.email ?? "Athlete"} displayName={profile?.display_name} />
           <LoadErrorBanner />
+          <ReferralRedeemer />
           {children}
         </main>
       </div>
