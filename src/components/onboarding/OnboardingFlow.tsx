@@ -5,7 +5,15 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
 import { GuardianFields } from "@/components/guardian/GuardianFields";
-import { validateGuardianAnswer, type GuardianAnswer } from "@/lib/guardian";
+import {
+  EMPTY_GUARDIAN_ANSWER,
+  fieldsFromSignupMetadata,
+  SIGNUP_AGE_KEY,
+  validateGuardianAnswer,
+  type GuardianAnswer,
+  type GuardianFields as AgeFields
+} from "@/lib/guardian";
+import { ATHLETE_GOALS, AthleteGoal, SPORTS, Sport, positionLabel } from "@/lib/athleteSignup";
 import { createClient as createGuardianClient } from "@/lib/supabase/client";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
@@ -14,8 +22,6 @@ import { useTeam } from "@/hooks/useTeam";
 import { pendingInviteFrom, PENDING_INVITE_KEY } from "@/lib/invite";
 import { startingProgramKeyForPosition } from "@/lib/positionProgram";
 import {
-  AGE_GROUPS,
-  AgeGroup,
   INJURY_AREAS,
   InjuryArea,
   TRAINING_LEVELS,
@@ -27,25 +33,6 @@ type Role = "coach" | "athlete";
 
 const POSITIONS = ["Outside Hitter", "Middle Blocker", "Opposite", "Setter", "Libero/DS"];
 const COMPETITIVE_LEVELS = ["Middle School", "JV", "Varsity", "Club", "College"];
-
-const TRAINING_GOAL_OPTIONS = [
-  "Increase vertical jump",
-  "Hitting power",
-  "Blocking footwork and timing",
-  "Ball-handling speed",
-  "Lateral agility",
-  "First-step speed",
-  "Shoulder health",
-  "Knee health"
-];
-
-const POSITION_DEFAULT_GOALS: Record<string, string[]> = {
-  "Outside Hitter": ["Increase vertical jump", "Hitting power"],
-  "Middle Blocker": ["Increase vertical jump", "Blocking footwork and timing"],
-  Opposite: ["Hitting power", "Increase vertical jump"],
-  Setter: ["Ball-handling speed", "Lateral agility"],
-  "Libero/DS": ["Lateral agility", "First-step speed"]
-};
 
 const TOTAL_STEPS = 4;
 
@@ -65,13 +52,17 @@ export function OnboardingFlow() {
   const [seasonEnd, setSeasonEnd] = useState("");
   const [athletesExpected, setAthletesExpected] = useState("");
   const [trainingDays, setTrainingDays] = useState("");
-  const [guardian, setGuardian] = useState<GuardianAnswer>({ isAdult: null, name: "", email: "", acknowledged: false });
+  const [guardian, setGuardian] = useState<GuardianAnswer>(EMPTY_GUARDIAN_ANSWER);
+  // Age and parent consent given on the sign-up screen (N-03). Null means
+  // onboarding asks: Google sign-in from the sign-in screen, or older accounts.
+  const [signupAge, setSignupAge] = useState<AgeFields | null>(null);
   const [guardianError, setGuardianError] = useState<string | null>(null);
 
+  const [sport, setSport] = useState<Sport>("volleyball");
   const [position, setPosition] = useState(POSITIONS[0]);
-  const [goals, setGoals] = useState<string[]>(POSITION_DEFAULT_GOALS[POSITIONS[0]] ?? []);
+  const [otherPosition, setOtherPosition] = useState("");
+  const [goal, setGoal] = useState<AthleteGoal>("jump");
   // Setup quiz (F-06): the plan adapts to these from the first workout.
-  const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(null);
   const [trainingLevel, setTrainingLevel] = useState<TrainingLevel>("intermediate");
   const [soreAreas, setSoreAreas] = useState<InjuryArea[]>([]);
   const [solo, setSolo] = useState(false);
@@ -90,9 +81,18 @@ export function OnboardingFlow() {
     } catch {
       // Storage blocked; the account copy below still works.
     }
+    let storedAge: unknown = null;
+    try {
+      storedAge = JSON.parse(window.localStorage.getItem(SIGNUP_AGE_KEY) ?? "null");
+    } catch {
+      // Nothing usable stored.
+    }
     createClient()
       .auth.getUser()
-      .then(({ data }) => setPendingInvite(pendingInviteFrom(stored, data.user?.user_metadata)));
+      .then(({ data }) => {
+        setPendingInvite(pendingInviteFrom(stored, data.user?.user_metadata));
+        setSignupAge(fieldsFromSignupMetadata(data.user?.user_metadata) ?? fieldsFromSignupMetadata(storedAge));
+      });
   }, []);
 
   async function clearPendingInvite() {
@@ -140,21 +140,15 @@ export function OnboardingFlow() {
     setStep(2);
   }
 
-  function selectPosition(next: string) {
-    setPosition(next);
-    setGoals(POSITION_DEFAULT_GOALS[next] ?? []);
-  }
-
-  function toggleGoal(goal: string) {
-    setGoals((current) => (current.includes(goal) ? current.filter((item) => item !== goal) : [...current, goal]));
-  }
 
   async function handleRoleDetailsSubmit(event: FormEvent) {
     event.preventDefault();
     if (saving) return;
 
-    // Athletes answer the age question; under 18 needs guardian details.
-    const guardianResult = role === "athlete" ? validateGuardianAnswer(guardian) : null;
+    // Athletes who didn't give their age at sign-up answer it here; under 13
+    // needs a parent's consent before going on (N-03).
+    const guardianResult =
+      role !== "athlete" ? null : signupAge ? ({ ok: true, fields: signupAge } as const) : validateGuardianAnswer(guardian);
     if (guardianResult && !guardianResult.ok) {
       setGuardianError(guardianResult.error);
       return;
@@ -171,20 +165,33 @@ export function OnboardingFlow() {
         athletes_expected: athletesExpected ? Number(athletesExpected) : null
       });
     } else {
-      setTrainingProfile({ level: trainingLevel, injuries: soreAreas, ageGroup });
-      await updateProfile({ position, training_goals: goals });
-      // Saved separately so a missing column (before schema_v45) can't block
-      // the position and goals above. A coach program still replaces it.
-      await setStartingProgram(startingProgramKeyForPosition(position));
-      if (guardianResult?.ok) {
-        // Separate write: before schema_v52 these columns don't exist, and
+      const ageFields = guardianResult?.ok ? guardianResult.fields : null;
+      setTrainingProfile({ level: trainingLevel, injuries: soreAreas, ageGroup: ageFields?.age_group ?? null });
+      await updateProfile({
+        position: positionLabel(sport, position, otherPosition),
+        training_goals: [ATHLETE_GOALS.find((option) => option.value === goal)!.label]
+      });
+      // The plan is assigned from the answers: a volleyball position gets its
+      // starting program, every other sport the all-round plan. Saved
+      // separately so a missing column can't block the answers above. A coach
+      // program still replaces it.
+      await setStartingProgram(sport === "volleyball" ? startingProgramKeyForPosition(position) : null);
+      if (ageFields) {
+        // Separate write: before schema_v61 these columns don't exist, and
         // that mustn't block onboarding. The athlete is asked again on Today.
         const { data } = await createGuardianClient().auth.getUser();
         if (data.user) {
           const { error } = await createGuardianClient()
             .from("profiles")
-            .upsert({ user_id: data.user.id, ...guardianResult.fields }, { onConflict: "user_id" });
-          if (error) console.error("Failed to save guardian info", error);
+            .upsert({ user_id: data.user.id, sport, ...ageFields }, { onConflict: "user_id" });
+          if (error) console.error("Failed to save age and sport", error);
+          else {
+            try {
+              window.localStorage.removeItem(SIGNUP_AGE_KEY);
+            } catch {
+              // Nothing to clear.
+            }
+          }
         }
       }
     }
@@ -300,34 +307,18 @@ export function OnboardingFlow() {
         <form className="onboarding-step onboarding-form" onSubmit={handleRoleDetailsSubmit}>
           <h2>Tell us about you</h2>
 
-          <label>
-            Position
-            <select value={position} onChange={(e) => selectPosition(e.target.value)}>
-              {POSITIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-          {startingProgramKeyForPosition(position) && (
-            <p className="muted">
-              You&apos;ll start on the {POSITION_PROGRAMS[startingProgramKeyForPosition(position)!].label} program:{" "}
-              {POSITION_PROGRAMS[startingProgramKeyForPosition(position)!].focus} You can switch on the Workouts page,
-              and your coach can assign their own.
-            </p>
-          )}
+          {!signupAge && <GuardianFields value={guardian} onChange={setGuardian} idPrefix="onboarding-guardian" />}
 
           <fieldset className="onboarding-quiz">
-            <legend>Age</legend>
+            <legend>Sport</legend>
             <div className="filter-row">
-              {AGE_GROUPS.map((option) => (
+              {SPORTS.map((option) => (
                 <button
                   key={option.value}
                   type="button"
-                  className={ageGroup === option.value ? "" : "ghost"}
-                  aria-pressed={ageGroup === option.value}
-                  onClick={() => setAgeGroup(option.value)}
+                  className={sport === option.value ? "" : "ghost"}
+                  aria-pressed={sport === option.value}
+                  onClick={() => setSport(option.value)}
                 >
                   {option.label}
                 </button>
@@ -335,8 +326,39 @@ export function OnboardingFlow() {
             </div>
           </fieldset>
 
+          {sport === "volleyball" ? (
+            <>
+              <label>
+                Position
+                <select value={position} onChange={(e) => setPosition(e.target.value)}>
+                  {POSITIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {startingProgramKeyForPosition(position) && (
+                <p className="muted">
+                  You&apos;ll start on the {POSITION_PROGRAMS[startingProgramKeyForPosition(position)!].label} program:{" "}
+                  {POSITION_PROGRAMS[startingProgramKeyForPosition(position)!].focus}
+                </p>
+              )}
+            </>
+          ) : (
+            <label>
+              Position (optional)
+              <input
+                value={otherPosition}
+                onChange={(e) => setOtherPosition(e.target.value)}
+                placeholder="ex: Point guard, Sprinter"
+                maxLength={40}
+              />
+            </label>
+          )}
+
           <fieldset className="onboarding-quiz">
-            <legend>Training experience</legend>
+            <legend>Level</legend>
             <div className="filter-row">
               {TRAINING_LEVELS.map((option) => (
                 <button
@@ -355,7 +377,24 @@ export function OnboardingFlow() {
           </fieldset>
 
           <fieldset className="onboarding-quiz">
-            <legend>Anything sore or injured? (optional)</legend>
+            <legend>Main goal</legend>
+            <div className="filter-row">
+              {ATHLETE_GOALS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={goal === option.value ? "" : "ghost"}
+                  aria-pressed={goal === option.value}
+                  onClick={() => setGoal(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="onboarding-quiz">
+            <legend>Any injuries or sore spots? (optional)</legend>
             <div className="filter-row">
               {INJURY_AREAS.map((option) => (
                 <button
@@ -372,17 +411,6 @@ export function OnboardingFlow() {
             <p className="muted">Your workouts swap to joint-friendly versions and add rehab work. Change it any time.</p>
           </fieldset>
 
-          <fieldset className="onboarding-goals">
-            <legend>Training goals (pick 1-2)</legend>
-            {TRAINING_GOAL_OPTIONS.map((goal) => (
-              <label key={goal} className="onboarding-goal-option">
-                <input type="checkbox" checked={goals.includes(goal)} onChange={() => toggleGoal(goal)} />
-                {goal}
-              </label>
-            ))}
-          </fieldset>
-
-          <GuardianFields value={guardian} onChange={setGuardian} idPrefix="onboarding-guardian" />
           {guardianError && (
             <p className="guardian-error" role="alert">
               {guardianError}

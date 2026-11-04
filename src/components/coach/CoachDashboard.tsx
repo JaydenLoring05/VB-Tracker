@@ -322,8 +322,8 @@ export function CoachDashboard({
                     <span className="pill roster-flag">Needs check-in</span>
                   )}
                   {athlete.guardianInfoMissing && (
-                    <span className="pill roster-flag roster-flag-guardian" title="Under 18 or hasn't answered: no parent or guardian info yet">
-                      Guardian info missing
+                    <span className="pill roster-flag roster-flag-guardian" title="Under 13 without parent consent, or hasn't told us their age">
+                      Age or parent consent missing
                     </span>
                   )}
                   <span className="muted roster-last-active">{formatLastActive(athlete.lastActiveAt)}</span>

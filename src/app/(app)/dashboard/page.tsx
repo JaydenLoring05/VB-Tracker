@@ -4,6 +4,7 @@ import { GuardianPrompt } from "@/components/guardian/GuardianPrompt";
 import "@/styles/coach.css";
 import "@/styles/dashboard.css";
 import "@/styles/onboarding.css";
+import "@/styles/guardian.css";
 
 export default function DashboardPage() {
   return (
