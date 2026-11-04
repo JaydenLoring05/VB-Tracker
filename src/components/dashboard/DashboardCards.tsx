@@ -13,6 +13,7 @@ import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
 import { usePRs } from "@/hooks/usePRs";
+import { useProgression } from "@/hooks/useProgression";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { usePushTrainingDays } from "@/hooks/usePushTrainingDays";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
@@ -43,6 +44,7 @@ export function DashboardCards() {
   const { week, completedExercises, totalExercises, progress } = useWorkoutProgress();
   const { prs } = usePRs();
   const { openSession } = useStartWorkout();
+  const progression = useProgression();
 
   const weekDays = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions, trainingProfile);
   const todayWorkout = weekDays.find((day) => day.day === today);
@@ -101,6 +103,27 @@ export function DashboardCards() {
             {cta.label}
           </Link>
         )}
+
+        <div className="today-level">
+          <div className="today-level-row">
+            <strong>{progression.level.name}</strong>
+            <span className="muted">
+              {progression.next
+                ? `${progression.xpToNext} XP to ${progression.next.name}`
+                : `${progression.xp} XP · top level`}
+            </span>
+          </div>
+          <div
+            className="progress-bar"
+            role="progressbar"
+            aria-label={`Level progress: ${progression.level.name}`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progression.percent}
+          >
+            <div className="progress-fill" style={{ width: `${progression.percent}%` }} />
+          </div>
+        </div>
       </section>
 
       <TeamNudge />

@@ -326,3 +326,18 @@
   margin-top: 2px;
   color: var(--gold);
 }
+
+/* G-02: level and progress to the next one, under the Start button. */
+.today-level {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
+}
+
+.today-level-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+}
