@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowRight, Check, Clock, ShieldPlus, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 
+import { ReferralCapture } from "@/components/join/ReferralCapture";
 import { TodayPreview } from "@/components/join/TodayPreview";
 import { Brand } from "@/components/shared/Brand";
 import { BADGES } from "@/lib/badges";
@@ -104,6 +105,7 @@ export default function JoinPage() {
       <main id="main-content" tabIndex={-1}>
         <section className="landing-hero join-hero">
           <div className="join-inner">
+            <ReferralCapture />
             <p className="micro micro-gold">For athletes of any age</p>
             <h1>
               Jump higher. Get stronger. <span className="landing-hero-accent">Train like a college athlete.</span>

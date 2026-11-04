@@ -54,10 +54,15 @@ describe("isJumpPR", () => {
 });
 
 describe("earnedBadges (G-03)", () => {
-  it("has every badge Jayden asked for", () => {
+  it("has every badge Jayden asked for, plus Recruiter for referrals (RF-01)", () => {
     expect(BADGES.map((badge) => badge.id).sort()).toEqual(
-      ["first-workout", "jump-pr", "perfect-week", "streak-30", "streak-7", "workouts-50"].sort()
+      ["first-workout", "jump-pr", "perfect-week", "recruiter", "streak-30", "streak-7", "workouts-50"].sort()
     );
+  });
+
+  it("gives Recruiter after the first friend signs up with your code", () => {
+    expect(earnedBadges({ workoutDates: [], prs: [], trainingDaysPerWeek: 5, referrals: 1 })).toEqual(["recruiter"]);
+    expect(earnedBadges({ workoutDates: [], prs: [], trainingDaysPerWeek: 5, referrals: 0 })).toEqual([]);
   });
 
   it("gives nothing before the first workout", () => {

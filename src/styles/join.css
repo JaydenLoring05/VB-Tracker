@@ -258,3 +258,16 @@
   max-width: 60ch;
   line-height: 1.6;
 }
+
+/* RF-01: arrived with a friend's code. */
+.join-referral {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-4);
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--gold) 14%, transparent);
+  color: var(--gold);
+  font-size: var(--fs-sm);
+}

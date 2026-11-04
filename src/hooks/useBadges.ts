@@ -2,7 +2,7 @@ import { useTrackerContext } from "@/context/TrackerContext";
 import { earnedBadges } from "@/lib/badges";
 
 /** Badges the athlete has earned (G-03). `trainingDaysPerWeek` is from their current plan week. */
-export function useBadges(trainingDaysPerWeek: number) {
+export function useBadges(trainingDaysPerWeek: number, referrals = 0) {
   const { workoutDates, prs } = useTrackerContext();
-  return earnedBadges({ workoutDates, prs, trainingDaysPerWeek });
+  return earnedBadges({ workoutDates, prs, trainingDaysPerWeek, referrals });
 }
