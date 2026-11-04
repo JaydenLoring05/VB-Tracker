@@ -25,6 +25,15 @@ one, run its check query; it should return the value shown.
 | v52 | `schema_v52_guardian_info.sql` | #49 | `select count(*) from information_schema.columns where table_name = 'profiles' and column_name = 'is_adult';` | `1` |
 | v53 | `schema_v53_film_quick_tags.sql` | F-02 | `select count(*) from information_schema.columns where table_name = 'film_tags' and column_name = 'result';` | `1` |
 | v54 | `schema_v54_daily_summary_date_fix.sql` | B-05 | `select pg_get_functiondef('public.daily_summary_data(text,date)'::regprocedure) like '%to_char(p_today%';` | `true` |
+| v55 | `schema_v55_push_reminders.sql` | F-30 | `select to_regclass('public.push_subscriptions') is not null;` | `true` |
+| v56 | `schema_v56_training_profile.sql` | F-34 | `select count(*) from information_schema.columns where table_name = 'profiles' and column_name = 'training_level';` | `1` |
+| v57 | `schema_v57_athlete_billing.sql` | F-37 | `select to_regclass('public.athlete_billing') is not null;` | `true` |
+| v58 | `schema_v58_weekly_schedule.sql` | F-38 | `select count(*) from information_schema.columns where table_name = 'profiles' and column_name = 'weekly_schedule';` | `1` |
+| v60 | `schema_v60_waitlist_signups.sql` | F-41 | `select to_regclass('public.waitlist_signups') is not null;` | `true` |
+| v61 | `schema_v61_athlete_signup.sql` | N-03 | `select count(*) from information_schema.columns where table_name = 'profiles' and column_name in ('sport', 'under_13');` | `2` |
+| v62 | `schema_v62_jump_tests.sql` | G-04 | `select to_regclass('public.jump_tests') is not null;` | `true` |
+| v63 | `schema_v63_weekly_challenge.sql` | G-06 | `select to_regprocedure('public.weekly_challenge_board(date,text)') is not null;` | `true` |
+| v64 | `schema_v64_referrals.sql` | RF-01 | `select to_regprocedure('public.redeem_referral(text)') is not null;` | `true` |
 
 **Already applied in production (October 2, 2026):** v44 to v47, and v48's
 statement (it ran as `schema_v44_skill_ratings.sql` before #41 renamed it). The
