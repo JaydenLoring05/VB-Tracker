@@ -31,11 +31,6 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| N-03 | Self-serve athlete sign-up (age, sport, position, level, goal, injuries) with an auto-assigned plan; parent consent under 13 only (PR #109, needs schema_v61) | building | me | M |
-| G-04 | Jump PR tracking: log touch/vertical, chart over time, PR celebration (PR #112, needs schema_v62) | building | me | M |
-| G-06 | Weekly challenge everyone can join, opt-in leaderboard by first name + initial (PR #115, needs schema_v63) | building | me | M |
-| RF-01 | Referral codes: extra free week for the new athlete, XP + badge for the referrer, sign-ups per code (PR #117, needs schema_v64) | building | me | M |
-| L-01 | Rewrite /join for athletes: Today screen, levels/badges, price + trial, FAQ, founder section (PR #116, waiting on Jayden's copy review) | building | me | S |
 | B-09 | "Save Stats Entry" on Stats counts as today's check-in and copies the last check-in's sleep and soreness into today | new | bug | S |
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
@@ -550,6 +545,11 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Referral codes: extra free week for the new athlete, 150 XP and the Recruiter badge for the referrer (schema v64) (RF-01) | me | #119 |
+| /join rewritten for athletes: Today preview, levels and badges, price and trial, FAQ, founder section (L-01) | me | #116 |
+| Weekly challenge with an opt-in leaderboard by first name + initial (schema v63) (G-06) | me | #115 |
+| Jump PR tracking: vertical and approach touch with a chart and PR celebration (schema v62) (G-04) | me | #112 |
+| Self-serve athlete sign-up with an auto-assigned plan; parent consent under 13 only (schema v61) (N-03) | me | #109 |
 | Share card with streak, level, badges and best jump, watermarked joinnextrep.com (G-05) | me | #114 |
 | Daily streak with freeze tokens earned weekly, no SQL: replayed from workout dates (G-01) | me | #113 |
 | Badges (First Rep, On Fire, Perfect Week, Sky High, Unstoppable, Half Century) with an unlock celebration (G-03) | me | #111 |
