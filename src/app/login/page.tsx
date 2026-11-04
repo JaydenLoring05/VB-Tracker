@@ -4,15 +4,24 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+import { GuardianFields } from "@/components/guardian/GuardianFields";
 import { Brand } from "@/components/shared/Brand";
 import { PasswordField } from "@/components/shared/PasswordField";
 import { authErrorMessage } from "@/lib/authErrors";
 import { normalizeInviteCode, PENDING_INVITE_KEY } from "@/lib/invite";
 import { googleOAuthRedirectTo, isGoogleSignInEnabled } from "@/lib/googleAuth";
+import {
+  EMPTY_GUARDIAN_ANSWER,
+  SIGNUP_AGE_KEY,
+  signupAgeMetadata,
+  validateGuardianAnswer,
+  type GuardianAnswer
+} from "@/lib/guardian";
 import { MIN_PASSWORD_LENGTH, newPasswordProblem, passwordMatchState } from "@/lib/passwordForm";
 import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
+import "@/styles/guardian.css";
 
 type Mode = "sign-in" | "sign-up" | "forgot-password";
 
@@ -36,6 +45,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // Sign-up only: age, and a parent's consent under 13, before the account exists (N-03).
+  const [ageAnswer, setAgeAnswer] = useState<GuardianAnswer>(EMPTY_GUARDIAN_ANSWER);
   // Sign-up only: the new password is too short or the two copies differ. Kept apart from
   // `error` so focus goes to the password fields, not back to the email.
   const [passwordProblem, setPasswordProblem] = useState("");
@@ -133,6 +144,12 @@ export default function LoginPage() {
     setNeedsConfirmation(false);
     setResendState("idle");
 
+    const ageResult = mode === "sign-up" ? validateGuardianAnswer(ageAnswer) : null;
+    if (ageResult && !ageResult.ok) {
+      setError(ageResult.error);
+      return;
+    }
+
     if (mode === "sign-up") {
       const problem = newPasswordProblem(password, confirmPassword);
       if (problem) {
@@ -169,10 +186,11 @@ export default function LoginPage() {
     // Also store a pending invite on the account, so it survives a
     // confirmation email that opens in a different browser.
     const invite = pendingInvite();
+    const ageMetadata = ageResult?.ok ? signupAgeMetadata(ageResult.fields) : {};
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      ...(invite ? { options: { data: { pending_invite: invite } } } : {})
+      options: { data: { ...ageMetadata, ...(invite ? { pending_invite: invite } : {}) } }
     });
 
     setLoading(false);
@@ -203,6 +221,20 @@ export default function LoginPage() {
 
   async function handleGoogleSignIn() {
     setError("");
+    // Creating an account with Google asks the same age question first, and
+    // keeps the answer in this browser for onboarding to save (N-03).
+    if (mode === "sign-up") {
+      const ageResult = validateGuardianAnswer(ageAnswer);
+      if (!ageResult.ok) {
+        setError(ageResult.error);
+        return;
+      }
+      try {
+        window.localStorage.setItem(SIGNUP_AGE_KEY, JSON.stringify(signupAgeMetadata(ageResult.fields)));
+      } catch {
+        // Storage blocked: onboarding asks the age again.
+      }
+    }
     setLoading(true);
     const supabase = createClient();
 
@@ -247,6 +279,8 @@ export default function LoginPage() {
               />
             </div>
           )}
+
+          {mode === "sign-up" && <GuardianFields value={ageAnswer} onChange={setAgeAnswer} idPrefix="signup" />}
 
           <div className="auth-field">
             <label htmlFor="auth-email">Email</label>
@@ -396,8 +430,8 @@ export default function LoginPage() {
             </p>
             <p className="muted">
               NextRep doesn&apos;t diagnose injuries or provide medical advice. Always
-              consult a medical professional for pain or injury concerns. Athletes under 18
-              should have a parent or guardian aware of their use of the app.
+              consult a medical professional for pain or injury concerns. Athletes under 13
+              need a parent or guardian&apos;s consent to sign up.
             </p>
           </div>
         )}
