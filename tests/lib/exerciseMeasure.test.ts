@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getPrescription, getWorkoutDays } from "@/data/workoutPlan";
-import { formatSeconds, formatSetValue, getExerciseMeasure, parseTargetSeconds } from "@/lib/exerciseMeasure";
+import { formatSeconds, formatSetValue, getExerciseMeasure, isJumpExercise, parseTargetSeconds, takesWeight } from "@/lib/exerciseMeasure";
 
 describe("getExerciseMeasure", () => {
   it("treats planks, holds and stretches as time", () => {
@@ -73,5 +73,50 @@ describe("formatting", () => {
     expect(formatSetValue({ weight: null, reps: null, seconds: 45 })).toBe("45s");
     expect(formatSetValue({ weight: 25, reps: null, seconds: 40 })).toBe("25 x 40s");
     expect(formatSetValue({ weight: null, reps: null })).toBe("-");
+  });
+});
+
+describe("takesWeight (N-01)", () => {
+  it("hides the weight box for jumps and plyometrics", () => {
+    for (const name of ["Approach Jumps", "Box Jumps", "Broad Jumps", "Pogo Hops", "Lateral Bounds", "Depth Drops", "Drop Jumps", "Squat Jumps", "Line Hops", "Sprint Starts"]) {
+      expect(takesWeight(name), name).toBe(false);
+    }
+  });
+
+  it("hides it for bodyweight library work", () => {
+    for (const name of ["Push-Ups", "Pull-Ups", "Bodyweight Rows", "Planks", "Dead Bugs", "Nordic Hamstring Curl", "Spanish Squat", "Clamshells"]) {
+      expect(takesWeight(name), name).toBe(false);
+    }
+  });
+
+  it("shows it for loaded library lifts", () => {
+    for (const name of ["Trap Bar Deadlift or RDL", "Front Squat", "DB Bench Press", "Hip Thrust", "Farmer Carries", "Lat Pulldown", "Goblet Squat"]) {
+      expect(takesWeight(name), name).toBe(true);
+    }
+  });
+
+  it("reads coach-written names", () => {
+    expect(takesWeight("Back squat")).toBe(true);
+    expect(takesWeight("Hang clean")).toBe(true);
+    expect(takesWeight("Bench press")).toBe(true);
+    expect(takesWeight("Seated box jumps")).toBe(false);
+    expect(takesWeight("Plyo push-ups")).toBe(false);
+    expect(takesWeight("Air squats")).toBe(false);
+    expect(takesWeight("Banded lateral walk")).toBe(false);
+    expect(takesWeight("Skips for height")).toBe(false);
+  });
+
+  it("keeps the box when the name says what the load is", () => {
+    expect(takesWeight("DB step-ups")).toBe(true);
+    expect(takesWeight("Trap bar jumps")).toBe(true);
+    expect(takesWeight("Weighted pull-ups")).toBe(true);
+  });
+});
+
+describe("isJumpExercise", () => {
+  it("knows jumps from lifts", () => {
+    expect(isJumpExercise("Approach Jumps")).toBe(true);
+    expect(isJumpExercise("Box Jumps")).toBe(true);
+    expect(isJumpExercise("Front Squat")).toBe(false);
   });
 });
