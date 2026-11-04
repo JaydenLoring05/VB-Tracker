@@ -418,3 +418,13 @@
 .badge-locked strong {
   color: var(--muted);
 }
+/* G-01: banked streak freezes. */
+.dashboard-freeze {
+  background: color-mix(in oklch, var(--blue) 16%, transparent);
+  color: var(--blue);
+}
+
+.today-freeze-note {
+  margin: calc(-1 * var(--sp-3)) 0 var(--sp-4);
+  font-size: var(--fs-sm);
+}

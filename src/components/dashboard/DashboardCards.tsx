@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ClipboardCheck, Flame, Moon } from "lucide-react";
+import { ArrowRight, ClipboardCheck, Flame, Moon, Snowflake } from "lucide-react";
 import Link from "next/link";
 
 import { BadgesLine } from "@/components/dashboard/BadgesLine";
@@ -16,6 +16,7 @@ import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
 import { usePRs } from "@/hooks/usePRs";
 import { useBadges } from "@/hooks/useBadges";
 import { useProgression } from "@/hooks/useProgression";
+import { useStreak } from "@/hooks/useStreak";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { usePushTrainingDays } from "@/hooks/usePushTrainingDays";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
@@ -38,7 +39,8 @@ const RECOVERY_COLOR: Record<string, string> = {
 export function DashboardCards() {
   const today = useTodayName();
   const todayISO = useTodayISO();
-  const { workoutStreak, teamOverride, substitutions } = useTrackerContext();
+  const { teamOverride, substitutions } = useTrackerContext();
+  const streak = useStreak();
   const { effectiveProfile: trainingProfile } = useTrainingProfile();
 
   const { recovery, status, hasLoggedStats, readinessExplanation, history } = useRecoveryStats();
@@ -73,13 +75,25 @@ export function DashboardCards() {
           {isRestDay
             ? "Recovery day. Sleep, mobility and a light walk count."
             : `${todayWorkout?.exercises.length ?? 0} exercises${todayWorkout?.minutes ? ` · ${todayWorkout.minutes} min` : ""}`}
-          {workoutStreak > 0 && (
+          {streak.current > 0 && (
             <span className="dashboard-streak">
               <Flame size={14} aria-hidden="true" />
-              {workoutStreak} day{workoutStreak === 1 ? "" : "s"} strong
+              {streak.current}-day streak
+            </span>
+          )}
+          {streak.freezes > 0 && (
+            <span
+              className="dashboard-streak dashboard-freeze"
+              title="A freeze saves your streak if you miss a day. Earn one each week you train 3+ times."
+            >
+              <Snowflake size={14} aria-hidden="true" />
+              {streak.freezes} freeze{streak.freezes === 1 ? "" : "s"}
             </span>
           )}
         </p>
+        {streak.frozeYesterday && (
+          <p className="muted today-freeze-note">A freeze saved your streak yesterday. Train today to keep it going.</p>
+        )}
 
         {isRestDay
           ? restTip && (
