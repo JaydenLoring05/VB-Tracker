@@ -14,7 +14,7 @@ import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
-import { formatSetValue, getExerciseMeasure, parseTargetSeconds } from "@/lib/exerciseMeasure";
+import { formatSetValue, getExerciseMeasure, parseTargetSeconds, takesWeight } from "@/lib/exerciseMeasure";
 import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
 import { formatDuration } from "@/lib/time";
 
@@ -254,6 +254,8 @@ export function WorkoutModeView({
   const coachNote = getExerciseNote(day, originalExercise);
   const adaptNote = day.adaptNotes?.[originalExercise] ?? "";
   const isTimed = getExerciseMeasure(exercise) === "time";
+  // Jumps and bodyweight work log reps (or seconds) only, no weight box (N-01).
+  const showWeight = takesWeight(exercise);
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
   currentExerciseRef.current = exercise ?? null;
 
@@ -294,7 +296,7 @@ export function WorkoutModeView({
     setRestOver(false);
     setIsLogging(true);
     try {
-      const loggedWeight = weight.trim() === "" ? null : Number(weight);
+      const loggedWeight = !showWeight || weight.trim() === "" ? null : Number(weight);
       const result = isTimed
         ? await logSet(exercise, loggedWeight, null, Math.round(Number(seconds)))
         : await logSet(exercise, loggedWeight, Number(reps));
@@ -457,29 +459,31 @@ export function WorkoutModeView({
             />
           )}
           <form className="log-set-form" onSubmit={handleLogSet}>
-            <div className="weight-input-group">
-              <input
-                type="number"
-                inputMode="decimal"
-                aria-label="Weight"
-                placeholder={isTimed ? "Weight (optional)" : "Weight"}
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-              />
-              <div className="input-increments">
-                {WEIGHT_INCREMENTS.map((amount) => (
-                  <button
-                    type="button"
-                    key={amount}
-                    className="ghost"
-                    onClick={() => bumpWeight(amount)}
-                    aria-label={`Add ${amount} to weight`}
-                  >
-                    +{amount}
-                  </button>
-                ))}
+            {showWeight && (
+              <div className="weight-input-group">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  aria-label="Weight"
+                  placeholder={isTimed ? "Weight (optional)" : "Weight"}
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                />
+                <div className="input-increments">
+                  {WEIGHT_INCREMENTS.map((amount) => (
+                    <button
+                      type="button"
+                      key={amount}
+                      className="ghost"
+                      onClick={() => bumpWeight(amount)}
+                      aria-label={`Add ${amount} to weight`}
+                    >
+                      +{amount}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
             {isTimed ? (
             <div className="weight-input-group">
               <input
