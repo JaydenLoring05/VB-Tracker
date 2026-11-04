@@ -16,9 +16,9 @@ export const EXPORT_TABLES: { table: string; column: string }[] = [
   { table: "prs", column: "user_id" },
   { table: "exercise_substitutions", column: "user_id" },
   { table: "performance_profiles", column: "user_id" },
-  { table: "challenge_entries", column: "user_id" },
   { table: "team_members", column: "user_id" },
   { table: "removal_notices", column: "user_id" },
+  { table: "challenge_entries", column: "user_id" },
   // Film tags a coach made about this athlete's plays.
   { table: "film_tags", column: "athlete_id" },
   // Teams this user created as a coach.
