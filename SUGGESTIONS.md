@@ -31,17 +31,17 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| N-01 | Bodyweight, plyo and jump exercises log reps (and optional height/touch), no weight box | planned | me | S |
-| N-02 | "Today" home screen: one card with today's workout and a big Start button; rest day shows a recovery tip | planned | me | M |
-| N-03 | Self-serve athlete sign-up (age, sport, position, level, goal, injuries) with an auto-assigned plan; parent-consent step under 13 only (needs SQL) | planned | me | M |
-| G-01 | Daily training streak with a freeze token earned weekly (needs SQL) | planned | me | M |
-| G-02 | XP and levels (Rookie, Starter, Varsity, All-Conference, Pro) with progress on Today | planned | me | S |
-| G-03 | Badges (first workout, 7- and 30-day streak, jump PR, 50 workouts, perfect week) with an unlock animation | planned | me | M |
-| G-04 | Jump PR tracking: log touch/vertical, chart over time, PR celebration (covers F-05; needs SQL) | planned | me | M |
-| G-05 | Share card: streak, level, badges, best jump, watermarked joinnextrep.com | planned | me | S |
-| G-06 | Weekly challenge everyone can join, opt-in leaderboard by first name + initial (needs SQL) | planned | me | M |
-| RF-01 | Referral codes: extra free week for the new athlete, XP + badge for the referrer, sign-ups per code (needs SQL) | planned | me | M |
-| L-01 | Rewrite /join for athletes: Today screen, levels/badges, price + trial, FAQ, founder section | planned | me | S |
+| N-03 | Self-serve athlete sign-up (age, sport, position, level, goal, injuries) with an auto-assigned plan; parent consent under 13 only (PR #109, needs schema_v61) | building | me | M |
+| G-04 | Jump PR tracking: log touch/vertical, chart over time, PR celebration (PR #112, needs schema_v62) | building | me | M |
+| G-06 | Weekly challenge everyone can join, opt-in leaderboard by first name + initial (PR #115, needs schema_v63) | building | me | M |
+| RF-01 | Referral codes: extra free week for the new athlete, XP + badge for the referrer, sign-ups per code (PR #117, needs schema_v64) | building | me | M |
+| L-01 | Rewrite /join for athletes: Today screen, levels/badges, price + trial, FAQ, founder section (PR #116, waiting on Jayden's copy review) | building | me | S |
+| B-09 | "Save Stats Entry" on Stats counts as today's check-in and copies the last check-in's sleep and soreness into today | new | bug | S |
+| F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
+| F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
+| F-44 | Home page (/) still says "volleyball only" and "athletes don't pay"; align it with the athlete-first /join | new | your idea | S |
+| RF-02 | Save the referral code on the account at sign-up, so it survives a confirmation email opened in another browser | new | your idea | S |
+| G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | new | your idea | S |
 | F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
@@ -51,7 +51,7 @@ Rules for automated runs:
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
-| F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
+| F-05 | Jump tracking over time (spike touch, set peak height); vertical and approach touch are covered by G-04 | new | me | M |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
 | F-08 | Skill radar history (overlay last month on this month) | new | your idea | M |
 | F-09 | Morning email at each coach's local time | new | your idea | M |
@@ -84,6 +84,20 @@ Rules for automated runs:
   before launch (see LAUNCH_CHECKLIST).
 - **Items that need SQL stay open** with the SQL in the PR description until
   Jayden runs it, so production never reads a column that doesn't exist yet.
+
+- **B-09. The stats form saves a fake check-in.** `StatsForm` calls
+  `saveStats()`, which writes the context's whole `stats` (the latest
+  check-in) as today's `stats_history` row. `checkedInToday` only looks at
+  the date, so saving a vertical marks the athlete as checked in, copies
+  yesterday's sleep and soreness into today, and updates `latest_stats`, so
+  the coach sees a fresh check-in. Found while building G-04, which saves
+  jumps to their own table for this reason. Fix: save only the edited
+  fields, and count a check-in only when its wellness fields are filled.
+- **F-42 and F-43** came from writing /join (L-01): Jayden's copy said
+  "no equipment needed for the youth/beginner plans" and "20-40 min a day",
+  but the youth and beginner swaps use goblet squats, kettlebell deadlifts
+  and lat pulldowns, and 7 of 20 plan days are 45-60 minutes. The page says
+  what's true today.
 
 ### Bugs
 
@@ -536,6 +550,13 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Share card with streak, level, badges and best jump, watermarked joinnextrep.com (G-05) | me | #114 |
+| Daily streak with freeze tokens earned weekly, no SQL: replayed from workout dates (G-01) | me | #113 |
+| Badges (First Rep, On Fire, Perfect Week, Sky High, Unstoppable, Half Century) with an unlock celebration (G-03) | me | #111 |
+| XP and levels (Rookie to Pro) with progress on the Today card (G-02) | me | #110 |
+| Today card lists the workout's exercises above Start; rest days show a recovery tip (N-02) | me | #108 |
+| Jumps and bodyweight work log reps with no weight box (N-01) | me | #107 |
+| Backlog catch-up: Phase 1 rows to Shipped, athlete-first rows added | me | #106 |
 | Public athlete sign-up page at /join with an early-access form (schema v60) (F-41) | me | #104 |
 | Injury and level adapt deeper: knee swaps, unknown jump/overhead work cut, % of max by level (F-40) | me | #103 |
 | Today's day in the browser's time zone, no hydration error #418 (B-08) | bug | #100 |
