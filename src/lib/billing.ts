@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
+import { REFERRAL_TRIAL_BONUS_DAYS } from "@/lib/referral";
+
 /**
  * Athlete plan payments (F-37). Stripe Checkout through its REST API (no SDK),
  * and the webhook signature check. Everything stays off until the keys are
@@ -7,6 +9,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  */
 
 export const ATHLETE_PLAN = { name: "NextRep Athlete", priceLabel: "$14.99/month", trialDays: 7 } as const;
+
 
 export type BillingConfig = {
   stripeSecretKey: string;
@@ -39,12 +42,14 @@ export function checkoutFields(input: {
   userId: string;
   email: string | null | undefined;
   siteUrl: string;
+  /** Signed up with a friend's referral code (RF-01): one extra free week. */
+  referred?: boolean;
 }): Record<string, string | number> {
   const fields: Record<string, string | number> = {
     mode: "subscription",
     "line_items[0][price]": input.priceId,
     "line_items[0][quantity]": 1,
-    "subscription_data[trial_period_days]": ATHLETE_PLAN.trialDays,
+    "subscription_data[trial_period_days]": ATHLETE_PLAN.trialDays + (input.referred ? REFERRAL_TRIAL_BONUS_DAYS : 0),
     "subscription_data[metadata][user_id]": input.userId,
     client_reference_id: input.userId,
     "metadata[user_id]": input.userId,

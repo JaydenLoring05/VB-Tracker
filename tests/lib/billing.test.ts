@@ -38,6 +38,12 @@ describe("checkout", () => {
     });
     expect(stripeForm({ "a[b]": "c d" })).toBe("a%5Bb%5D=c%20d");
   });
+
+  it("gives a referred athlete one extra free week (RF-01), and only them", () => {
+    const base = { priceId: "price_1", userId: "u1", email: "a@b.co", siteUrl: "https://x.app" };
+    expect(checkoutFields({ ...base, referred: true })["subscription_data[trial_period_days]"]).toBe(14);
+    expect(checkoutFields({ ...base, referred: false })["subscription_data[trial_period_days]"]).toBe(7);
+  });
 });
 
 describe("verifyStripeSignature", () => {

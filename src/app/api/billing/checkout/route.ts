@@ -5,7 +5,8 @@ import { SITE_URL } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 
 // Starts Stripe Checkout for the athlete plan (F-37): $14.99/month after a
-// 7-day free trial. Off (503) until STRIPE_SECRET_KEY, STRIPE_PRICE_ID,
+// 7-day free trial, or 14 days for an athlete who signed up with a friend's
+// referral code (RF-01). Off (503) until STRIPE_SECRET_KEY, STRIPE_PRICE_ID,
 // STRIPE_WEBHOOK_SECRET and BILLING_SECRET are all set in Vercel.
 
 export const runtime = "nodejs";
@@ -28,13 +29,23 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return json({ ok: false, error: "signed_out" }, 401);
 
+  // RLS lets the athlete read their own referral row. Any error (no row, or
+  // schema_v64 not run yet) means the normal trial.
+  const { data: referral } = await supabase.from("referrals").select("id").eq("referred_id", user.id).maybeSingle();
+
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${config.stripeSecretKey}`,
       "Content-Type": "application/x-www-form-urlencoded"
     },
-    body: stripeForm(checkoutFields({ priceId: config.priceId, userId: user.id, email: user.email, siteUrl: SITE_URL }))
+    body: stripeForm(checkoutFields({
+      priceId: config.priceId,
+      userId: user.id,
+      email: user.email,
+      siteUrl: SITE_URL,
+      referred: Boolean(referral)
+    }))
   });
 
   const session = (await response.json().catch(() => null)) as { url?: string; error?: { message?: string } } | null;
