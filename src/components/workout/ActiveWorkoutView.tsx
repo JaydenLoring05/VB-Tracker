@@ -1,11 +1,13 @@
 "use client";
 
 import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { Celebrate } from "@/components/shared/Celebrate";
 import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
+import { useDemo } from "@/context/DemoContext";
 import { getExercise } from "@/data/exercises";
 import { getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
 import { getExerciseNote, getExerciseTarget } from "@/lib/customProgram";
@@ -14,7 +16,7 @@ import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
-import { formatSetValue, getExerciseMeasure, parseTargetSeconds, takesWeight } from "@/lib/exerciseMeasure";
+import { formatSetValue, getExerciseMeasure, isJumpExercise, parseTargetSeconds, takesWeight } from "@/lib/exerciseMeasure";
 import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
 import { formatDuration } from "@/lib/time";
 
@@ -66,6 +68,7 @@ export function WorkoutModeView({
     finishWorkout,
     updateSessionRPE
   } = controller;
+  const demo = useDemo();
 
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [weight, setWeight] = useState("");
@@ -385,6 +388,15 @@ export function WorkoutModeView({
         {adaptNote && <p className="exercise-adapt-note">{adaptNote}</p>}
         {coachNote && <p className="exercise-coach-note">Coach: {coachNote}</p>}
         {lastTime && <p className="muted last-time">Last time: {formatSetValue(lastTime)}</p>}
+        {/* N-01: jumps log reps here; a measured height or touch goes on the jump tracker (G-04). */}
+        {!demo && isJumpExercise(exercise) && (
+          <p className="muted">
+            Measured a jump?{" "}
+            <Link href="/stats#jumps" target="_blank" className="dashboard-inline-link">
+              Log your height or touch
+            </Link>
+          </p>
+        )}
 
         {cues.length > 0 && (
           <div className="exercise-cues">
