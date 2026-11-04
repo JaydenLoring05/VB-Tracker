@@ -428,3 +428,13 @@
   margin: calc(-1 * var(--sp-3)) 0 var(--sp-4);
   font-size: var(--fs-sm);
 }
+
+/* G-05: share card button under the level bar. */
+.share-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+}
