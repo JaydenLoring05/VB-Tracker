@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { BadgesLine } from "@/components/dashboard/BadgesLine";
 import { PushReminderNudge } from "@/components/dashboard/PushReminderNudge";
+import { ShareProgressButton } from "@/components/dashboard/ShareProgressButton";
 import { TeamNudge } from "@/components/dashboard/TeamNudge";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { statusTone } from "@/components/shared/StatusLabel";
@@ -141,6 +142,12 @@ export function DashboardCards() {
           >
             <div className="progress-fill" style={{ width: `${progression.percent}%` }} />
           </div>
+          <ShareProgressButton
+            streak={streak.current}
+            levelName={progression.level.name}
+            xp={progression.xp}
+            badges={badges}
+          />
         </div>
       </section>
 
