@@ -19,6 +19,7 @@ export const EXPORT_TABLES: { table: string; column: string }[] = [
   { table: "jump_tests", column: "user_id" },
   { table: "team_members", column: "user_id" },
   { table: "removal_notices", column: "user_id" },
+  { table: "challenge_entries", column: "user_id" },
   // Film tags a coach made about this athlete's plays.
   { table: "film_tags", column: "athlete_id" },
   // Teams this user created as a coach.
