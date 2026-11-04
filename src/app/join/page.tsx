@@ -1,68 +1,87 @@
 import type { Metadata } from "next";
-import { ArrowRight, Check, ClipboardList, HeartPulse, LineChart, ShieldPlus, SlidersHorizontal, Target } from "lucide-react";
+import { ArrowRight, Check, Clock, ShieldPlus, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 
-import { WaitlistForm } from "@/components/join/WaitlistForm";
+import { TodayPreview } from "@/components/join/TodayPreview";
 import { Brand } from "@/components/shared/Brand";
+import { BADGES } from "@/lib/badges";
 import { ATHLETE_PLAN } from "@/lib/billing";
 import { CONTACT_EMAIL } from "@/lib/contact";
+import { LEVELS } from "@/lib/progression";
 import { pageMetadata } from "@/lib/site";
 
 import "@/styles/landing.css";
 import "@/styles/pilot.css";
+import "@/styles/dashboard.css";
 import "@/styles/join.css";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Your volleyball training plan, built around you",
+  title: "Jump higher. Get stronger.",
   description:
-    "A personalized volleyball training plan that adapts to your level and works around a sore knee or shoulder. $14.99/month with a 7-day free trial.",
+    "A training plan for any athlete who wants to jump higher, get stronger and stay healthy. Adapts to your level and to injuries. $14.99/month with a 7-day free trial.",
   path: "/join",
-  shareTitle: "NextRep: a volleyball training plan that adapts to you",
-  shareDescription:
-    "Personalized jump, strength and shoulder training for volleyball athletes. Adapts to your level and to injuries."
+  shareTitle: "NextRep: jump higher, get stronger, train like a college athlete",
+  shareDescription: "Daily workouts that adapt to your level and to injuries, with streaks, levels and badges."
 });
+
+const SIGN_UP = "/login?mode=sign-up";
 
 const BENEFITS = [
   {
-    icon: Target,
-    title: "Built for volleyball",
-    body: "A 20-week plan for jumping higher, hitting harder and staying healthy: jump work, strength, landing practice and shoulder care."
+    icon: Clock,
+    title: "20-60 minutes a day",
+    body: "One workout a day, laid out for you: jumps, strength, landing practice and shoulder care. Open the app, tap Start, follow along."
   },
   {
     icon: ShieldPlus,
     title: "Works around injuries",
-    body: "Flag a sore knee or shoulder and the plan swaps in joint-friendly exercises, cuts the risky volume and adds rehab work."
+    body: "Flag a sore knee, shoulder, back or ankle and the plan swaps in joint-friendly exercises, cuts the risky volume and adds rehab work."
   },
   {
     icon: SlidersHorizontal,
-    title: "Fits your level",
-    body: "Beginner, intermediate or advanced: sets and exercise picks change to match where you are, and each week adjusts to how you recover."
-  }
-];
-
-const STEPS = [
-  {
-    icon: ClipboardList,
-    title: "Tell us about you",
-    body: "Your level, your age group, anything that hurts, and your practice days. It takes about a minute."
-  },
-  {
-    icon: HeartPulse,
-    title: "Get your plan",
-    body: "Your week is laid out day by day, with demos and cues for each exercise and a rest timer in Workout Mode."
-  },
-  {
-    icon: LineChart,
-    title: "Train and check in",
-    body: "Log your sets and a quick daily check-in. The plan lightens up after rough weeks and keeps you on track."
+    title: "Fits your level and age",
+    body: "Beginner to advanced, 10 years old to college. Exercises and sets change to match you, and each week adjusts to how you recover."
   }
 ];
 
 const PLAN_POINTS = [
-  "Your personalized 20-week plan",
-  "Injury and level adjustments",
-  "Workout Mode, PR tracking and progress charts",
+  "Your plan, picked from your age, level, goal and injuries",
+  "Workout Mode with cues, demos and a rest timer",
+  "Streaks, levels, badges and a weekly challenge",
+  "Jump and PR tracking with charts",
   "Cancel anytime"
+];
+
+const FAQS = [
+  {
+    question: "Do I need equipment?",
+    answer:
+      "Jump days, landing practice, mobility and core use just your body. Strength days use basic gym gear: dumbbells, a kettlebell and bands cover most of it. Every exercise lists swaps, and the beginner and under-14 versions skip heavy barbell lifts."
+  },
+  {
+    question: "What if something hurts?",
+    answer:
+      "Tell the app in your setup or in the 30-second daily check-in. Knee, shoulder, lower-back and ankle pain change that day's workout: joint-friendly swaps, less jumping or overhead work, and rehab exercises. NextRep isn't medical advice; if pain keeps coming back, see an athletic trainer, physio or doctor."
+  },
+  {
+    question: "I don't play volleyball. Does it work for me?",
+    answer:
+      "Yes, if your sport needs you to jump, sprint or be strong: basketball, soccer, track, football and more. The plan was built from college volleyball training, so jumping and landing are front and centre."
+  },
+  {
+    question: "Is it OK for kids?",
+    answer:
+      "Yes. Athletes under 14 get a youth version: bodyweight and light-implement strength, no heavy barbell lifts or depth jumps, and landing practice on every jump day. Under 13, a parent or guardian gives consent at sign-up."
+  },
+  {
+    question: "How does the free trial work?",
+    answer: `Create your account for free and start training. When you're ready, start the ${ATHLETE_PLAN.trialDays}-day free trial from Settings; after it, the plan is ${ATHLETE_PLAN.priceLabel}. Cancel anytime before it ends and you won't be charged.`
+  },
+  {
+    question: "I'm on a team. Can my coach use it?",
+    answer:
+      "Yes. Coaches can build or assign programs, see check-ins and track the team. Ask your coach for an invite code, or train solo."
+  }
 ];
 
 export default function JoinPage() {
@@ -75,9 +94,9 @@ export default function JoinPage() {
           </Link>
           <nav className="landing-header-nav" aria-label="Account">
             <Link href="/login">Log in</Link>
-            <a href="#sign-up" className="btn">
-              Get early access
-            </a>
+            <Link href={SIGN_UP} className="btn">
+              Start free
+            </Link>
           </nav>
         </div>
       </header>
@@ -85,19 +104,18 @@ export default function JoinPage() {
       <main id="main-content" tabIndex={-1}>
         <section className="landing-hero join-hero">
           <div className="join-inner">
-            <p className="micro micro-gold">For volleyball athletes</p>
+            <p className="micro micro-gold">For athletes of any age</p>
             <h1>
-              Your volleyball training plan.{" "}
-              <span className="landing-hero-accent">Built around you.</span>
+              Jump higher. Get stronger. <span className="landing-hero-accent">Train like a college athlete.</span>
             </h1>
             <p className="landing-hero-sub">
-              Get a personalized plan to jump higher and stay healthy. It adapts to your level, and if your knee or
-              shoulder is bothering you, it works around that too.
+              20-60 minutes a day. A plan that fits your age, your level and your goal, and works around a sore knee
+              or shoulder.
             </p>
             <div className="landing-hero-actions">
-              <a href="#sign-up" className="btn btn-lg">
-                Get early access <ArrowRight size={18} aria-hidden="true" />
-              </a>
+              <Link href={SIGN_UP} className="btn btn-lg">
+                Start free <ArrowRight size={18} aria-hidden="true" />
+              </Link>
               <Link href="/demo" className="btn ghost btn-lg">
                 See the app
               </Link>
@@ -105,10 +123,54 @@ export default function JoinPage() {
           </div>
         </section>
 
+        <section className="landing-section" aria-labelledby="join-today">
+          <div className="join-inner join-today">
+            <div>
+              <h2 id="join-today" className="landing-section-title">
+                Open the app. Tap Start.
+              </h2>
+              <p className="landing-section-lead">
+                Your Today screen shows one thing: today&apos;s workout. Recovery, progress and PRs are a tap away.
+                Rest days give you a recovery tip instead.
+              </p>
+            </div>
+            <TodayPreview />
+          </div>
+        </section>
+
+        <section className="landing-section landing-section-alt" aria-labelledby="join-levels">
+          <div className="join-inner">
+            <h2 id="join-levels" className="landing-section-title">
+              Level up every workout
+            </h2>
+            <p className="landing-section-lead">
+              Earn XP for every workout and PR. Keep your streak alive (a freeze saves it when you miss a day) and
+              unlock badges.
+            </p>
+            <ol className="join-levels" aria-label="Levels">
+              {LEVELS.map((level) => (
+                <li key={level.name}>
+                  <strong>{level.name}</strong>
+                  <span className="muted">{level.minXp === 0 ? "Start" : `${level.minXp.toLocaleString("en-US")} XP`}</span>
+                </li>
+              ))}
+            </ol>
+            <ul className="join-badges" aria-label="Badges">
+              {BADGES.map((badge) => (
+                <li key={badge.id}>
+                  <span aria-hidden="true">{badge.icon}</span>
+                  <strong>{badge.name}</strong>
+                  <span className="muted">{badge.description}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
         <section className="landing-section" aria-labelledby="join-benefits">
           <div className="join-inner">
             <h2 id="join-benefits" className="landing-section-title">
-              Why NextRep
+              Built around you
             </h2>
             <ul className="join-cards">
               {BENEFITS.map(({ icon: Icon, title, body }) => (
@@ -122,36 +184,13 @@ export default function JoinPage() {
           </div>
         </section>
 
-        <section className="landing-section landing-section-alt" aria-labelledby="join-how">
-          <div className="join-inner">
-            <h2 id="join-how" className="landing-section-title">
-              How it works
-            </h2>
-            <ol className="join-steps">
-              {STEPS.map(({ icon: Icon, title, body }, index) => (
-                <li className="join-step" key={title}>
-                  <span className="join-step-number" aria-hidden="true">
-                    {index + 1}
-                  </span>
-                  <div>
-                    <h3>
-                      <Icon size={18} aria-hidden="true" /> {title}
-                    </h3>
-                    <p className="muted">{body}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section className="landing-section" aria-labelledby="join-price">
+        <section className="landing-section landing-section-alt" aria-labelledby="join-price">
           <div className="join-inner">
             <h2 id="join-price" className="landing-section-title">
               One simple price
             </h2>
             <div className="panel join-price-card">
-              <p className="micro micro-gold">Athlete plan · coming soon</p>
+              <p className="micro micro-gold">{ATHLETE_PLAN.name}</p>
               <p className="join-price">
                 <span className="join-price-amount">$14.99</span>
                 <span className="muted">/month</span>
@@ -165,28 +204,60 @@ export default function JoinPage() {
                   </li>
                 ))}
               </ul>
-              <a href="#sign-up" className="btn">
-                Join the early access list
-              </a>
+              <Link href={SIGN_UP} className="btn">
+                Start free
+              </Link>
               <p className="muted join-price-note">
-                Payments aren&apos;t open yet. Sign up below and we&apos;ll email you when your free trial is ready.
+                Creating your account is free. Start your {ATHLETE_PLAN.trialDays}-day trial from Settings when
+                you&apos;re ready.
               </p>
             </div>
           </div>
         </section>
 
-        <section id="sign-up" className="landing-section landing-section-alt join-signup" aria-labelledby="join-signup">
+        <section className="landing-section" aria-labelledby="join-faq">
           <div className="join-inner">
-            <h2 id="join-signup" className="landing-section-title">
-              Get early access
+            <h2 id="join-faq" className="landing-section-title">
+              Questions
             </h2>
-            <p className="landing-section-lead">
-              Leave your name and email and we&apos;ll let you know when the athlete plan opens.
+            <div className="landing-faq-list">
+              {FAQS.map((item) => (
+                <details className="landing-faq-item" key={item.question}>
+                  <summary>{item.question}</summary>
+                  <p className="muted">{item.answer}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-section landing-section-alt" aria-labelledby="join-founder">
+          <div className="join-inner join-founder">
+            <h2 id="join-founder" className="landing-section-title">
+              Why I built NextRep
+            </h2>
+            <p>
+              I&apos;m Jayden Loring, a college volleyball player and youth coach. College athletes get a strength
+              coach, a plan and someone watching their knees and shoulders. Most athletes don&apos;t, especially
+              younger ones. NextRep is the training I wish I&apos;d had growing up, in your pocket.
             </p>
-            <WaitlistForm />
+            <p className="muted">Jayden Loring, founder</p>
+          </div>
+        </section>
+
+        <section className="landing-section join-signup" aria-labelledby="join-start">
+          <div className="join-inner">
+            <h2 id="join-start" className="landing-section-title">
+              Start today
+            </h2>
+            <p className="landing-section-lead">Your first workout is a minute away.</p>
+            <div className="landing-hero-actions">
+              <Link href={SIGN_UP} className="btn btn-lg">
+                Start free <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            </div>
             <p className="muted join-account-note">
-              Want to start training today? <Link href="/login?mode=sign-up">Create a free account</Link>. Already
-              have one? <Link href="/login">Log in</Link>.
+              Already have an account? <Link href="/login">Log in</Link>.
             </p>
             <p className="muted join-disclaimer">
               NextRep is a training tool, not medical advice. If pain persists, follow your athletic trainer, physio
