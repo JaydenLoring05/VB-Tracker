@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp, MessageSquarePlus, Plus, Save, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import { AddFromProgramSelect } from "@/components/coach/AddFromProgramSelect";
 import { WholeNumberInput } from "@/components/shared/WholeNumberInput";
 import { useTrackerContext } from "@/context/TrackerContext";
 import { exercises as exerciseCatalog } from "@/data/exercises";
@@ -11,9 +12,12 @@ import { useCoachRoster } from "@/hooks/useCoachRoster";
 import { TeamGroup, useCustomPrograms } from "@/hooks/useCustomPrograms";
 import { getExerciseMeasure } from "@/lib/exerciseMeasure";
 import {
+  addFromProgram,
+  AddFromProgramResult,
   blankProgram,
   copyDay,
   CustomProgram,
+  daysToAddFrom,
   exerciseKey,
   formatTarget,
   hasStartingTargets,
@@ -22,6 +26,7 @@ import {
   ownExercises,
   pickAssignedProgramId,
   ProgramDay,
+  ProgramDayChoice,
   ProgramExercise,
   programFromRecommended,
   validateDraft,
@@ -180,6 +185,8 @@ function DayEditor({
   remembered,
   onOpen,
   onCopy,
+  addChoices,
+  onAddFrom,
   saving,
   status,
   onSaveDay,
@@ -193,6 +200,9 @@ function DayEditor({
   remembered: ProgramExercise[];
   onOpen: () => void;
   onCopy: (to: string[]) => void;
+  /** Training days of the team's other saved programs (F-24). */
+  addChoices: ProgramDayChoice[];
+  onAddFrom: (choice: ProgramDayChoice) => AddFromProgramResult;
   saving: boolean;
   /** "Monday saved at 4:52 PM", shown under this day's save button. */
   status: string | null;
@@ -323,6 +333,7 @@ function DayEditor({
               ))}
             </select>
           )}
+          <AddFromProgramSelect dayName={day.day} choices={addChoices} onAdd={onAddFrom} />
           <div className="custom-program-day-save">
             <button type="button" onClick={onSaveDay} disabled={saving}>
               <Save size={14} /> {saving ? "Saving…" : `Save ${day.day}`}
@@ -388,6 +399,15 @@ function ProgramEditorForm({
     [draft, savedPrograms]
   );
 
+  // Days a coach can add from their other programs (F-24).
+  const addChoices = useMemo(() => daysToAddFrom(savedPrograms, draft.id), [savedPrograms, draft.id]);
+
+  function handleAddFrom(dayName: string, choice: ProgramDayChoice): AddFromProgramResult {
+    const result = addFromProgram(draft.days, dayName, choice.day);
+    if (result.added > 0) setDraft({ ...draft, days: result.days });
+    return result;
+  }
+
   function updateDay(next: ProgramDay) {
     setDraft((current) => ({ ...current, days: current.days.map((day) => (day.day === next.day ? next : day)) }));
   }
@@ -445,7 +465,8 @@ function ProgramEditorForm({
         Save each day as you finish it. This week repeats every week. Pick training days, name them, and set each
         exercise as sets × reps or sets × seconds. Type any exercise, or pick one from the library, and add a note
         under any exercise for your athletes. Exercises you add yourself show up in the suggestions next time, and
-        picking one brings back its sets, reps and note.
+        picking one brings back its sets, reps and note. To build a day from two plans, pick “Add from another program”
+        under it.
       </p>
 
       {draft.days.map((day) => (
@@ -457,6 +478,8 @@ function ProgramEditorForm({
           remembered={remembered}
           onOpen={() => setOpenDay(day.day)}
           onCopy={(to) => setDraft((current) => ({ ...current, days: copyDay(current.days, day.day, to) }))}
+          addChoices={addChoices}
+          onAddFrom={(choice) => handleAddFrom(day.day, choice)}
           saving={saving}
           status={dayStatus?.day === day.day && !dirty ? dayStatus.text : null}
           onSaveDay={() => handleSaveDay(day.day)}
