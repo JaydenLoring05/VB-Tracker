@@ -185,5 +185,3 @@ the code (old link: "This invite link doesn't work").
 - **Exports and deletion are self-serve for athletes**, but deleting a coach
   account deletes their teams. The app shows which teams before it lets them
   confirm.
-- **Film tagging is coach-only**, and keyboard shortcuts start working a
-  moment after the video loads.

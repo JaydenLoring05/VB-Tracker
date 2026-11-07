@@ -146,14 +146,6 @@ const PRODUCT_SHOTS = [
     alt: "Workout Mode logging a 160 x 5 set with a new PR badge and the rest timer running",
     width: 1280,
     height: 860
-  },
-  {
-    src: "/screenshots/film-room.jpg",
-    title: "Film room.",
-    caption: "Tag plays by athlete with the mouse, keyboard shortcuts or your voice: pass ratings, set zones, block outcomes.",
-    alt: "Film room tag panel with a pass being tagged and a list of tagged plays by athlete",
-    width: 656,
-    height: 796
   }
 ];
 

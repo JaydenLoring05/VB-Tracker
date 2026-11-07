@@ -387,7 +387,6 @@ export function CoachDashboard({
         <AthleteStatsModal
           userId={selectedAthlete.userId}
           displayName={selectedAthlete.displayName}
-          teamId={activeTeam?.id}
           onClose={() => setSelectedAthlete(null)}
         />
       )}

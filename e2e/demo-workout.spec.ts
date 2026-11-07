@@ -10,7 +10,7 @@ const WORKOUT_CTA = new RegExp(
   "i"
 );
 
-// The demo versions of Workout Mode and the film room: real components on
+// The demo version of Workout Mode: real components on
 // in-memory sample data. No account, no Supabase, nothing saved.
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => window.localStorage.setItem("nextrep-demo-tour-dismissed", "1"));
@@ -33,26 +33,5 @@ test("Workout Mode logs a set, flags a PR and finishes on /demo", async ({ page 
   await expect(page.getByText(/Workout complete/i)).toBeVisible();
   await page.getByRole("button", { name: "Back to Dashboard" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Athlete view" })).toBeVisible();
-  await expect(page).toHaveURL(/\/demo$/);
-});
-
-test("the film room shows sample film and tags, and keyboard tagging adds one", async ({ page }) => {
-  await page.goto("/demo");
-  await page.getByRole("button", { name: "Film room" }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Film room" })).toBeVisible();
-  await expect(page.getByText(/CHN vs\. TUR/).first()).toBeVisible();
-  await expect(page.locator('iframe[src*="youtube"]')).toBeVisible();
-
-  await expect(page.getByRole("button", { name: /Kill \(\d+\)/ })).toBeVisible();
-  const before = Number(/\((\d+)\)/.exec((await page.getByRole("button", { name: /Kill \(\d+\)/ }).innerText()) ?? "")?.[1]);
-
-  await page.locator("h1").click();
-  // Press K once, straight away, while the YouTube player may still be loading.
-  // A hotkey must work on the first press (B-02), so there is no retry here.
-  await page.keyboard.press("k");
-  await expect(page.getByText("Kill → direction?")).toBeVisible();
-  await page.keyboard.press("c");
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: `Kill (${before + 1})` })).toBeVisible();
   await expect(page).toHaveURL(/\/demo$/);
 });

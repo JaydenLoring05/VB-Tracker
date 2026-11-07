@@ -31,13 +31,13 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
+| F-45 | Remove the film feature from NextRep: film moved to a separate tool (Film Room); film tables stay in the database | building | me | M |
 | B-09 | "Save Stats Entry" on Stats counts as today's check-in and copies the last check-in's sleep and soreness into today | new | bug | S |
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
 | F-44 | Home page (/) still says "volleyball only" and "athletes don't pay"; align it with the athlete-first /join | new | your idea | S |
 | RF-02 | Save the referral code on the account at sign-up, so it survives a confirmation email opened in another browser | new | your idea | S |
 | G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | new | your idea | S |
-| F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
@@ -62,8 +62,6 @@ Rules for automated runs:
 | R-06 | README setup steps leave out `schema_v53` | new | your idea | S |
 | A-01 | Split `TrackerContext.tsx` into smaller providers | new | your idea | L |
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
-| F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
-| F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
 
 ## Details
 
@@ -96,15 +94,8 @@ Rules for automated runs:
 
 ### Bugs
 
-- **B-02. Film hotkeys ignore key presses for a moment after the player
-  loads.** In `src/components/film/FilmPanel.tsx`, keyboard tagging only
-  starts responding a second or two after the YouTube player mounts (found
-  while writing the e2e test in #39, which has to retry the first key).
-  Attach the window keydown listener immediately or queue keys until the
-  player is ready, so a coach who starts tagging right away doesn't lose
-  presses.
 - **B-04. The Workout Mode browser test fails on rest days.**
-  `e2e/demo-workout-and-film.spec.ts` clicked "Start Today's Workout" on the
+  `e2e/demo-workout.spec.ts` (then `demo-workout-and-film.spec.ts`) clicked "Start Today's Workout" on the
   demo athlete view. On a rest day (every Sunday) `DashboardCards` shows
   "Want to train anyway? Pick a workout" in its place, so the test timed
   out and the `e2e` check went red on every PR opened that day (#62, #63
@@ -119,52 +110,16 @@ Rules for automated runs:
   `schema_v54_daily_summary_date_fix.sql`, which compares text with text.
   The email stays broken until that file is run in the SQL Editor.
 
-### Film
-
-- **F-01. Film stats from tags.** `film_tags` already records `athlete_id`,
-  `pass_rating`, `set_zone`, `set_type`, `block_outcome` and
-  `attack_direction` (schema v36), but nothing aggregates them. Pure
-  functions in `src/lib` could compute:
-  - set distribution by zone;
-  - pass-rating average per athlete (the 0–3 passing scale);
-  - block outcomes per athlete per match.
-
-  Show them on the film page and in the athlete drill-down. This is the
-  payoff for the time coaches spend tagging.
-- **F-03. Film links that aren't YouTube.** `parseYouTubeId` in
-  `src/lib/film.ts` only recognises YouTube hosts. For any other link,
-  `FilmPanel` shows an "Open video" link that opens in a new tab in place of
-  the player, so tags can't be read off the video's own clock. Find out what
-  Hudl allows before sizing this: if it can't be embedded, the honest
-  version is typed timestamps next to the external link.
-- **F-14. AI film.** Jayden plans AI film analysis. Competitors already
-  sell it: Balltime (Hudl) charges athletes $20/month for automatic downtime
-  removal, play filters, highlight reels, serve and attack speed, and jump
-  detection. A first version could find rallies and cut downtime from a
-  YouTube link, then suggest tags for a coach to confirm in the F-02 flow.
-  It also sets the price of the solo plan (F-06): launch Athlete Pro at
-  $7.99/month or $59/year, and raise new signups to about $14.99/month or
-  $99/year once AI film ships. Split into smaller rows before building.
-
-- **F-15. Three-tap sets record the zone.** The three-tap flow saves a set
-  as Good / Hittable / Error (`QUICK_RESULTS` in `src/lib/filmQuickTag.ts`)
-  and leaves `set_zone` empty, so the set distribution in film stats (F-01)
-  only counts sets tagged through "Detailed tags" or by voice. A fourth tap
-  for the zone on sets only (six buttons laid out like the court, with a
-  "Skip") would fill it from the flow coaches use most. No schema change:
-  `set_zone` exists since v36.
-
 ### Coach experience
 
 - **F-04. A per-athlete overview page.** `AthleteStatsModal` splits one
-  athlete across Recovery, PRs and Adherence tabs in a modal, and film tags
-  live on another page. A `/coach/athletes/[id]` page could combine:
+  athlete across Recovery, PRs and Adherence tabs in a modal. A
+  `/coach/athletes/[id]` page could combine:
   - the readiness trend;
   - PRs and adherence;
-  - recent pain flags;
-  - their film stats (F-01).
+  - recent pain flags.
 
-  It would give coaches something to link to and room for the film numbers.
+  It would give coaches something to link to.
 - **Plan builder rows from Taichi's onboarding call (B-06, F-16 to F-25).**
   Taichi Watanabe (UNLV men's club, first founding pilot coach) built his
   own program in the app on 2026-10-10 and found it long and hard. Jayden
@@ -391,10 +346,9 @@ Rules for automated runs:
   step from #49 already exists; who pays is the open question.
   Decision (Jayden, 2026-10-02): solo accounts stay free, and a paid
   "Athlete Pro" plan is added at $7.99/month or $59/year. Pro adds full
-  history and graphs, a self-built program, "My clips" for the athlete's own
-  film, and stats export. Athletes on a paying team get Pro free, and Pro
+  history and graphs, a self-built program, and stats export. Athletes on a paying team get Pro free, and Pro
   shows an "Invite your coach" button. Jayden revisits this the week of
-  2026-10-05 before marking it planned. See F-14 for the price step-up.
+  2026-10-05 before marking it planned.
 - **F-08. The skill radar only keeps the latest ratings.** #40 stores one
   `performance_profiles.skill_ratings` value per athlete (schema v48), so
   each new self-rating overwrites the last. Keeping dated ratings (a small
@@ -439,10 +393,9 @@ Rules for automated runs:
     team, and as an anonymous client;
   - assert who can read and write each table.
 - **R-04. Several screens only see the first page of a large roster.**
-  `useCoachRoster` pages at 100 athletes, but four screens use only its
-  first page: the film athlete picker (`src/app/(app)/film/page.tsx`),
-  program assignment (`CustomProgramPanel`), `TeamProgressView` and
-  `TeamNudge`. That's fine for a volleyball team. A club roster past 100
+  `useCoachRoster` pages at 100 athletes, but three screens use only its
+  first page: program assignment (`CustomProgramPanel`), `TeamProgressView`
+  and `TeamNudge`. That's fine for a volleyball team. A club roster past 100
   would need "load all" or search on those screens.
 - **R-05. Reminder timing depends on GitHub's scheduler.** #45 triggers
   reminders from a scheduled GitHub workflow because Vercel's Hobby plan
@@ -453,8 +406,8 @@ Rules for automated runs:
 - **R-06. The README's setup steps leave out `schema_v53`.** Step 3 of the
   README lists every schema file to run and stops at
   `schema_v52_guardian_info.sql`. `schema_v53_film_quick_tags.sql` (F-02,
-  #58) is missing, so a fresh install following the README has no
-  `film_tags.result` column and three-tap tags fail to save.
+  #58) is missing, so a fresh install following the README has a different
+  `film_tags` table from production (the app no longer uses film, F-45).
   `docs/LAUNCH_CHECKLIST.md` already lists v53. Add it to the README list.
 
 ### Architecture
@@ -473,7 +426,7 @@ Rules for automated runs:
   `PlanProvider`, `LibraryUIProvider`, `SyncStatusProvider`), keeping
   `useTrackerContext` as a thin compatibility layer during the move.
 - **A-02. Data hooks repeat the same fetch-in-effect pattern.** Most hooks
-  in `src/hooks` (`useTeamFilm`, `useTeamCalendar`, `useCoachRoster`,
+  in `src/hooks` (`useTeamCalendar`, `useCoachRoster`,
   `useAthletePRs`, ...) hand-roll loading, error and retry state with
   `setState` inside `useEffect`. The ESLint config flags 29 of these as
   `react-hooks/set-state-in-effect` and 2 as `react-hooks/refs` (warnings
@@ -614,5 +567,6 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | Why |
 | --- | --- | --- |
+| Film in NextRep (film review, tags, stats, AI film: F-03, F-14, F-15) | me | Film moved to a separate tool (Film Room / volley-viz-studio) on 2026-11-07; see F-45 |
 | Volleyball "N" monogram as the logo (#37) | your idea | Jayden kept the current gold pulse mark and app icons |
 | Public demo team/dashboard as new work | your idea | Already shipped as `/demo`; checked end to end, no change needed |
