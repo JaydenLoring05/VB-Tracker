@@ -31,11 +31,17 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| F-45 | Remove the film feature from NextRep: film moved to a separate tool (Film Room); film tables stay in the database | building | me | M |
+| P-01 | Landing page at / from the coach's copy: volleyball S&C first, unshipped features labelled "Coming soon" (also covers F-44) | building | me | M |
+| P-02 | Payments: $29.95/month or $179.70/year after a 7-day trial, gate premium on active/trialing, parent/coach viewers free | planned | me | M |
+| P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 | planned | me | M |
+| P-04 | Season- and practice-adaptive plan: season phases, practice intensity, match-day rules, double progression with "last time → today's target", weekly coach note | planned | me | L |
+| P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
+| P-06 | Free read-only parent and coach viewer, invited by link or email | planned | me | M |
+| P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
+| P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | planned | me | S |
 | B-09 | "Save Stats Entry" on Stats counts as today's check-in and copies the last check-in's sleep and soreness into today | new | bug | S |
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
-| F-44 | Home page (/) still says "volleyball only" and "athletes don't pay"; align it with the athlete-first /join | new | your idea | S |
 | RF-02 | Save the referral code on the account at sign-up, so it survives a confirmation email opened in another browser | new | your idea | S |
 | G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | new | your idea | S |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
@@ -498,6 +504,7 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Film removed from NextRep, moved to a separate tool (Film Room); film tables kept in the database (F-45) | me | #122 |
 | Referral codes: extra free week for the new athlete, 150 XP and the Recruiter badge for the referrer (schema v64) (RF-01) | me | #119 |
 | /join rewritten for athletes: Today preview, levels and badges, price and trial, FAQ, founder section (L-01) | me | #116 |
 | Weekly challenge with an opt-in leaderboard by first name + initial (schema v63) (G-06) | me | #115 |
