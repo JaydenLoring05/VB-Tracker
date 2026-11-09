@@ -9,24 +9,22 @@ import { DemoProvider, type DemoContextValue } from "@/context/DemoContext";
 import { buildDemoData, type DemoData } from "@/data/demoData";
 
 import { DemoBanner } from "./DemoBanner";
-import { DemoFilmRoom } from "./DemoFilmRoom";
 import { DemoSignupPrompt } from "./DemoSignupPrompt";
 import { DemoTour } from "./DemoTour";
 import { DemoTrackerProvider } from "./DemoTrackerProvider";
 import { DemoWorkout } from "./DemoWorkout";
 
-type DemoView = "coach" | "athlete" | "workout" | "film";
+type DemoView = "coach" | "athlete" | "workout";
 
 const VIEWS: { id: DemoView; label: string; title: string }[] = [
   { id: "coach", label: "Coach view", title: "Coach dashboard" },
   { id: "athlete", label: "Athlete view", title: "Athlete view" },
-  { id: "workout", label: "Workout Mode", title: "Workout Mode" },
-  { id: "film", label: "Film room", title: "Film room" }
+  { id: "workout", label: "Workout Mode", title: "Workout Mode" }
 ];
 
 // App routes that have a demo version: clicking a link to them switches tabs
 // instead of asking the visitor to sign up.
-const DEMO_VIEW_FOR_PATH: Record<string, DemoView> = { "/workout": "workout", "/film": "film" };
+const DEMO_VIEW_FOR_PATH: Record<string, DemoView> = { "/workout": "workout" };
 
 // The only routes the demo may navigate to: everything else needs a login.
 const PUBLIC_LINK_PATHS = ["/", "/login", "/demo"];
@@ -127,9 +125,7 @@ export function DemoExperience() {
                       ? `${data.team.name}, week ${data.spotlight.week} of the season. Click around, nothing is saved.`
                       : view === "athlete"
                         ? "This is what Ava Thompson sees when she opens NextRep today."
-                        : view === "workout"
-                          ? `Ava's ${data.workout.day} lower-body session. Log a set, start the rest timer, finish for the summary. Nothing is saved.`
-                          : "Review game film and tag plays by athlete, with the mouse, the keyboard (press ?) or your voice."}
+                        : `Ava's ${data.workout.day} lower-body session. Log a set, start the rest timer, finish for the summary. Nothing is saved.`}
                   </p>
                 </div>
 
@@ -165,10 +161,8 @@ export function DemoExperience() {
                   />
                 ) : view === "athlete" ? (
                   <DashboardCards />
-                ) : view === "workout" ? (
-                  <DemoWorkout workout={data.workout} onExit={() => setView("athlete")} />
                 ) : (
-                  <DemoFilmRoom data={data} requestSignup={requestSignup} />
+                  <DemoWorkout workout={data.workout} onExit={() => setView("athlete")} />
                 )}
               </div>
 

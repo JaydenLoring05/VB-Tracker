@@ -18,9 +18,7 @@ import { useAthletePRs } from "@/hooks/useAthletePRs";
 import { useAthleteStatsHistory } from "@/hooks/useAthleteStatsHistory";
 import { gridTemplate, RECOVERY_COLUMNS } from "@/lib/statsTable";
 
-import { AthleteFilmStats } from "./AthleteFilmStats";
-
-type Tab = "recovery" | "prs" | "adherence" | "film";
+type Tab = "recovery" | "prs" | "adherence";
 
 // Read by .athlete-stats-row in coach.css, so the header and every row share the same tracks.
 const RECOVERY_TABLE_STYLE = { "--stats-columns": gridTemplate(RECOVERY_COLUMNS) } as React.CSSProperties;
@@ -28,20 +26,16 @@ const RECOVERY_TABLE_STYLE = { "--stats-columns": gridTemplate(RECOVERY_COLUMNS)
 const TABS: { id: Tab; label: string }[] = [
   { id: "recovery", label: "Recovery" },
   { id: "prs", label: "PRs" },
-  { id: "adherence", label: "Adherence" },
-  { id: "film", label: "Film" }
+  { id: "adherence", label: "Adherence" }
 ];
 
 export function AthleteStatsModal({
   userId,
   displayName,
-  teamId,
   onClose
 }: {
   userId: string;
   displayName: string;
-  /** The team being viewed. Keeps the Film tab to that team's film. */
-  teamId?: string;
   onClose: () => void;
 }) {
   const [tab, setTab] = useState<Tab>("recovery");
@@ -214,7 +208,6 @@ export function AthleteStatsModal({
           </>
         ))}
 
-      {tab === "film" && <AthleteFilmStats userId={userId} teamId={teamId} displayName={displayName} />}
     </ModalDialog>
   );
 }

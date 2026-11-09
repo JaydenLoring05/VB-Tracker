@@ -34,7 +34,7 @@ describe("todayWorkoutCta", () => {
     }
   });
 
-  // The regression: e2e/demo-workout-and-film.spec.ts looked for "Start today"
+  // The regression: e2e/demo-workout.spec.ts looked for "Start today"
   // only, so it timed out every Sunday and turned CI red on any PR opened then.
   it("shows the rest-day link, not a Start button, on Sunday in every phase", () => {
     for (const [phase, week] of Object.entries(PHASE_WEEKS)) {

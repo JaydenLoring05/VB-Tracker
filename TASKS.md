@@ -65,5 +65,4 @@ rows; the daily bug check fixes at most one bug a day.
 | F-12 Pilot clock starts at the first athlete workout | S | `new` | You to mark it `planned` |
 | F-15 Three-tap sets record the zone | S | `new` | You to mark it `planned`; builds on F-01 |
 | F-04 Per-athlete overview page for coaches | M | `new` | You to mark it `planned`; builds on F-01 |
-| F-03 Film links that aren't YouTube | M | `new` | You to mark it `planned` |
 | F-05 Jump tracking over time | M | `new` | You to mark it `planned`; needs SQL when built |
