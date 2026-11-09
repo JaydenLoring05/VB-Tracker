@@ -271,3 +271,98 @@
   color: var(--gold);
   font-size: var(--fs-sm);
 }
+
+/* Landing page (P-01): coach's copy at / and /join */
+
+.join-page .landing-header-nav a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.join-page .landing-header-nav a:not(.btn):hover {
+  color: var(--text);
+}
+
+/* Phones keep the header to "Log in" and the trial button; coaches find /pilot in section 6 and the footer. */
+@media (max-width: 520px) {
+  .join-page .landing-header-nav a.join-coach-link {
+    display: none;
+  }
+}
+
+.join-hero-note {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-sm);
+}
+
+.landing-soon {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-pill);
+  color: var(--gold);
+  font-size: var(--fs-xs, 12px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.join-soon-line {
+  margin: var(--sp-5) 0 0;
+  line-height: 1.55;
+}
+
+.join-soon-line .landing-soon {
+  margin-right: var(--sp-2);
+}
+
+.join-results {
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.join-results li {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+}
+
+.join-results li .join-card-icon {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.join-results p {
+  margin: var(--sp-1) 0 0;
+  line-height: 1.5;
+}
+
+.join-results .landing-soon {
+  margin-left: var(--sp-2);
+}
+
+@media (min-width: 760px) {
+  .join-cards-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .join-results {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-5) var(--sp-6);
+  }
+}
+
+@media (min-width: 1040px) {
+  .join-cards-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

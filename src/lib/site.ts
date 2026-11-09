@@ -7,15 +7,15 @@ const DEFAULT_SITE_URL = "https://volleyball-tracker-beta.vercel.app";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/+$/, "");
 
 export const SITE_NAME = "NextRep";
-export const SITE_TAGLINE = "Know who's ready. Know who needs attention.";
+export const SITE_TAGLINE = "Every volleyball player deserves a strength coach.";
 export const SITE_DESCRIPTION =
-  "NextRep gives volleyball teams structured workouts, daily readiness monitoring, and clear progress tracking, all from one coach dashboard.";
+  "Your personal volleyball strength and conditioning coach: a plan for your position, level and age that adjusts to practice, games and sore spots. Jump higher, move faster, get stronger.";
 
 const SHARE_IMAGE = {
   url: "/opengraph-image",
   width: 1200,
   height: 630,
-  alt: "NextRep: know who's ready, know who needs attention"
+  alt: "NextRep: every volleyball player deserves a strength coach"
 };
 
 // Per-page metadata. A page that sets openGraph or twitter replaces the layout's

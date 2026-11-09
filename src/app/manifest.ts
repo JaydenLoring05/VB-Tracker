@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "NextRep",
     short_name: "NextRep",
     description:
-      "The athlete training and recovery operating system for volleyball teams.",
+      "Your personal volleyball strength and conditioning coach.",
     start_url: "/",
     scope: "/",
     lang: "en",
