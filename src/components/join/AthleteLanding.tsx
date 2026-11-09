@@ -21,6 +21,7 @@ import { Brand } from "@/components/shared/Brand";
 import {
   ANNUAL_COMPARE_AT,
   ANNUAL_PER_MONTH,
+  ANNUAL_PLAN_ON,
   ANNUAL_SAVE_PERCENT,
   ATHLETE_PLAN,
   MONTHLY_UNDER_A_DOLLAR_A_DAY,
@@ -144,7 +145,8 @@ export function AthleteLanding() {
               </Link>
             </div>
             <p className="muted join-hero-note">
-              Then {PLAN_OPTIONS.monthly.priceLabel}, or save {ANNUAL_SAVE_PERCENT}% yearly. Cancel anytime.
+              Then {PLAN_OPTIONS.monthly.priceLabel}
+              {ANNUAL_PLAN_ON && `, or save ${ANNUAL_SAVE_PERCENT}% yearly`}. Cancel anytime.
             </p>
           </div>
         </section>
@@ -271,12 +273,14 @@ export function AthleteLanding() {
         <section id="pricing" className="landing-section" aria-labelledby="land-price">
           <div className="join-inner">
             <h2 id="land-price" className="landing-section-title">
-              Pick your plan
+              {ANNUAL_PLAN_ON ? "Pick your plan" : "One simple price"}
             </h2>
             <p className="landing-section-lead">
-              Both start with a {ATHLETE_PLAN.trialDays}-day free trial and include everything.
+              {ANNUAL_PLAN_ON ? "Both start" : "Starts"} with a {ATHLETE_PLAN.trialDays}-day free trial and includes
+              everything.
             </p>
-            <ul className="join-plans">
+            <ul className={ANNUAL_PLAN_ON ? "join-plans" : "join-plans join-plans-single"}>
+              {ANNUAL_PLAN_ON && (
               <li className="panel join-price-card join-plan-featured">
                 <p className="join-plan-head">
                   <span className="micro micro-gold">{PLAN_OPTIONS.annual.name}</span>
@@ -292,7 +296,8 @@ export function AthleteLanding() {
                   {TRIAL_CTA}
                 </Link>
               </li>
-              <li className="panel join-price-card">
+              )}
+              <li className={ANNUAL_PLAN_ON ? "panel join-price-card" : "panel join-price-card join-plan-featured"}>
                 <p className="join-plan-head">
                   <span className="micro micro-gold">{PLAN_OPTIONS.monthly.name}</span>
                 </p>
@@ -303,7 +308,7 @@ export function AthleteLanding() {
                 <p className="join-price-trial">
                   {MONTHLY_UNDER_A_DOLLAR_A_DAY ? "Less than $1 a day" : "Cancel anytime"}
                 </p>
-                <Link href={SIGN_UP} className="btn ghost">
+                <Link href={SIGN_UP} className={ANNUAL_PLAN_ON ? "btn ghost" : "btn"}>
                   {TRIAL_CTA}
                 </Link>
               </li>

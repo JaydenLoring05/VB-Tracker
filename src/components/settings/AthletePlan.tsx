@@ -12,9 +12,13 @@ import {
   BillingStatus,
   hasPaidAccess,
   PLAN_OPTIONS,
-  PlanInterval
+  PlanInterval,
+  plansOnSale
 } from "@/lib/billing";
 import { createClient } from "@/lib/supabase/client";
+
+/** Monthly only while the annual plan is switched off (ANNUAL_PLAN_ON). */
+const PLANS = plansOnSale();
 
 type BillingRow = {
   status: BillingStatus;
@@ -41,7 +45,7 @@ export function AthletePlan() {
   const [billing, setBilling] = useState<BillingRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [plan, setPlan] = useState<PlanInterval>("annual");
+  const [plan, setPlan] = useState<PlanInterval>(PLANS[0]);
 
   useEffect(() => {
     if (!userId) return;
@@ -119,8 +123,8 @@ export function AthletePlan() {
       <h2>{ATHLETE_PLAN.name}</h2>
       <p className="muted">
         Your plan built around your level, age and anything sore, a week that adjusts around practice and games, and
-        results you can share. {ATHLETE_PLAN.trialDays}-day free trial, then {PLAN_OPTIONS.monthly.priceLabel} or{" "}
-        {PLAN_OPTIONS.annual.priceLabel}. Cancel any time.
+        results you can share. {ATHLETE_PLAN.trialDays}-day free trial, then{" "}
+        {PLANS.map((option) => PLAN_OPTIONS[option].priceLabel).join(" or ")}. Cancel any time.
       </p>
       <p>
         <strong>Status:</strong> {billingStatusLabel(status)}
@@ -133,9 +137,10 @@ export function AthletePlan() {
         </button>
       ) : (
         <>
+          {PLANS.length > 1 && (
           <fieldset className="athlete-plan-options">
             <legend className="sr-only">Choose a plan</legend>
-            {(["annual", "monthly"] as const).map((option) => (
+            {PLANS.map((option) => (
               <label key={option} className={plan === option ? "is-selected" : undefined}>
                 <input
                   type="radio"
@@ -153,6 +158,7 @@ export function AthletePlan() {
               </label>
             ))}
           </fieldset>
+          )}
           <button type="button" onClick={() => go("/api/billing/checkout")} disabled={busy}>
             {busy
               ? "Opening checkout…"

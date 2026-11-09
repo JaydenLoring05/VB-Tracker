@@ -11,8 +11,18 @@ import { REFERRAL_TRIAL_BONUS_DAYS } from "@/lib/referral";
 export type PlanInterval = "monthly" | "annual";
 
 /** Prices in cents (P-02). Stripe charges whatever its price IDs say, so these must match them. */
-export const MONTHLY_PRICE_CENTS = 2995;
-export const ANNUAL_PRICE_CENTS = 17970;
+export const MONTHLY_PRICE_CENTS = 1499;
+
+/**
+ * The annual plan is built but switched off: Jayden is keeping $14.99/month
+ * for now and raising it later (2026-11-09). To turn annual on, set this to
+ * true, set ANNUAL_PRICE_CENTS to the yearly price, create that price in
+ * Stripe and add STRIPE_ANNUAL_PRICE_ID in Vercel. While it's off, the
+ * landing page and Settings show monthly only and checkout refuses annual.
+ */
+export const ANNUAL_PLAN_ON = false;
+/** Half of twelve months, the coach's "save 50%" rule; only shown once ANNUAL_PLAN_ON is true. */
+export const ANNUAL_PRICE_CENTS = MONTHLY_PRICE_CENTS * 6;
 
 const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 
@@ -53,6 +63,11 @@ export function parsePlanInterval(value: unknown): PlanInterval {
   return value === "annual" ? "annual" : "monthly";
 }
 
+/** The plans on sale, in the order they're shown (best value first). */
+export function plansOnSale(annualOn: boolean = ANNUAL_PLAN_ON): PlanInterval[] {
+  return annualOn ? ["annual", "monthly"] : ["monthly"];
+}
+
 export type BillingConfig = {
   stripeSecretKey: string;
   /** The monthly price. */
@@ -76,9 +91,10 @@ export function readBillingConfig(env: Record<string, string | undefined>): Bill
   return { stripeSecretKey, priceId, annualPriceId, webhookSecret, billingSecret };
 }
 
-/** The Stripe price for a plan, or null when that plan isn't set up. */
-export function priceIdFor(config: BillingConfig, plan: PlanInterval): string | null {
-  return plan === "annual" ? config.annualPriceId : config.priceId;
+/** The Stripe price for a plan, or null when that plan isn't on sale or set up. */
+export function priceIdFor(config: BillingConfig, plan: PlanInterval, annualOn: boolean = ANNUAL_PLAN_ON): string | null {
+  if (plan === "annual") return annualOn ? config.annualPriceId : null;
+  return config.priceId;
 }
 
 /** Stripe's API takes form encoding with bracketed keys. */

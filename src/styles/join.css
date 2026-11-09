@@ -192,6 +192,11 @@
   .join-plans {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* Monthly only (annual switched off): one card, not half a grid. */
+  .join-plans-single {
+    grid-template-columns: minmax(0, 440px);
+  }
 }
 
 /* Sign-up */

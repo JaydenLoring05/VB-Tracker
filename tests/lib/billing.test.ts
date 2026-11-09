@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   ANNUAL_COMPARE_AT,
   ANNUAL_PER_MONTH,
+  ANNUAL_PLAN_ON,
   ANNUAL_SAVE_PERCENT,
   ATHLETE_PLAN,
   billingUpdateFromEvent,
@@ -13,6 +14,7 @@ import {
   MONTHLY_UNDER_A_DOLLAR_A_DAY,
   parsePlanInterval,
   PLAN_OPTIONS,
+  plansOnSale,
   priceIdFor,
   readBillingConfig,
   stripeForm,
@@ -20,16 +22,22 @@ import {
 } from "@/lib/billing";
 
 describe("plan prices (P-02)", () => {
-  it("sells $29.95/month and $179.70/year after a 7-day trial", () => {
-    expect(PLAN_OPTIONS.monthly.priceLabel).toBe("$29.95/month");
-    expect(PLAN_OPTIONS.annual.priceLabel).toBe("$179.70/year");
-    expect(ATHLETE_PLAN.priceLabel).toBe("$29.95/month");
+  it("sells $14.99/month after a 7-day trial, with annual switched off for now", () => {
+    expect(PLAN_OPTIONS.monthly.priceLabel).toBe("$14.99/month");
+    expect(ATHLETE_PLAN.priceLabel).toBe("$14.99/month");
     expect(ATHLETE_PLAN.trialDays).toBe(7);
+    expect(ANNUAL_PLAN_ON).toBe(false);
+    expect(plansOnSale()).toEqual(["monthly"]);
   });
 
-  it("derives the annual comparison the landing page shows", () => {
-    expect(ANNUAL_COMPARE_AT).toBe("$359.40");
-    expect(ANNUAL_PER_MONTH).toBe("$14.98");
+  it("shows annual first once it's switched on", () => {
+    expect(plansOnSale(true)).toEqual(["annual", "monthly"]);
+  });
+
+  it("derives the annual comparison from the monthly price (half of twelve months)", () => {
+    expect(PLAN_OPTIONS.annual.priceLabel).toBe("$89.94/year");
+    expect(ANNUAL_COMPARE_AT).toBe("$179.88");
+    expect(ANNUAL_PER_MONTH).toBe("$7.50");
     expect(ANNUAL_SAVE_PERCENT).toBe(50);
     expect(MONTHLY_UNDER_A_DOLLAR_A_DAY).toBe(true);
   });
@@ -54,15 +62,17 @@ describe("readBillingConfig", () => {
     ).toEqual({ stripeSecretKey: "sk", priceId: "p", annualPriceId: null, webhookSecret: "w", billingSecret: "b" });
   });
 
-  it("sells annual only once its price is set", () => {
+  it("sells annual only once it's switched on and its price is set", () => {
     const keys = { STRIPE_SECRET_KEY: "sk", STRIPE_PRICE_ID: "p_month", STRIPE_WEBHOOK_SECRET: "w", BILLING_SECRET: "b" };
     const monthlyOnly = readBillingConfig(keys)!;
     expect(priceIdFor(monthlyOnly, "monthly")).toBe("p_month");
-    expect(priceIdFor(monthlyOnly, "annual")).toBeNull();
+    expect(priceIdFor(monthlyOnly, "annual", true)).toBeNull();
 
     const both = readBillingConfig({ ...keys, STRIPE_ANNUAL_PRICE_ID: " p_year " })!;
-    expect(priceIdFor(both, "annual")).toBe("p_year");
+    expect(priceIdFor(both, "annual", true)).toBe("p_year");
     expect(priceIdFor(both, "monthly")).toBe("p_month");
+    // Switched off (today): a price ID in Vercel still doesn't sell annual.
+    expect(priceIdFor(both, "annual")).toBeNull();
   });
 });
 

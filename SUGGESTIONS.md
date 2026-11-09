@@ -32,7 +32,7 @@ Rules for automated runs:
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
 | P-01 | Landing page at / from the coach's copy: volleyball S&C first, unshipped features labelled "Coming soon" (also covers F-44) | building | me | M |
-| P-02 | Payments: $29.95/month or $179.70/year after a 7-day trial (schema v65), everything locked after the trial for solo athletes; team athletes and coaches free | building | me | M |
+| P-02 | Payments: $14.99/month after a 7-day trial (annual built, switched off until the price goes up) (schema v65), everything locked after the trial for solo athletes; team athletes and coaches free | building | me | M |
 | P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 | planned | me | M |
 | P-04 | Season- and practice-adaptive plan: season phases, practice intensity, match-day rules, double progression with "last time → today's target", weekly coach note | planned | me | L |
 | P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
