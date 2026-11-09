@@ -86,6 +86,14 @@ describe("checkout", () => {
     expect(checkoutFields({ ...base, referred: true })["subscription_data[trial_period_days]"]).toBe(14);
     expect(checkoutFields({ ...base, referred: false })["subscription_data[trial_period_days]"]).toBe(7);
   });
+
+  it("gives no second free trial to an athlete who had a plan before (P-02)", () => {
+    const base = { priceId: "price_1", userId: "u1", email: "a@b.co", siteUrl: "https://x.app" };
+    expect(checkoutFields({ ...base, hadPlan: true })).not.toHaveProperty(["subscription_data[trial_period_days]"]);
+    expect(checkoutFields({ ...base, hadPlan: true, referred: true })).not.toHaveProperty([
+      "subscription_data[trial_period_days]"
+    ]);
+  });
 });
 
 describe("verifyStripeSignature", () => {

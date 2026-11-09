@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { useTrackerContext } from "@/context/TrackerContext";
@@ -19,9 +20,14 @@ type BillingRow = {
   status: BillingStatus;
   trial_ends_at: string | null;
   current_period_end: string | null;
+  /** Set once the athlete has had a subscription; they get no second trial (P-02). */
+  stripe_subscription_id?: string | null;
   /** From schema_v65; missing before it runs. */
   plan?: PlanInterval | null;
 };
+
+const CONFIRM_TRIES = 10;
+const CONFIRM_EVERY_MS = 2000;
 
 function shortDate(iso: string | null) {
   return iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : null;
@@ -31,6 +37,7 @@ function shortDate(iso: string | null) {
 export function AthletePlan() {
   const { userId } = useTrackerContext();
   const supabase = useMemo(() => createClient(), []);
+  const router = useRouter();
   const [billing, setBilling] = useState<BillingRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -38,16 +45,43 @@ export function AthletePlan() {
 
   useEffect(() => {
     if (!userId) return;
-    // "*" rather than a column list, so the card still loads before schema_v65 adds `plan`.
-    supabase
-      .from("athlete_billing")
-      .select("*")
-      .eq("user_id", userId)
-      .maybeSingle()
-      .then(({ data }) => setBilling((data as BillingRow | null) ?? null));
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("billing") === "success") setMessage("You're in. Your free trial has started.");
-  }, [supabase, userId]);
+    // Back from Stripe Checkout: the webhook can land a few seconds after the
+    // redirect, so check again until the trial shows, then refresh the app
+    // layout so the paywall (P-02) lifts without a manual reload.
+    const returning = new URLSearchParams(window.location.search).get("billing") === "success";
+    let cancelled = false;
+    let tries = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const load = () =>
+      supabase
+        .from("athlete_billing")
+        // "*" rather than a column list, so the card still loads before schema_v65 adds `plan`.
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (cancelled) return;
+          const row = (data as BillingRow | null) ?? null;
+          setBilling(row);
+          if (!returning) return;
+          if (hasPaidAccess(row?.status)) {
+            setMessage("You're in. Your free trial has started.");
+            router.refresh();
+          } else if (++tries < CONFIRM_TRIES) {
+            setMessage("Starting your trial…");
+            timer = setTimeout(load, CONFIRM_EVERY_MS);
+          } else {
+            setMessage("Your trial is on its way. It can take a minute to show here, so refresh in a moment.");
+          }
+        });
+
+    load();
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [router, supabase, userId]);
 
   async function go(path: "/api/billing/checkout" | "/api/billing/portal") {
     setBusy(true);
@@ -120,7 +154,11 @@ export function AthletePlan() {
             ))}
           </fieldset>
           <button type="button" onClick={() => go("/api/billing/checkout")} disabled={busy}>
-            {busy ? "Opening checkout…" : `Start ${ATHLETE_PLAN.trialDays}-day free trial`}
+            {busy
+              ? "Opening checkout…"
+              : billing?.stripe_subscription_id
+                ? "Restart my plan"
+                : `Start ${ATHLETE_PLAN.trialDays}-day free trial`}
           </button>
         </>
       )}

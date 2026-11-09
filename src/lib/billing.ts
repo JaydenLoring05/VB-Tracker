@@ -95,12 +95,13 @@ export function checkoutFields(input: {
   siteUrl: string;
   /** Signed up with a friend's referral code (RF-01): one extra free week. */
   referred?: boolean;
+  /** Already had a subscription (P-02): no second free trial, billing starts now. */
+  hadPlan?: boolean;
 }): Record<string, string | number> {
   const fields: Record<string, string | number> = {
     mode: "subscription",
     "line_items[0][price]": input.priceId,
     "line_items[0][quantity]": 1,
-    "subscription_data[trial_period_days]": ATHLETE_PLAN.trialDays + (input.referred ? REFERRAL_TRIAL_BONUS_DAYS : 0),
     "subscription_data[metadata][user_id]": input.userId,
     client_reference_id: input.userId,
     "metadata[user_id]": input.userId,
@@ -108,6 +109,9 @@ export function checkoutFields(input: {
     success_url: `${input.siteUrl}/settings?billing=success`,
     cancel_url: `${input.siteUrl}/settings?billing=canceled`
   };
+  if (!input.hadPlan) {
+    fields["subscription_data[trial_period_days]"] = ATHLETE_PLAN.trialDays + (input.referred ? REFERRAL_TRIAL_BONUS_DAYS : 0);
+  }
   if (input.email) fields.customer_email = input.email;
   return fields;
 }

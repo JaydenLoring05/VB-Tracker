@@ -319,8 +319,9 @@ export function AthleteLanding() {
                 ))}
               </ul>
               <p className="muted join-price-note">
-                Creating your account is free. Start the trial from Settings when you&apos;re ready, and cancel
-                before it ends to pay nothing. Under 13? A parent or guardian gives consent at sign-up.
+                Sign up, answer a few questions so we can build your plan, then start your trial. Cancel before it
+                ends and you pay nothing. On a team? Your coach&apos;s team covers you. Under 13? A parent or guardian
+                gives consent at sign-up.
               </p>
             </div>
           </div>

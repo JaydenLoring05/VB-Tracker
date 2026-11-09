@@ -39,6 +39,14 @@ export async function POST(request: NextRequest) {
   // schema_v64 not run yet) means the normal trial.
   const { data: referral } = await supabase.from("referrals").select("id").eq("referred_id", user.id).maybeSingle();
 
+  // One free trial per athlete (P-02): anyone who has had a subscription
+  // before (canceled, or a failed payment) starts paying right away.
+  const { data: previous } = await supabase
+    .from("athlete_billing")
+    .select("stripe_subscription_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
@@ -50,7 +58,8 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       email: user.email,
       siteUrl: SITE_URL,
-      referred: Boolean(referral)
+      referred: Boolean(referral),
+      hadPlan: Boolean(previous?.stripe_subscription_id)
     }))
   });
 
