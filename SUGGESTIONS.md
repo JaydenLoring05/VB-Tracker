@@ -31,8 +31,6 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| P-01 | Landing page at / from the coach's copy: volleyball S&C first, unshipped features labelled "Coming soon" (also covers F-44) | building | me | M |
-| P-02 | Payments: $14.99/month after a 7-day trial (annual built, switched off until the price goes up) (schema v65), everything locked after the trial for solo athletes; team athletes and coaches free | building | me | M |
 | P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 | planned | me | M |
 | P-04 | Season- and practice-adaptive plan: season phases, practice intensity, match-day rules, double progression with "last time → today's target", weekly coach note | planned | me | L |
 | P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
@@ -504,6 +502,8 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| $14.99/month athlete plan (annual built, switched off); app locked after the trial for athletes not on a team; one trial per athlete (schema v65) (P-02) | me | #124 |
+| Volleyball landing page at / from the coach's copy; unshipped features labelled "Coming soon" (P-01, covers F-44) | me | #121 |
 | Film removed from NextRep, moved to a separate tool (Film Room); film tables kept in the database (F-45) | me | #122 |
 | Referral codes: extra free week for the new athlete, 150 XP and the Recruiter badge for the referrer (schema v64) (RF-01) | me | #119 |
 | /join rewritten for athletes: Today preview, levels and badges, price and trial, FAQ, founder section (L-01) | me | #116 |
