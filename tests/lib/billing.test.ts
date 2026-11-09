@@ -2,14 +2,45 @@ import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
 
 import {
+  ANNUAL_COMPARE_AT,
+  ANNUAL_PER_MONTH,
+  ANNUAL_SAVE_PERCENT,
+  ATHLETE_PLAN,
   billingUpdateFromEvent,
   checkoutFields,
   hasPaidAccess,
   mapSubscriptionStatus,
+  MONTHLY_UNDER_A_DOLLAR_A_DAY,
+  parsePlanInterval,
+  PLAN_OPTIONS,
+  priceIdFor,
   readBillingConfig,
   stripeForm,
   verifyStripeSignature
 } from "@/lib/billing";
+
+describe("plan prices (P-02)", () => {
+  it("sells $29.95/month and $179.70/year after a 7-day trial", () => {
+    expect(PLAN_OPTIONS.monthly.priceLabel).toBe("$29.95/month");
+    expect(PLAN_OPTIONS.annual.priceLabel).toBe("$179.70/year");
+    expect(ATHLETE_PLAN.priceLabel).toBe("$29.95/month");
+    expect(ATHLETE_PLAN.trialDays).toBe(7);
+  });
+
+  it("derives the annual comparison the landing page shows", () => {
+    expect(ANNUAL_COMPARE_AT).toBe("$359.40");
+    expect(ANNUAL_PER_MONTH).toBe("$14.98");
+    expect(ANNUAL_SAVE_PERCENT).toBe(50);
+    expect(MONTHLY_UNDER_A_DOLLAR_A_DAY).toBe(true);
+  });
+
+  it("treats anything but 'annual' as monthly", () => {
+    expect(parsePlanInterval("annual")).toBe("annual");
+    expect(parsePlanInterval("monthly")).toBe("monthly");
+    expect(parsePlanInterval(undefined)).toBe("monthly");
+    expect(parsePlanInterval("yearly")).toBe("monthly");
+  });
+});
 
 const sign = (payload: string, secret: string, t: number) =>
   `t=${t},v1=${createHmac("sha256", secret).update(`${t}.${payload}`).digest("hex")}`;
@@ -20,7 +51,18 @@ describe("readBillingConfig", () => {
     expect(readBillingConfig({ STRIPE_SECRET_KEY: "sk", STRIPE_PRICE_ID: "price" })).toBeNull();
     expect(
       readBillingConfig({ STRIPE_SECRET_KEY: "sk", STRIPE_PRICE_ID: "p", STRIPE_WEBHOOK_SECRET: "w", BILLING_SECRET: "b" })
-    ).toEqual({ stripeSecretKey: "sk", priceId: "p", webhookSecret: "w", billingSecret: "b" });
+    ).toEqual({ stripeSecretKey: "sk", priceId: "p", annualPriceId: null, webhookSecret: "w", billingSecret: "b" });
+  });
+
+  it("sells annual only once its price is set", () => {
+    const keys = { STRIPE_SECRET_KEY: "sk", STRIPE_PRICE_ID: "p_month", STRIPE_WEBHOOK_SECRET: "w", BILLING_SECRET: "b" };
+    const monthlyOnly = readBillingConfig(keys)!;
+    expect(priceIdFor(monthlyOnly, "monthly")).toBe("p_month");
+    expect(priceIdFor(monthlyOnly, "annual")).toBeNull();
+
+    const both = readBillingConfig({ ...keys, STRIPE_ANNUAL_PRICE_ID: " p_year " })!;
+    expect(priceIdFor(both, "annual")).toBe("p_year");
+    expect(priceIdFor(both, "monthly")).toBe("p_month");
   });
 });
 
@@ -84,6 +126,30 @@ describe("billingUpdateFromEvent", () => {
         data: { object: { id: "sub_1", status: "active", metadata: { user_id: "u1" } } }
       })?.status
     ).toBe("canceled");
+  });
+
+  it("reads monthly or annual from the subscription's price interval (P-02)", () => {
+    const withInterval = (interval?: string) =>
+      billingUpdateFromEvent({
+        type: "customer.subscription.created",
+        data: {
+          object: {
+            id: "sub_1",
+            status: "trialing",
+            metadata: { user_id: "u1" },
+            items: { data: [{ price: interval ? { recurring: { interval } } : {} }] }
+          }
+        }
+      })?.plan;
+    expect(withInterval("year")).toBe("annual");
+    expect(withInterval("month")).toBe("monthly");
+    expect(withInterval()).toBeNull();
+    expect(
+      billingUpdateFromEvent({
+        type: "checkout.session.completed",
+        data: { object: { client_reference_id: "u1" } }
+      })?.plan
+    ).toBeNull();
   });
 
   it("ignores other events and events with no athlete", () => {

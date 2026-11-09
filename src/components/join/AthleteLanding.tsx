@@ -18,19 +18,25 @@ import Link from "next/link";
 import { ReferralCapture } from "@/components/join/ReferralCapture";
 import { TodayPreview } from "@/components/join/TodayPreview";
 import { Brand } from "@/components/shared/Brand";
-import { ATHLETE_PLAN } from "@/lib/billing";
+import {
+  ANNUAL_COMPARE_AT,
+  ANNUAL_PER_MONTH,
+  ANNUAL_SAVE_PERCENT,
+  ATHLETE_PLAN,
+  MONTHLY_UNDER_A_DOLLAR_A_DAY,
+  PLAN_OPTIONS
+} from "@/lib/billing";
 import { CONTACT_EMAIL } from "@/lib/contact";
 
 /**
  * The athlete landing page (P-01), shown at / and /join. Section order and
  * headlines come from the coach's copy. Anything the app can't do yet is
- * labelled "Coming soon", and the price is read from ATHLETE_PLAN so the page
+ * labelled "Coming soon", and the prices are read from billing.ts so the page
  * always matches what checkout charges.
  */
 
 const SIGN_UP = "/login?mode=sign-up";
 const TRIAL_CTA = `Start your ${ATHLETE_PLAN.trialDays}-day free trial`;
-const [PRICE_AMOUNT, PRICE_PERIOD] = ATHLETE_PLAN.priceLabel.split("/");
 
 const FOCUS_CARDS = [
   {
@@ -138,7 +144,7 @@ export function AthleteLanding() {
               </Link>
             </div>
             <p className="muted join-hero-note">
-              {ATHLETE_PLAN.priceLabel} after the trial. Cancel anytime.
+              Then {PLAN_OPTIONS.monthly.priceLabel}, or save {ANNUAL_SAVE_PERCENT}% yearly. Cancel anytime.
             </p>
           </div>
         </section>
@@ -265,15 +271,45 @@ export function AthleteLanding() {
         <section id="pricing" className="landing-section" aria-labelledby="land-price">
           <div className="join-inner">
             <h2 id="land-price" className="landing-section-title">
-              One simple price
+              Pick your plan
             </h2>
-            <div className="panel join-price-card">
-              <p className="micro micro-gold">{ATHLETE_PLAN.name}</p>
-              <p className="join-price">
-                <span className="join-price-amount">{PRICE_AMOUNT}</span>
-                {PRICE_PERIOD && <span className="muted">/{PRICE_PERIOD}</span>}
-              </p>
-              <p className="join-price-trial">{ATHLETE_PLAN.trialDays}-day free trial</p>
+            <p className="landing-section-lead">
+              Both start with a {ATHLETE_PLAN.trialDays}-day free trial and include everything.
+            </p>
+            <ul className="join-plans">
+              <li className="panel join-price-card join-plan-featured">
+                <p className="join-plan-head">
+                  <span className="micro micro-gold">{PLAN_OPTIONS.annual.name}</span>
+                  <span className="landing-soon join-save">Save {ANNUAL_SAVE_PERCENT}%</span>
+                </p>
+                <p className="join-price">
+                  <s className="muted join-price-was">{ANNUAL_COMPARE_AT}</s>
+                  <span className="join-price-amount">{PLAN_OPTIONS.annual.amount}</span>
+                  <span className="muted">/year</span>
+                </p>
+                <p className="join-price-trial">That&apos;s {ANNUAL_PER_MONTH}/month</p>
+                <Link href={SIGN_UP} className="btn">
+                  {TRIAL_CTA}
+                </Link>
+              </li>
+              <li className="panel join-price-card">
+                <p className="join-plan-head">
+                  <span className="micro micro-gold">{PLAN_OPTIONS.monthly.name}</span>
+                </p>
+                <p className="join-price">
+                  <span className="join-price-amount">{PLAN_OPTIONS.monthly.amount}</span>
+                  <span className="muted">/month</span>
+                </p>
+                <p className="join-price-trial">
+                  {MONTHLY_UNDER_A_DOLLAR_A_DAY ? "Less than $1 a day" : "Cancel anytime"}
+                </p>
+                <Link href={SIGN_UP} className="btn ghost">
+                  {TRIAL_CTA}
+                </Link>
+              </li>
+            </ul>
+            <div className="panel join-price-card join-plan-includes">
+              <p className="micro micro-gold">{ATHLETE_PLAN.name} includes</p>
               <ul className="pilot-points">
                 {PLAN_POINTS.map((point) => (
                   <li key={point}>
@@ -282,9 +318,6 @@ export function AthleteLanding() {
                   </li>
                 ))}
               </ul>
-              <Link href={SIGN_UP} className="btn">
-                {TRIAL_CTA}
-              </Link>
               <p className="muted join-price-note">
                 Creating your account is free. Start the trial from Settings when you&apos;re ready, and cancel
                 before it ends to pay nothing. Under 13? A parent or guardian gives consent at sign-up.

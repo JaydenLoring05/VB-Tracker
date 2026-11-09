@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     { auth: { persistSession: false, autoRefreshToken: false } }
   );
-  const { error } = await supabase.rpc("apply_billing_update", {
+  const args = {
     p_secret: config.billingSecret,
     p_user_id: update.userId,
     p_customer_id: update.customerId,
@@ -51,7 +51,11 @@ export async function POST(request: NextRequest) {
     p_status: update.status,
     p_trial_ends_at: update.trialEndsAt,
     p_current_period_end: update.currentPeriodEnd
-  });
+  };
+  let { error } = await supabase.rpc("apply_billing_update", { ...args, p_plan: update.plan });
+  // Before schema_v65 runs there is no p_plan parameter (PostgREST answers
+  // PGRST202, "function not found"). Save everything else so payments keep working.
+  if (error?.code === "PGRST202") ({ error } = await supabase.rpc("apply_billing_update", args));
 
   if (error) {
     // 500 makes Stripe retry later, which is what we want if the database blipped.

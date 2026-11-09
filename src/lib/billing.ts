@@ -8,12 +8,57 @@ import { REFERRAL_TRIAL_BONUS_DAYS } from "@/lib/referral";
  * set in Vercel; see readBillingConfig.
  */
 
-export const ATHLETE_PLAN = { name: "NextRep Athlete", priceLabel: "$14.99/month", trialDays: 7 } as const;
+export type PlanInterval = "monthly" | "annual";
 
+/** Prices in cents (P-02). Stripe charges whatever its price IDs say, so these must match them. */
+export const MONTHLY_PRICE_CENTS = 2995;
+export const ANNUAL_PRICE_CENTS = 17970;
+
+const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+
+export const PLAN_OPTIONS: Record<
+  PlanInterval,
+  { interval: PlanInterval; name: string; amount: string; period: "month" | "year"; priceLabel: string }
+> = {
+  monthly: {
+    interval: "monthly",
+    name: "Monthly",
+    amount: dollars(MONTHLY_PRICE_CENTS),
+    period: "month",
+    priceLabel: `${dollars(MONTHLY_PRICE_CENTS)}/month`
+  },
+  annual: {
+    interval: "annual",
+    name: "Annual",
+    amount: dollars(ANNUAL_PRICE_CENTS),
+    period: "year",
+    priceLabel: `${dollars(ANNUAL_PRICE_CENTS)}/year`
+  }
+};
+
+/** A year of monthly, the annual plan per month, and the saving, all derived so they can't drift. */
+export const ANNUAL_COMPARE_AT = dollars(MONTHLY_PRICE_CENTS * 12);
+export const ANNUAL_PER_MONTH = dollars(Math.round(ANNUAL_PRICE_CENTS / 12));
+export const ANNUAL_SAVE_PERCENT = Math.round((1 - ANNUAL_PRICE_CENTS / (MONTHLY_PRICE_CENTS * 12)) * 100);
+/** True while monthly costs under $1 a day over a 30-day month, so the copy may say so. */
+export const MONTHLY_UNDER_A_DOLLAR_A_DAY = MONTHLY_PRICE_CENTS / 30 < 100;
+
+export const ATHLETE_PLAN = {
+  name: "NextRep Athlete",
+  priceLabel: PLAN_OPTIONS.monthly.priceLabel,
+  trialDays: 7
+} as const;
+
+export function parsePlanInterval(value: unknown): PlanInterval {
+  return value === "annual" ? "annual" : "monthly";
+}
 
 export type BillingConfig = {
   stripeSecretKey: string;
+  /** The monthly price. */
   priceId: string;
+  /** The annual price; null until STRIPE_ANNUAL_PRICE_ID is set, and until then only monthly is sold. */
+  annualPriceId: string | null;
   webhookSecret: string;
   billingSecret: string;
 };
@@ -27,7 +72,13 @@ export function readBillingConfig(env: Record<string, string | undefined>): Bill
   const webhookSecret = env.STRIPE_WEBHOOK_SECRET?.trim();
   const billingSecret = env.BILLING_SECRET?.trim();
   if (!stripeSecretKey || !priceId || !webhookSecret || !billingSecret) return null;
-  return { stripeSecretKey, priceId, webhookSecret, billingSecret };
+  const annualPriceId = env.STRIPE_ANNUAL_PRICE_ID?.trim() || null;
+  return { stripeSecretKey, priceId, annualPriceId, webhookSecret, billingSecret };
+}
+
+/** The Stripe price for a plan, or null when that plan isn't set up. */
+export function priceIdFor(config: BillingConfig, plan: PlanInterval): string | null {
+  return plan === "annual" ? config.annualPriceId : config.priceId;
 }
 
 /** Stripe's API takes form encoding with bracketed keys. */
@@ -111,6 +162,8 @@ export type BillingUpdate = {
   status: BillingStatus;
   trialEndsAt: string | null;
   currentPeriodEnd: string | null;
+  /** Monthly or annual, from the subscription's price; null when the event doesn't say. */
+  plan: PlanInterval | null;
 };
 
 type StripeObject = Record<string, unknown> & { metadata?: Record<string, string> };
@@ -132,7 +185,8 @@ export function billingUpdateFromEvent(event: { type?: string; data?: { object?:
       subscriptionId: str(object.subscription),
       status: "trialing",
       trialEndsAt: null,
-      currentPeriodEnd: null
+      currentPeriodEnd: null,
+      plan: null
     };
   }
 
@@ -143,14 +197,17 @@ export function billingUpdateFromEvent(event: { type?: string; data?: { object?:
   ) {
     const userId = object.metadata?.user_id ?? null;
     if (!userId) return null;
-    const firstItem = (object.items as { data?: { current_period_end?: number }[] } | undefined)?.data?.[0];
+    type Item = { current_period_end?: number; price?: { recurring?: { interval?: string } | null } };
+    const firstItem = (object.items as { data?: Item[] } | undefined)?.data?.[0];
+    const interval = firstItem?.price?.recurring?.interval;
     return {
       userId,
       customerId: str(object.customer),
       subscriptionId: str(object.id),
       status: event.type === "customer.subscription.deleted" ? "canceled" : mapSubscriptionStatus(str(object.status) ?? undefined),
       trialEndsAt: toISO(object.trial_end),
-      currentPeriodEnd: toISO(object.current_period_end ?? firstItem?.current_period_end)
+      currentPeriodEnd: toISO(object.current_period_end ?? firstItem?.current_period_end),
+      plan: interval === "year" ? "annual" : interval === "month" ? "monthly" : null
     };
   }
 
