@@ -1,13 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { checkoutFields, readBillingConfig, stripeForm } from "@/lib/billing";
+import { checkoutFields, parsePlanInterval, priceIdFor, readBillingConfig, stripeForm } from "@/lib/billing";
 import { SITE_URL } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 
-// Starts Stripe Checkout for the athlete plan (F-37): $14.99/month after a
-// 7-day free trial, or 14 days for an athlete who signed up with a friend's
-// referral code (RF-01). Off (503) until STRIPE_SECRET_KEY, STRIPE_PRICE_ID,
-// STRIPE_WEBHOOK_SECRET and BILLING_SECRET are all set in Vercel.
+// Starts Stripe Checkout for the athlete plan (F-37, P-02): monthly or annual
+// (body {"plan": "monthly" | "annual"}, monthly if missing) after a 7-day free
+// trial, or 14 days for an athlete who signed up with a friend's referral code
+// (RF-01). Off (503) until STRIPE_SECRET_KEY, STRIPE_PRICE_ID,
+// STRIPE_WEBHOOK_SECRET and BILLING_SECRET are all set in Vercel. Annual also
+// needs STRIPE_ANNUAL_PRICE_ID; without it an annual request gets 409.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,9 +31,21 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return json({ ok: false, error: "signed_out" }, 401);
 
+  const body = (await request.json().catch(() => null)) as { plan?: unknown } | null;
+  const priceId = priceIdFor(config, parsePlanInterval(body?.plan));
+  if (!priceId) return json({ ok: false, error: "plan_unavailable" }, 409);
+
   // RLS lets the athlete read their own referral row. Any error (no row, or
   // schema_v64 not run yet) means the normal trial.
   const { data: referral } = await supabase.from("referrals").select("id").eq("referred_id", user.id).maybeSingle();
+
+  // One free trial per athlete (P-02): anyone who has had a subscription
+  // before (canceled, or a failed payment) starts paying right away.
+  const { data: previous } = await supabase
+    .from("athlete_billing")
+    .select("stripe_subscription_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
@@ -40,11 +54,12 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/x-www-form-urlencoded"
     },
     body: stripeForm(checkoutFields({
-      priceId: config.priceId,
+      priceId,
       userId: user.id,
       email: user.email,
       siteUrl: SITE_URL,
-      referred: Boolean(referral)
+      referred: Boolean(referral),
+      hadPlan: Boolean(previous?.stripe_subscription_id)
     }))
   });
 

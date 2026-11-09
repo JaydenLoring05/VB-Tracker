@@ -147,6 +147,58 @@
   line-height: 1.5;
 }
 
+/* Two plans side by side from tablet up (P-02) */
+
+.join-plans {
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+  list-style: none;
+}
+
+.join-plans .join-price-card {
+  max-width: none;
+  border-color: var(--border);
+}
+
+.join-plans .join-plan-featured {
+  border-color: var(--gold);
+}
+
+.join-plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin: 0;
+}
+
+.join-save {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.join-price-was {
+  align-self: center;
+  font-size: var(--fs-lg);
+}
+
+.join-plan-includes {
+  max-width: none;
+}
+
+@media (min-width: 760px) {
+  .join-plans {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Monthly only (annual switched off): one card, not half a grid. */
+  .join-plans-single {
+    grid-template-columns: minmax(0, 440px);
+  }
+}
+
 /* Sign-up */
 
 .join-signup {
