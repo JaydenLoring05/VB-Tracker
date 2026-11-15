@@ -43,11 +43,13 @@ Rules for automated runs:
 | RF-02 | Save the referral code on the account at sign-up, so it survives a confirmation email opened in another browser | new | your idea | S |
 | G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | new | your idea | S |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
-| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
-| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
-| F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
+| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | building | me | M |
+| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | building | coach feedback | L |
+| F-24 | A day built from more than one program (lifts plus accessory work) | building | me | M |
 | F-19 | Supersets in coach-built programs | planned | coach feedback | M |
-| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
+| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | building | me | M |
+| F-28 | Weight targets as a percent of each athlete's estimated max | building | coach feedback | M |
+| B-10 | Continue Workout reopens the workout in progress, on the exercise reached | building | bug | S |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height); vertical and approach touch are covered by G-04 | new | me | M |
@@ -330,6 +332,12 @@ Rules for automated runs:
   (falling back to `created_at` when there is none) gives every pilot a fair
   30 days of real use before the "Continue for $29/month" banner. Keep the
   same date in the Notion Teams table's Pilot start.
+
+- **F-28 and B-10 had open PRs but no row on `main`** (added 2026-11-15).
+  F-28 is #83: a coach sets "@ 75% max" on an exercise and each athlete
+  sees their own weight from an Epley estimate of their max. B-10 is #74:
+  Jayden reported "when I leave a workout and push Continue it rarely
+  saves"; the sets were saved, but Continue started a new session.
 
 ### Athlete experience
 

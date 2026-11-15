@@ -1,59 +1,56 @@
 # Tasks
 
-Refreshed on Thursday 8 October 2026. Everything through #61 is merged, along
-with B-03 (#67). Five pull requests are open and all of them pass their
-checks. The launch steps (database, accounts, dry run) are in
-[docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md).
+Refreshed on Sunday 15 November 2026. Everything through #125 is merged.
+This week #121 (landing page, P-01), #122 (film removed), #124 (athlete
+plan, P-02) and #125 (docs) were merged. The launch steps (database,
+accounts, dry run) are in [docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md).
 
 ## Open pull requests
 
-They can be merged in any order. None of them conflicts with another.
-The order below is the suggested one.
+### Ready to review
 
-| Order | PR | What | Needs SQL | Waiting on |
-| --- | --- | --- | --- | --- |
-| 1 | #66 | B-04: the browser test no longer fails on rest days | No | Your merge |
-| 2 | #62 | B-02: film hotkeys work while the YouTube player is still loading | No | Your merge |
-| 3 | #65 | B-05: the daily coach summary email fails with `text = date` | **Yes**, `schema_v54_daily_summary_date_fix.sql` | You to run the SQL, then merge |
-| 4 | #63 | F-01: film stats from tags (passing average, set distribution, block outcomes) | No | You to try the preview, then merge. Questions for you are in the PR description |
-| 5 | This PR | Housekeeping: this file and two new backlog rows | No | Your merge |
+| PR | What | Needs SQL | Merges into `main` |
+| --- | --- | --- | --- |
+| #126 | P-03: athlete onboarding quiz (years lifting, equipment, two goals, season, practice days) | **Yes**, `schema_v66_onboarding_quiz.sql` | Clean |
+| This PR | Housekeeping: this file; F-17, F-22, F-23, F-24 to `building`; rows for F-28 and B-10 | No | Clean |
+| #87 | F-24 part 1: add a day from another program in the plan builder | No | Clean |
 
-#62 carries #66's change and #63 carries both, because they edit the same
-browser test. SUGGESTIONS.md is edited only by this PR, which marks B-02,
-B-04, B-05 and F-01 `building`. The weekly update moves each one to Shipped
-once its PR is merged.
+### Conflict with `main` (need a rebase or a rebuild)
 
-The bug-fix PRs were not merged automatically on 8 October: the session
-that updated them was not allowed to merge. They are ready when you are.
+| PR | What | Needs SQL |
+| --- | --- | --- |
+| #101 | F-22: a coach's own exercises in the Exercise Library | **Yes**, `schema_v59_team_exercises.sql` |
+| #75 | F-23: sections in a day, with a warm-up written once (carries #73) | No |
+| #76, #77, #78 | F-17 parts 1-3: paste a plan, upload a file, a Google Sheets link (stacked on #75) | No |
+| #83 | F-28: weight targets as a percent of max | No |
+| #74 | B-10: Continue Workout reopens the workout in progress | No |
+
+### Can be closed (already shipped or replaced)
+
+- #73: F-16 shipped in #81, and #75 carries it.
+- #72, #88, #102, #105: old housekeeping, replaced by later ones.
+- #123: last week's housekeeping. It now conflicts with `main`, and this
+  PR carries its changes.
+- #86: docs only. It asks for `schema_v55_push_reminders.sql` to be run,
+  which the launch checklist already covers.
 
 ## Needs you
 
-Not checked against the live project. Tick these off as you confirm them.
-
-- [ ] Merge #66 and #62 (neither needs SQL).
-- [ ] Run `supabase/schema_v54_daily_summary_date_fix.sql` in the Supabase
-      SQL Editor, then merge #65. Until the SQL is run the morning coach
-      email fails every day at 13:00 UTC. It has failed every day since
-      4 October.
-- [ ] Open the #63 preview at `/demo` → Film room → Stats, then merge #63.
-- [ ] Mark the next rows `planned` in SUGGESTIONS.md. After F-01 no row is
-      `planned`, so Sunday's update builds nothing until one is. Worth a
-      look first with a pilot team starting: F-12 (pilot clock starts at
-      the first athlete workout), F-15 (three-tap sets record the zone) and
-      F-04 (per-athlete overview page).
-- [ ] F-06 (solo plan): you set the week of 5 October to revisit it before
-      marking it `planned`.
-- [ ] Confirm `schema_v49` to `schema_v53` were run in the Supabase SQL
-      Editor (check queries are in the launch checklist). v53 came with
-      F-02 (#58); without it three-tap film tags don't save.
-- [ ] Email setup: Resend domain, Supabase SMTP through Resend, `RESEND_API_KEY`,
-      `DAILY_SUMMARY_FROM`, `CRON_SECRET` (Vercel and GitHub), and the
-      secret's hash in `private.cron_secrets`.
-- [ ] `NEXT_PUBLIC_SENTRY_DSN` and `NEXT_PUBLIC_ANALYTICS_ENABLED`.
-- [ ] `NEXT_PUBLIC_PAYMENT_LINK`.
-- [ ] Optional: Google sign-in (#34's steps).
-- [ ] Have the under-18 wording checked (#49). This is not legal advice.
-- [ ] Do the dry run in the launch checklist with one coach and three athletes.
+- [ ] Review #126 (P-03). Run `schema_v66_onboarding_quiz.sql`, then merge.
+      It has three questions for you in the description.
+- [ ] Merge this PR, then #87, if you're happy with them.
+- [ ] Decide on the plan builder stack: should next Sunday's run rebuild
+      F-23 (#75) on current `main`? F-17 (#76 to #78) and F-19 (supersets)
+      depend on it. If yes, close #75 to #78 and say so in the F-23 row.
+- [ ] Close the PRs listed under "Can be closed".
+- [ ] Confirm that the SQL files up to `schema_v65` were run in the Supabase
+      SQL Editor. The check queries are in the launch checklist.
+- [ ] P-04 and P-05 are size L, so the weekly update won't start them.
+      Next Sunday's run splits P-04 into smaller rows and builds nothing
+      from it. If you'd rather split them yourself, do it before then.
+- [ ] Email setup (Resend, `CRON_SECRET`), Sentry and analytics flags, and
+      the under-13 consent wording check. These are unchanged; the details
+      are in the launch checklist.
 
 ## Next up
 
@@ -62,7 +59,6 @@ rows; the daily bug check fixes at most one bug a day.
 
 | Row | Size | Status | What it needs |
 | --- | --- | --- | --- |
-| F-12 Pilot clock starts at the first athlete workout | S | `new` | You to mark it `planned` |
-| F-15 Three-tap sets record the zone | S | `new` | You to mark it `planned`; builds on F-01 |
-| F-04 Per-athlete overview page for coaches | M | `new` | You to mark it `planned`; builds on F-01 |
-| F-05 Jump tracking over time | M | `new` | You to mark it `planned`; needs SQL when built |
+| P-04 Season- and practice-adaptive plan | L | `planned` | Split into smaller rows first; uses P-03's season answers |
+| P-05 Test days (jump, broad jump, sprint, pro-agility, Max Day) | L | `planned` | Split into smaller rows first |
+| P-06 Free read-only parent and coach viewer | M | `planned` | Nothing, it's ready to build. It also covers P-03's under-13 parent viewer |
