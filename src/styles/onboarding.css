@@ -74,3 +74,14 @@
 .onboarding-solo p {
   margin: 0 0 10px;
 }
+
+/* Back and Continue on the athlete quiz steps (P-03). */
+.onboarding-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.onboarding-actions button[type="submit"] {
+  flex: 1;
+}

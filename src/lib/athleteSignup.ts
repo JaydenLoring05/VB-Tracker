@@ -25,10 +25,13 @@ export const SPORTS: { value: Sport; label: string }[] = [
   { value: "other", label: "Other" }
 ];
 
-export type AthleteGoal = "jump" | "strength" | "healthy";
+export type AthleteGoal = "jump" | "speed" | "power" | "strength" | "healthy";
 
+// Speed and power added by the onboarding quiz (P-03).
 export const ATHLETE_GOALS: { value: AthleteGoal; label: string }[] = [
   { value: "jump", label: "Jump higher" },
+  { value: "speed", label: "Get faster" },
+  { value: "power", label: "Hit harder" },
   { value: "strength", label: "Get stronger" },
   { value: "healthy", label: "Stay healthy" }
 ];
