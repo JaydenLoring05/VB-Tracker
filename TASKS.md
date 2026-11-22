@@ -66,3 +66,17 @@ rows; the daily bug check fixes at most one bug a day.
 | F-15 Three-tap sets record the zone | S | `new` | You to mark it `planned`; builds on F-01 |
 | F-04 Per-athlete overview page for coaches | M | `new` | You to mark it `planned`; builds on F-01 |
 | F-05 Jump tracking over time | M | `new` | You to mark it `planned`; needs SQL when built |
+
+## Later
+
+Demoted on 22 November 2026 (Jayden approved, #36 B). They are `new` in
+SUGGESTIONS.md and sit at the bottom of the backlog, so the weekly update
+skips them until Jayden marks them `planned` again.
+
+| Row | Size | Status | What it needs |
+| --- | --- | --- | --- |
+| F-17 Bring in a plan a coach already has | L | `new` | You to mark it `planned`; split before building |
+| F-19 Supersets in coach-built programs | M | `new` | You to mark it `planned`; builds on F-23 |
+| F-22 A coach's own exercises in the Exercise Library | M | `new` | You to mark it `planned`; needs SQL |
+| F-23 Sections in a day, starting with a warm-up | M | `new` | You to mark it `planned`; F-19, F-24 and F-26 build on it |
+| F-24 A day built from more than one program | M | `new` | You to mark it `planned`; builds on F-23 |

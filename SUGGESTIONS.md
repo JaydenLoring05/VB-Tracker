@@ -43,11 +43,6 @@ Rules for automated runs:
 | RF-02 | Save the referral code on the account at sign-up, so it survives a confirmation email opened in another browser | building | your idea | S |
 | G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | new | your idea | S |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
-| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
-| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
-| F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
-| F-19 | Supersets in coach-built programs | planned | coach feedback | M |
-| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height); vertical and approach touch are covered by G-04 | new | me | M |
@@ -66,6 +61,11 @@ Rules for automated runs:
 | R-06 | README setup steps leave out `schema_v53` | new | your idea | S |
 | A-01 | Split `TrackerContext.tsx` into smaller providers | new | your idea | L |
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
+| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | new | me | M |
+| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | new | coach feedback | L |
+| F-24 | A day built from more than one program (lifts plus accessory work) | new | me | M |
+| F-19 | Supersets in coach-built programs | new | coach feedback | M |
+| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | new | me | M |
 
 ## Details
 
