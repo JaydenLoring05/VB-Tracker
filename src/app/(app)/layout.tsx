@@ -27,13 +27,21 @@ export default async function AppLayout({
   }
 
   const billingEnabled = readBillingConfig(process.env) !== null;
-  const [{ data: profile }, membership, billing] = await Promise.all([
+  const [{ data: profile }, membership, billing, finished] = await Promise.all([
     supabase.from("profiles").select("display_name").eq("user_id", user.id).maybeSingle(),
     billingEnabled
       ? supabase.from("team_members").select("team_id").eq("user_id", user.id).limit(1)
       : Promise.resolve(null),
     billingEnabled
       ? supabase.from("athlete_billing").select("status").eq("user_id", user.id).maybeSingle()
+      : Promise.resolve(null),
+    // The first workout is free: count finished ones so the paywall waits for workout 2.
+    billingEnabled
+      ? supabase
+          .from("workout_sessions")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .not("ended_at", "is", null)
       : Promise.resolve(null)
   ]);
 
@@ -43,6 +51,8 @@ export default async function AppLayout({
     billingEnabled,
     onTeam: (membership?.data?.length ?? 0) > 0,
     status,
+    // A failed count counts as zero finished: the first workout stays open rather than locking.
+    finishedWorkouts: finished?.count ?? 0,
     billingLoadFailed: Boolean(membership?.error || billing?.error)
   });
 

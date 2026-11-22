@@ -2,7 +2,21 @@ import { describe, expect, it } from "vitest";
 
 import { isOpenWithoutPlan, needsPlan, paywallMessage } from "@/lib/access";
 
-const solo = { billingEnabled: true, onTeam: false, billingLoadFailed: false };
+// Past the free first workout unless a test says otherwise.
+const solo = { billingEnabled: true, onTeam: false, billingLoadFailed: false, finishedWorkouts: 1 };
+
+describe("first workout free (Phase 1 #2)", () => {
+  it("stays open until the first workout is finished, then asks for the trial", () => {
+    expect(needsPlan({ ...solo, status: null, finishedWorkouts: 0 })).toBe(false);
+    expect(needsPlan({ ...solo, status: "none", finishedWorkouts: 0 })).toBe(false);
+    expect(needsPlan({ ...solo, status: null, finishedWorkouts: 1 })).toBe(true);
+    expect(needsPlan({ ...solo, status: "none", finishedWorkouts: 3 })).toBe(true);
+  });
+  it("never opens the door for canceled or past-due athletes", () => {
+    expect(needsPlan({ ...solo, status: "canceled", finishedWorkouts: 0 })).toBe(true);
+    expect(needsPlan({ ...solo, status: "past_due", finishedWorkouts: 0 })).toBe(true);
+  });
+});
 
 describe("needsPlan (P-02)", () => {
   it("locks a solo athlete with no plan, a canceled plan or a failed payment", () => {
