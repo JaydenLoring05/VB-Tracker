@@ -49,6 +49,20 @@ export function useWeeklyChallenge(): WeeklyChallengeState {
   const [reloadKey, setReloadKey] = useState(0);
   const metric = challenge?.metric ?? null;
 
+  // G-07: tell the database this athlete's time zone, so their week runs in it
+  // (schema_v66). Best effort: before v66 runs the column is missing and this fails quietly.
+  useEffect(() => {
+    if (demo || !userId) return;
+    let zone = "";
+    try {
+      zone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
+    } catch {
+      return;
+    }
+    if (!zone || zone.length > 64) return;
+    supabase.from("profiles").update({ time_zone: zone }).eq("user_id", userId).then(() => undefined);
+  }, [demo, userId, supabase]);
+
   useEffect(() => {
     if (demo || !userId || !metric) return;
     let cancelled = false;

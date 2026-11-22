@@ -41,7 +41,7 @@ Rules for automated runs:
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
 | RF-02 | Save the referral code on the account at sign-up, so it survives a confirmation email opened in another browser | building | your idea | S |
-| G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | new | your idea | S |
+| G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | building | your idea | S |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
