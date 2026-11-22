@@ -8,8 +8,9 @@ import { isDeadSessionError } from "@/lib/authErrors";
 const AUTH_PAGES = ["/", "/login"];
 // Reachable without a session, and never bounced for a signed-in user: the pilot
 // application page, legal pages, and the email-link callback (a signed-in user
-// opening a password reset or confirmation link must still be able to finish it).
-const ALWAYS_PUBLIC = ["/pilot", "/join", "/privacy", "/terms", "/auth/callback", "/unsubscribe"];
+// opening a password reset or confirmation link must still be able to finish it),
+// and the read-only viewer page a parent or coach opens from an athlete's link (P-06).
+const ALWAYS_PUBLIC = ["/pilot", "/join", "/privacy", "/terms", "/auth/callback", "/unsubscribe", "/view"];
 
 function clearSupabaseCookies(request: NextRequest, response: NextResponse) {
   request.cookies

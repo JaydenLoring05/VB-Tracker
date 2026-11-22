@@ -1,0 +1,73 @@
+/* /view: the read-only page a parent or coach opens from an athlete's link (P-06). */
+.viewer-card {
+  max-width: 560px;
+}
+
+.viewer-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: var(--sp-5) 0;
+}
+
+.viewer-stats div {
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+}
+
+.viewer-stats dt {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.viewer-stats dd {
+  margin: var(--sp-1) 0 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.viewer-of {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.viewer-heading {
+  margin: 0 0 var(--sp-2);
+  font-size: 1.05rem;
+}
+
+.viewer-workouts {
+  display: grid;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.viewer-workouts li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.viewer-footer {
+  margin-top: var(--sp-5);
+}
+
+.viewer-retry {
+  width: 100%;
+  min-height: 48px;
+  margin-top: var(--sp-4);
+}
+
+@media (max-width: 380px) {
+  .viewer-stats {
+    grid-template-columns: 1fr;
+  }
+}
