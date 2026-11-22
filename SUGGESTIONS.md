@@ -37,7 +37,7 @@ Rules for automated runs:
 | P-06 | Free read-only parent and coach viewer, invited by link or email | planned | me | M |
 | P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
 | P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | planned | me | S |
-| B-09 | "Save Stats Entry" on Stats counts as today's check-in and copies the last check-in's sleep and soreness into today | new | bug | S |
+| B-09 | "Save Stats Entry" on Stats counts as today's check-in and copies the last check-in's sleep and soreness into today | building | bug | S |
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
 | RF-02 | Save the referral code on the account at sign-up, so it survives a confirmation email opened in another browser | new | your idea | S |
