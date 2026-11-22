@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isFinalRedeemResult, normalizeReferralCode, REFERRAL_ALPHABET, referralLink } from "@/lib/referral";
+import { codeToRedeem, isFinalRedeemResult, normalizeReferralCode, REFERRAL_ALPHABET, referralLink } from "@/lib/referral";
 
 describe("normalizeReferralCode (RF-01)", () => {
   it("accepts six letters and digits from the code alphabet, any case", () => {
@@ -30,5 +30,18 @@ describe("isFinalRedeemResult", () => {
     for (const result of ["ok", "invalid", "self", "already", "too_old"]) expect(isFinalRedeemResult(result)).toBe(true);
     expect(isFinalRedeemResult(null)).toBe(false);
     expect(isFinalRedeemResult("maybe")).toBe(false);
+  });
+});
+
+describe("codeToRedeem (RF-02)", () => {
+  it("prefers the code stored in this browser", () => {
+    expect(codeToRedeem("abc234", { pending_referral: "ZZZ999" })).toBe("ABC234");
+  });
+  it("falls back to the code saved on the account", () => {
+    expect(codeToRedeem(null, { pending_referral: "abc234" })).toBe("ABC234");
+  });
+  it("is null when neither is a valid code", () => {
+    expect(codeToRedeem("bad", { pending_referral: 5 })).toBeNull();
+    expect(codeToRedeem(null, null)).toBeNull();
   });
 });

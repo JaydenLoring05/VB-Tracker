@@ -22,6 +22,19 @@ export function normalizeReferralCode(input: string | null | undefined): string 
   return [...code].every((char) => REFERRAL_ALPHABET.includes(char)) ? code : null;
 }
 
+/**
+ * The code to redeem: the one stored in this browser, else the one saved on
+ * the account at sign-up (RF-02), which survives a confirmation email opened
+ * in another browser.
+ */
+export function codeToRedeem(
+  stored: string | null | undefined,
+  metadata: Record<string, unknown> | null | undefined
+): string | null {
+  const fromMeta = metadata?.pending_referral;
+  return normalizeReferralCode(stored) ?? normalizeReferralCode(typeof fromMeta === "string" ? fromMeta : null);
+}
+
 export function referralLink(code: string): string {
   return `${SITE_URL}/join?ref=${encodeURIComponent(code)}`;
 }

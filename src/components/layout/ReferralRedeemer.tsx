@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 import { useSupabase } from "@/hooks/useSupabase";
-import { isFinalRedeemResult, normalizeReferralCode, REFERRAL_KEY } from "@/lib/referral";
+import { codeToRedeem, isFinalRedeemResult, REFERRAL_KEY } from "@/lib/referral";
 
 /**
  * After sign-up, links the new account to the friend whose code brought them
@@ -16,19 +16,26 @@ export function ReferralRedeemer() {
   useEffect(() => {
     let stored: string | null = null;
     try {
-      stored = normalizeReferralCode(window.localStorage.getItem(REFERRAL_KEY));
+      stored = window.localStorage.getItem(REFERRAL_KEY);
     } catch {
-      return;
+      // Storage blocked: the code on the account may still be there.
     }
-    if (!stored) return;
-    supabase.rpc("redeem_referral", { p_code: stored }).then(({ data, error }) => {
-      // Network trouble or schema_v64 missing: keep the code and try next time.
-      if (error || !isFinalRedeemResult(data)) return;
-      try {
-        window.localStorage.removeItem(REFERRAL_KEY);
-      } catch {
-        // Nothing to clear.
-      }
+    supabase.auth.getUser().then(({ data }) => {
+      const code = codeToRedeem(stored, data.user?.user_metadata);
+      if (!code) return;
+      supabase.rpc("redeem_referral", { p_code: code }).then(({ data: result, error }) => {
+        // Network trouble or schema_v64 missing: keep the code and try next time.
+        if (error || !isFinalRedeemResult(result)) return;
+        try {
+          window.localStorage.removeItem(REFERRAL_KEY);
+        } catch {
+          // Nothing to clear.
+        }
+        // Drop the code from the account too, so it isn't tried again.
+        if (data.user?.user_metadata?.pending_referral) {
+          supabase.auth.updateUser({ data: { pending_referral: null } });
+        }
+      });
     });
   }, [supabase]);
 
