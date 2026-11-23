@@ -56,7 +56,7 @@ describe("isJumpPR", () => {
 describe("earnedBadges (G-03)", () => {
   it("has every badge Jayden asked for, plus Recruiter for referrals (RF-01)", () => {
     expect(BADGES.map((badge) => badge.id).sort()).toEqual(
-      ["first-workout", "jump-pr", "perfect-week", "recruiter", "streak-30", "streak-7", "workouts-50"].sort()
+      ["first-workout", "jump-pr", "perfect-week", "recruiter", "streak-30", "streak-7", "workouts-10", "workouts-50"].sort()
     );
   });
 
@@ -73,11 +73,16 @@ describe("earnedBadges (G-03)", () => {
     expect(earnedBadges({ workoutDates: ["2026-11-02"], prs: [], trainingDaysPerWeek: 5 })).toEqual(["first-workout"]);
   });
 
+  it("gives Ten Deep at 10 workouts, not at 9 (P-08)", () => {
+    expect(earnedBadges({ workoutDates: run("2026-11-01", 9), prs: [], trainingDaysPerWeek: 7 })).not.toContain("workouts-10");
+    expect(earnedBadges({ workoutDates: run("2026-11-01", 10), prs: [], trainingDaysPerWeek: 7 })).toContain("workouts-10");
+  });
+
   it("gives streak, perfect week, jump PR and 50 workouts badges", () => {
     const dates = [...run("2026-09-01", 30), ...run("2026-10-05", 20)];
     expect(
       earnedBadges({ workoutDates: dates, prs: [{ exercise: "Vertical Jump", unit: "in" }], trainingDaysPerWeek: 6 })
-    ).toEqual(["first-workout", "streak-7", "perfect-week", "jump-pr", "streak-30", "workouts-50"]);
+    ).toEqual(["first-workout", "workouts-10", "streak-7", "perfect-week", "jump-pr", "streak-30", "workouts-50"]);
   });
 });
 
