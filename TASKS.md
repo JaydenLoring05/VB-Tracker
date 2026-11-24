@@ -1,40 +1,66 @@
 # Tasks
 
-Refreshed on Sunday 22 November 2026 to match `main`. The launch steps
+Refreshed on Sunday 22 November 2026 by the weekly update. The launch steps
 (database, accounts, dry run) are in
 [docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md).
 
 Merged since 15 November: #128 (B-09), #129 (RF-02), #131 and #132
 (Phase 1 #5 and #3). Stripe checkout checked by Jayden on 22 November: the
-live Checkout session loads (no payment made).
+live Checkout session loads (no payment made). #138 (docs) merged.
 
 ## Open pull requests
 
-| PR | What | Needs SQL | Waiting on |
-| --- | --- | --- | --- |
-| #134 | Phase 1 #2: first workout free, card at workout 2 | No | Your review and merge |
-| #133 | Phase 1 #4: solo-first onboarding, team code optional | No | Your review and merge |
-| #126 | P-03: onboarding quiz | **Yes**, `schema_v66_onboarding_quiz.sql` | Run the SQL, then merge |
-| #135 | Phase 1 #1: Week 1 preview at the end of onboarding | No | Merge after #126 (both edit onboarding) |
-| #130 | G-07: challenge weeks in the athlete's time zone | **Yes**, `schema_v66_challenge_time_zone.sql` | Run the SQL, then merge |
-| #136 | P-06: read-only viewer link for a parent or coach | **Yes**, `schema_v67_viewer_links.sql` | Run the SQL, then merge |
-| This PR | Docs: B-09 and RF-02 to Shipped; F-17, F-19, F-22, F-23, F-24 to Later | No | Your merge |
+### Ready now (merge cleanly into `main`)
 
-#137 (weekly housekeeping) also edits these two files and marks F-17, F-22,
-F-23 and F-24 `building`. That goes against the demotion below, so merge
-this PR and close #137, or rebase #137 onto this one.
+| Order | PR | What | Needs SQL | Waiting on |
+| --- | --- | --- | --- | --- |
+| 1 | #134 | Phase 1 #2: first workout free, card at workout 2 | No | Your review and merge |
+| 2 | #133 | Phase 1 #4: solo-first onboarding copy, team code optional | No | Your review and merge |
+| 3 | #126 | P-03: onboarding quiz | **Yes**, `schema_v66_onboarding_quiz.sql` | Run the SQL, then merge. Three questions in the PR |
+| 4 | #135 | Phase 1 #1: Week 1 preview at the end of onboarding | No | Merge after #126: they both edit onboarding and conflict, so rebase whichever goes second |
+| 5 | #130 | G-07: challenge weeks in the athlete's time zone | **Yes**, `schema_v66_challenge_time_zone.sql` | Run the SQL, then merge |
+| 6 | #136 | P-06: read-only viewer link for a parent or coach | **Yes**, `schema_v67_viewer_links.sql` | Run the SQL, then merge. Four questions in the PR |
+| 7 | This PR | Housekeeping: this file and SUGGESTIONS.md | No | Your merge |
 
-The older feature PRs for the demoted rows (#75 F-23, #76 to #78 F-17,
-#87 F-24, #101 F-22) stay open but parked until those rows are `planned`
-again.
+Two files are numbered v66 (#126 and #130). They don't touch the same
+tables, so run both in either order; the numbers only look odd.
+
+If #130 merges after this PR, it conflicts on one line of SUGGESTIONS.md
+(the G-07 row). This PR already marks G-07 `building`; keep that line.
+
+### Need a rebase first (conflict with `main`)
+
+These are five to six weeks old and no longer merge cleanly. Each needs the
+weekly update or you to rebase it before review.
+
+| PR | Row | What |
+| --- | --- | --- |
+| #75 | F-23 (parked) | Sections in a day, warm-up written once |
+| #76, #77, #78 | F-17 (parked) | Bring in a plan by paste, file, or Google Sheets link |
+| #83 | F-28 | Weight targets as a percent of each athlete's max |
+| #101 | F-22 (parked) | A coach's own exercises in the library (needs `schema_v59_team_exercises.sql`) |
+| #74 | B-10 | Continue Workout reopens the workout in progress |
+
+### Can be closed
+
+- #73 (F-16): shipped in #81.
+- #72, #86, #88, #102, #105, #123, #127: older weekly housekeeping PRs.
+  This PR carries what they still had (the F-28 and B-10 rows). #127's
+  F-17, F-22, F-23 and F-24 `building` marks were dropped: those rows are
+  demoted to Later (#138).
 
 ## Needs you
 
 - [ ] Run `schema_v66_onboarding_quiz.sql`, `schema_v66_challenge_time_zone.sql`
       and `schema_v67_viewer_links.sql` in the Supabase SQL Editor before
       merging #126, #130 and #136.
-- [ ] Launch checklist items still open: email setup (Resend,
-      `CRON_SECRET`), `NEXT_PUBLIC_SENTRY_DSN`,
+- [ ] Mark the P-04 and P-05 parts `planned` (P-04a to P-04d, P-05a to
+      P-05c). P-04 and P-05 are size L, so they were split and nothing was
+      built from them.
+- [ ] Decide on the old conflicting PRs above: rebase or close.
+- [ ] Answer the questions in #126 and #136.
+- [ ] Earlier items still open from the launch checklist: email setup
+      (Resend, `CRON_SECRET`), `NEXT_PUBLIC_SENTRY_DSN`,
       `NEXT_PUBLIC_ANALYTICS_ENABLED`, the under-13 wording check, and the
       dry run with one coach and three athletes.
 
@@ -45,16 +71,17 @@ rows that have no open PR; the daily bug check fixes at most one bug a day.
 
 | Row | Size | Status | What it needs |
 | --- | --- | --- | --- |
-| P-04 Season- and practice-adaptive plan | L | `planned` | Split before building |
-| P-05 Test days | L | `planned` | Split before building |
 | P-07 Public athletic resume, highlight video link, PDF export | M | `planned` | Next weekly update builds it |
-| P-08 10-session and test-day badges, retest-day push reminders | S | `planned` | After P-07 |
+| P-08 10-session and test-day badges, retest-day push reminders | S | `planned` | The update after P-07 (two rows are built only when the first is size S) |
+| P-04a to P-05c | S-M | `new` | You to mark them `planned` |
 
 ## Later
 
-Demoted on 22 November 2026 (Jayden approved, #36 B). They are `new` in
-SUGGESTIONS.md and sit at the bottom of the backlog, so the weekly update
-skips them until Jayden marks them `planned` again.
+Demoted on 22 November 2026 (Jayden approved, #36 B; merged in #138). They
+are `new` in SUGGESTIONS.md and sit at the bottom of the backlog, so the
+weekly update skips them until Jayden marks them `planned` again. Their old
+feature PRs (#75 F-23, #76 to #78 F-17, #87 F-24, #101 F-22) stay open but
+parked.
 
 | Row | Size | Status | What it needs |
 | --- | --- | --- | --- |
