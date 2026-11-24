@@ -31,10 +31,10 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 | building | me | M |
+| P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 (code merged in #126; needs `schema_v66_onboarding_quiz.sql` confirmed run) | building | me | M |
 | P-04 | Season- and practice-adaptive plan: season phases, practice intensity, match-day rules, double progression with "last time → today's target", weekly coach note | planned | me | L |
 | P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
-| P-06 | Free read-only parent and coach viewer, invited by link or email (needs SQL) | building | me | M |
+| P-06 | Free read-only parent and coach viewer, invited by link or email (code merged in #136; needs `schema_v67_viewer_links.sql` confirmed run) | building | me | M |
 | P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
 | P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | planned | me | S |
 | P-04a | Season phase changes the plan: off-season, preseason and in-season volume and intensity (uses P-03's saved phase) | new | me | M |
@@ -49,7 +49,7 @@ Rules for automated runs:
 | PH1-4 | Solo-first onboarding copy, team code optional; Topbar drops readiness and team | building | me | S |
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
-| G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | building | your idea | S |
+| G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC (code merged in #130; needs `schema_v66_challenge_time_zone.sql` confirmed run) | building | your idea | S |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-28 | Weight targets as a percent of each athlete's estimated max | building | coach feedback | M |
 | B-10 | Continue Workout reopens the workout in progress, on the exercise reached | building | bug | S |

@@ -8,6 +8,22 @@ Merged since 15 November: #128 (B-09), #129 (RF-02), #131 and #132
 (Phase 1 #5 and #3). Stripe checkout checked by Jayden on 22 November: the
 live Checkout session loads (no payment made). #138 (docs) merged.
 
+## Merged in code, schema not verified (24 Nov 2026)
+
+#126 (P-03), #130 (G-07) and #136 (P-06) show **merged** on GitHub
+(24 Nov, 05:06 to 05:12 UTC, merged by the repo owner account). A merged PR
+does not prove the SQL ran. Until someone checks the database, treat these as
+**code merged, schema pending**, not live:
+
+| Feature | Needs in the database | Evidence it exists |
+| --- | --- | --- |
+| P-03 quiz | `profiles.years_lifting`, `equipment`, `season_phase` | None yet |
+| G-07 time zone | `profiles.time_zone`, `athlete_time_zone()` | None yet |
+| P-06 viewer link | `viewer_links` table | None yet |
+
+The "Needs you" SQL item below stays open until Jayden confirms or the tables
+are seen in the Supabase table list.
+
 ## Open pull requests
 
 ### Ready now (merge cleanly into `main`)
@@ -16,10 +32,10 @@ live Checkout session loads (no payment made). #138 (docs) merged.
 | --- | --- | --- | --- | --- |
 | 1 | #134 | Phase 1 #2: first workout free, card at workout 2 | No | Your review and merge |
 | 2 | #133 | Phase 1 #4: solo-first onboarding copy, team code optional | No | Your review and merge |
-| 3 | #126 | P-03: onboarding quiz | **Yes**, `schema_v66_onboarding_quiz.sql` | Run the SQL, then merge. Three questions in the PR |
+| 3 | #126 | P-03: onboarding quiz | **Yes**, `schema_v66_onboarding_quiz.sql` | **Code merged 24 Nov (GitHub).** Schema not verified: confirm the SQL ran. Three questions in the PR |
 | 4 | #135 | Phase 1 #1: Week 1 preview at the end of onboarding | No | Merge after #126: they both edit onboarding and conflict, so rebase whichever goes second |
-| 5 | #130 | G-07: challenge weeks in the athlete's time zone | **Yes**, `schema_v66_challenge_time_zone.sql` | Run the SQL, then merge |
-| 6 | #136 | P-06: read-only viewer link for a parent or coach | **Yes**, `schema_v67_viewer_links.sql` | Run the SQL, then merge. Four questions in the PR |
+| 5 | #130 | G-07: challenge weeks in the athlete's time zone | **Yes**, `schema_v66_challenge_time_zone.sql` | **Code merged 24 Nov (GitHub).** Schema not verified: confirm the SQL ran |
+| 6 | #136 | P-06: read-only viewer link for a parent or coach | **Yes**, `schema_v67_viewer_links.sql` | **Code merged 24 Nov (GitHub).** Schema not verified: confirm the SQL ran. Four questions in the PR |
 | 7 | This PR | Housekeeping: this file and SUGGESTIONS.md | No | Your merge |
 
 Two files are numbered v66 (#126 and #130). They don't touch the same
