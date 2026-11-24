@@ -8,6 +8,22 @@ Merged since 15 November: #128 (B-09), #129 (RF-02), #131 and #132
 (Phase 1 #5 and #3). Stripe checkout checked by Jayden on 22 November: the
 live Checkout session loads (no payment made). #138 (docs) merged.
 
+## Merged, schema present (24 Nov 2026)
+
+#126 (P-03), #130 (G-07) and #136 (P-06) are **merged** on GitHub (24 Nov,
+05:06 to 05:12 UTC). Jayden ran `schema_v66_*` and `schema_v67_viewer_links.sql`
+on 24 Nov. What is verified and what is only claimed:
+
+| Feature | In the database | Status |
+| --- | --- | --- |
+| P-03 quiz | `profiles.years_lifting`, `equipment`, `season_phase` | **Seen** by a read-only Supabase check (relayed from ChatGPT, MSG-2026-11-24-016) |
+| G-07 time zone | `profiles.time_zone` seen. `athlete_time_zone()` not checked | Column seen; function **claimed** (Jayden ran the SQL), not seen |
+| P-06 viewer link | `viewer_links` table | **Seen** by the same check, and by Jayden's earlier check |
+
+Not verified: the migration-history listing is empty, so it cannot confirm
+which files ran. The check is by columns and tables only. Which Supabase
+project the deployed app uses has not been matched yet (see PR #141).
+
 ## Open pull requests
 
 ### Ready now (merge cleanly into `main`)
@@ -16,10 +32,10 @@ live Checkout session loads (no payment made). #138 (docs) merged.
 | --- | --- | --- | --- | --- |
 | 1 | #134 | Phase 1 #2: first workout free, card at workout 2 | No | Your review and merge |
 | 2 | #133 | Phase 1 #4: solo-first onboarding copy, team code optional | No | Your review and merge |
-| 3 | #126 | P-03: onboarding quiz | **Yes**, `schema_v66_onboarding_quiz.sql` | Run the SQL, then merge. Three questions in the PR |
+| 3 | #126 | P-03: onboarding quiz | **Yes**, `schema_v66_onboarding_quiz.sql` | **Merged 24 Nov (GitHub).** Schema seen in Supabase (see section above). Three questions in the PR |
 | 4 | #135 | Phase 1 #1: Week 1 preview at the end of onboarding | No | Merge after #126: they both edit onboarding and conflict, so rebase whichever goes second |
-| 5 | #130 | G-07: challenge weeks in the athlete's time zone | **Yes**, `schema_v66_challenge_time_zone.sql` | Run the SQL, then merge |
-| 6 | #136 | P-06: read-only viewer link for a parent or coach | **Yes**, `schema_v67_viewer_links.sql` | Run the SQL, then merge. Four questions in the PR |
+| 5 | #130 | G-07: challenge weeks in the athlete's time zone | **Yes**, `schema_v66_challenge_time_zone.sql` | **Merged 24 Nov (GitHub).** Schema seen in Supabase (see section above) |
+| 6 | #136 | P-06: read-only viewer link for a parent or coach | **Yes**, `schema_v67_viewer_links.sql` | **Merged 24 Nov (GitHub).** Schema seen in Supabase (see section above). Four questions in the PR |
 | 7 | This PR | Housekeeping: this file and SUGGESTIONS.md | No | Your merge |
 
 Two files are numbered v66 (#126 and #130). They don't touch the same
@@ -51,9 +67,8 @@ weekly update or you to rebase it before review.
 
 ## Needs you
 
-- [ ] Run `schema_v66_onboarding_quiz.sql`, `schema_v66_challenge_time_zone.sql`
-      and `schema_v67_viewer_links.sql` in the Supabase SQL Editor before
-      merging #126, #130 and #136.
+- [x] `schema_v66_*` and `schema_v67_viewer_links.sql` ran on 24 Nov
+      (columns and table seen; see "Merged, schema present").
 - [ ] Mark the P-04 and P-05 parts `planned` (P-04a to P-04d, P-05a to
       P-05c). P-04 and P-05 are size L, so they were split and nothing was
       built from them.
