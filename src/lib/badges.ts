@@ -8,6 +8,7 @@ import { isJumpExercise } from "@/lib/exerciseMeasure";
 
 export type BadgeId =
   | "first-workout"
+  | "workouts-10"
   | "streak-7"
   | "streak-30"
   | "jump-pr"
@@ -19,6 +20,7 @@ export type Badge = { id: BadgeId; name: string; description: string; icon: stri
 
 export const BADGES: readonly Badge[] = [
   { id: "first-workout", name: "First Rep", description: "Finish your first workout.", icon: "🏁" },
+  { id: "workouts-10", name: "Ten Deep", description: "Finish 10 workouts.", icon: "💪" },
   { id: "streak-7", name: "On Fire", description: "Train 7 days in a row.", icon: "🔥" },
   { id: "perfect-week", name: "Perfect Week", description: "Do every training day in a week.", icon: "✅" },
   { id: "jump-pr", name: "Sky High", description: "Set a new jump PR.", icon: "🚀" },
@@ -90,6 +92,7 @@ export function earnedBadges({
   const streak = bestStreak(workoutDates);
   const earned = new Set<BadgeId>();
   if (workoutDates.length >= 1) earned.add("first-workout");
+  if (workoutDates.length >= 10) earned.add("workouts-10");
   if (streak >= 7) earned.add("streak-7");
   if (streak >= 30) earned.add("streak-30");
   if (prs.some(isJumpPR)) earned.add("jump-pr");
