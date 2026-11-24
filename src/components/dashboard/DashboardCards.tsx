@@ -58,7 +58,7 @@ export function DashboardCards() {
   usePushTrainingDays(weekDays.filter((day) => !day.rest && day.exercises.length > 0).map((day) => day.day));
   const trainingDays = weekDays.filter((day) => !day.rest && day.exercises.length > 0).length;
   const badges = useBadges(trainingDays, referrals.signups);
-  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession));
+  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession), openSession?.id);
   const isRestDay = cta.isRestDay;
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";
   const phase = getPhase(week);
