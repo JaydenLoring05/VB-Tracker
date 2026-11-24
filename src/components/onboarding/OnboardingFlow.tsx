@@ -13,11 +13,14 @@ import {
   type GuardianAnswer,
   type GuardianFields as AgeFields
 } from "@/lib/guardian";
+import { Week1Card } from "@/components/onboarding/Week1Card";
+import { week1Preview } from "@/lib/week1Preview";
 import { ATHLETE_GOALS, AthleteGoal, SPORTS, Sport, positionLabel } from "@/lib/athleteSignup";
 import { createClient as createGuardianClient } from "@/lib/supabase/client";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
+import type { TrainingProfile } from "@/lib/trainingProfile";
 import { useTeam } from "@/hooks/useTeam";
 import { pendingInviteFrom, PENDING_INVITE_KEY } from "@/lib/invite";
 import { startingProgramKeyForPosition } from "@/lib/positionProgram";
@@ -66,6 +69,7 @@ export function OnboardingFlow() {
   const [trainingLevel, setTrainingLevel] = useState<TrainingLevel>("intermediate");
   const [soreAreas, setSoreAreas] = useState<InjuryArea[]>([]);
   const [solo, setSolo] = useState(false);
+  const [previewProfile, setPreviewProfile] = useState<TrainingProfile | null>(null);
   const [inviteCode, setInviteCode] = useState("");
   // From an invite link (/join/<code>): this browser's saved code, else the
   // one stored on the account at sign-up.
@@ -166,7 +170,9 @@ export function OnboardingFlow() {
       });
     } else {
       const ageFields = guardianResult?.ok ? guardianResult.fields : null;
-      setTrainingProfile({ level: trainingLevel, injuries: soreAreas, ageGroup: ageFields?.age_group ?? null });
+      const answers: TrainingProfile = { level: trainingLevel, injuries: soreAreas, ageGroup: ageFields?.age_group ?? null };
+      setPreviewProfile(answers);
+      setTrainingProfile(answers);
       await updateProfile({
         position: positionLabel(sport, position, otherPosition),
         training_goals: [ATHLETE_GOALS.find((option) => option.value === goal)!.label]
@@ -448,36 +454,39 @@ export function OnboardingFlow() {
 
       {step === 3 && role === "athlete" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleTeamStep}>
-          <h2>Join your team, or train solo</h2>
+          <h2>Train solo, or join a team</h2>
           {pendingInvite && saving && <p className="muted">Joining your team from the invite link…</p>}
-          <label>
-            Invite code from your coach
-            <input
-              value={inviteCode}
-              onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-              placeholder="Invite code"
-              autoCapitalize="characters"
-              autoComplete="off"
-              spellCheck={false}
-              maxLength={6}
-              required
-            />
-          </label>
-          {teamError && (
-            <p className="muted" role="alert">
-              {teamError}
-            </p>
-          )}
-          <button type="submit" disabled={!inviteCode.trim() || saving}>
-            {saving ? "Joining..." : "Join Team"}
-          </button>
 
           <div className="onboarding-solo">
-            <p className="muted">No team or no code? NextRep works on your own: your plan, check-ins and progress.</p>
-            <button type="button" className="secondary" onClick={trainSolo} disabled={saving}>
+            <p className="muted">NextRep works on your own: your plan, check-ins and progress. No team needed.</p>
+            <button type="button" onClick={trainSolo} disabled={saving}>
               Train solo
             </button>
           </div>
+
+          <details className="onboarding-team-code" open={Boolean(pendingInvite)}>
+            <summary>Have a team code? (optional)</summary>
+            <label>
+              Invite code from your coach
+              <input
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                placeholder="Invite code"
+                autoCapitalize="characters"
+                autoComplete="off"
+                spellCheck={false}
+                maxLength={6}
+              />
+            </label>
+            {teamError && (
+              <p className="muted" role="alert">
+                {teamError}
+              </p>
+            )}
+            <button type="submit" className="secondary" disabled={!inviteCode.trim() || saving}>
+              {saving ? "Joining..." : "Join Team"}
+            </button>
+          </details>
         </form>
       )}
 
@@ -491,6 +500,16 @@ export function OnboardingFlow() {
                 ? "Your plan is set up around you. Start today's workout from the dashboard, and join a team any time."
                 : "You're on the roster. Your dashboard is ready."}
           </p>
+          {role === "athlete" && previewProfile && (
+            <Week1Card
+              preview={week1Preview({
+                sport,
+                position,
+                positionLabel: positionLabel(sport, position, otherPosition) ?? position,
+                profile: previewProfile
+              })}
+            />
+          )}
           <button type="button" onClick={finish}>
             Go to {role === "coach" ? "Coach Dashboard" : "Dashboard"}
           </button>

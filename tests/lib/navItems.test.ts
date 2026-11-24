@@ -86,3 +86,11 @@ describe("activePrimaryHref", () => {
     expect(activePrimaryHref(navItemsFor("coach"), "/workouts")).toBeNull();
   });
 });
+
+describe("Start Workout is not duplicated in More (Phase 1 #5)", () => {
+  it.each(["athlete", "coach"] as const)("%s More has no Start Workout; /workout still highlights Today", (role) => {
+    const { more } = navItemsFor(role);
+    expect(more.some((link) => link.label === "Start Workout")).toBe(false);
+    expect(activePrimaryHref(navItemsFor(role), "/workout")).toBe(role === "athlete" ? "/dashboard" : null);
+  });
+});

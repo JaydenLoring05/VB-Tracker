@@ -8,7 +8,6 @@ import {
   GraduationCap,
   Home,
   MessageSquare,
-  Play,
   Settings,
   type LucideIcon
 } from "lucide-react";
@@ -45,7 +44,6 @@ export const NAV_ROUTES = [
   "/feedback"
 ];
 
-const startWorkout: NavLink = { href: "/workout", label: "Start Workout", icon: Play };
 const calendar: NavLink = { href: "/calendar", label: "Calendar", icon: CalendarDays };
 const library: NavLink = { href: "/library", label: "Exercise Library", icon: BookOpen };
 const settings: NavLink = { href: "/settings", label: "Settings", icon: Settings };
@@ -58,7 +56,7 @@ const athleteNav: NavConfig = {
     // Coach-only pages redirect athletes to their own version.
     { href: "/stats", label: "Progress", icon: BarChart3, alsoMatches: ["/team-progress"] }
   ],
-  more: [startWorkout, calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }, settings, feedback]
+  more: [calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }, settings, feedback]
 };
 
 const coachNav: NavConfig = {
@@ -68,9 +66,8 @@ const coachNav: NavConfig = {
     { href: "/team-progress", label: "Progress", icon: BarChart3 }
   ],
   more: [
-    { href: "/dashboard", label: "My Training", icon: Home },
+    { href: "/dashboard", label: "My Training", icon: Home, alsoMatches: ["/workout", "/check-in"] },
     { href: "/workouts", label: "Workouts", icon: Dumbbell },
-    startWorkout,
     calendar,
     { href: "/stats", label: "My Stats", icon: Activity },
     library,
