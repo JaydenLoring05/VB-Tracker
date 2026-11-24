@@ -8,7 +8,7 @@ export function Topbar({ userEmail, displayName: name }: { userEmail: string; di
     <header className="topbar">
       <div>
         <h1>Welcome back, {displayName}</h1>
-        <p>Your training, readiness and team in one place.</p>
+        <p>Your training and progress in one place.</p>
       </div>
 
       <div className="topbar-user">

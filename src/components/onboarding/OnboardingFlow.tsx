@@ -448,36 +448,39 @@ export function OnboardingFlow() {
 
       {step === 3 && role === "athlete" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleTeamStep}>
-          <h2>Join your team, or train solo</h2>
+          <h2>Train solo, or join a team</h2>
           {pendingInvite && saving && <p className="muted">Joining your team from the invite link…</p>}
-          <label>
-            Invite code from your coach
-            <input
-              value={inviteCode}
-              onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-              placeholder="Invite code"
-              autoCapitalize="characters"
-              autoComplete="off"
-              spellCheck={false}
-              maxLength={6}
-              required
-            />
-          </label>
-          {teamError && (
-            <p className="muted" role="alert">
-              {teamError}
-            </p>
-          )}
-          <button type="submit" disabled={!inviteCode.trim() || saving}>
-            {saving ? "Joining..." : "Join Team"}
-          </button>
 
           <div className="onboarding-solo">
-            <p className="muted">No team or no code? NextRep works on your own: your plan, check-ins and progress.</p>
-            <button type="button" className="secondary" onClick={trainSolo} disabled={saving}>
+            <p className="muted">NextRep works on your own: your plan, check-ins and progress. No team needed.</p>
+            <button type="button" onClick={trainSolo} disabled={saving}>
               Train solo
             </button>
           </div>
+
+          <details className="onboarding-team-code" open={Boolean(pendingInvite)}>
+            <summary>Have a team code? (optional)</summary>
+            <label>
+              Invite code from your coach
+              <input
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                placeholder="Invite code"
+                autoCapitalize="characters"
+                autoComplete="off"
+                spellCheck={false}
+                maxLength={6}
+              />
+            </label>
+            {teamError && (
+              <p className="muted" role="alert">
+                {teamError}
+              </p>
+            )}
+            <button type="submit" className="secondary" disabled={!inviteCode.trim() || saving}>
+              {saving ? "Joining..." : "Join Team"}
+            </button>
+          </details>
         </form>
       )}
 
