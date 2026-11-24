@@ -3,8 +3,14 @@ import { describe, expect, it } from "vitest";
 import { ATHLETE_GOALS, positionLabel, SPORTS } from "@/lib/athleteSignup";
 
 describe("athlete sign-up answers (N-03)", () => {
-  it("offers the three goals Jayden asked for", () => {
-    expect(ATHLETE_GOALS.map((goal) => goal.label)).toEqual(["Jump higher", "Get stronger", "Stay healthy"]);
+  it("offers the goals Jayden asked for, with speed and power (P-03)", () => {
+    expect(ATHLETE_GOALS.map((goal) => goal.label)).toEqual([
+      "Jump higher",
+      "Get faster",
+      "Hit harder",
+      "Get stronger",
+      "Stay healthy"
+    ]);
   });
 
   it("lists volleyball first and has an Other choice", () => {

@@ -75,6 +75,17 @@
   margin: 0 0 10px;
 }
 
+/* Back and Continue on the athlete quiz steps (P-03). */
+.onboarding-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.onboarding-actions button[type="submit"] {
+  flex: 1;
+}
+
 .week1-preview { margin: var(--sp-4) 0; text-align: left; }
 .week1-preview h3 { margin: 0 0 var(--sp-1); }
 .week1-days { list-style: none; margin: var(--sp-3) 0 0; padding: 0; display: grid; gap: var(--sp-2); }

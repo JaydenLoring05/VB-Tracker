@@ -116,6 +116,16 @@ Rules for automated runs:
   the coach sees a fresh check-in. Found while building G-04, which saves
   jumps to their own table for this reason. Fix: save only the edited
   fields, and count a check-in only when its wellness fields are filled.
+- **P-03. Onboarding quiz.** Athletes get two more onboarding steps after
+  "Tell us about you": "Your training" (years lifting, which sets the plan
+  level; equipment; a main goal, now including "Get faster" and "Hit
+  harder"; an optional second goal) and "Your season" (off-season,
+  preseason or in season; optional season dates; practice days, which go
+  into the F-38 weekly schedule). Years lifting, equipment and season phase
+  need `schema_v66_onboarding_quiz.sql`. Not yet used by the plan:
+  equipment (F-42 would use it) and season phase (P-04). The parent viewer
+  for under-13 athletes needs P-06; the parent email is already saved by
+  the N-03 consent step, so P-06 can invite that parent.
 - **F-42 and F-43** came from writing /join (L-01): Jayden's copy said
   "no equipment needed for the youth/beginner plans" and "20-40 min a day",
   but the youth and beginner swaps use goblet squats, kettlebell deadlifts

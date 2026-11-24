@@ -16,6 +16,23 @@ import {
 import { Week1Card } from "@/components/onboarding/Week1Card";
 import { week1Preview } from "@/lib/week1Preview";
 import { ATHLETE_GOALS, AthleteGoal, SPORTS, Sport, positionLabel } from "@/lib/athleteSignup";
+import {
+  EQUIPMENT,
+  Equipment,
+  equipmentNote,
+  goalLabels,
+  levelForYearsLifting,
+  onboardingSteps,
+  OnboardingStep,
+  quizToRow,
+  SEASON_PHASES,
+  SeasonPhase,
+  secondaryGoalOptions,
+  validateSeasonDates,
+  weeklyWithPracticeDays,
+  YEARS_LIFTING,
+  YearsLifting
+} from "@/lib/onboardingQuiz";
 import { createClient as createGuardianClient } from "@/lib/supabase/client";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
@@ -24,12 +41,7 @@ import type { TrainingProfile } from "@/lib/trainingProfile";
 import { useTeam } from "@/hooks/useTeam";
 import { pendingInviteFrom, PENDING_INVITE_KEY } from "@/lib/invite";
 import { startingProgramKeyForPosition } from "@/lib/positionProgram";
-import {
-  INJURY_AREAS,
-  InjuryArea,
-  TRAINING_LEVELS,
-  TrainingLevel
-} from "@/lib/trainingProfile";
+import { INJURY_AREAS, InjuryArea, TRAINING_LEVELS, WEEKDAYS, Weekday } from "@/lib/trainingProfile";
 import { createClient } from "@/lib/supabase/client";
 
 type Role = "coach" | "athlete";
@@ -37,16 +49,14 @@ type Role = "coach" | "athlete";
 const POSITIONS = ["Outside Hitter", "Middle Blocker", "Opposite", "Setter", "Libero/DS"];
 const COMPETITIVE_LEVELS = ["Middle School", "JV", "Varsity", "Club", "College"];
 
-const TOTAL_STEPS = 4;
-
 export function OnboardingFlow() {
   const router = useRouter();
   const { updateProfile } = useProfile();
   const { setStartingProgram } = useTrackerContext();
   const { createTeam, joinTeam, error: teamError } = useTeam();
-  const { setProfile: setTrainingProfile } = useTrainingProfile();
+  const { profile: savedTrainingProfile, setProfile: setTrainingProfile } = useTrainingProfile();
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<OnboardingStep>("role");
   const [role, setRole] = useState<Role | null>(null);
 
   const [teamName, setTeamName] = useState("");
@@ -65,9 +75,15 @@ export function OnboardingFlow() {
   const [position, setPosition] = useState(POSITIONS[0]);
   const [otherPosition, setOtherPosition] = useState("");
   const [goal, setGoal] = useState<AthleteGoal>("jump");
-  // Setup quiz (F-06): the plan adapts to these from the first workout.
-  const [trainingLevel, setTrainingLevel] = useState<TrainingLevel>("intermediate");
+  // Setup quiz (F-06, P-03): the plan adapts to these from the first workout.
   const [soreAreas, setSoreAreas] = useState<InjuryArea[]>([]);
+  const [ageFields, setAgeFields] = useState<AgeFields | null>(null);
+  const [yearsLifting, setYearsLifting] = useState<YearsLifting>("1to2");
+  const [equipment, setEquipment] = useState<Equipment>("fullGym");
+  const [secondaryGoal, setSecondaryGoal] = useState<AthleteGoal | null>(null);
+  const [seasonPhase, setSeasonPhase] = useState<SeasonPhase>("offSeason");
+  const [practiceDays, setPracticeDays] = useState<Weekday[]>([]);
+  const [seasonError, setSeasonError] = useState<string | null>(null);
   const [solo, setSolo] = useState(false);
   const [previewProfile, setPreviewProfile] = useState<TrainingProfile | null>(null);
   const [inviteCode, setInviteCode] = useState("");
@@ -111,7 +127,7 @@ export function OnboardingFlow() {
 
   // Athletes who came from an invite link join automatically at the team step.
   useEffect(() => {
-    if (step !== 3 || role !== "athlete" || !pendingInvite || autoJoinTried.current) return;
+    if (step !== "team" || role !== "athlete" || !pendingInvite || autoJoinTried.current) return;
     autoJoinTried.current = true;
     setInviteCode(pendingInvite);
     setSaving(true);
@@ -119,7 +135,7 @@ export function OnboardingFlow() {
       setSaving(false);
       if (ok) {
         await clearPendingInvite();
-        setStep(4);
+        setStep("done");
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,7 +157,7 @@ export function OnboardingFlow() {
 
   function selectRole(next: Role) {
     setRole(next);
-    setStep(2);
+    setStep("details");
   }
 
 
@@ -168,42 +184,81 @@ export function OnboardingFlow() {
         training_days_per_week: trainingDays ? Number(trainingDays) : null,
         athletes_expected: athletesExpected ? Number(athletesExpected) : null
       });
-    } else {
-      const ageFields = guardianResult?.ok ? guardianResult.fields : null;
-      const answers: TrainingProfile = { level: trainingLevel, injuries: soreAreas, ageGroup: ageFields?.age_group ?? null };
-      setPreviewProfile(answers);
-      setTrainingProfile(answers);
-      await updateProfile({
-        position: positionLabel(sport, position, otherPosition),
-        training_goals: [ATHLETE_GOALS.find((option) => option.value === goal)!.label]
-      });
-      // The plan is assigned from the answers: a volleyball position gets its
-      // starting program, every other sport the all-round plan. Saved
-      // separately so a missing column can't block the answers above. A coach
-      // program still replaces it.
-      await setStartingProgram(sport === "volleyball" ? startingProgramKeyForPosition(position) : null);
+      setSaving(false);
+      setStep("team");
+      return;
+    }
+
+    // Athletes answer the quiz (P-03) before anything is saved.
+    setAgeFields(guardianResult?.ok ? guardianResult.fields : null);
+    setSaving(false);
+    setStep("training");
+  }
+
+  function handleTrainingSubmit(event: FormEvent) {
+    event.preventDefault();
+    setStep("season");
+  }
+
+  async function handleSeasonSubmit(event: FormEvent) {
+    event.preventDefault();
+    if (saving) return;
+    const dateError = validateSeasonDates(seasonStart, seasonEnd);
+    if (dateError) {
+      setSeasonError(dateError);
+      return;
+    }
+    setSeasonError(null);
+    setSaving(true);
+
+    const answers: TrainingProfile = {
+      level: levelForYearsLifting(yearsLifting),
+      injuries: soreAreas,
+      ageGroup: ageFields?.age_group ?? null,
+      weekly: weeklyWithPracticeDays(savedTrainingProfile.weekly ?? {}, practiceDays)
+    };
+    setPreviewProfile(answers);
+    setTrainingProfile(answers);
+    await updateProfile({
+      position: positionLabel(sport, position, otherPosition),
+      training_goals: goalLabels(goal, secondaryGoal),
+      season_start: seasonStart || null,
+      season_end: seasonEnd || null
+    });
+    // The plan is assigned from the answers: a volleyball position gets its
+    // starting program, every other sport the all-round plan. Saved
+    // separately so a missing column can't block the answers above. A coach
+    // program still replaces it.
+    await setStartingProgram(sport === "volleyball" ? startingProgramKeyForPosition(position) : null);
+    const { data } = await createGuardianClient().auth.getUser();
+    if (data.user) {
       if (ageFields) {
         // Separate write: before schema_v61 these columns don't exist, and
         // that mustn't block onboarding. The athlete is asked again on Today.
-        const { data } = await createGuardianClient().auth.getUser();
-        if (data.user) {
-          const { error } = await createGuardianClient()
-            .from("profiles")
-            .upsert({ user_id: data.user.id, sport, ...ageFields }, { onConflict: "user_id" });
-          if (error) console.error("Failed to save age and sport", error);
-          else {
-            try {
-              window.localStorage.removeItem(SIGNUP_AGE_KEY);
-            } catch {
-              // Nothing to clear.
-            }
+        const { error } = await createGuardianClient()
+          .from("profiles")
+          .upsert({ user_id: data.user.id, sport, ...ageFields }, { onConflict: "user_id" });
+        if (error) console.error("Failed to save age and sport", error);
+        else {
+          try {
+            window.localStorage.removeItem(SIGNUP_AGE_KEY);
+          } catch {
+            // Nothing to clear.
           }
         }
       }
+      // Separate write too: before schema_v66 these columns don't exist.
+      const { error: quizError } = await createGuardianClient()
+        .from("profiles")
+        .upsert(
+          { user_id: data.user.id, ...quizToRow({ yearsLifting, equipment, seasonPhase }) },
+          { onConflict: "user_id" }
+        );
+      if (quizError) console.error("Failed to save quiz answers", quizError);
     }
 
     setSaving(false);
-    setStep(3);
+    setStep("team");
   }
 
   async function handleTeamStep(event: FormEvent) {
@@ -215,17 +270,28 @@ export function OnboardingFlow() {
 
     setSaving(false);
     if (ok && role === "athlete" && pendingInvite) await clearPendingInvite();
-    if (ok) setStep(4);
+    if (ok) setStep("done");
   }
 
   function trainSolo() {
     setSolo(true);
-    setStep(4);
+    setStep("done");
   }
 
   function toggleSoreArea(area: InjuryArea) {
     setSoreAreas((current) => (current.includes(area) ? current.filter((item) => item !== area) : [...current, area]));
   }
+
+  function pickGoal(next: AthleteGoal) {
+    setGoal(next);
+    if (secondaryGoal === next) setSecondaryGoal(null);
+  }
+
+  function togglePracticeDay(day: Weekday) {
+    setPracticeDays((current) => (current.includes(day) ? current.filter((item) => item !== day) : [...current, day]));
+  }
+
+  const steps = onboardingSteps(role);
 
   function finish() {
     router.push(role === "coach" ? "/coach" : "/dashboard");
@@ -234,10 +300,10 @@ export function OnboardingFlow() {
   return (
     <div className="panel onboarding-flow" ref={flowRef}>
       <p className="muted onboarding-step-indicator">
-        Step {step} of {TOTAL_STEPS}
+        {role ? `Step ${steps.indexOf(step) + 1} of ${steps.length}` : "Step 1"}
       </p>
 
-      {step === 1 && (
+      {step === "role" && (
         <div className="onboarding-step">
           <h2>Welcome! Are you a coach or an athlete?</h2>
           {pendingInvite && (
@@ -257,7 +323,7 @@ export function OnboardingFlow() {
         </div>
       )}
 
-      {step === 2 && role === "coach" && (
+      {step === "details" && role === "coach" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleRoleDetailsSubmit}>
           <h2>Tell us about your team</h2>
 
@@ -309,7 +375,7 @@ export function OnboardingFlow() {
         </form>
       )}
 
-      {step === 2 && role === "athlete" && (
+      {step === "details" && role === "athlete" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleRoleDetailsSubmit}>
           <h2>Tell us about you</h2>
 
@@ -364,42 +430,6 @@ export function OnboardingFlow() {
           )}
 
           <fieldset className="onboarding-quiz">
-            <legend>Level</legend>
-            <div className="filter-row">
-              {TRAINING_LEVELS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={trainingLevel === option.value ? "" : "ghost"}
-                  aria-pressed={trainingLevel === option.value}
-                  title={option.hint}
-                  onClick={() => setTrainingLevel(option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            <p className="muted">{TRAINING_LEVELS.find((option) => option.value === trainingLevel)?.hint}</p>
-          </fieldset>
-
-          <fieldset className="onboarding-quiz">
-            <legend>Main goal</legend>
-            <div className="filter-row">
-              {ATHLETE_GOALS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={goal === option.value ? "" : "ghost"}
-                  aria-pressed={goal === option.value}
-                  onClick={() => setGoal(option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-
-          <fieldset className="onboarding-quiz">
             <legend>Any injuries or sore spots? (optional)</legend>
             <div className="filter-row">
               {INJURY_AREAS.map((option) => (
@@ -429,7 +459,164 @@ export function OnboardingFlow() {
         </form>
       )}
 
-      {step === 3 && role === "coach" && (
+      {step === "training" && role === "athlete" && (
+        <form className="onboarding-step onboarding-form" onSubmit={handleTrainingSubmit}>
+          <h2>Your training</h2>
+
+          <fieldset className="onboarding-quiz">
+            <legend>How long have you been lifting?</legend>
+            <div className="filter-row">
+              {YEARS_LIFTING.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={yearsLifting === option.value ? "" : "ghost"}
+                  aria-pressed={yearsLifting === option.value}
+                  onClick={() => setYearsLifting(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="muted">
+              You&apos;ll start at {TRAINING_LEVELS.find((option) => option.value === levelForYearsLifting(yearsLifting))?.label}{" "}
+              level. Change it any time on Workouts.
+            </p>
+          </fieldset>
+
+          <fieldset className="onboarding-quiz">
+            <legend>What can you train with?</legend>
+            <div className="filter-row">
+              {EQUIPMENT.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={equipment === option.value ? "" : "ghost"}
+                  aria-pressed={equipment === option.value}
+                  onClick={() => setEquipment(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="muted">
+              {EQUIPMENT.find((option) => option.value === equipment)?.hint}
+              {equipmentNote(equipment) ? `. ${equipmentNote(equipment)}` : ""}
+            </p>
+          </fieldset>
+
+          <fieldset className="onboarding-quiz">
+            <legend>Main goal</legend>
+            <div className="filter-row">
+              {ATHLETE_GOALS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={goal === option.value ? "" : "ghost"}
+                  aria-pressed={goal === option.value}
+                  onClick={() => pickGoal(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="onboarding-quiz">
+            <legend>Second goal (optional)</legend>
+            <div className="filter-row">
+              {secondaryGoalOptions(goal).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={secondaryGoal === option.value ? "" : "ghost"}
+                  aria-pressed={secondaryGoal === option.value}
+                  onClick={() => setSecondaryGoal(secondaryGoal === option.value ? null : option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="onboarding-actions">
+            <button type="button" className="ghost" onClick={() => setStep("details")}>
+              Back
+            </button>
+            <button type="submit">Continue</button>
+          </div>
+        </form>
+      )}
+
+      {step === "season" && role === "athlete" && (
+        <form className="onboarding-step onboarding-form" onSubmit={handleSeasonSubmit}>
+          <h2>Your season</h2>
+
+          <fieldset className="onboarding-quiz">
+            <legend>Where are you in your season?</legend>
+            <div className="filter-row">
+              {SEASON_PHASES.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={seasonPhase === option.value ? "" : "ghost"}
+                  aria-pressed={seasonPhase === option.value}
+                  onClick={() => setSeasonPhase(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="muted">{SEASON_PHASES.find((option) => option.value === seasonPhase)?.hint}</p>
+          </fieldset>
+
+          <label>
+            Season start (optional)
+            <input type="date" value={seasonStart} onChange={(e) => setSeasonStart(e.target.value)} />
+          </label>
+
+          <label>
+            Season end (optional)
+            <input type="date" value={seasonEnd} onChange={(e) => setSeasonEnd(e.target.value)} />
+          </label>
+
+          <fieldset className="onboarding-quiz">
+            <legend>Which days do you have practice? (optional)</legend>
+            <div className="filter-row">
+              {WEEKDAYS.map((day) => (
+                <button
+                  key={day}
+                  type="button"
+                  className={practiceDays.includes(day) ? "" : "ghost"}
+                  aria-pressed={practiceDays.includes(day)}
+                  aria-label={day}
+                  onClick={() => togglePracticeDay(day)}
+                >
+                  {day.slice(0, 3)}
+                </button>
+              ))}
+            </div>
+            <p className="muted">Practice days get no extra jumping, so your legs stay fresh.</p>
+          </fieldset>
+
+          {seasonError && (
+            <p className="guardian-error" role="alert">
+              {seasonError}
+            </p>
+          )}
+
+          <div className="onboarding-actions">
+            <button type="button" className="ghost" onClick={() => setStep("training")} disabled={saving}>
+              Back
+            </button>
+            <button type="submit" disabled={saving}>
+              {saving ? "Saving..." : "Continue"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {step === "team" && role === "coach" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleTeamStep}>
           <h2>Create your team</h2>
           <label>
@@ -452,7 +639,7 @@ export function OnboardingFlow() {
         </form>
       )}
 
-      {step === 3 && role === "athlete" && (
+      {step === "team" && role === "athlete" && (
         <form className="onboarding-step onboarding-form" onSubmit={handleTeamStep}>
           <h2>Train solo, or join a team</h2>
           {pendingInvite && saving && <p className="muted">Joining your team from the invite link…</p>}
@@ -490,7 +677,7 @@ export function OnboardingFlow() {
         </form>
       )}
 
-      {step === 4 && (
+      {step === "done" && (
         <div className="onboarding-step">
           <h2>You&apos;re all set!</h2>
           <p className="muted">
