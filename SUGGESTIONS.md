@@ -37,6 +37,7 @@ Rules for automated runs:
 | P-06 | Free read-only parent and coach viewer, invited by link or email | planned | me | M |
 | P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
 | P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | planned | me | S |
+| F-46 | Mobility and explosive high-flyer exercises in the style of Elastaboy, THP, Keone Thin and Eugene Nishida | building | me | M |
 | B-09 | "Save Stats Entry" on Stats counts as today's check-in and copies the last check-in's sleep and soreness into today | building | bug | S |
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
@@ -332,6 +333,13 @@ Rules for automated runs:
   same date in the Notion Teams table's Pilot start.
 
 ### Athlete experience
+
+- **F-46.** Jayden 2026-11-24: mobility and explosive high-flyer work in the
+  style of Elastaboy, THP, Keone Thin and Eugene Nishida. Approved and moved to
+  planned the same day. Adds nine Exercise Library entries (4 Mobility, 5 Jump
+  Development). Video links are YouTube searches naming the creator, not
+  direct video links (none could be verified). The "add my workouts"
+  questions stay paused.
 
 - **F-05. Jump tracking over time.** `performance_profiles` keeps one row
   per athlete (`standing_reach_in`, `approach_touch_in`, `block_touch_in`),
