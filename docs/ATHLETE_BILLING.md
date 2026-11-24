@@ -1,6 +1,6 @@
 # Athlete plan billing (Stripe)
 
-NextRep sells one athlete plan at **$14.99/month** with a 7-day free trial (card up front). After the trial, the app is locked for athletes who aren't on a team until they subscribe.
+NextRep sells one athlete plan at **$14.99/month** with a 7-day free trial (card up front). The first workout is free with no card; once an athlete finishes it, the app is locked for athletes who aren't on a team until they start the trial at checkout (card at workout 2).
 
 An **annual plan is built but switched off** (`ANNUAL_PLAN_ON = false` in `src/lib/billing.ts`). Jayden is keeping $14.99/month for now and raising the price later. To change the price or turn annual on, see "Changing the price later" below.
 
