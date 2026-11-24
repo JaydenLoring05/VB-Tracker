@@ -34,7 +34,7 @@ Rules for automated runs:
 | P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 | building | me | M |
 | P-04 | Season- and practice-adaptive plan: season phases, practice intensity, match-day rules, double progression with "last time → today's target", weekly coach note | planned | me | L |
 | P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
-| P-06 | Free read-only parent and coach viewer, invited by link or email | planned | me | M |
+| P-06 | Free read-only parent and coach viewer, invited by link or email (needs SQL) | building | me | M |
 | P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
 | P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | planned | me | S |
 | P-04a | Season phase changes the plan: off-season, preseason and in-season volume and intensity (uses P-03's saved phase) | new | me | M |

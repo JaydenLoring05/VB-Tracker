@@ -11,6 +11,7 @@ import { AthletePlan } from "./AthletePlan";
 import { InviteFriends } from "./InviteFriends";
 import { PhoneReminders } from "./PhoneReminders";
 import { ReminderPreference } from "./ReminderPreference";
+import { ShareTraining } from "./ShareTraining";
 
 export function AccountSettings() {
   const { ownedTeams, exporting, deleting, error, exportData, deleteAccount } = useAccountData();
@@ -29,6 +30,7 @@ export function AccountSettings() {
 
       <AthletePlan />
       <InviteFriends />
+      <ShareTraining />
 
       <PhoneReminders />
       <ReminderPreference />

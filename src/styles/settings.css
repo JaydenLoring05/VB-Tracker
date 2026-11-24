@@ -157,3 +157,76 @@
   margin: 0 0 var(--sp-2);
   line-height: 1.55;
 }
+
+/* Share with a parent or coach (P-06) */
+.share-training {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.share-training h2,
+.share-training h3,
+.share-training p {
+  margin: 0;
+}
+
+.share-training h3 {
+  font-size: 1rem;
+}
+
+.share-training-roles {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.share-training-roles legend {
+  margin-bottom: var(--sp-1);
+}
+
+.share-training-hint {
+  font-size: var(--fs-sm);
+}
+
+.share-training input[aria-invalid="true"] {
+  border-color: var(--red);
+}
+
+.share-training-new {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+}
+
+.share-training-new input {
+  width: 100%;
+  font-size: 14px;
+}
+
+.share-training-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.share-training-list ul {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.share-training-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  min-height: 44px;
+}
