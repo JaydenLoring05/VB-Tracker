@@ -85,3 +85,9 @@
 .onboarding-actions button[type="submit"] {
   flex: 1;
 }
+
+.week1-preview { margin: var(--sp-4) 0; text-align: left; }
+.week1-preview h3 { margin: 0 0 var(--sp-1); }
+.week1-days { list-style: none; margin: var(--sp-3) 0 0; padding: 0; display: grid; gap: var(--sp-2); }
+.week1-days li { display: grid; grid-template-columns: 6.5rem 1fr; gap: var(--sp-2); }
+.week1-highlights { display: block; font-size: 0.85em; }

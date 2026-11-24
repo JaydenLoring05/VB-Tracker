@@ -525,3 +525,10 @@
 .hold-timer .hold-timer-controls button {
   width: auto;
 }
+
+/* Shown once when an athlete returns to a workout they left part-way through. */
+.workout-resumed {
+  margin: 0;
+  font-size: var(--fs-sm);
+  border-color: color-mix(in oklch, var(--green) 40%, var(--border));
+}

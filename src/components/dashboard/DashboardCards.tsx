@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ClipboardCheck, Flame, Moon, Snowflake } from "lucide-react";
+import { ArrowRight, Flame, Moon, Snowflake } from "lucide-react";
 import Link from "next/link";
 
 import { BadgesLine } from "@/components/dashboard/BadgesLine";
@@ -24,7 +24,6 @@ import { useRecoveryStats } from "@/hooks/useRecoveryStats";
 import { usePushTrainingDays } from "@/hooks/usePushTrainingDays";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
-import { checkedInToday } from "@/lib/dailyCheckIn";
 import { todayWorkoutCta } from "@/lib/dashboardCta";
 import { exercisePreview, recoveryTipFor } from "@/lib/recoveryTips";
 
@@ -46,8 +45,7 @@ export function DashboardCards() {
   const streak = useStreak();
   const { effectiveProfile: trainingProfile } = useTrainingProfile();
 
-  const { recovery, status, hasLoggedStats, readinessExplanation, history } = useRecoveryStats();
-  const needsCheckIn = !checkedInToday(history);
+  const { recovery, status, hasLoggedStats, readinessExplanation } = useRecoveryStats();
   const { week, completedExercises, totalExercises, progress } = useWorkoutProgress();
   const { prs } = usePRs();
   const { openSession } = useStartWorkout();
@@ -60,7 +58,7 @@ export function DashboardCards() {
   usePushTrainingDays(weekDays.filter((day) => !day.rest && day.exercises.length > 0).map((day) => day.day));
   const trainingDays = weekDays.filter((day) => !day.rest && day.exercises.length > 0).length;
   const badges = useBadges(trainingDays, referrals.signups);
-  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession));
+  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession), openSession?.id);
   const isRestDay = cta.isRestDay;
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";
   const phase = getPhase(week);
@@ -156,17 +154,6 @@ export function DashboardCards() {
 
       <TeamNudge />
       <PushReminderNudge />
-
-      {needsCheckIn && (
-        <Link href="/check-in" className="panel today-checkin">
-          <ClipboardCheck size={26} aria-hidden="true" />
-          <span>
-            <strong>Daily check-in</strong>
-            <span className="muted">30 seconds. Sleep, energy, soreness, anything hurting.</span>
-          </span>
-          <ArrowRight size={20} aria-hidden="true" />
-        </Link>
-      )}
 
       <div className="today-lines">
         <details className="today-line">

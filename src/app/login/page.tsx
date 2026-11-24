@@ -18,6 +18,7 @@ import {
   type GuardianAnswer
 } from "@/lib/guardian";
 import { MIN_PASSWORD_LENGTH, newPasswordProblem, passwordMatchState } from "@/lib/passwordForm";
+import { normalizeReferralCode, REFERRAL_KEY } from "@/lib/referral";
 import { createClient } from "@/lib/supabase/client";
 
 import "@/styles/auth.css";
@@ -187,10 +188,22 @@ export default function LoginPage() {
     // confirmation email that opens in a different browser.
     const invite = pendingInvite();
     const ageMetadata = ageResult?.ok ? signupAgeMetadata(ageResult.fields) : {};
+    let referral: string | null = null;
+    try {
+      referral = normalizeReferralCode(window.localStorage.getItem(REFERRAL_KEY));
+    } catch {
+      // Storage blocked: sign up without a referral.
+    }
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { ...ageMetadata, ...(invite ? { pending_invite: invite } : {}) } }
+      options: {
+        data: {
+          ...ageMetadata,
+          ...(invite ? { pending_invite: invite } : {}),
+          ...(referral ? { pending_referral: referral } : {})
+        }
+      }
     });
 
     setLoading(false);
