@@ -13,11 +13,14 @@ import {
   type GuardianAnswer,
   type GuardianFields as AgeFields
 } from "@/lib/guardian";
+import { Week1Card } from "@/components/onboarding/Week1Card";
+import { week1Preview } from "@/lib/week1Preview";
 import { ATHLETE_GOALS, AthleteGoal, SPORTS, Sport, positionLabel } from "@/lib/athleteSignup";
 import { createClient as createGuardianClient } from "@/lib/supabase/client";
 import { POSITION_PROGRAMS } from "@/data/positionPrograms";
 import { useProfile } from "@/hooks/useProfile";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
+import type { TrainingProfile } from "@/lib/trainingProfile";
 import { useTeam } from "@/hooks/useTeam";
 import { pendingInviteFrom, PENDING_INVITE_KEY } from "@/lib/invite";
 import { startingProgramKeyForPosition } from "@/lib/positionProgram";
@@ -66,6 +69,7 @@ export function OnboardingFlow() {
   const [trainingLevel, setTrainingLevel] = useState<TrainingLevel>("intermediate");
   const [soreAreas, setSoreAreas] = useState<InjuryArea[]>([]);
   const [solo, setSolo] = useState(false);
+  const [previewProfile, setPreviewProfile] = useState<TrainingProfile | null>(null);
   const [inviteCode, setInviteCode] = useState("");
   // From an invite link (/join/<code>): this browser's saved code, else the
   // one stored on the account at sign-up.
@@ -166,7 +170,9 @@ export function OnboardingFlow() {
       });
     } else {
       const ageFields = guardianResult?.ok ? guardianResult.fields : null;
-      setTrainingProfile({ level: trainingLevel, injuries: soreAreas, ageGroup: ageFields?.age_group ?? null });
+      const answers: TrainingProfile = { level: trainingLevel, injuries: soreAreas, ageGroup: ageFields?.age_group ?? null };
+      setPreviewProfile(answers);
+      setTrainingProfile(answers);
       await updateProfile({
         position: positionLabel(sport, position, otherPosition),
         training_goals: [ATHLETE_GOALS.find((option) => option.value === goal)!.label]
@@ -494,6 +500,16 @@ export function OnboardingFlow() {
                 ? "Your plan is set up around you. Start today's workout from the dashboard, and join a team any time."
                 : "You're on the roster. Your dashboard is ready."}
           </p>
+          {role === "athlete" && previewProfile && (
+            <Week1Card
+              preview={week1Preview({
+                sport,
+                position,
+                positionLabel: positionLabel(sport, position, otherPosition) ?? position,
+                profile: previewProfile
+              })}
+            />
+          )}
           <button type="button" onClick={finish}>
             Go to {role === "coach" ? "Coach Dashboard" : "Dashboard"}
           </button>
