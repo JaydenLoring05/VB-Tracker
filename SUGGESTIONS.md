@@ -31,24 +31,29 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 | planned | me | M |
+| P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 (code merged in #126; schema present in Supabase on 24 Nov) | building | me | M |
 | P-04 | Season- and practice-adaptive plan: season phases, practice intensity, match-day rules, double progression with "last time → today's target", weekly coach note | planned | me | L |
 | P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
-| P-06 | Free read-only parent and coach viewer, invited by link or email | planned | me | M |
+| P-06 | Free read-only parent and coach viewer, invited by link or email (code merged in #136; schema present in Supabase on 24 Nov) | building | me | M |
 | P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
 | P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | planned | me | S |
 | F-46 | Mobility and explosive high-flyer exercises in the style of Elastaboy, THP, Keone Thin and Eugene Nishida | building | me | M |
-| B-09 | "Save Stats Entry" on Stats counts as today's check-in and copies the last check-in's sleep and soreness into today | building | bug | S |
+| P-04a | Season phase changes the plan: off-season, preseason and in-season volume and intensity (uses P-03's saved phase) | new | me | M |
+| P-04b | Practice intensity and match-day rules: a hard practice makes the lift lighter; game day and the day before | new | me | M |
+| P-04c | Double progression: "last time → today's target" on each lift in Workout Mode | new | me | M |
+| P-04d | A weekly coach note on Today | new | me | S |
+| P-05a | Test day: log broad jump, sprint and pro-agility next to vertical and approach (needs SQL) | new | me | M |
+| P-05b | Max Day: a test day for estimated maxes on the main lifts | new | me | M |
+| P-05c | Retest prompts every 4 weeks, and self-reported vs coach-verified results (needs SQL) | new | me | M |
+| PH1-1 | Read-only Week 1 preview at the end of onboarding | building | me | S |
+| PH1-2 | First workout free with no card; the trial starts at checkout after workout 1 | building | me | S |
+| PH1-4 | Solo-first onboarding copy, team code optional; Topbar drops readiness and team | building | me | S |
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
-| RF-02 | Save the referral code on the account at sign-up, so it survives a confirmation email opened in another browser | building | your idea | S |
-| G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC | new | your idea | S |
+| G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC (code merged in #130; schema present in Supabase on 24 Nov) | building | your idea | S |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
-| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
-| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
-| F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
-| F-19 | Supersets in coach-built programs | planned | coach feedback | M |
-| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | planned | me | M |
+| F-28 | Weight targets as a percent of each athlete's estimated max | building | coach feedback | M |
+| B-10 | Continue Workout reopens the workout in progress, on the exercise reached | building | bug | S |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height); vertical and approach touch are covered by G-04 | new | me | M |
@@ -67,6 +72,11 @@ Rules for automated runs:
 | R-06 | README setup steps leave out `schema_v53` | new | your idea | S |
 | A-01 | Split `TrackerContext.tsx` into smaller providers | new | your idea | L |
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
+| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | new | me | M |
+| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | new | coach feedback | L |
+| F-24 | A day built from more than one program (lifts plus accessory work) | new | me | M |
+| F-19 | Supersets in coach-built programs | new | coach feedback | M |
+| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | new | me | M |
 
 ## Details
 
@@ -82,6 +92,22 @@ Rules for automated runs:
   before launch (see LAUNCH_CHECKLIST).
 - **Items that need SQL stay open** with the SQL in the PR description until
   Jayden runs it, so production never reads a column that doesn't exist yet.
+- **P-04 and P-05 are split (2026-11-22).** Both are size L, so the weekly
+  update can't build them. They stay as the umbrella rows; the parts are
+  P-04a to P-04d and P-05a to P-05c, all `new`. Mark the parts you want
+  `planned`. Already in the app: F-38 removes jumping on practice days and
+  makes game day a loosen-up day, G-04 logs vertical and approach touch,
+  F-36 has a 4-week retest card, and F-28 (#83, open) sets weights from a
+  percent of max. P-03 (#126, open) saves the season phase P-04a needs.
+- **PH1-1 to PH1-5 (Phase 1).** Five PRs titled "Phase 1 #1" to "#5" were
+  opened on 2026-11-22 with no rows here. #3 (#132) and #5 (#131) merged
+  and are under Shipped; #1 (#135), #2 (#134) and #4 (#133) are open.
+  Source recorded as `me`; correct it if they came from somewhere else.
+- **F-28 and B-10 had open PRs but no row on `main`** (added 2026-11-15).
+  F-28 is #83: a coach sets "@ 75% max" on an exercise and each athlete
+  sees their own weight from an Epley estimate of their max. B-10 is #74:
+  Jayden reported "when I leave a workout and push Continue it rarely
+  saves"; the sets were saved, but Continue started a new session.
 
 - **B-09. The stats form saves a fake check-in.** `StatsForm` calls
   `saveStats()`, which writes the context's whole `stats` (the latest
@@ -91,6 +117,16 @@ Rules for automated runs:
   the coach sees a fresh check-in. Found while building G-04, which saves
   jumps to their own table for this reason. Fix: save only the edited
   fields, and count a check-in only when its wellness fields are filled.
+- **P-03. Onboarding quiz.** Athletes get two more onboarding steps after
+  "Tell us about you": "Your training" (years lifting, which sets the plan
+  level; equipment; a main goal, now including "Get faster" and "Hit
+  harder"; an optional second goal) and "Your season" (off-season,
+  preseason or in season; optional season dates; practice days, which go
+  into the F-38 weekly schedule). Years lifting, equipment and season phase
+  need `schema_v66_onboarding_quiz.sql`. Not yet used by the plan:
+  equipment (F-42 would use it) and season phase (P-04). The parent viewer
+  for under-13 athletes needs P-06; the parent email is already saved by
+  the N-03 consent step, so P-06 can invite that parent.
 - **F-42 and F-43** came from writing /join (L-01): Jayden's copy said
   "no equipment needed for the youth/beginner plans" and "20-40 min a day",
   but the youth and beginner swaps use goblet squats, kettlebell deadlifts
@@ -510,6 +546,10 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Today no longer shows the Daily check-in card; it stays under Progress (PH1-3) | me | #132 |
+| More no longer has a second Start Workout (PH1-5) | me | #131 |
+| Referral code saved on the account at sign-up, so it survives a confirmation email opened in another browser (RF-02) | your idea | #129 |
+| Stats form no longer saves a fake check-in or copies sleep and soreness into today (B-09) | bug | #128 |
 | $14.99/month athlete plan (annual built, switched off); app locked after the trial for athletes not on a team; one trial per athlete (schema v65) (P-02) | me | #124 |
 | Volleyball landing page at / from the coach's copy; unshipped features labelled "Coming soon" (P-01, covers F-44) | me | #121 |
 | Film removed from NextRep, moved to a separate tool (Film Room); film tables kept in the database (F-45) | me | #122 |

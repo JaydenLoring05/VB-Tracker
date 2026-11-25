@@ -66,7 +66,7 @@ describe("proxy: /demo", () => {
 });
 
 describe("proxy: signed out", () => {
-  it.each(["/", "/login", "/pilot", "/join", "/privacy", "/terms", "/auth/callback", "/join/A1B2C3", "/unsubscribe"])("lets a visitor open %s", async (path) => {
+  it.each(["/", "/login", "/pilot", "/join", "/privacy", "/terms", "/auth/callback", "/join/A1B2C3", "/unsubscribe", "/view"])("lets a visitor open %s", async (path) => {
     const response = await proxy(request(path));
     expect(isRedirect(response)).toBe(false);
   });
