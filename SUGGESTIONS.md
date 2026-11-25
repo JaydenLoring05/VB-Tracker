@@ -37,6 +37,7 @@ Rules for automated runs:
 | P-06 | Free read-only parent and coach viewer, invited by link or email (code merged in #136; schema present in Supabase on 24 Nov) | building | me | M |
 | P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
 | P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | planned | me | S |
+| F-46 | Mobility and explosive high-flyer exercises in the style of Elastaboy, THP, Keone Thin and Eugene Nishida | building | me | M |
 | P-04a | Season phase changes the plan: off-season, preseason and in-season volume and intensity (uses P-03's saved phase) | new | me | M |
 | P-04b | Practice intensity and match-day rules: a hard practice makes the lift lighter; game day and the day before | new | me | M |
 | P-04c | Double progression: "last time → today's target" on each lift in Workout Mode | new | me | M |
@@ -368,6 +369,13 @@ Rules for automated runs:
   same date in the Notion Teams table's Pilot start.
 
 ### Athlete experience
+
+- **F-46.** Jayden 2026-11-24: mobility and explosive high-flyer work in the
+  style of Elastaboy, THP, Keone Thin and Eugene Nishida. Approved and moved to
+  planned the same day. Adds nine Exercise Library entries (4 Mobility, 5 Jump
+  Development). Video links are YouTube searches naming the creator, not
+  direct video links (none could be verified). The "add my workouts"
+  questions stay paused.
 
 - **F-05. Jump tracking over time.** `performance_profiles` keeps one row
   per athlete (`standing_reach_in`, `approach_touch_in`, `block_touch_in`),

@@ -11,7 +11,8 @@ const ex = (
   purpose: string,
   cues: string[],
   mistakes: string[],
-  substitutions: string[]
+  substitutions: string[],
+  videoQuery?: string
 ): Exercise => ({
   name,
   category,
@@ -21,7 +22,7 @@ const ex = (
   cues,
   mistakes,
   substitutions,
-  video: yt(`${name} proper form athlete`)
+  video: yt(videoQuery ?? `${name} proper form athlete`)
 });
 
 export const exercises: Exercise[] = [
@@ -1241,6 +1242,106 @@ export const exercises: Exercise[] = [
     ["Lie on your side, knees bent and stacked.", "Arms straight out in front, palms together.", "Open the top arm across to the other side.", "Follow the hand with your eyes; keep the knees together."],
     ["Knees coming apart as you rotate.", "Forcing the arm to the floor.", "Holding your breath."],
     ["Thoracic Rotations", "Shoulder CARs", "Full-Body Mobility Flow"]
+  ),
+  // HIGH-FLYER MOBILITY AND EXPLOSIVE WORK (F-46)
+  ex(
+    "Cossack Squats",
+    "Mobility",
+    "Intermediate",
+    "🤸",
+    "Side-to-side deep squat. Opens the adductors and hips and builds the end range you need to load a jump.",
+    ["Wide stance, toes slightly out.", "Sit back onto one leg; keep that heel down.", "Straight leg's toes point up if you can.", "Stay tall and drive back to the middle."],
+    ["Heel lifting on the bent leg.", "Rounding the lower back at the bottom.", "Forcing depth with knee pain."],
+    ["Lateral Lunges", "Deep Squat Holds", "90/90 Hip Switches"],
+    "Cossack squat mobility Elastaboy Keone Thin"
+  ),
+  ex(
+    "Frog Stretch",
+    "Mobility",
+    "Beginner",
+    "🐸",
+    "Opens the inner thigh and hips. Helps you sit into a deep, wide landing and a strong takeoff.",
+    ["Knees wide, shins on the floor, feet turned out.", "Hips back toward the heels in small rocks.", "Keep the spine long, not rounded.", "Ease out of it if you feel the knees pinch."],
+    ["Dumping into the lower back.", "Pushing through sharp knee pain.", "Holding your breath."],
+    ["90/90 Hip Switches", "Couch Stretch", "Deep Squat Holds"],
+    "frog stretch hip mobility vertical jump THP"
+  ),
+  ex(
+    "Jefferson Curl",
+    "Mobility",
+    "Advanced",
+    "🪢",
+    "A slow, light loaded hamstring and back stretch. Builds the flexibility behind a deep hip hinge.",
+    ["Use a very light weight or no weight.", "Tuck the chin and roll down one vertebra at a time.", "Soft knees; move slowly.", "Roll back up the same way."],
+    ["Loading it heavy.", "Rushing the movement.", "Doing it with back pain."],
+    ["Romanian Deadlift", "Single-Leg RDL", "Hip CARs"],
+    "Jefferson curl light mobility Elastaboy"
+  ),
+  ex(
+    "Shin Box Transitions",
+    "Mobility",
+    "Intermediate",
+    "📦",
+    "Switches both hips between internal and external rotation on the floor. Frees the hips for cutting and landing.",
+    ["Sit with both knees bent at 90 degrees, one in front, one to the side.", "Rotate both knees over to the other side.", "Keep your chest tall; use hands for balance.", "Move slow and controlled."],
+    ["Leaning back on your hands.", "Rushing through.", "Forcing the knees down."],
+    ["90/90 Hip Switches", "Hip CARs", "Deep Squat Holds"],
+    "shin box transitions hip mobility Keone Thin"
+  ),
+  ex(
+    "Single-Leg Pogo Hops",
+    "Jump Development",
+    "Intermediate",
+    "🦘",
+    "Quick, stiff ankle hops on one leg. Builds the ankle spring that sits under a high jump.",
+    ["Stay tall and quiet at the hips.", "Bounce off the ball of the foot.", "Minimum ground contact; stay light.", "Land under your body, not in front."],
+    ["Sinking into the knee.", "Letting the heel slam down.", "Doing it tired."],
+    ["Pogo Hops", "Line Hops", "Jump Rope"],
+    "single leg pogo hops ankle stiffness Elastaboy"
+  ),
+  ex(
+    "Tuck Jumps",
+    "Jump Development",
+    "Intermediate",
+    "🚀",
+    "Max-height jumps with the knees pulled up. Trains fast hip flexion and hang time.",
+    ["Quick dip, then jump as high as you can.", "Pull the knees up toward the chest.", "Land softly on both feet, knees tracking over toes.", "Reset between reps if you need to."],
+    ["Doing too many reps tired.", "Landing stiff-legged.", "Knees caving in on landing."],
+    ["Squat Jumps", "Standing Vertical Jumps", "Box Jumps"],
+    "tuck jumps explosive THP"
+  ),
+  ex(
+    "Hurdle Hops",
+    "Jump Development",
+    "Advanced",
+    "🏃",
+    "Fast, repeated jumps over low hurdles. Trains quick re-bounding with a short ground contact.",
+    ["Use low hurdles (about knee height or lower).", "Jump straight up and over, not out.", "Spend as little time on the ground as you can.", "Stop the set when the jumps get slow."],
+    ["Setting the hurdles too high.", "Collapsing on landing.", "Piling up reps while tired."],
+    ["Line Hops", "Pogo Hops", "Skater Jumps"],
+    "hurdle hops plyometrics Eugene Nishida"
+  ),
+  ex(
+    "Single-Leg Box Jump",
+    "Jump Development",
+    "Advanced",
+    "🦅",
+    "Jumps up onto a box from one leg. Builds single-leg power for the approach jump.",
+    ["Start with a low box.", "Drive the knee and arms up.", "Land on the box with a soft knee and balance.", "Step down; don't jump down."],
+    ["Using a box that's too high.", "Landing with the knee caving in.", "Jumping down from the box."],
+    ["Box Jumps", "Approach Jumps", "Box Step-Offs"],
+    "single leg box jump Keone Thin"
+  ),
+  ex(
+    "Kneeling Jump to Squat",
+    "Jump Development",
+    "Intermediate",
+    "⚡",
+    "From your knees, explode to your feet in one move. Trains hip power from a standing start with no run-up.",
+    ["Kneel tall with arms back.", "Swing the arms and drive the hips up.", "Snap both feet under you and land in a squat.", "Stand tall and reset."],
+    ["Landing with your feet too narrow.", "Falling forward.", "Skipping the reset between reps."],
+    ["Squat Jumps", "Snap Downs", "Standing Vertical Jumps"],
+    "kneeling jump to squat explosive hips Elastaboy"
   )
 ];
 
