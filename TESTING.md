@@ -72,6 +72,7 @@ Tests live under `tests/`, mirroring `src/`.
 | Stats history dates | `tests/lib/statsHistory.test.ts` | Old `M/D/YYYY` and ISO dates normalize to one day, latest save per day wins, pain streaks on old-format rows are flagged |
 | Recovery history table | `tests/lib/statsTable.test.ts` | Every column is as wide as its header and widest value (no run-together headers, dates on one line), one track per column, cell text and dashes for blanks |
 | Whole-number fields | `tests/lib/numberInput.test.ts` | One- and two-digit numbers, an empty field is "no change" not a default, minimums, decimals and signs rejected |
+| Badges and retest push (P-08) | `tests/lib/badges.test.ts`, `tests/lib/pushReminders.test.ts`, `tests/supabase/pushRetestSql.test.ts` | Test Day and Level Check badges (28-day gap, bad dates), retest message wins over daily nudges and opens `/stats`, v68 SQL keeps the secret check, log and 28-30 day window |
 | Adherence summary | `tests/hooks/summarizeAdherence.test.ts` | Minutes, completion percent, cap at 100 |
 | Demo data | `tests/data/demoData.test.ts` | Deterministic, no missing fields, sane ranges, storylines hold every weekday; demo workout has last week's numbers for every exercise |
 | Workout plan and exercise library | `tests/data/workoutPlan.test.ts` | Every planned exercise exists in the library |

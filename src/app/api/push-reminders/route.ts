@@ -29,6 +29,7 @@ type Recipient = {
   display_name: string | null;
   needs_check_in: boolean;
   needs_workout: boolean;
+  needs_retest?: boolean;
 };
 
 export async function GET(request: NextRequest) {

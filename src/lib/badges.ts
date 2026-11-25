@@ -1,4 +1,5 @@
 import { isJumpExercise } from "@/lib/exerciseMeasure";
+import { daysBetween, RETEST_DAYS } from "@/lib/resultsCard";
 
 /**
  * Badges (G-03). Pure: which badges an athlete has earned from their finished
@@ -14,7 +15,9 @@ export type BadgeId =
   | "jump-pr"
   | "workouts-50"
   | "perfect-week"
-  | "recruiter";
+  | "recruiter"
+  | "first-test"
+  | "retest";
 
 export type Badge = { id: BadgeId; name: string; description: string; icon: string };
 
@@ -26,7 +29,9 @@ export const BADGES: readonly Badge[] = [
   { id: "jump-pr", name: "Sky High", description: "Set a new jump PR.", icon: "🚀" },
   { id: "streak-30", name: "Unstoppable", description: "Train 30 days in a row.", icon: "⚡" },
   { id: "workouts-50", name: "Half Century", description: "Finish 50 workouts.", icon: "🏆" },
-  { id: "recruiter", name: "Recruiter", description: "Get a friend to sign up with your code.", icon: "🤝" }
+  { id: "recruiter", name: "Recruiter", description: "Get a friend to sign up with your code.", icon: "🤝" },
+  { id: "first-test", name: "Test Day", description: "Log your first jump test.", icon: "📏" },
+  { id: "retest", name: "Level Check", description: `Retest at least ${RETEST_DAYS / 7} weeks after an earlier test.`, icon: "📈" }
 ];
 
 const JUMP_PR = /\b(vert(ical)?|approach|touch|reach|jump|broad)\b/i;
@@ -80,7 +85,8 @@ export function earnedBadges({
   workoutDates,
   prs,
   trainingDaysPerWeek,
-  referrals = 0
+  referrals = 0,
+  testDates = []
 }: {
   workoutDates: string[];
   prs: { exercise: string; unit?: string }[];
@@ -88,6 +94,8 @@ export function earnedBadges({
   trainingDaysPerWeek: number;
   /** Friends who signed up with the athlete's code (RF-01). */
   referrals?: number;
+  /** Days a vertical or approach test was logged (P-08); from jump tests and the stats form. */
+  testDates?: string[];
 }): BadgeId[] {
   const streak = bestStreak(workoutDates);
   const earned = new Set<BadgeId>();
@@ -99,6 +107,9 @@ export function earnedBadges({
   if (workoutDates.length >= 50) earned.add("workouts-50");
   if (hasPerfectWeek(workoutDates, trainingDaysPerWeek)) earned.add("perfect-week");
   if (referrals >= 1) earned.add("recruiter");
+  const tests = [...new Set(testDates)].filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+  if (tests.length >= 1) earned.add("first-test");
+  if (tests.length >= 2 && daysBetween(tests[0], tests[tests.length - 1]) >= RETEST_DAYS) earned.add("retest");
   return BADGES.map((badge) => badge.id).filter((id) => earned.has(id));
 }
 

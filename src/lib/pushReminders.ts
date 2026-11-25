@@ -44,9 +44,19 @@ export function buildPushReminder(recipient: {
   display_name?: string | null;
   needs_check_in: boolean;
   needs_workout: boolean;
+  /** 4 weeks since the last jump test (P-08). */
+  needs_retest?: boolean;
 }): PushMessage {
   const name = firstName(recipient.display_name);
   const hey = name ? `${name}, ` : "";
+  if (recipient.needs_retest) {
+    return {
+      title: "Retest day",
+      body: `${hey}it's been 4 weeks. Re-measure your vertical and approach touch and see your gain.`,
+      url: "/stats",
+      tag: "nextrep-retest"
+    };
+  }
   if (recipient.needs_check_in && recipient.needs_workout) {
     return {
       title: "Check in, then train",
