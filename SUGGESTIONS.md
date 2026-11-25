@@ -36,7 +36,7 @@ Rules for automated runs:
 | P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
 | P-06 | Free read-only parent and coach viewer, invited by link or email (code merged in #136; schema present in Supabase on 24 Nov) | building | me | M |
 | P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
-| P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | planned | me | S |
+| P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | building | me | S |
 | F-46 | Mobility and explosive high-flyer exercises in the style of Elastaboy, THP, Keone Thin and Eugene Nishida | building | me | M |
 | P-04a | Season phase changes the plan: off-season, preseason and in-season volume and intensity (uses P-03's saved phase) | new | me | M |
 | P-04b | Practice intensity and match-day rules: a hard practice makes the lift lighter; game day and the day before | new | me | M |

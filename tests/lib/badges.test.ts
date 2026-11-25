@@ -56,7 +56,7 @@ describe("isJumpPR", () => {
 describe("earnedBadges (G-03)", () => {
   it("has every badge Jayden asked for, plus Recruiter for referrals (RF-01)", () => {
     expect(BADGES.map((badge) => badge.id).sort()).toEqual(
-      ["first-workout", "jump-pr", "perfect-week", "recruiter", "streak-30", "streak-7", "workouts-10", "workouts-50"].sort()
+      ["first-test", "first-workout", "jump-pr", "perfect-week", "recruiter", "retest", "streak-30", "streak-7", "workouts-10", "workouts-50"].sort()
     );
   });
 
@@ -83,6 +83,24 @@ describe("earnedBadges (G-03)", () => {
     expect(
       earnedBadges({ workoutDates: dates, prs: [{ exercise: "Vertical Jump", unit: "in" }], trainingDaysPerWeek: 6 })
     ).toEqual(["first-workout", "workouts-10", "streak-7", "perfect-week", "jump-pr", "streak-30", "workouts-50"]);
+  });
+});
+
+describe("test-day badges (P-08)", () => {
+  const base = { workoutDates: [], prs: [], trainingDaysPerWeek: 5 };
+
+  it("gives Test Day after the first logged test, nothing before", () => {
+    expect(earnedBadges({ ...base, testDates: [] })).toEqual([]);
+    expect(earnedBadges({ ...base, testDates: ["2026-11-02"] })).toEqual(["first-test"]);
+  });
+
+  it("gives Level Check only for a retest 28+ days after an earlier test", () => {
+    expect(earnedBadges({ ...base, testDates: ["2026-11-01", "2026-11-28"] })).toEqual(["first-test"]);
+    expect(earnedBadges({ ...base, testDates: ["2026-11-01", "2026-11-29"] })).toEqual(["first-test", "retest"]);
+  });
+
+  it("ignores bad dates and repeats on one day", () => {
+    expect(earnedBadges({ ...base, testDates: ["nope", "2026-11-01", "2026-11-01"] })).toEqual(["first-test"]);
   });
 });
 

@@ -36,6 +36,13 @@ describe("buildPushReminder", () => {
     });
   });
 
+  it("asks for a retest, opening the stats page, and wins over the daily nudges (P-08)", () => {
+    expect(
+      buildPushReminder({ display_name: "Maya Chen", needs_check_in: true, needs_workout: true, needs_retest: true })
+    ).toMatchObject({ title: "Retest day", url: "/stats", tag: "nextrep-retest" });
+    expect(buildPushReminder({ needs_check_in: false, needs_workout: false, needs_retest: true }).body).toMatch(/vertical/i);
+  });
+
   it("uses the first name only and keeps markup out", () => {
     expect(buildPushReminder({ display_name: "<b>Jay</b> L", needs_check_in: true, needs_workout: false }).body).toMatch(
       /^bJay\/b, /

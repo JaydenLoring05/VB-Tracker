@@ -36,7 +36,7 @@ describe("buildShareCard", () => {
     expect(card.stats).toEqual([
       { label: "Streak", value: "12 days" },
       { label: "Level", value: "Varsity" },
-      { label: "Badges", value: "2 of 8" },
+      { label: "Badges", value: "2 of 10" },
       { label: "Best vertical", value: "24.5 in" }
     ]);
     expect(card.badges.map((badge) => badge.name)).toEqual(["First Rep", "On Fire"]);
