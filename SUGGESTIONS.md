@@ -54,6 +54,7 @@ Rules for automated runs:
 | F-04 | Per-athlete overview page for coaches | new | me | M |
 | F-28 | Weight targets as a percent of each athlete's estimated max | building | coach feedback | M |
 | B-10 | Continue Workout reopens the workout in progress, on the exercise reached | building | bug | S |
+| B-11 | Phone push reminders fail: `push_reminder_recipients` is missing from the production database (needs SQL run, no code change) | new | bug | S |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height); vertical and approach touch are covered by G-04 | new | me | M |
@@ -150,6 +151,23 @@ Rules for automated runs:
   Postgres rejects the query and no coach gets the email. #65 adds
   `schema_v54_daily_summary_date_fix.sql`, which compares text with text.
   The email stays broken until that file is run in the SQL Editor.
+- **B-11. Phone push reminders fail: the database function is missing.**
+  Found by the daily bug check on 2026-11-26. Vercel logs `push-reminders:
+  could not load recipients Could not find the function
+  public.push_reminder_recipients(p_secret) in the schema cache` from
+  `/api/push-reminders` (first seen 2026-10-18, latest 2026-11-26 04:56 UTC),
+  so no player gets a phone reminder. The route's call matches the function
+  in `schema_v55_push_reminders.sql` and `schema_v68_push_retest.sql`
+  (`p_secret text, p_now timestamptz default now()`), so the code is not at
+  fault: the function isn't in the production database. Most likely v55 was
+  never run there (the error predates v68), or v68 was only partly run (it
+  drops the old function before creating the new one). Fix, for Jayden: run
+  `schema_v55_push_reminders.sql` if it hasn't been, then
+  `schema_v68_push_retest.sql`, in the SQL Editor, and check with
+  `select exists (select 1 from pg_proc where proname =
+  'push_reminder_recipients' and pronargs = 2);`. If that already returns
+  true, reload the API schema cache (`notify pgrst, 'reload schema';`).
+  Move the row to Shipped once the error stops.
 
 ### Coach experience
 
