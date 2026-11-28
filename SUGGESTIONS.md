@@ -75,7 +75,7 @@ Rules for automated runs:
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | new | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | new | coach feedback | L |
-| F-24 | A day built from more than one program (lifts plus accessory work) | new | me | M |
+| F-24 | A day built from more than one program (lifts plus accessory work) (PR #87) | building | me | M |
 | F-19 | Supersets in coach-built programs | new | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | new | me | M |
 
