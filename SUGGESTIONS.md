@@ -31,13 +31,9 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| P-03 | Onboarding quiz: years lifting, equipment, speed/power goals, secondary goal, season setup; parent viewer created for under-13 (code merged in #126; schema present in Supabase on 24 Nov) | building | me | M |
 | P-04 | Season- and practice-adaptive plan: season phases, practice intensity, match-day rules, double progression with "last time → today's target", weekly coach note | planned | me | L |
 | P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
-| P-06 | Free read-only parent and coach viewer, invited by link or email (code merged in #136; schema present in Supabase on 24 Nov) | building | me | M |
 | P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
-| P-08 | Engagement: 10-session and test-day badges, retest-day push reminders | building | me | S |
-| F-46 | Mobility and explosive high-flyer exercises in the style of Elastaboy, THP, Keone Thin and Eugene Nishida | building | me | M |
 | P-04a | Season phase changes the plan: off-season, preseason and in-season volume and intensity (uses P-03's saved phase) | new | me | M |
 | P-04b | Practice intensity and match-day rules: a hard practice makes the lift lighter; game day and the day before | new | me | M |
 | P-04c | Double progression: "last time → today's target" on each lift in Workout Mode | new | me | M |
@@ -45,16 +41,10 @@ Rules for automated runs:
 | P-05a | Test day: log broad jump, sprint and pro-agility next to vertical and approach (needs SQL) | new | me | M |
 | P-05b | Max Day: a test day for estimated maxes on the main lifts | new | me | M |
 | P-05c | Retest prompts every 4 weeks, and self-reported vs coach-verified results (needs SQL) | new | me | M |
-| PH1-1 | Read-only Week 1 preview at the end of onboarding | building | me | S |
-| PH1-2 | First workout free with no card; the trial starts at checkout after workout 1 | building | me | S |
-| PH1-4 | Solo-first onboarding copy, team code optional; Topbar drops readiness and team | building | me | S |
 | F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
 | F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
-| G-07 | Weekly challenge and streak weeks in the athlete's own time zone, not UTC (code merged in #130; schema present in Supabase on 24 Nov) | building | your idea | S |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
-| F-28 | Weight targets as a percent of each athlete's estimated max (PR #83) | building | coach feedback | M |
-| B-10 | Continue Workout reopens the workout in progress, on the exercise reached | building | bug | S |
-| B-11 | Phone push reminders fail: `push_reminder_recipients` is missing from the production database (needs SQL run, no code change) | new | bug | S |
+| B-11 | Phone push reminders fail: `push_reminder_recipients` is missing from the production database; run v55 then v68 (needs SQL, no code change) | building | bug | S |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
 | F-05 | Jump tracking over time (spike touch, set peak height); vertical and approach touch are covered by G-04 | new | me | M |
@@ -75,7 +65,6 @@ Rules for automated runs:
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | new | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | new | coach feedback | L |
-| F-24 | A day built from more than one program (lifts plus accessory work) (PR #87) | building | me | M |
 | F-19 | Supersets in coach-built programs | new | coach feedback | M |
 | F-22 | A coach's own exercises in the Exercise Library (needs SQL) | new | me | M |
 
@@ -575,6 +564,17 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Weight targets as a percent of each athlete's estimated max (F-28) | coach feedback | #83 |
+| A day built from more than one program: add a day from another program in the plan builder (F-24) | me | #87 |
+| Engagement: 10-session and test-day badges, retest-day push reminders (schema v68; the retest push waits on B-11) (P-08) | me | #139, #143 |
+| Mobility and explosive high-flyer exercises (F-46) | me | #142 |
+| Free read-only parent and coach viewer, invited by link or email (schema v67) (P-06) | me | #136 |
+| Read-only Week 1 preview at the end of onboarding (PH1-1) | me | #135 |
+| First workout free with no card; the trial starts at checkout after workout 1 (PH1-2) | me | #134 |
+| Solo-first onboarding copy, team code optional; Topbar drops readiness and team (PH1-4) | me | #133 |
+| Continue Workout reopens the workout in progress, on the exercise reached (B-10) | bug | #140 |
+| Weekly challenge and streak weeks in the athlete's own time zone (schema v66) (G-07) | your idea | #130 |
+| Onboarding quiz: years lifting, equipment, goals, season setup (schema v66) (P-03) | me | #126 |
 | Today no longer shows the Daily check-in card; it stays under Progress (PH1-3) | me | #132 |
 | More no longer has a second Start Workout (PH1-5) | me | #131 |
 | Referral code saved on the account at sign-up, so it survives a confirmation email opened in another browser (RF-02) | your idea | #129 |
