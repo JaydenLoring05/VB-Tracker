@@ -3,10 +3,11 @@
 import { FormEvent, useState } from "react";
 
 import { useCalendar } from "@/hooks/useCalendar";
-import { todayISO } from "@/lib/storage";
+import { useTodayISO } from "@/hooks/useToday";
 
 export function CalendarPanel() {
   const { calendarPreview, trainingLoad, addGame } = useCalendar();
+  const today = useTodayISO();
   const [isAddingGame, setIsAddingGame] = useState(false);
   const [gameTitle, setGameTitle] = useState("");
 
@@ -53,7 +54,7 @@ export function CalendarPanel() {
 
       <div className="calendar-preview" style={{ marginTop: 16 }}>
         {calendarPreview.map((day) => (
-          <div className={`calendar-day${day.iso === todayISO() ? " is-today" : ""}`} key={day.iso}>
+          <div className={`calendar-day${day.iso === today ? " is-today" : ""}`} key={day.iso}>
             <strong>
               {day.day} {day.number}
             </strong>

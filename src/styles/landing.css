@@ -967,7 +967,7 @@
     align-items: start;
   }
 
-  /* Paired shots share one frame size; taller crops (film room) letterbox instead of stretching the row. */
+  /* Paired shots share one frame size; taller crops letterbox instead of stretching the row. */
   .landing-shot:not(.landing-shot-main) img {
     aspect-ratio: 1280 / 860;
     object-fit: contain;

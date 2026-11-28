@@ -2,16 +2,20 @@
 
 
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
-import { todayName } from "@/lib/storage";
+import { useTodayName } from "@/hooks/useToday";
+import { countAdaptations } from "@/lib/trainingProfile";
 
 import { DayCard } from "./DayCard";
+import { TrainingProfileCard } from "./TrainingProfileCard";
 
 export function WorkoutGrid() {
-  const today = todayName();
+  const today = useTodayName();
   const { workoutDays } = useWorkoutProgress();
 
   return (
     <section id="workouts">
+      <TrainingProfileCard adaptedCount={countAdaptations(workoutDays)} />
+
       <h2>
         Weekly Workouts
       </h2>

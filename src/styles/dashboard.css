@@ -246,30 +246,6 @@
   }
 }
 
-/* One-tap entry to the daily check-in, shown until today's is saved. */
-.today-checkin {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
-  min-height: 64px;
-  color: var(--text);
-  text-decoration: none;
-  border-color: var(--gold);
-}
-
-.today-checkin > span {
-  display: grid;
-  flex: 1;
-  gap: 2px;
-}
-
-.today-checkin svg {
-  flex: 0 0 auto;
-  color: var(--gold);
-}
-
-/* Phone reminder card on Today (schema_v55): same look as the check-in card, plus a close button. */
 .push-nudge {
   position: relative;
   border-color: var(--border);
@@ -294,4 +270,211 @@
 
 .push-nudge-close svg {
   color: var(--muted);
+}
+
+/* N-02: what today's workout is, and a recovery tip on rest days. */
+.today-exercises {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-5);
+  padding: 0;
+  list-style: none;
+}
+
+.today-exercises li {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
+}
+
+.today-rest-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-5);
+  line-height: 1.45;
+}
+
+.today-rest-tip svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--gold);
+}
+
+/* G-02: level and progress to the next one, under the Start button. */
+.today-level {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
+}
+
+.today-level-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+/* G-03: badges on Today and the unlock celebration. */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge {
+  display: grid;
+  gap: 2px;
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
+}
+
+.badge-icon {
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.badge-locked .badge-icon {
+  filter: grayscale(1);
+  opacity: 0.35;
+}
+
+.badge-unlock {
+  text-align: center;
+}
+
+.badge-unlock-burst {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 96px;
+}
+
+.badge-unlock-icon {
+  font-size: 64px;
+  animation: badge-pop 520ms var(--ease-out) both;
+}
+
+.badge-unlock-list {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 var(--sp-5);
+  padding: 0;
+  list-style: none;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  70% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-unlock-icon {
+    animation: none;
+  }
+}
+
+.badge strong {
+  color: var(--text);
+}
+
+.badge-earned {
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+
+.badge-locked strong {
+  color: var(--muted);
+}
+/* G-01: banked streak freezes. */
+.dashboard-freeze {
+  background: color-mix(in oklch, var(--blue) 16%, transparent);
+  color: var(--blue);
+}
+
+.today-freeze-note {
+  margin: calc(-1 * var(--sp-3)) 0 var(--sp-4);
+  font-size: var(--fs-sm);
+}
+
+/* G-05: share card button under the level bar. */
+.share-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+}
+
+/* G-06: weekly challenge and leaderboard. */
+.challenge-body {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.challenge-body p {
+  margin: 0;
+}
+
+.challenge-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 600;
+}
+
+.challenge-title svg {
+  color: var(--gold);
+}
+
+.challenge-optin {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  min-height: 44px;
+  font-size: var(--fs-sm);
+}
+
+.challenge-optin input {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  margin-top: 2px;
+  flex: none;
+}
+
+.challenge-board {
+  display: grid;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.challenge-board li {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.challenge-rank {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.challenge-me {
+  box-shadow: inset 0 0 0 1px var(--gold);
 }

@@ -75,11 +75,11 @@ export function useCoachRoster(team: Team | null) {
         console.error("Failed to load roster activity", profilesError);
       }
 
-      // Guardian status, read separately: before schema_v52 these columns
+      // Age and parent-consent status, read separately: before schema_v61 these columns
       // don't exist, and that must not hide the roster. On error, no flags.
       const { data: guardianRows, error: guardianError } = await supabase
         .from("profiles")
-        .select("user_id, is_adult, guardian_name, guardian_email, guardian_acknowledged_at")
+        .select("user_id, is_adult, under_13, guardian_email, guardian_acknowledged_at")
         .in("user_id", athleteIds);
       const guardianMissing = new Set(
         guardianError

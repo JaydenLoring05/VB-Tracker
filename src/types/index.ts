@@ -35,6 +35,10 @@ export type WorkoutDay = {
   targets?: Record<string, string>;
   /** Coach's own note per exercise ("land on the balls of your feet"). Only on coach-built programs. */
   exerciseNotes?: Record<string, string>;
+  /** Why the athlete's training profile changed or added an exercise ("Knee-friendly swap for Box Jumps"). */
+  adaptNotes?: Record<string, string>;
+  /** Why this whole day changed this week ("Practice day: ..."), F-38. */
+  adjustNote?: string;
 };
 
 export type StatEntry = {
@@ -123,75 +127,6 @@ export type TeamMember = {
   joined_at: string;
 };
 
-export type FilmTagType =
-  | "kill"
-  | "error"
-  | "block"
-  | "dig"
-  | "ace"
-  | "serve_error"
-  | "set"
-  | "note"
-  | "pass"
-  | "serve"
-  | "attack";
-
-/** The result of a three-tap tag (schema_v53). Which values apply depends on the skill. */
-export type FilmResult =
-  | "ace"
-  | "in"
-  | "error"
-  | "3"
-  | "2"
-  | "1"
-  | "0"
-  | "good"
-  | "ok"
-  | "kill"
-  | "in_play"
-  | "stuff"
-  | "touch"
-  | "up";
-
-export type PassRating = 0 | 1 | 2 | 3;
-export type SetZone = "1" | "2" | "3" | "4" | "5" | "6";
-export type SetType = "4" | "5" | "slide" | "pipe" | "back_row" | "quick" | "dump";
-export type BlockOutcome = "stuff" | "touch" | "tooled" | "missed";
-export type AttackDirection = "line" | "cross" | "seam" | "tip" | "roll";
-
-/** The optional "who made the play and how good was it" fields from schema_v36. */
-export type FilmTagDetails = {
-  athlete_id: string | null;
-  pass_rating: PassRating | null;
-  set_zone: SetZone | null;
-  set_type: SetType | null;
-  block_outcome: BlockOutcome | null;
-  attack_direction: AttackDirection | null;
-};
-
-export type TeamFilm = {
-  id: string;
-  team_id: string;
-  event_id: string | null;
-  title: string;
-  video_url: string;
-  created_by: string;
-  created_at: string;
-};
-
-export type FilmTag = {
-  id: string;
-  film_id: string;
-  team_id: string;
-  seconds: number;
-  tag: FilmTagType;
-  note: string | null;
-  /** Set by the three-tap flow; absent on older tags and before schema_v53 runs. */
-  result?: FilmResult | null;
-  created_by: string;
-  created_at: string;
-} & FilmTagDetails;
-
 export type RosterAthlete = {
   userId: string;
   displayName: string;
@@ -201,6 +136,6 @@ export type RosterAthlete = {
   lastCheckIn: string | null;
   needsCheckIn: boolean;
   lastActiveAt: string | null;
-  /** Hasn't answered the 18+ question, or is under 18 without guardian info (schema_v52). */
+  /** Hasn't told us their age, or is under 13 without parent consent (schema_v61, N-03). */
   guardianInfoMissing?: boolean;
 };

@@ -1,8 +1,10 @@
 import { CoachPanel } from "@/components/stats/CoachPanel";
 import { DailyCheckIn } from "@/components/stats/DailyCheckIn";
+import { JumpTracker } from "@/components/stats/JumpTracker";
 import { PerformanceProfileForm } from "@/components/stats/PerformanceProfileForm";
 import { PRTracker } from "@/components/stats/PRTracker";
 import { ProgressCharts } from "@/components/stats/ProgressCharts";
+import { ResultsCard } from "@/components/stats/ResultsCard";
 import { SkillRadar } from "@/components/stats/SkillRadar";
 import { StatsForm } from "@/components/stats/StatsForm";
 import { StatsHeadline } from "@/components/stats/StatsHeadline";
@@ -13,6 +15,14 @@ export default function StatsPage() {
   return (
     <>
       <StatsHeadline />
+
+      <section style={{ marginBottom: 24 }}>
+        <JumpTracker />
+      </section>
+
+      <section style={{ marginBottom: 24 }}>
+        <ResultsCard />
+      </section>
 
       <section id="stats" className="lower-grid">
         <DailyCheckIn compact />

@@ -21,7 +21,7 @@ export default function PrivacyPage() {
 
       <main id="main-content" tabIndex={-1} className="legal-content">
         <h1>Privacy Policy</h1>
-        <p className="muted">Last updated October 2, 2026.</p>
+        <p className="muted">Last updated November 3, 2026.</p>
 
         <p>
           NextRep is a training and recovery tracker for volleyball teams. This page explains
@@ -166,35 +166,41 @@ export default function PrivacyPage() {
           Don&apos;t rely on this app for that decision.
         </p>
 
-        <h2>Athletes under 18</h2>
+        <h2>Age and athletes under 13</h2>
         <p>
-          When an athlete sets up NextRep, we ask whether they are 18 or older. We don&apos;t ask
-          for a date of birth. If they are under 18, we ask for a parent or guardian&apos;s name
-          and email, and for the athlete to confirm that their parent or guardian knows they are
-          using NextRep and that their coach can see their check-ins, including soreness and pain.
+          When someone signs up, we ask their age. We don&apos;t ask for a date of birth and we
+          don&apos;t store the exact age: we keep only an age group (under 14, 14 to 17, or 18 and
+          older), which the plan uses to pick age-appropriate exercises, and whether the athlete is
+          under 13.
+        </p>
+        <p>
+          Athletes under 13 can&apos;t create an account until a parent or guardian gives their
+          email and confirms that they agree to the athlete using NextRep and to this Privacy
+          Policy.
         </p>
         <ul>
           <li>
-            We store that answer, the parent or guardian&apos;s name and email, and when it was
-            confirmed, on the athlete&apos;s profile.
+            We store the parent or guardian&apos;s email and when they agreed on the athlete&apos;s
+            profile.
           </li>
           <li>
-            The athlete&apos;s coach can see whether this information has been given, and can see the
-            parent or guardian&apos;s name and email so they can reach them. Nobody else can.
+            If the athlete is on a team, their coach can see whether consent has been given and the
+            parent or guardian&apos;s email so they can reach them. Nobody else can.
           </li>
           <li>
-            We don&apos;t email or contact the parent or guardian, and we don&apos;t use their details for
+            We don&apos;t send marketing to the parent or guardian, and we don&apos;t use their email for
             anything else. A parent or guardian can ask us to see, correct, or delete the
             athlete&apos;s data at the contact address below.
           </li>
           <li>
-            Athletes who joined before we asked will be asked the next time they open the app.
-            Until they answer, their coach sees &quot;Guardian info missing&quot; next to their name.
+            Athletes who joined before we asked their age will be asked the next time they open the
+            app. Until they answer, their coach sees &quot;Age or parent consent missing&quot; next to
+            their name.
           </li>
         </ul>
         <p>
-          Coaches who invite athletes under 18 are still responsible for having any permission
-          their school or club requires.
+          Coaches who invite young athletes are still responsible for having any permission their
+          school or club requires.
         </p>
 
         <h2>Changes</h2>

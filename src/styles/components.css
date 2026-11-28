@@ -461,3 +461,73 @@
     padding: 3px 9px;
   }
 }
+
+/* Training profile (F-31): level and sore-area picker, and swap notes. */
+.training-profile-card {
+  margin-bottom: 16px;
+}
+
+.training-profile-label {
+  margin: 12px 0 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.training-profile-summary,
+.training-profile-disclaimer {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+}
+
+.exercise-adapt-note {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+}
+
+.training-profile-checkin {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: var(--gold);
+}
+
+/* Weekly auto-adjust (F-38). */
+.training-profile-week {
+  margin-top: 14px;
+}
+
+.training-profile-week summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.training-profile-week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.training-profile-week-grid label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.training-profile-week-grid span {
+  width: 2.5em;
+  font-weight: 600;
+}
+
+.training-profile-this-week ul {
+  margin: 4px 0 8px;
+  padding-left: 18px;
+  font-size: 0.88rem;
+}
+
+.day-adjust-note {
+  margin: 4px 0 8px;
+  font-size: 0.85rem;
+  color: var(--gold);
+}

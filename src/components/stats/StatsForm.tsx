@@ -54,7 +54,7 @@ export function StatsForm() {
       </div>
 
       <div className="button-row">
-        <button onClick={saveStats}>Save Stats Entry</button>
+        <button onClick={() => saveStats({ testOnly: true })}>Save Stats Entry</button>
         <button className="ghost" onClick={() => setConfirmingClear(true)}>
           Clear History
         </button>

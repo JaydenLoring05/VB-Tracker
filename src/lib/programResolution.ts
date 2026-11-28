@@ -1,4 +1,5 @@
 import { CustomProgram, programToWorkoutDays } from "@/lib/customProgram";
+import { adaptWorkoutDays, DEFAULT_TRAINING_PROFILE, TrainingProfile } from "@/lib/trainingProfile";
 import { WorkoutDay } from "@/types";
 
 export type PhaseSlug = "foundation" | "build" | "power" | "taper";
@@ -24,14 +25,24 @@ export function dayOverrideKey(phase: PhaseSlug, day: string) {
 
 function applySubstitutions(day: WorkoutDay, substitutions: Record<string, string>): WorkoutDay {
   const exercises = day.exercises.map((exercise) => substitutions[exercise] ?? exercise);
-  if (!day.targets) return { ...day, exercises };
+  if (!day.targets && !day.adaptNotes) return { ...day, exercises };
   // Keep the coach's target attached to the exercise the athlete swapped in.
+  // A profile note only stays on an exercise the athlete didn't swap away.
   const targets: Record<string, string> = {};
+  const adaptNotes: Record<string, string> = {};
   day.exercises.forEach((exercise, index) => {
     const target = day.targets?.[exercise];
     if (target) targets[exercises[index]] = target;
+    const note = day.adaptNotes?.[exercise];
+    if (note && exercises[index] === exercise) adaptNotes[exercise] = note;
   });
-  return { ...day, exercises, targets };
+  const result: WorkoutDay = { ...day, exercises };
+  if (day.targets) result.targets = targets;
+  if (day.adaptNotes) {
+    if (Object.keys(adaptNotes).length > 0) result.adaptNotes = adaptNotes;
+    else delete result.adaptNotes;
+  }
+  return result;
 }
 
 /**
@@ -41,28 +52,35 @@ function applySubstitutions(day: WorkoutDay, substitutions: Record<string, strin
  * Otherwise, resolution order: athlete's personal substitution -> team's full day edit
  * (paid tier only, if that day has one) -> team's per-exercise preset
  * default (pilot tier only, if set) -> the plan's original exercise.
+ *
+ * The athlete's training profile (level and injuries, F-31) adapts the
+ * team-resolved week before personal swaps, so an injury swap always wins
+ * over the plan or the coach's defaults but the athlete can still swap by hand.
  */
 export function resolveWorkoutDays(
   days: WorkoutDay[],
   week: number,
   team: TeamOverrideData | null,
-  substitutions: Record<string, string>
+  substitutions: Record<string, string>,
+  profile: TrainingProfile = DEFAULT_TRAINING_PROFILE
 ): WorkoutDay[] {
   if (team?.customProgram) {
-    return programToWorkoutDays(team.customProgram).map((day) => applySubstitutions(day, substitutions));
+    return adaptWorkoutDays(programToWorkoutDays(team.customProgram), week, profile, { coachProgram: true }).map(
+      (day) => applySubstitutions(day, substitutions)
+    );
   }
 
   if (!team) {
-    return days.map((day) => applySubstitutions(day, substitutions));
+    return adaptWorkoutDays(days, week, profile).map((day) => applySubstitutions(day, substitutions));
   }
 
   const phase = phaseSlug(week);
 
-  return days.map((day) => {
+  const teamDays = days.map((day) => {
     const fullOverride =
       team.planTier === "paid" ? team.dayOverrides[dayOverrideKey(phase, day.day)] : undefined;
 
-    const teamResolved =
+    const exercises =
       fullOverride ??
       day.exercises.map((exercise) =>
         team.planTier === "pilot" && team.exerciseDefaults[exercise]
@@ -70,9 +88,8 @@ export function resolveWorkoutDays(
           : exercise
       );
 
-    return {
-      ...day,
-      exercises: teamResolved.map((exercise) => substitutions[exercise] ?? exercise)
-    };
+    return { ...day, exercises };
   });
+
+  return adaptWorkoutDays(teamDays, week, profile).map((day) => applySubstitutions(day, substitutions));
 }
