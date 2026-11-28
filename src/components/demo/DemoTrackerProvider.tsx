@@ -4,6 +4,7 @@ import { useMemo } from "react";
 
 import { emptyStats, TrackerContext, type TrackerContextValue } from "@/context/TrackerContext";
 import type { DemoData } from "@/data/demoData";
+import { todayISO } from "@/lib/storage";
 
 /**
  * Feeds the real athlete-facing components a read-only TrackerContext built
@@ -78,6 +79,7 @@ export function DemoTrackerProvider({
       },
 
       workoutStreak: spotlight.workoutStreak,
+      workoutDates: (data.completedSessions[spotlight.userId] ?? []).map((session) => todayISO(new Date(session.ended_at))),
 
       syncError: null,
       syncRetry: null,

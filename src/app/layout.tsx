@@ -18,7 +18,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME}: volleyball readiness and training for coaches`,
+    default: `${SITE_NAME}: your personal volleyball strength coach`,
     template: `%s | ${SITE_NAME}`
   },
   description: SITE_DESCRIPTION,

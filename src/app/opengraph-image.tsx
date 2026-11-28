@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "NextRep: know who's ready, know who needs attention";
+export const alt = "NextRep: every volleyball player deserves a strength coach";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -34,15 +34,15 @@ export default function OpenGraphImage() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ fontSize: 76, fontWeight: 800, lineHeight: 1.05, maxWidth: 980 }}>
-            Know who&apos;s ready. Know who needs attention.
+            Every volleyball player deserves a strength coach.
           </div>
           <div style={{ fontSize: 34, color: "#aeb6c4", maxWidth: 900 }}>
-            Workouts, daily readiness, and progress for volleyball teams, in one coach dashboard.
+            Jump higher. Move faster. Get stronger. Your personal volleyball performance coach, in your pocket.
           </div>
         </div>
 
         <div style={{ display: "flex", fontSize: 30, color: "#ffc400", fontWeight: 700 }}>
-          Free 30-day founding team pilot
+          joinnextrep.com
         </div>
       </div>
     ),

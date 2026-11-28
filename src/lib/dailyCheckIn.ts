@@ -109,9 +109,18 @@ export function stepSleep(hours: number, direction: 1 | -1): number {
   return Math.min(SLEEP_MAX, Math.max(SLEEP_MIN, snapped + direction * SLEEP_STEP));
 }
 
-/** Whether the athlete's latest history entry is from today (in either stored date format). */
-export function checkedInToday(history: { date: string }[], now: Date = new Date()): boolean {
-  const last = history[history.length - 1]?.date;
+/**
+ * Whether the athlete's latest history entry is from today (in either stored
+ * date format) and is a real check-in: an entry with a blank sleep answer is a
+ * test-day save (vertical, weight...) and doesn't count.
+ */
+export function checkedInToday(
+  history: { date: string; sleep?: number | "" }[],
+  now: Date = new Date()
+): boolean {
+  const lastEntry = history[history.length - 1];
+  if (!lastEntry || lastEntry.sleep === "") return false;
+  const last = lastEntry.date;
   if (!last) return false;
   const local = new Date(now);
   local.setMinutes(local.getMinutes() - local.getTimezoneOffset());

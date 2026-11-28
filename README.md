@@ -15,10 +15,8 @@ From the public demo at `/demo` (sample team, no real athletes):
 | Coach dashboard and Attention Center | Athlete drill-down | Athlete home |
 | --- | --- | --- |
 | ![Coach dashboard with the Attention Center ranking who needs a look today](docs/screenshots/coach-dashboard.jpg) | ![One athlete's readiness history chart and daily check-ins](docs/screenshots/athlete-drilldown.jpg) | ![Athlete home screen with today's workout, recovery, weekly progress and recent PRs](docs/screenshots/athlete-view.jpg) |
-| **Workout Mode** | **Film room** | |
-| ![Workout Mode logging a set, with a new PR badge and the rest timer running](docs/screenshots/workout-mode.jpg) | ![Film room tag panel with a pass being tagged and a list of tagged plays by athlete](docs/screenshots/film-room.jpg) | |
-
-The Workout Mode and film room demo tabs come from #39.
+| **Workout Mode** | | |
+| ![Workout Mode logging a set, with a new PR badge and the rest timer running](docs/screenshots/workout-mode.jpg) | | |
 
 Regenerate them with `node scripts/capture-readme-screenshots.mjs` against a running build.
 
@@ -44,17 +42,6 @@ Regenerate them with `node scripts/capture-readme-screenshots.mjs` against a run
   another exercise in the same category, remembered across sessions
 - Exercise library tagged by Beginner/Intermediate/Advanced, including
   hip-abduction, single-leg balance, and landing-mechanics work
-- Team film review: coaches link YouTube (or other) game film to the team,
-  tag plays by type at a timestamp, and athletes can jump straight to a
-  tagged moment
-- Film tag details: every tag can record the athlete, pass rating, set zone
-  and type, block outcome or attack direction. Coaches can tag with the
-  keyboard (one key per tag type, then a detail key) or by voice
-  ("Maya pass two") through the browser's Web Speech API
-- Film stats from tags: each film has a Stats view with the passing average
-  per athlete (0 to 3), where the sets went by court zone, and block outcomes
-  per athlete. The coach's athlete drill-down has a Film tab with the same
-  numbers film by film. Athletes see their own passing and blocking rows
 - Coach program builder: coaches build their own repeating week and assign it
   to the whole team, a group of athletes, or one athlete (the most specific
   assignment wins)
@@ -86,7 +73,7 @@ Regenerate them with `node scripts/capture-readme-screenshots.mjs` against a run
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
    ```
-3. Run every file in `supabase/`, once each, in your project's SQL Editor, in this order, to create the tables, row-level security policies, and constraints: `schema.sql`, `schema_v18_5.sql`, `schema_v19.sql`, `schema_v20_teams.sql`, `schema_v21_substitutions.sql`, `schema_v22_profiles.sql`, `schema_v23_team_management.sql`, `schema_v24_performance_profiles.sql`, `schema_v25_removal_notices.sql`, `schema_v26_multi_team_coach.sql`, `schema_v27_team_plan_tier.sql`, `schema_v28_team_exercise_defaults.sql`, `schema_v29_team_day_overrides.sql`, `schema_v30_workout_active_time.sql`, `schema_v31_readiness_expansion.sql`, `schema_v32_workout_rpe.sql`, `schema_v33_team_calendar.sql`, `schema_v34_profile_onboarding.sql`, `schema_v35_team_film.sql`, `schema_v36_film_tag_details.sql`, `schema_v40_pilot_applications.sql`, `schema_v41_team_member_names.sql`, `schema_v42_workout_set_seconds.sql`, `schema_v43_team_programs.sql`, `schema_v44_program_start_date.sql`, `schema_v45_starting_program.sql`, `schema_v46_delete_my_account.sql`, `schema_v47_daily_coach_summary.sql`, `schema_v48_skill_ratings.sql`, `schema_v49_invite_preview.sql`, `schema_v50_checkin_reminders.sql`, `schema_v51_feedback.sql`, `schema_v52_guardian_info.sql`. (There are no v37 to v39 files.)
+3. Run every file in `supabase/`, once each, in your project's SQL Editor, in this order, to create the tables, row-level security policies, and constraints: `schema.sql`, `schema_v18_5.sql`, `schema_v19.sql`, `schema_v20_teams.sql`, `schema_v21_substitutions.sql`, `schema_v22_profiles.sql`, `schema_v23_team_management.sql`, `schema_v24_performance_profiles.sql`, `schema_v25_removal_notices.sql`, `schema_v26_multi_team_coach.sql`, `schema_v27_team_plan_tier.sql`, `schema_v28_team_exercise_defaults.sql`, `schema_v29_team_day_overrides.sql`, `schema_v30_workout_active_time.sql`, `schema_v31_readiness_expansion.sql`, `schema_v32_workout_rpe.sql`, `schema_v33_team_calendar.sql`, `schema_v34_profile_onboarding.sql`, `schema_v35_team_film.sql`, `schema_v36_film_tag_details.sql`, `schema_v40_pilot_applications.sql`, `schema_v41_team_member_names.sql`, `schema_v42_workout_set_seconds.sql`, `schema_v43_team_programs.sql`, `schema_v44_program_start_date.sql`, `schema_v45_starting_program.sql`, `schema_v46_delete_my_account.sql`, `schema_v47_daily_coach_summary.sql`, `schema_v48_skill_ratings.sql`, `schema_v49_invite_preview.sql`, `schema_v50_checkin_reminders.sql`, `schema_v51_feedback.sql`, `schema_v52_guardian_info.sql`, then any later numbered files in order (for example `schema_v60_waitlist_signups.sql` for the `/join` athlete sign-up form). (There are no v37 to v39 files.)
 4. `npm run dev`
 
 ### Optional environment variables

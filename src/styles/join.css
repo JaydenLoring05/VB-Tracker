@@ -1,0 +1,420 @@
+/* Athlete sign-up page (/join, F-41). Mobile first; builds on landing.css and pilot.css. */
+
+.join-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.join-hero h1 {
+  margin: var(--sp-4) 0 var(--sp-5);
+  font-size: clamp(36px, 10vw, 58px);
+  line-height: 1;
+}
+
+/* The landing header hides its section links on phones; keep the CTA from crowding the logo. */
+@media (max-width: 380px) {
+  .join-page .landing-header-nav a:first-child {
+    display: none;
+  }
+}
+
+/* Benefits */
+
+.join-cards {
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.join-card {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.join-card h3 {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+.join-card p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.join-card-icon {
+  color: var(--gold);
+}
+
+@media (min-width: 760px) {
+  .join-inner {
+    max-width: 1040px;
+  }
+
+  .join-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* How it works */
+
+.join-steps {
+  display: grid;
+  gap: var(--sp-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.join-step {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: flex-start;
+}
+
+.join-step-number {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: var(--on-gold);
+  font-weight: var(--fw-display);
+}
+
+.join-step h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 4px 0 var(--sp-1);
+  font-size: var(--fs-lg);
+}
+
+.join-step h3 svg {
+  color: var(--gold);
+}
+
+.join-step p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+@media (min-width: 760px) {
+  .join-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Price */
+
+.join-price-card {
+  display: grid;
+  gap: var(--sp-3);
+  max-width: 440px;
+  border-color: color-mix(in oklch, var(--gold) 45%, var(--border));
+}
+
+.join-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+}
+
+.join-price-amount {
+  font-size: 44px;
+  font-weight: var(--fw-display);
+  line-height: 1;
+}
+
+.join-price-trial {
+  margin: 0;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.join-price-card .pilot-points {
+  margin: var(--sp-2) 0;
+}
+
+.join-price-note {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+/* Two plans side by side from tablet up (P-02) */
+
+.join-plans {
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+  list-style: none;
+}
+
+.join-plans .join-price-card {
+  max-width: none;
+  border-color: var(--border);
+}
+
+.join-plans .join-plan-featured {
+  border-color: var(--gold);
+}
+
+.join-plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin: 0;
+}
+
+.join-save {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.join-price-was {
+  align-self: center;
+  font-size: var(--fs-lg);
+}
+
+.join-plan-includes {
+  max-width: none;
+}
+
+@media (min-width: 760px) {
+  .join-plans {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Monthly only (annual switched off): one card, not half a grid. */
+  .join-plans-single {
+    grid-template-columns: minmax(0, 440px);
+  }
+}
+
+/* Sign-up */
+
+.join-signup {
+  scroll-margin-top: 64px;
+}
+
+.join-signup .pilot-form,
+.join-signup .pilot-result {
+  max-width: 520px;
+}
+
+.join-signup .pilot-result h3 {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  line-height: 1.1;
+}
+
+.join-signup .pilot-result h3:focus {
+  outline: none;
+}
+
+.join-account-note,
+.join-disclaimer {
+  max-width: 520px;
+  margin: var(--sp-5) 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.join-account-note a,
+.join-signup .pilot-result a:not(.btn) {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.join-disclaimer {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-xs);
+}
+
+/* L-01: Today screen preview, levels and badges, founder. */
+.join-today {
+  display: grid;
+  gap: var(--sp-6);
+}
+
+.join-today-preview {
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.join-today-preview .today-hero {
+  animation: none;
+}
+
+.join-today-title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  text-transform: uppercase;
+}
+
+.join-levels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-5);
+  padding: 0;
+  list-style: none;
+  counter-reset: level;
+}
+
+.join-levels li {
+  display: grid;
+  gap: 2px;
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: var(--fs-sm);
+}
+
+.join-levels li:last-child {
+  border-color: var(--gold);
+}
+
+.join-badges {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.join-badges li {
+  display: grid;
+  gap: 2px;
+  font-size: var(--fs-sm);
+}
+
+.join-badges li > span:first-child {
+  font-size: 28px;
+}
+
+.join-founder p {
+  max-width: 60ch;
+  line-height: 1.6;
+}
+
+/* RF-01: arrived with a friend's code. */
+.join-referral {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-4);
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--gold) 14%, transparent);
+  color: var(--gold);
+  font-size: var(--fs-sm);
+}
+
+/* Landing page (P-01): coach's copy at / and /join */
+
+.join-page .landing-header-nav a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.join-page .landing-header-nav a:not(.btn):hover {
+  color: var(--text);
+}
+
+/* Phones keep the header to "Log in" and the trial button; coaches find /pilot in section 6 and the footer. */
+@media (max-width: 520px) {
+  .join-page .landing-header-nav a.join-coach-link {
+    display: none;
+  }
+}
+
+.join-hero-note {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-sm);
+}
+
+.landing-soon {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-pill);
+  color: var(--gold);
+  font-size: var(--fs-xs, 12px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.join-soon-line {
+  margin: var(--sp-5) 0 0;
+  line-height: 1.55;
+}
+
+.join-soon-line .landing-soon {
+  margin-right: var(--sp-2);
+}
+
+.join-results {
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.join-results li {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+}
+
+.join-results li .join-card-icon {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.join-results p {
+  margin: var(--sp-1) 0 0;
+  line-height: 1.5;
+}
+
+.join-results .landing-soon {
+  margin-left: var(--sp-2);
+}
+
+@media (min-width: 760px) {
+  .join-cards-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .join-results {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-5) var(--sp-6);
+  }
+}
+
+@media (min-width: 1040px) {
+  .join-cards-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

@@ -70,7 +70,7 @@ erDiagram
 | `team_program_assignments` | Which program goes to the team, a group, or one athlete |
 | `team_exercise_defaults`, `team_day_overrides` | Older, lighter ways to customize the recommended plan |
 | `team_calendar_events` | Practices, matches, tournaments, travel, testing |
-| `team_film`, `film_tags` | Game film links and timestamped tags (who made the play, pass rating, set zone, ...) |
+| `team_film`, `film_tags` | Old game film links and tags. Film moved to a separate tool (Film Room), so the app no longer reads or writes these; the tables and data are kept until Jayden decides what to do with them |
 
 The recommended 20-week plan is not in the database at all. It is static
 TypeScript in `src/data/workoutPlan.ts` and `src/data/exercises.ts`, shipped
@@ -119,7 +119,7 @@ create function public.is_caller_coach_of(p_user_id uuid) returns boolean ...
 
 They are used two ways:
 
-- **Team tables** (programs, groups, calendar, film):
+- **Team tables** (programs, groups, calendar):
   `for all using (public.is_team_coach(team_id))`. Only that team's coach can
   write. Any member of the team can read.
 - **Athlete tables** (check-ins, sessions, PRs, profiles): a second, read-only
@@ -151,8 +151,7 @@ same team, and can only assign a program that belongs to the same team (see
 The rules that matter are pure TypeScript functions in `src/lib`: readiness
 scoring (`recovery.ts`), what the Attention Center flags
 (`attentionCenter.ts`), which program an athlete follows
-(`customProgram.ts`, `programResolution.ts`), film hotkeys and voice parsing
-(`filmHotkeys.ts`, `filmVoice.ts`).
+(`customProgram.ts`, `programResolution.ts`).
 
 "Pure" means: data in, answer out. No React, no Supabase, no clock unless
 it is passed in. That gives three things:

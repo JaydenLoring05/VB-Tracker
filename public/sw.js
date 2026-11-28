@@ -126,3 +126,44 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(cacheFirst(event));
   }
 });
+
+/* Phone reminders (schema_v55). The server sends { title, body, url, tag } as JSON.
+ * Nothing here is cached. Tapping opens the reminder's page in an existing NextRep tab
+ * if there is one, otherwise in a new window. Only same-origin paths are opened. */
+self.addEventListener("push", (event) => {
+  let message = {};
+  try {
+    message = event.data ? event.data.json() : {};
+  } catch {
+    message = { body: event.data ? event.data.text() : "" };
+  }
+  const title = message.title || "NextRep";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: message.body || "",
+      tag: message.tag || "nextrep",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      data: { url: typeof message.url === "string" && message.url.startsWith("/") ? message.url : "/dashboard" }
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const path = (event.notification.data && event.notification.data.url) || "/dashboard";
+  const target = new URL(path, self.location.origin).href;
+  event.waitUntil(
+    (async () => {
+      const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const client of windows) {
+        if (new URL(client.url).origin === self.location.origin && "focus" in client) {
+          await client.focus();
+          if ("navigate" in client) await client.navigate(target).catch(() => undefined);
+          return;
+        }
+      }
+      await self.clients.openWindow(target);
+    })()
+  );
+});

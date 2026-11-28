@@ -2,6 +2,13 @@
   display: grid;
   grid-template-columns: repeat(7, minmax(140px, 1fr));
   gap: 14px;
+  /* Collapsed days pack together into one row of chips (F-32). */
+  grid-auto-flow: row dense;
+}
+
+/* An open day gets the full row instead of a 140px column (F-32). */
+.workout-grid .day-card:not(.day-card-collapsed) {
+  grid-column: 1 / -1;
 }
 
 .day-card {
@@ -184,6 +191,20 @@
 }
 
 /* iOS zooms into any focused field under 16px. */
+/* On wide screens the open day lays its exercises out side by side. */
+@media (min-width: 1201px) {
+  .workout-grid .day-card:not(.day-card-collapsed) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    column-gap: 24px;
+    align-items: start;
+  }
+
+  .workout-grid .day-card:not(.day-card-collapsed) > :not(.exercise-log-block) {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (pointer: coarse) {
   .swap-picker select,
   .exercise-log-input,

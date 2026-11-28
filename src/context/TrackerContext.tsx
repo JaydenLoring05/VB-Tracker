@@ -53,6 +53,11 @@ function numOrNull(value: number | "") {
   return value === "" ? null : value;
 }
 
+const BLANK_ENTRY: StatEntry = {
+  date: "", vertical: "", approach: "", weight: "", pullups: "", sleep: "", energy: "", stress: "",
+  soreness: "", kneePain: "", shoulderPain: "", lowerBackPain: "", anklePain: "", motivation: ""
+};
+
 function toStatsRow(entry: StatEntry): StatsRow {
   return {
     date: entry.date || null,
@@ -131,7 +136,7 @@ export type TrackerContextValue = {
   stats: StatEntry;
   setStats: React.Dispatch<React.SetStateAction<StatEntry>>;
   history: StatEntry[];
-  saveStats: () => void;
+  saveStats: (options?: { testOnly?: boolean }) => void;
   clearStats: () => void;
 
   calendarEvents: CalendarEvent[];
@@ -167,6 +172,12 @@ export type TrackerContextValue = {
   setStartingProgram: (key: StartingProgramKey | null) => Promise<boolean>;
 
   workoutStreak: number;
+  /**
+   * The local date (YYYY-MM-DD) of every finished workout, newest first, one
+   * entry per workout (so a date repeats on a two-workout day). Feeds XP,
+   * badges and streaks (G-01 to G-03).
+   */
+  workoutDates: string[];
 
   syncError: string | null;
   syncRetry: (() => void) | null;
@@ -208,6 +219,7 @@ export function TrackerProvider({
   const [teamOverride, setTeamOverride] = useState<TeamOverrideData | null>(null);
   const [startingProgram, setStartingProgramState] = useState<StartingProgramKey | null>(null);
   const [workoutStreak, setWorkoutStreak] = useState(0);
+  const [workoutDates, setWorkoutDates] = useState<string[]>([]);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [syncRetry, setSyncRetry] = useState<(() => void) | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -391,7 +403,9 @@ export function TrackerProvider({
           .eq("user_id", userId)
           .not("ended_at", "is", null)
           .order("ended_at", { ascending: false })
-          .limit(60),
+          // Every finished workout, for XP and badges. One short column, so
+          // even years of training stay a small read.
+          .limit(2000),
         supabase
           .from("exercise_substitutions")
           .select("original_exercise, chosen_exercise")
@@ -540,12 +554,11 @@ export function TrackerProvider({
         setTeamOverride(null);
       }
 
-      const workoutDates = new Set(
-        (sessionsRes.data ?? [])
-          .filter((row): row is { ended_at: string } => row.ended_at != null)
-          .map((row) => todayISO(new Date(row.ended_at)))
-      );
-      setWorkoutStreak(computeStreak(workoutDates));
+      const finishedDates = (sessionsRes.data ?? [])
+        .filter((row): row is { ended_at: string } => row.ended_at != null)
+        .map((row) => todayISO(new Date(row.ended_at)));
+      setWorkoutDates(finishedDates);
+      setWorkoutStreak(computeStreak(new Set(finishedDates)));
     }
 
     load();
@@ -638,17 +651,37 @@ export function TrackerProvider({
       });
   }
 
-  function saveStats() {
+  function saveStats(options?: { testOnly?: boolean }) {
+    const testOnly = options?.testOnly === true;
     const previousStats = stats;
     const previousHistory = history;
     const [today, legacyToday] = sameDayDateValues();
-    const entry = { ...stats, date: today };
+    // Test-day numbers (B-09): keep today's real check-in as it is (or leave
+    // the wellness fields blank if there isn't one) and change only the
+    // numbers that were edited, so a saved vertical is never a fake check-in.
+    const todayEntry = history.find((item) => item.date === today);
+    const entry: StatEntry = testOnly
+      ? {
+          ...(todayEntry ?? BLANK_ENTRY),
+          date: today,
+          vertical: stats.vertical,
+          approach: stats.approach,
+          weight: stats.weight,
+          pullups: stats.pullups
+        }
+      : { ...stats, date: today };
 
-    setStats(entry);
+    if (!testOnly) setStats(entry);
     // A second save on the same day replaces that day's entry instead of adding one.
     setHistory((current) => [...current.filter((item) => item.date !== today), entry]);
 
     const row = toStatsRow(entry);
+    const testColumns = {
+      vertical: row.vertical,
+      approach: row.approach,
+      weight: row.weight,
+      pullups: row.pullups
+    };
     let failed = false;
 
     function rollbackOnce(message: string) {
@@ -656,12 +689,17 @@ export function TrackerProvider({
       failed = true;
       setStats(previousStats);
       setHistory(previousHistory);
-      reportSyncError(message, () => saveStats());
+      reportSyncError(message, () => saveStats(options));
     }
 
     supabase
       .from("latest_stats")
-      .upsert(latestStatsUpsert(userId, row), { onConflict: "user_id" })
+      .upsert(
+        testOnly
+          ? ({ user_id: userId, ...testColumns } as unknown as StatsRow) // no updated_at: "last check-in" must not move
+          : latestStatsUpsert(userId, row),
+        { onConflict: "user_id" }
+      )
       .then(({ error }) => {
         if (error) {
           console.error("Failed to save latest stats", error);
@@ -685,7 +723,10 @@ export function TrackerProvider({
         }
         const todayRow = existing?.[0] as { id: string } | undefined;
         const { error } = todayRow
-          ? await supabase.from("stats_history").update(row).eq("id", todayRow.id).eq("user_id", userId)
+          ? await supabase
+              .from("stats_history")
+              .update(testOnly ? testColumns : row)
+              .eq("id", todayRow.id).eq("user_id", userId)
           : await supabase.from("stats_history").insert({ user_id: userId, ...row });
         if (error) {
           console.error("Failed to save stats history", error);
@@ -870,6 +911,7 @@ export function TrackerProvider({
     startingProgram,
     setStartingProgram,
     workoutStreak,
+    workoutDates,
     syncError,
     syncRetry,
     reportSyncError,

@@ -1,11 +1,13 @@
 "use client";
 
 import { CheckCircle2, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { Celebrate } from "@/components/shared/Celebrate";
 import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
+import { useDemo } from "@/context/DemoContext";
 import { getExercise } from "@/data/exercises";
 import { getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
 import { getExerciseNote, getExerciseTarget } from "@/lib/customProgram";
@@ -14,8 +16,10 @@ import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
-import { formatSetValue, getExerciseMeasure, parseTargetSeconds } from "@/lib/exerciseMeasure";
+import { useTrainingProfile } from "@/hooks/useTrainingProfile";
+import { formatSetValue, getExerciseMeasure, isJumpExercise, parseTargetSeconds, takesWeight } from "@/lib/exerciseMeasure";
 import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
+import { resumeExerciseIndex } from "@/lib/workoutResume";
 import { formatDuration } from "@/lib/time";
 
 import { DiscomfortSuggestion } from "./DiscomfortSuggestion";
@@ -67,6 +71,7 @@ export function WorkoutModeView({
     finishWorkout,
     updateSessionRPE
   } = controller;
+  const demo = useDemo();
 
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [weight, setWeight] = useState("");
@@ -88,18 +93,23 @@ export function WorkoutModeView({
   const currentExerciseRef = useRef<string | null>(null);
   const isLoggingRef = useRef(false);
   const isFinishingRef = useRef(false);
+  // Sets already saved when this screen opened, so a returning athlete is told they are there.
+  const [resumedSetCount, setResumedSetCount] = useState<number | null>(null);
+  // True once the athlete has moved, logged or removed anything in this visit.
+  const touchedRef = useRef(false);
 
   const { resolveExercise, setSubstitution } = useExerciseSubstitutions();
   const { teamOverride, substitutions, stats } = useTrackerContext();
+  const { effectiveProfile: trainingProfile } = useTrainingProfile();
 
   const day = useMemo(
     () =>
       session
-        ? resolveWorkoutDays(getWorkoutDays(session.week), session.week, teamOverride, substitutions).find(
+        ? resolveWorkoutDays(getWorkoutDays(session.week), session.week, teamOverride, substitutions, trainingProfile).find(
             (d) => d.day === session.day
           )
         : undefined,
-    [session, teamOverride, substitutions]
+    [session, teamOverride, substitutions, trainingProfile]
   );
 
   const resolvedExercises = useMemo(
@@ -108,6 +118,21 @@ export function WorkoutModeView({
   );
 
   const showSummary = finished || session?.ended_at != null;
+
+  // Coming back to a workout: open on the exercise the athlete had reached, not on the
+  // first one with an empty form, which looked like nothing had saved. Runs when the
+  // session and its saved sets arrive, and again if the program resolves a moment later
+  // (a coach's program loads after the default plan), but never once the athlete has
+  // done anything in this visit.
+  useEffect(() => {
+    if (touchedRef.current || loading || !session || !day) return;
+    if (sets.length === 0 || session.ended_at) return;
+
+    setExerciseIndex(
+      resumeExerciseIndex(resolvedExercises, sets, (name) => getExerciseTarget(day, session.week, name))
+    );
+    setResumedSetCount(sets.length);
+  }, [loading, session, day, resolvedExercises, sets]);
 
   useEffect(() => {
     if (!session || showSummary) return;
@@ -256,12 +281,17 @@ export function WorkoutModeView({
   const targetPercent = parseTargetPercent(prescription);
   const exerciseMax = estimatedMax[exercise];
   const percentWeight = targetPercent != null && exerciseMax ? weightForPercent(exerciseMax, targetPercent) : null;
+  const adaptNote = day.adaptNotes?.[originalExercise] ?? "";
   const isTimed = getExerciseMeasure(exercise) === "time";
+  // Jumps and bodyweight work log reps (or seconds) only, no weight box (N-01).
+  const showWeight = takesWeight(exercise);
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;
   currentExerciseRef.current = exercise ?? null;
 
   function goToExercise(nextIndex: number) {
+    touchedRef.current = true;
     setExerciseIndex(Math.max(0, Math.min(resolvedExercises.length - 1, nextIndex)));
+    setResumedSetCount(null);
     setWeight("");
     setReps("");
     setSeconds("");
@@ -295,9 +325,11 @@ export function WorkoutModeView({
     // This tap is the user gesture that lets the end-of-rest beeps play on phones.
     primeRestAlert();
     setRestOver(false);
+    touchedRef.current = true;
+    setResumedSetCount(null);
     setIsLogging(true);
     try {
-      const loggedWeight = weight.trim() === "" ? null : Number(weight);
+      const loggedWeight = !showWeight || weight.trim() === "" ? null : Number(weight);
       const result = isTimed
         ? await logSet(exercise, loggedWeight, null, Math.round(Number(seconds)))
         : await logSet(exercise, loggedWeight, Number(reps));
@@ -349,6 +381,13 @@ export function WorkoutModeView({
 
         <div className="workout-elapsed">{formatDuration(elapsedSeconds)}</div>
       </div>
+
+      {resumedSetCount != null && (
+        <p className="panel workout-resumed" role="status">
+          Welcome back. {resumedSetCount} set{resumedSetCount === 1 ? "" : "s"} from earlier{" "}
+          {resumedSetCount === 1 ? "is" : "are"} saved. You&apos;re on {exercise}.
+        </p>
+      )}
 
       <div className="panel workout-warm-up">
         <button type="button" className="ghost warm-up-toggle" onClick={() => setShowWarmUp((current) => !current)}>
@@ -404,8 +443,18 @@ export function WorkoutModeView({
             )}
           </p>
         )}
+        {adaptNote && <p className="exercise-adapt-note">{adaptNote}</p>}
         {coachNote && <p className="exercise-coach-note">Coach: {coachNote}</p>}
         {lastTime && <p className="muted last-time">Last time: {formatSetValue(lastTime)}</p>}
+        {/* N-01: jumps log reps here; a measured height or touch goes on the jump tracker (G-04). */}
+        {!demo && isJumpExercise(exercise) && (
+          <p className="muted">
+            Measured a jump?{" "}
+            <Link href="/stats#jumps" target="_blank" className="dashboard-inline-link">
+              Log your height or touch
+            </Link>
+          </p>
+        )}
 
         {cues.length > 0 && (
           <div className="exercise-cues">
@@ -452,7 +501,10 @@ export function WorkoutModeView({
                 <button
                   type="button"
                   className="ghost danger-button"
-                  onClick={() => deleteSet(set.id)}
+                  onClick={() => {
+                    touchedRef.current = true;
+                    deleteSet(set.id);
+                  }}
                   aria-label={`Remove set ${set.set_number}`}
                 >
                   Remove
@@ -480,29 +532,31 @@ export function WorkoutModeView({
             />
           )}
           <form className="log-set-form" onSubmit={handleLogSet}>
-            <div className="weight-input-group">
-              <input
-                type="number"
-                inputMode="decimal"
-                aria-label="Weight"
-                placeholder={isTimed ? "Weight (optional)" : "Weight"}
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-              />
-              <div className="input-increments">
-                {WEIGHT_INCREMENTS.map((amount) => (
-                  <button
-                    type="button"
-                    key={amount}
-                    className="ghost"
-                    onClick={() => bumpWeight(amount)}
-                    aria-label={`Add ${amount} to weight`}
-                  >
-                    +{amount}
-                  </button>
-                ))}
+            {showWeight && (
+              <div className="weight-input-group">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  aria-label="Weight"
+                  placeholder={isTimed ? "Weight (optional)" : "Weight"}
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                />
+                <div className="input-increments">
+                  {WEIGHT_INCREMENTS.map((amount) => (
+                    <button
+                      type="button"
+                      key={amount}
+                      className="ghost"
+                      onClick={() => bumpWeight(amount)}
+                      aria-label={`Add ${amount} to weight`}
+                    >
+                      +{amount}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
             {isTimed ? (
             <div className="weight-input-group">
               <input

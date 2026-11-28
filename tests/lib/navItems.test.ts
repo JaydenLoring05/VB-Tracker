@@ -5,12 +5,12 @@ import { NAV_ROUTES, activePrimaryHref, isNavLinkActive, navItemsFor } from "@/l
 const labels = (links: { label: string }[]) => links.map((link) => link.label);
 
 describe("navItemsFor", () => {
-  it("gives athletes Today, Plan, Progress, Film up front", () => {
-    expect(labels(navItemsFor("athlete").primary)).toEqual(["Today", "Plan", "Progress", "Film"]);
+  it("gives athletes Today, Plan, Progress up front", () => {
+    expect(labels(navItemsFor("athlete").primary)).toEqual(["Today", "Plan", "Progress"]);
   });
 
-  it("gives coaches Team, Plan, Film, Progress up front", () => {
-    expect(labels(navItemsFor("coach").primary)).toEqual(["Team", "Plan", "Film", "Progress"]);
+  it("gives coaches Team, Plan, Progress up front", () => {
+    expect(labels(navItemsFor("coach").primary)).toEqual(["Team", "Plan", "Progress"]);
   });
 
   it("sends coaches' Progress to team progress and keeps their own stats under More", () => {
@@ -84,5 +84,13 @@ describe("activePrimaryHref", () => {
   it("returns null for pages that live under More", () => {
     expect(activePrimaryHref(navItemsFor("athlete"), "/library")).toBeNull();
     expect(activePrimaryHref(navItemsFor("coach"), "/workouts")).toBeNull();
+  });
+});
+
+describe("Start Workout is not duplicated in More (Phase 1 #5)", () => {
+  it.each(["athlete", "coach"] as const)("%s More has no Start Workout; /workout still highlights Today", (role) => {
+    const { more } = navItemsFor(role);
+    expect(more.some((link) => link.label === "Start Workout")).toBe(false);
+    expect(activePrimaryHref(navItemsFor(role), "/workout")).toBe(role === "athlete" ? "/dashboard" : null);
   });
 });

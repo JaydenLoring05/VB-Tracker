@@ -12,9 +12,9 @@ export function LandingHeader() {
         </Link>
 
         <nav className="landing-header-links" aria-label="Page sections">
-          <Link href="/#product-preview">Product</Link>
-          <Link href="/#for-coaches">For Coaches</Link>
-          <Link href="/#for-athletes">For Athletes</Link>
+          <Link href="/#program">Training</Link>
+          <Link href="/#results">Results</Link>
+          <Link href="/pilot">For Coaches</Link>
           <Link href="/#pricing">Pricing</Link>
         </nav>
 

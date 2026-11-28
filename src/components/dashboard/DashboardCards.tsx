@@ -1,21 +1,31 @@
 "use client";
 
-import { ArrowRight, ClipboardCheck, Flame } from "lucide-react";
+import { ArrowRight, Flame, Moon, Snowflake } from "lucide-react";
 import Link from "next/link";
 
+import { BadgesLine } from "@/components/dashboard/BadgesLine";
+import { ChallengeLine } from "@/components/dashboard/ChallengeLine";
+import { PushReminderNudge } from "@/components/dashboard/PushReminderNudge";
+import { ShareProgressButton } from "@/components/dashboard/ShareProgressButton";
 import { TeamNudge } from "@/components/dashboard/TeamNudge";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { statusTone } from "@/components/shared/StatusLabel";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTodayISO, useTodayName } from "@/hooks/useToday";
+import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { getPhase, getWorkoutDays } from "@/data/workoutPlan";
 import { usePRs } from "@/hooks/usePRs";
+import { useBadges } from "@/hooks/useBadges";
+import { useProgression } from "@/hooks/useProgression";
+import { useReferrals } from "@/hooks/useReferrals";
+import { useStreak } from "@/hooks/useStreak";
 import { useRecoveryStats } from "@/hooks/useRecoveryStats";
+import { usePushTrainingDays } from "@/hooks/usePushTrainingDays";
 import { useStartWorkout } from "@/hooks/useStartWorkout";
 import { useWorkoutProgress } from "@/hooks/useWorkoutProgress";
-import { checkedInToday } from "@/lib/dailyCheckIn";
 import { todayWorkoutCta } from "@/lib/dashboardCta";
-import { todayName } from "@/lib/storage";
+import { exercisePreview, recoveryTipFor } from "@/lib/recoveryTips";
 
 const RECOVERY_COLOR: Record<string, string> = {
   Elite: "var(--green)",
@@ -29,39 +39,35 @@ const RECOVERY_COLOR: Record<string, string> = {
  * Recovery, weekly progress and PRs are one summary line each that expand on tap.
  */
 export function DashboardCards() {
-  const today = todayName();
-  const { workoutStreak, teamOverride, substitutions } = useTrackerContext();
+  const today = useTodayName();
+  const todayISO = useTodayISO();
+  const { teamOverride, substitutions } = useTrackerContext();
+  const streak = useStreak();
+  const { effectiveProfile: trainingProfile } = useTrainingProfile();
 
-  const { recovery, status, hasLoggedStats, readinessExplanation, history } = useRecoveryStats();
-  const needsCheckIn = !checkedInToday(history);
+  const { recovery, status, hasLoggedStats, readinessExplanation } = useRecoveryStats();
   const { week, completedExercises, totalExercises, progress } = useWorkoutProgress();
   const { prs } = usePRs();
   const { openSession } = useStartWorkout();
+  const referrals = useReferrals();
+  const progression = useProgression(referrals.signups);
 
-  const todayWorkout = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions).find(
-    (day) => day.day === today
-  );
-  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession));
+  const weekDays = resolveWorkoutDays(getWorkoutDays(week), week, teamOverride, substitutions, trainingProfile);
+  const todayWorkout = weekDays.find((day) => day.day === today);
+  // Phone reminders only say "time to train" on days this plan trains.
+  usePushTrainingDays(weekDays.filter((day) => !day.rest && day.exercises.length > 0).map((day) => day.day));
+  const trainingDays = weekDays.filter((day) => !day.rest && day.exercises.length > 0).length;
+  const badges = useBadges(trainingDays, referrals.signups);
+  const cta = todayWorkoutCta(todayWorkout, Boolean(openSession), openSession?.id);
   const isRestDay = cta.isRestDay;
   const ringColor = RECOVERY_COLOR[status.label] ?? "var(--gold)";
   const phase = getPhase(week);
   const recentPRs = prs.slice(0, 3);
+  const preview = exercisePreview(todayWorkout?.exercises ?? []);
+  const restTip = recoveryTipFor(todayISO);
 
   return (
     <>
-      <TeamNudge />
-
-      {needsCheckIn && (
-        <Link href="/check-in" className="panel today-checkin">
-          <ClipboardCheck size={26} aria-hidden="true" />
-          <span>
-            <strong>Daily check-in</strong>
-            <span className="muted">30 seconds. Sleep, energy, soreness, anything hurting.</span>
-          </span>
-          <ArrowRight size={20} aria-hidden="true" />
-        </Link>
-      )}
-
       <section id="dashboard" className="panel today-hero" aria-labelledby="today-title">
         <p className="micro micro-gold">Today &middot; {today}</p>
         <h2 id="today-title" className="today-title">
@@ -71,13 +77,41 @@ export function DashboardCards() {
           {isRestDay
             ? "Recovery day. Sleep, mobility and a light walk count."
             : `${todayWorkout?.exercises.length ?? 0} exercises${todayWorkout?.minutes ? ` · ${todayWorkout.minutes} min` : ""}`}
-          {workoutStreak > 0 && (
+          {streak.current > 0 && (
             <span className="dashboard-streak">
               <Flame size={14} aria-hidden="true" />
-              {workoutStreak} day{workoutStreak === 1 ? "" : "s"} strong
+              {streak.current}-day streak
+            </span>
+          )}
+          {streak.freezes > 0 && (
+            <span
+              className="dashboard-streak dashboard-freeze"
+              title="A freeze saves your streak if you miss a day. Earn one each week you train 3+ times."
+            >
+              <Snowflake size={14} aria-hidden="true" />
+              {streak.freezes} freeze{streak.freezes === 1 ? "" : "s"}
             </span>
           )}
         </p>
+        {streak.frozeYesterday && (
+          <p className="muted today-freeze-note">A freeze saved your streak yesterday. Train today to keep it going.</p>
+        )}
+
+        {isRestDay
+          ? restTip && (
+              <p className="today-rest-tip">
+                <Moon size={18} aria-hidden="true" />
+                <span>{restTip}</span>
+              </p>
+            )
+          : preview.shown.length > 0 && (
+              <ul className="today-exercises" aria-label="Today's exercises">
+                {preview.shown.map((name) => (
+                  <li key={name}>{name}</li>
+                ))}
+                {preview.more > 0 && <li className="muted">+{preview.more} more</li>}
+              </ul>
+            )}
 
         {cta.prominent ? (
           <Link href={cta.href} className="btn dashboard-hero-cta">
@@ -89,7 +123,37 @@ export function DashboardCards() {
             {cta.label}
           </Link>
         )}
+
+        <div className="today-level">
+          <div className="today-level-row">
+            <strong>{progression.level.name}</strong>
+            <span className="muted">
+              {progression.next
+                ? `${progression.xpToNext} XP to ${progression.next.name}`
+                : `${progression.xp} XP · top level`}
+            </span>
+          </div>
+          <div
+            className="progress-bar"
+            role="progressbar"
+            aria-label={`Level progress: ${progression.level.name}`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progression.percent}
+          >
+            <div className="progress-fill" style={{ width: `${progression.percent}%` }} />
+          </div>
+          <ShareProgressButton
+            streak={streak.current}
+            levelName={progression.level.name}
+            xp={progression.xp}
+            badges={badges}
+          />
+        </div>
       </section>
+
+      <TeamNudge />
+      <PushReminderNudge />
 
       <div className="today-lines">
         <details className="today-line">
@@ -185,6 +249,9 @@ export function DashboardCards() {
             )}
           </div>
         </details>
+
+        <ChallengeLine />
+        <BadgesLine earned={badges} />
       </div>
     </>
   );

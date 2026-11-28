@@ -17,8 +17,13 @@ export const REST_DAY_WORKOUT_LABEL = "Want to train anyway? Pick a workout";
 /** Every label `todayWorkoutCta` can return. The e2e spec builds its locator from this. */
 export const WORKOUT_CTA_LABELS = [START_WORKOUT_LABEL, CONTINUE_WORKOUT_LABEL, REST_DAY_WORKOUT_LABEL] as const;
 
-/** Where the call to action always goes, rest day or not. */
+/** Where the call to action goes when no workout is in progress, rest day or not. */
 export const WORKOUT_CTA_HREF = "/workout";
+
+/** The Workout Mode screen for one session. */
+export function workoutSessionHref(sessionId: string) {
+  return `/workout/${sessionId}`;
+}
 
 export type WorkoutCta = {
   label: string;
@@ -33,12 +38,22 @@ export type WorkoutCta = {
  * @param todayWorkout Today's resolved program day, or undefined when the
  *   program doesn't list today at all. Both count as a rest day.
  * @param hasOpenSession True when the athlete left a workout part-finished.
+ * @param openSessionId That workout's id. "Continue Workout" opens it directly.
+ *   Without it the button falls back to /workout, which offers Resume.
  */
-export function todayWorkoutCta(todayWorkout: WorkoutDay | undefined, hasOpenSession: boolean): WorkoutCta {
+export function todayWorkoutCta(
+  todayWorkout: WorkoutDay | undefined,
+  hasOpenSession: boolean,
+  openSessionId?: string | null
+): WorkoutCta {
   const isRestDay = !todayWorkout || Boolean(todayWorkout.rest);
 
   if (hasOpenSession) {
-    return { label: CONTINUE_WORKOUT_LABEL, href: WORKOUT_CTA_HREF, isRestDay, prominent: true };
+    // Straight back into the workout. Sending the athlete to /workout put a
+    // big "Start Workout" button under a small Resume banner, and tapping it
+    // began a second, empty session, so it looked like nothing had saved.
+    const href = openSessionId ? workoutSessionHref(openSessionId) : WORKOUT_CTA_HREF;
+    return { label: CONTINUE_WORKOUT_LABEL, href, isRestDay, prominent: true };
   }
   if (isRestDay) {
     return { label: REST_DAY_WORKOUT_LABEL, href: WORKOUT_CTA_HREF, isRestDay, prominent: false };
