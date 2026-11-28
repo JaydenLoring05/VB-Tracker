@@ -5,6 +5,7 @@ import { useMemo } from "react";
 
 import { exercises } from "@/data/exercises";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { buildLibrary, filterLibrary, TeamExercise } from "@/lib/teamExercises";
 
 function normalizeText(value: string) {
   return value
@@ -13,7 +14,10 @@ function normalizeText(value: string) {
     .trim();
 }
 
-export function useExerciseLibrary() {
+const NO_TEAM_EXERCISES: TeamExercise[] = [];
+
+/** `teamExercises` adds the team's own exercises (F-22) to the list the library shows. */
+export function useExerciseLibrary(teamExercises: TeamExercise[] = NO_TEAM_EXERCISES) {
   const router = useRouter();
 
   const {
@@ -28,28 +32,12 @@ export function useExerciseLibrary() {
     setExpandedExercises
   } = useTrackerContext();
 
-  const filteredExercises = useMemo(() => {
-    return exercises.filter((exercise) => {
-      const matchesCategory = selectedFilter === "All" || exercise.category === selectedFilter;
-      const matchesLevel = selectedLevel === "All" || exercise.level === selectedLevel;
-      const search = exerciseSearch.toLowerCase().trim();
+  const library = useMemo(() => buildLibrary(teamExercises), [teamExercises]);
 
-      const searchableText = [
-        exercise.name,
-        exercise.category,
-        exercise.purpose,
-        ...(exercise.cues ?? []),
-        ...(exercise.mistakes ?? []),
-        ...(exercise.substitutions ?? [])
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      const matchesSearch = !search || searchableText.includes(search);
-
-      return matchesCategory && matchesLevel && matchesSearch;
-    });
-  }, [selectedFilter, selectedLevel, exerciseSearch]);
+  const filteredExercises = useMemo(
+    () => filterLibrary(library, { category: selectedFilter, level: selectedLevel, search: exerciseSearch }),
+    [library, selectedFilter, selectedLevel, exerciseSearch]
+  );
 
   function expandAllVisibleExercises() {
     const expanded = { ...expandedExercises };
@@ -106,6 +94,7 @@ export function useExerciseLibrary() {
     toggleExerciseCard,
     expandAllVisibleExercises,
     collapseAllExercises,
+    libraryCount: library.length,
     filteredExercises,
     openExerciseFromWorkout
   };

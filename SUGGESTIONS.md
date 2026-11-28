@@ -66,7 +66,7 @@ Rules for automated runs:
 | F-23 | Sections in a day, starting with a warm-up written once and added to every training day | new | me | M |
 | F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | new | coach feedback | L |
 | F-19 | Supersets in coach-built programs | new | coach feedback | M |
-| F-22 | A coach's own exercises in the Exercise Library (needs SQL) | new | me | M |
+| F-22 | A coach's own exercises in the Exercise Library (PR #101, needs SQL) | building | me | M |
 
 ## Details
 

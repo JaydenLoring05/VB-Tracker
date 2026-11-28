@@ -8,7 +8,6 @@ import { Celebrate } from "@/components/shared/Celebrate";
 import { InlineError } from "@/components/shared/InlineError";
 import { Skeleton, SkeletonRegion } from "@/components/shared/Skeleton";
 import { useDemo } from "@/context/DemoContext";
-import { getExercise } from "@/data/exercises";
 import { getWorkoutDays, STANDARD_WARM_UP } from "@/data/workoutPlan";
 import { getExerciseNote, getExerciseTarget } from "@/lib/customProgram";
 import { parseTargetPercent, weightForPercent } from "@/lib/percentOfMax";
@@ -16,8 +15,10 @@ import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { useTrackerContext } from "@/context/TrackerContext";
+import { useTeamExercises } from "@/hooks/useTeamExercises";
 import { useTrainingProfile } from "@/hooks/useTrainingProfile";
-import { formatSetValue, getExerciseMeasure, isJumpExercise, parseTargetSeconds, takesWeight } from "@/lib/exerciseMeasure";
+import { cuesFor, measureFor, TeamExercise } from "@/lib/teamExercises";
+import { formatSetValue, isJumpExercise, parseTargetSeconds, takesWeight } from "@/lib/exerciseMeasure";
 import { fireRestAlert, primeRestAlert } from "@/lib/restAlert";
 import { resumeExerciseIndex } from "@/lib/workoutResume";
 import { formatDuration } from "@/lib/time";
@@ -43,8 +44,12 @@ function vibrate(pattern: number | number[]) {
 export type WorkoutSessionController = ReturnType<typeof useActiveWorkoutSession>;
 
 export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
-  return <WorkoutModeView controller={useActiveWorkoutSession(sessionId)} />;
+  const controller = useActiveWorkoutSession(sessionId);
+  const { exercises: teamExercises } = useTeamExercises();
+  return <WorkoutModeView controller={controller} teamExercises={teamExercises} />;
 }
+
+const NO_TEAM_EXERCISES: TeamExercise[] = [];
 
 /**
  * The Workout Mode screen. `onExit` replaces the summary's "Back to
@@ -52,10 +57,13 @@ export function ActiveWorkoutView({ sessionId }: { sessionId: string }) {
  */
 export function WorkoutModeView({
   controller,
-  onExit
+  onExit,
+  teamExercises = NO_TEAM_EXERCISES
 }: {
   controller: WorkoutSessionController;
   onExit?: () => void;
+  /** The team's own exercises (F-22), for their cues and reps-or-time. The demo has none. */
+  teamExercises?: TeamExercise[];
 }) {
   const {
     loading,
@@ -274,7 +282,7 @@ export function WorkoutModeView({
   const exercise = resolvedExercises[exerciseIndex];
   const exerciseSets = sets.filter((s) => s.exercise === exercise);
   const lastTime = previousSets[exercise];
-  const cues = getExercise(originalExercise)?.cues ?? [];
+  const cues = cuesFor(originalExercise, teamExercises);
   const prescription = getExerciseTarget(day, session.week, exercise);
   const coachNote = getExerciseNote(day, originalExercise);
   // "5x5 @ 75%": this athlete's own weight, from their best logged set.
@@ -282,7 +290,7 @@ export function WorkoutModeView({
   const exerciseMax = estimatedMax[exercise];
   const percentWeight = targetPercent != null && exerciseMax ? weightForPercent(exerciseMax, targetPercent) : null;
   const adaptNote = day.adaptNotes?.[originalExercise] ?? "";
-  const isTimed = getExerciseMeasure(exercise) === "time";
+  const isTimed = measureFor(exercise, teamExercises) === "time";
   // Jumps and bodyweight work log reps (or seconds) only, no weight box (N-01).
   const showWeight = takesWeight(exercise);
   const targetSeconds = holdTarget ?? parseTargetSeconds(prescription) ?? DEFAULT_HOLD_SECONDS;

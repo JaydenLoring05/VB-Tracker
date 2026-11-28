@@ -215,6 +215,122 @@
   outline-color: transparent;
 }
 
+/* ---------- A team's own exercises (F-22) ---------- */
+
+.exercise-team-line {
+  margin: 0 0 6px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.exercise-details-empty {
+  margin: 0;
+  font-size: 13px;
+}
+
+.exercise-card-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.exercise-card-actions button {
+  flex: 1;
+}
+
+.library-actions button svg {
+  vertical-align: -3px;
+}
+
+.team-exercise-setup-note {
+  margin: 0 0 12px;
+}
+
+.team-exercise-card h2 {
+  margin-bottom: 4px;
+}
+
+.team-exercise-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.team-exercise-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.team-exercise-field > span,
+.team-exercise-field > legend {
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  padding: 0;
+}
+
+.team-exercise-field > span .muted {
+  font-weight: 500;
+}
+
+.team-exercise-field textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.team-exercise-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.team-exercise-measure {
+  grid-auto-flow: column;
+  justify-content: start;
+  align-items: center;
+  column-gap: 14px;
+}
+
+.team-exercise-measure > legend {
+  margin-bottom: 6px;
+}
+
+.team-exercise-measure label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.team-exercise-measure input {
+  min-height: auto;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold);
+}
+
+.team-exercise-hint {
+  font-size: var(--fs-sm);
+}
+
+.team-exercise-error {
+  color: var(--red);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .team-exercise-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (min-width: 1000px) {
   .exercise-card-detailed {
     min-height: 460px;
