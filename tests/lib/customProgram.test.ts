@@ -380,3 +380,30 @@ describe("validateDraft", () => {
     expect(isProgramComplete(programFromRecommended(1))).toBe(true);
   });
 });
+
+describe("percent of max on a program exercise", () => {
+  const squat = { name: "Back Squat", sets: 5, reps: "5", seconds: null, percent: 75 };
+
+  it("shows in the target athletes see", () => {
+    expect(formatTarget(squat)).toBe("5x5 @ 75%");
+    expect(formatTarget({ ...squat, percent: null })).toBe("5x5");
+  });
+
+  it("survives a save and load, and drops empty values", () => {
+    const days = parseProgramDays([
+      { day: "Monday", exercises: [squat, { ...squat, name: "Bench", percent: null }, { ...squat, name: "RDL", percent: "x" }] }
+    ]);
+    expect(days[0].exercises.map((exercise) => exercise.percent)).toEqual([75, undefined, undefined]);
+  });
+
+  it("must be between 1 and 120", () => {
+    const withPercent = (percent: number) => ({
+      name: "P",
+      days: blankProgram().days.map((day) => (day.day === "Monday" ? { ...day, exercises: [{ ...squat, percent }] } : day))
+    });
+    expect(validateDraft(withPercent(75))).toEqual([]);
+    expect(validateDraft(withPercent(150))).toEqual([
+      "Back Squat on Monday needs a percent of max between 1 and 120."
+    ]);
+  });
+});

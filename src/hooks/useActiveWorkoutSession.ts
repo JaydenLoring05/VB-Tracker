@@ -8,6 +8,7 @@ import { useTrainingProfile } from "@/hooks/useTrainingProfile";
 import { useExerciseSubstitutions } from "@/hooks/useExerciseSubstitutions";
 import { activeSecondsAfterWindow, buildActiveTimeFlushRequest } from "@/lib/activeTimeFlush";
 import { requestNotionSync } from "@/lib/notionSyncTrigger";
+import { estimatedMaxByExercise } from "@/lib/percentOfMax";
 import { bestMarksByExercise, detectPersonalRecord, personalRecordEntry } from "@/lib/personalRecord";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import { createClient } from "@/lib/supabase/client";
@@ -30,6 +31,8 @@ export function useActiveWorkoutSession(sessionId: string) {
   const [previousSets, setPreviousSets] = useState<Record<string, PreviousSet>>({});
   const [maxWeightByExercise, setMaxWeightByExercise] = useState<Record<string, number>>({});
   const [maxSecondsByExercise, setMaxSecondsByExercise] = useState<Record<string, number>>({});
+  // Best estimated one-rep max per exercise from earlier workouts, for "@ 75%" targets.
+  const [estimatedMax, setEstimatedMax] = useState<Record<string, number>>({});
 
   const sessionRef = useRef(session);
   useEffect(() => {
@@ -141,6 +144,7 @@ export function useActiveWorkoutSession(sessionId: string) {
         setPreviousSets(lastSeen);
         setMaxWeightByExercise(maxWeight);
         setMaxSecondsByExercise(maxSeconds);
+        setEstimatedMax(estimatedMaxByExercise(rows));
       });
 
     return () => {
@@ -386,6 +390,7 @@ export function useActiveWorkoutSession(sessionId: string) {
     session,
     sets,
     previousSets,
+    estimatedMax,
     logSet,
     deleteSet,
     finishWorkout,
