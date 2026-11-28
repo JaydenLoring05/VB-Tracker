@@ -100,6 +100,10 @@ describe("checkedInToday", () => {
     expect(checkedInToday([{ date: "2026-10-02" }], now)).toBe(true);
     expect(checkedInToday([{ date: "10/2/2026" }], now)).toBe(true);
   });
+  it("is false for a test-day entry with no sleep answer (B-09)", () => {
+    expect(checkedInToday([{ date: "2026-10-02", sleep: "" }], now)).toBe(false);
+    expect(checkedInToday([{ date: "2026-10-02", sleep: 7 }], now)).toBe(true);
+  });
   it("is false for yesterday or no history", () => {
     expect(checkedInToday([{ date: "2026-10-01" }], now)).toBe(false);
     expect(checkedInToday([], now)).toBe(false);

@@ -1,5 +1,6 @@
 import { CoachPanel } from "@/components/stats/CoachPanel";
 import { DailyCheckIn } from "@/components/stats/DailyCheckIn";
+import { JumpTracker } from "@/components/stats/JumpTracker";
 import { PerformanceProfileForm } from "@/components/stats/PerformanceProfileForm";
 import { PRTracker } from "@/components/stats/PRTracker";
 import { ProgressCharts } from "@/components/stats/ProgressCharts";
@@ -14,6 +15,10 @@ export default function StatsPage() {
   return (
     <>
       <StatsHeadline />
+
+      <section style={{ marginBottom: 24 }}>
+        <JumpTracker />
+      </section>
 
       <section style={{ marginBottom: 24 }}>
         <ResultsCard />

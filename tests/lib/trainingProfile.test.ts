@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { resolveWorkoutDays } from "@/lib/programResolution";
 import {
+  adaptExercise,
   adaptWorkoutDays,
   checkInSoreAreas,
   countAdaptations,
@@ -10,6 +11,8 @@ import {
   parseTrainingProfile,
   profileFromRow,
   profileToRow,
+  reduceTargetForInjury,
+  scalePercentForLevel,
   scaleTargetForLevel,
   withCheckInAreas
 } from "@/lib/trainingProfile";
@@ -98,8 +101,8 @@ describe("adaptWorkoutDays", () => {
   it("keeps a coach's exercises and targets for level but still applies injury swaps", () => {
     const coachDay = day(["Front Squat", "Box Jumps"], { targets: { "Front Squat": "5x3", "Box Jumps": "4x3" } });
     const [result] = adaptWorkoutDays([coachDay], 1, { level: "beginner", injuries: ["knee"] }, { coachProgram: true });
-    expect(result.exercises[0]).toBe("Goblet Squat");
-    expect(result.targets?.["Goblet Squat"]).toBe("5x3");
+    expect(result.exercises[0]).toBe("Box Squat");
+    expect(result.targets?.["Box Squat"]).toBe("5x3");
     expect(result.targets?.["Hip Thrust"]).toBe("4x3");
   });
 
@@ -243,5 +246,104 @@ describe("youth version (F-35)", () => {
   it("changes nothing for 14 and up at the default level", () => {
     const days = [day(["Front Squat"])];
     expect(adaptWorkoutDays(days, 1, { level: "intermediate", injuries: [], ageGroup: "14to17" })).toBe(days);
+  });
+});
+
+describe("knee and shoulder flags, deeper (injury-adaptive plan)", () => {
+  const knee = { level: "intermediate" as const, injuries: ["knee" as const] };
+  const shoulder = { level: "intermediate" as const, injuries: ["shoulder" as const] };
+
+  it("swaps deep loaded knee bends for a box squat to parallel, step-ups and wall sits", () => {
+    const [result] = adaptWorkoutDays(
+      [day(["Front Squat", "Bulgarian Split Squat", "Deep Squat Holds"])],
+      1,
+      knee
+    );
+    expect(result.exercises.slice(0, 3)).toEqual(["Box Squat", "Step-Ups", "Wall Sit"]);
+    expect(result.adaptNotes?.["Box Squat"]).toBe("Knee-friendly swap for Front Squat");
+  });
+
+  it("keeps a coach's unknown jump work but halves the sets and adds landing practice", () => {
+    const coachDay = day(["Max Approach Jumps", "Pull-Ups"], { targets: { "Max Approach Jumps": "6x3" } });
+    const [result] = adaptWorkoutDays([coachDay], 1, knee, { coachProgram: true });
+    expect(result.exercises).toContain("Max Approach Jumps");
+    expect(result.targets?.["Max Approach Jumps"]).toBe("3x3");
+    expect(result.adaptNotes?.["Max Approach Jumps"]).toMatch(/Fewer sets for your knee/);
+    expect(result.exercises).toContain("Landing Mechanics Drill");
+  });
+
+  it("cuts a coach's overhead pressing and swing volume for a sore shoulder", () => {
+    const coachDay = day(["Overhead Press", "Arm Swing Drill", "Lat Pulldown"], {
+      targets: { "Overhead Press": "4x6", "Arm Swing Drill": "5x10", "Lat Pulldown": "3x10" }
+    });
+    const [result] = adaptWorkoutDays([coachDay], 1, shoulder, { coachProgram: true });
+    expect(result.targets?.["Overhead Press"]).toBe("2x6");
+    expect(result.targets?.["Arm Swing Drill"]).toBe("3x10");
+    expect(result.targets?.["Lat Pulldown"]).toBe("3x10");
+    expect(result.exercises).toEqual(expect.arrayContaining(["External Rotations", "Band Pull-Aparts"]));
+  });
+
+  it("does not cut landing drills or anything for the wrong area", () => {
+    const [result] = adaptWorkoutDays([day(["Landing Mechanics Drill", "Overhead Press"])], 1, knee);
+    expect(result.adaptNotes?.["Landing Mechanics Drill"]).toBeUndefined();
+    expect(result.adaptNotes?.["Overhead Press"]).toBeUndefined();
+  });
+});
+
+describe("adaptExercise (one exercise + flags -> adjusted exercise)", () => {
+  it("returns the exercise unchanged with no flags", () => {
+    expect(adaptExercise("Box Jumps", "4x3", DEFAULT_TRAINING_PROFILE)).toEqual({
+      exercise: "Box Jumps",
+      target: "4x3",
+      note: null
+    });
+  });
+
+  it("maps a knee flag to a knee-friendly swap", () => {
+    expect(adaptExercise("Box Jumps", "4x3", { level: "intermediate", injuries: ["knee"] })).toEqual({
+      exercise: "Hip Thrust",
+      target: "4x3",
+      note: "Knee-friendly swap for Box Jumps"
+    });
+  });
+
+  it("maps a shoulder flag to a landmine press", () => {
+    expect(adaptExercise("Push Press", "4x5", { level: "intermediate", injuries: ["shoulder"] }).exercise).toBe(
+      "Half-Kneeling Landmine Press"
+    );
+  });
+
+  it("scales volume by level", () => {
+    expect(adaptExercise("Hip Thrust", "2-3x10", { level: "beginner", injuries: [] }).target).toBe("2x10");
+    expect(adaptExercise("Hip Thrust", "2-3x10", { level: "advanced", injuries: [] }).target).toBe("3x10");
+  });
+});
+
+describe("percent of max by level", () => {
+  it.each([
+    ["5x5 @ 75%", "beginner", "4x5 @ 65%"],
+    ["5x5 @ 75%", "advanced", "5x5 @ 80%"],
+    ["3x3 @ 88%", "advanced", "3x3 @ 90%"],
+    ["3x3 @ 45%", "beginner", "2x3 @ 40%"],
+    ["1x1 @ 95%", "advanced", "1x1 @ 95%"],
+    ["5x5 @ 75%", "intermediate", "5x5 @ 75%"]
+  ] as const)("%s for %s is %s", (target, level, expected) => {
+    expect(scaleTargetForLevel(target, level)).toBe(expected);
+  });
+
+  it("only moves a percent, not reps", () => {
+    expect(scalePercentForLevel("3x10", "beginner")).toBe("3x10");
+  });
+});
+
+describe("reduceTargetForInjury", () => {
+  it.each([
+    ["5x3", "3x3"],
+    ["4x3", "2x3"],
+    ["2x5", "2x5"],
+    ["3-4x8", "2x8"],
+    ["10-20 min", "10-20 min"]
+  ])("%s becomes %s", (target, expected) => {
+    expect(reduceTargetForInjury(target)).toBe(expected);
   });
 });

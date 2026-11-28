@@ -8,8 +8,10 @@ import { DELETE_CONFIRMATION_PHRASE, isDeleteConfirmed } from "@/lib/accountData
 import { GuardianPrompt } from "@/components/guardian/GuardianPrompt";
 
 import { AthletePlan } from "./AthletePlan";
+import { InviteFriends } from "./InviteFriends";
 import { PhoneReminders } from "./PhoneReminders";
 import { ReminderPreference } from "./ReminderPreference";
+import { ShareTraining } from "./ShareTraining";
 
 export function AccountSettings() {
   const { ownedTeams, exporting, deleting, error, exportData, deleteAccount } = useAccountData();
@@ -27,6 +29,8 @@ export function AccountSettings() {
       <h1>Settings</h1>
 
       <AthletePlan />
+      <InviteFriends />
+      <ShareTraining />
 
       <PhoneReminders />
       <ReminderPreference />

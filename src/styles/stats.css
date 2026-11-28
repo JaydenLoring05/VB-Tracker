@@ -485,3 +485,42 @@
 .results-retest-due {
   color: var(--gold);
 }
+
+/* G-04: jump PR tracking. */
+.jump-tracker {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.jump-tracker h2 {
+  margin: 0;
+}
+
+.jump-form {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.jump-form-row {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.jump-form-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.jump-result {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.jump-result-pr {
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--gold) 14%, transparent);
+  color: var(--gold);
+}

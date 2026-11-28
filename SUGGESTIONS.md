@@ -31,26 +31,23 @@ Rules for automated runs:
 
 | ID | Item | Status | Source | Size |
 | --- | --- | --- | --- | --- |
-| B-02 | Film hotkeys ignore key presses right after the player loads (PR #62) | building | bug | S |
-| B-04 | The Workout Mode browser test fails on rest days, turning CI red (PR #66) | building | bug | S |
-| B-05 | Daily coach summary email fails with `text = date` (PR #65, needs SQL) | building | bug | S |
-| F-01 | Film stats from tags (set distribution, pass average, block outcomes) (PR #63) | building | me | M |
-| B-08 | React hydration error #418 every evening: server renders "today" in UTC, a day ahead of Pacific | building | bug | S |
-| F-03 | Film links that aren't YouTube (Hudl and others) | new | me | M |
+| P-04 | Season- and practice-adaptive plan: season phases, practice intensity, match-day rules, double progression with "last time → today's target", weekly coach note | planned | me | L |
+| P-05 | Test days: jump, broad jump, sprint, pro-agility and Max Day, retest prompts, self-reported vs coach-verified | planned | me | L |
+| P-07 | Public athletic resume with a highlight video link, PDF export | planned | me | M |
+| P-04a | Season phase changes the plan: off-season, preseason and in-season volume and intensity (uses P-03's saved phase) | new | me | M |
+| P-04b | Practice intensity and match-day rules: a hard practice makes the lift lighter; game day and the day before | new | me | M |
+| P-04c | Double progression: "last time → today's target" on each lift in Workout Mode | new | me | M |
+| P-04d | A weekly coach note on Today | new | me | S |
+| P-05a | Test day: log broad jump, sprint and pro-agility next to vertical and approach (needs SQL) | new | me | M |
+| P-05b | Max Day: a test day for estimated maxes on the main lifts | new | me | M |
+| P-05c | Retest prompts every 4 weeks, and self-reported vs coach-verified results (needs SQL) | new | me | M |
+| F-42 | A true no-equipment version of the youth and beginner plans (bodyweight and bands only) | new | your idea | M |
+| F-43 | Plan days that fit 20-40 minutes, or keep the "20-60 minutes" copy on /join | new | your idea | M |
 | F-04 | Per-athlete overview page for coaches | new | me | M |
-| B-06 | Plan builder: sets and seconds boxes can't be cleared and retyped (PR #69) | building | bug | S |
-| F-25 | Show password and confirm password on sign-up (PR #68) | building | coach feedback | S |
-| F-21 | Plan builder remembers a coach's own exercises (PR #70) | building | me | S |
-| F-38 | Weekly auto-adjust: lighter week after poor recovery, repeated pain on all week, repeat a missed week, practice/lift-elsewhere days, games (needs SQL) | building | me | M |
-| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | planned | me | M |
-| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | planned | coach feedback | L |
-| F-24 | A day built from more than one program (lifts plus accessory work) | planned | me | M |
-| F-19 | Supersets in coach-built programs | planned | coach feedback | M |
-| F-22 | A coach's own exercises in the Exercise Library (PR #101, needs SQL) | building | me | M |
+| B-11 | Phone push reminders fail: `push_reminder_recipients` is missing from the production database; run v55 then v68 (needs SQL, no code change) | building | bug | S |
 | F-26 | "Pick one" groups: the coach lists options and the athlete does one | new | your idea | S |
-| F-29 | One font across the whole app (PR #84) | building | me | S |
 | F-27 | Programs that change by week (a max-test week, a rest week) and weight targets | new | your idea | L |
-| F-05 | Jump tracking over time (spike touch, set peak height) | new | me | M |
+| F-05 | Jump tracking over time (spike touch, set peak height); vertical and approach touch are covered by G-04 | new | me | M |
 | F-07 | Coach sets the program start date for the team or a group | new | your idea | M |
 | F-08 | Skill radar history (overlay last month on this month) | new | your idea | M |
 | F-09 | Morning email at each coach's local time | new | your idea | M |
@@ -66,23 +63,70 @@ Rules for automated runs:
 | R-06 | README setup steps leave out `schema_v53` | new | your idea | S |
 | A-01 | Split `TrackerContext.tsx` into smaller providers | new | your idea | L |
 | A-02 | One shared data-fetch hook in place of fetch-in-effect | new | your idea | M |
-| F-14 | AI film: find plays and make clips from game video automatically | new | me | L |
-| F-15 | Three-tap sets record the zone, so set distribution fills in | new | your idea | S |
-| F-30 | Phone push reminders players turn on themselves (PR #85, needs SQL and keys) | building | me | L |
+| F-23 | Sections in a day, starting with a warm-up written once and added to every training day | new | me | M |
+| F-17 | Bring in a plan a coach already has (paste it, upload a sheet or doc, or a Google Sheets link) | new | coach feedback | L |
+| F-19 | Supersets in coach-built programs | new | coach feedback | M |
+| F-22 | A coach's own exercises in the Exercise Library (PR #101, needs SQL) | building | me | M |
 
 ## Details
 
+### Athlete-first build (asked for by Jayden on 2026-11-03)
+
+- **IDs.** The referral item is `RF-01` because `R-01` was already taken
+  by the `latest_stats.updated_at` row. G-04 covers F-05 (jump tracking),
+  and G-05 builds on the F-36 results card.
+- **N-03 changes the parent step.** #49 asks every athlete under 18 for a
+  guardian. Jayden on 2026-11-03: only athletes under 13 get a parent-consent
+  step (parent email, a checkbox, a link to the privacy policy) before the
+  account is created; 13 and up get no parent step. Have the wording checked
+  before launch (see LAUNCH_CHECKLIST).
+- **Items that need SQL stay open** with the SQL in the PR description until
+  Jayden runs it, so production never reads a column that doesn't exist yet.
+- **P-04 and P-05 are split (2026-11-22).** Both are size L, so the weekly
+  update can't build them. They stay as the umbrella rows; the parts are
+  P-04a to P-04d and P-05a to P-05c, all `new`. Mark the parts you want
+  `planned`. Already in the app: F-38 removes jumping on practice days and
+  makes game day a loosen-up day, G-04 logs vertical and approach touch,
+  F-36 has a 4-week retest card, and F-28 (#83, open) sets weights from a
+  percent of max. P-03 (#126, open) saves the season phase P-04a needs.
+- **PH1-1 to PH1-5 (Phase 1).** Five PRs titled "Phase 1 #1" to "#5" were
+  opened on 2026-11-22 with no rows here. #3 (#132) and #5 (#131) merged
+  and are under Shipped; #1 (#135), #2 (#134) and #4 (#133) are open.
+  Source recorded as `me`; correct it if they came from somewhere else.
+- **F-28 and B-10 had open PRs but no row on `main`** (added 2026-11-15).
+  F-28 is #83: a coach sets "@ 75% max" on an exercise and each athlete
+  sees their own weight from an Epley estimate of their max. B-10 is #74:
+  Jayden reported "when I leave a workout and push Continue it rarely
+  saves"; the sets were saved, but Continue started a new session.
+
+- **B-09. The stats form saves a fake check-in.** `StatsForm` calls
+  `saveStats()`, which writes the context's whole `stats` (the latest
+  check-in) as today's `stats_history` row. `checkedInToday` only looks at
+  the date, so saving a vertical marks the athlete as checked in, copies
+  yesterday's sleep and soreness into today, and updates `latest_stats`, so
+  the coach sees a fresh check-in. Found while building G-04, which saves
+  jumps to their own table for this reason. Fix: save only the edited
+  fields, and count a check-in only when its wellness fields are filled.
+- **P-03. Onboarding quiz.** Athletes get two more onboarding steps after
+  "Tell us about you": "Your training" (years lifting, which sets the plan
+  level; equipment; a main goal, now including "Get faster" and "Hit
+  harder"; an optional second goal) and "Your season" (off-season,
+  preseason or in season; optional season dates; practice days, which go
+  into the F-38 weekly schedule). Years lifting, equipment and season phase
+  need `schema_v66_onboarding_quiz.sql`. Not yet used by the plan:
+  equipment (F-42 would use it) and season phase (P-04). The parent viewer
+  for under-13 athletes needs P-06; the parent email is already saved by
+  the N-03 consent step, so P-06 can invite that parent.
+- **F-42 and F-43** came from writing /join (L-01): Jayden's copy said
+  "no equipment needed for the youth/beginner plans" and "20-40 min a day",
+  but the youth and beginner swaps use goblet squats, kettlebell deadlifts
+  and lat pulldowns, and 7 of 20 plan days are 45-60 minutes. The page says
+  what's true today.
+
 ### Bugs
 
-- **B-02. Film hotkeys ignore key presses for a moment after the player
-  loads.** In `src/components/film/FilmPanel.tsx`, keyboard tagging only
-  starts responding a second or two after the YouTube player mounts (found
-  while writing the e2e test in #39, which has to retry the first key).
-  Attach the window keydown listener immediately or queue keys until the
-  player is ready, so a coach who starts tagging right away doesn't lose
-  presses.
 - **B-04. The Workout Mode browser test fails on rest days.**
-  `e2e/demo-workout-and-film.spec.ts` clicked "Start Today's Workout" on the
+  `e2e/demo-workout.spec.ts` (then `demo-workout-and-film.spec.ts`) clicked "Start Today's Workout" on the
   demo athlete view. On a rest day (every Sunday) `DashboardCards` shows
   "Want to train anyway? Pick a workout" in its place, so the test timed
   out and the `e2e` check went red on every PR opened that day (#62, #63
@@ -96,53 +140,34 @@ Rules for automated runs:
   Postgres rejects the query and no coach gets the email. #65 adds
   `schema_v54_daily_summary_date_fix.sql`, which compares text with text.
   The email stays broken until that file is run in the SQL Editor.
-
-### Film
-
-- **F-01. Film stats from tags.** `film_tags` already records `athlete_id`,
-  `pass_rating`, `set_zone`, `set_type`, `block_outcome` and
-  `attack_direction` (schema v36), but nothing aggregates them. Pure
-  functions in `src/lib` could compute:
-  - set distribution by zone;
-  - pass-rating average per athlete (the 0–3 passing scale);
-  - block outcomes per athlete per match.
-
-  Show them on the film page and in the athlete drill-down. This is the
-  payoff for the time coaches spend tagging.
-- **F-03. Film links that aren't YouTube.** `parseYouTubeId` in
-  `src/lib/film.ts` only recognises YouTube hosts. For any other link,
-  `FilmPanel` shows an "Open video" link that opens in a new tab in place of
-  the player, so tags can't be read off the video's own clock. Find out what
-  Hudl allows before sizing this: if it can't be embedded, the honest
-  version is typed timestamps next to the external link.
-- **F-14. AI film.** Jayden plans AI film analysis. Competitors already
-  sell it: Balltime (Hudl) charges athletes $20/month for automatic downtime
-  removal, play filters, highlight reels, serve and attack speed, and jump
-  detection. A first version could find rallies and cut downtime from a
-  YouTube link, then suggest tags for a coach to confirm in the F-02 flow.
-  It also sets the price of the solo plan (F-06): launch Athlete Pro at
-  $7.99/month or $59/year, and raise new signups to about $14.99/month or
-  $99/year once AI film ships. Split into smaller rows before building.
-
-- **F-15. Three-tap sets record the zone.** The three-tap flow saves a set
-  as Good / Hittable / Error (`QUICK_RESULTS` in `src/lib/filmQuickTag.ts`)
-  and leaves `set_zone` empty, so the set distribution in film stats (F-01)
-  only counts sets tagged through "Detailed tags" or by voice. A fourth tap
-  for the zone on sets only (six buttons laid out like the court, with a
-  "Skip") would fill it from the flow coaches use most. No schema change:
-  `set_zone` exists since v36.
+- **B-11. Phone push reminders fail: the database function is missing.**
+  Found by the daily bug check on 2026-11-26. Vercel logs `push-reminders:
+  could not load recipients Could not find the function
+  public.push_reminder_recipients(p_secret) in the schema cache` from
+  `/api/push-reminders` (first seen 2026-10-18, latest 2026-11-26 04:56 UTC),
+  so no player gets a phone reminder. The route's call matches the function
+  in `schema_v55_push_reminders.sql` and `schema_v68_push_retest.sql`
+  (`p_secret text, p_now timestamptz default now()`), so the code is not at
+  fault: the function isn't in the production database. Most likely v55 was
+  never run there (the error predates v68), or v68 was only partly run (it
+  drops the old function before creating the new one). Fix, for Jayden: run
+  `schema_v55_push_reminders.sql` if it hasn't been, then
+  `schema_v68_push_retest.sql`, in the SQL Editor, and check with
+  `select exists (select 1 from pg_proc where proname =
+  'push_reminder_recipients' and pronargs = 2);`. If that already returns
+  true, reload the API schema cache (`notify pgrst, 'reload schema';`).
+  Move the row to Shipped once the error stops.
 
 ### Coach experience
 
 - **F-04. A per-athlete overview page.** `AthleteStatsModal` splits one
-  athlete across Recovery, PRs and Adherence tabs in a modal, and film tags
-  live on another page. A `/coach/athletes/[id]` page could combine:
+  athlete across Recovery, PRs and Adherence tabs in a modal. A
+  `/coach/athletes/[id]` page could combine:
   - the readiness trend;
   - PRs and adherence;
-  - recent pain flags;
-  - their film stats (F-01).
+  - recent pain flags.
 
-  It would give coaches something to link to and room for the film numbers.
+  It would give coaches something to link to.
 - **Plan builder rows from Taichi's onboarding call (B-06, F-16 to F-25).**
   Taichi Watanabe (UNLV men's club, first founding pilot coach) built his
   own program in the app on 2026-10-10 and found it long and hard. Jayden
@@ -323,7 +348,18 @@ Rules for automated runs:
   1. per-week overrides on a program (week 6 is the max test, week 7 is
      rest), keyed to the program start date (F-07);
   2. a weight or percent-of-max target per exercise, filled from the
-     athlete's best on the PR board.
+     athlete's best on the PR board. Taichi asked for this one, so it is
+     now F-28.
+- **F-28. Percent-of-max weight targets.** Taichi asked for weights as a
+  percent of each athlete's max (2026-10-17). The coach fills in "% max"
+  on a rep exercise and the target reads "5x5 @ 75%". In Workout Mode each
+  athlete sees their own weight, rounded to 5, with a "Use" button that
+  fills the weight box. Jayden chose an estimated max over the heaviest
+  weight lifted, because the PR board keeps the heaviest weight and a 5-rep
+  best isn't a 1-rep max: Epley (weight x (1 + reps / 30)) over earlier
+  sets of 1 to 12 reps, in `src/lib/percentOfMax.ts`. An athlete with no
+  usable set is told to log a heavy set. No SQL (`team_programs.days` is
+  jsonb). Later: show the estimated max on the PR board.
 - **F-20. Copy a day, fold the rest.** "Copy to..." on each day in the
   builder, and only the day being edited stays open. Found while reading
   the builder for F-16.
@@ -352,6 +388,13 @@ Rules for automated runs:
 
 ### Athlete experience
 
+- **F-46.** Jayden 2026-11-24: mobility and explosive high-flyer work in the
+  style of Elastaboy, THP, Keone Thin and Eugene Nishida. Approved and moved to
+  planned the same day. Adds nine Exercise Library entries (4 Mobility, 5 Jump
+  Development). Video links are YouTube searches naming the creator, not
+  direct video links (none could be verified). The "add my workouts"
+  questions stay paused.
+
 - **F-05. Jump tracking over time.** `performance_profiles` keeps one row
   per athlete (`standing_reach_in`, `approach_touch_in`, `block_touch_in`),
   so each new measurement overwrites the last. `stats_history` has
@@ -369,10 +412,9 @@ Rules for automated runs:
   step from #49 already exists; who pays is the open question.
   Decision (Jayden, 2026-10-02): solo accounts stay free, and a paid
   "Athlete Pro" plan is added at $7.99/month or $59/year. Pro adds full
-  history and graphs, a self-built program, "My clips" for the athlete's own
-  film, and stats export. Athletes on a paying team get Pro free, and Pro
+  history and graphs, a self-built program, and stats export. Athletes on a paying team get Pro free, and Pro
   shows an "Invite your coach" button. Jayden revisits this the week of
-  2026-10-05 before marking it planned. See F-14 for the price step-up.
+  2026-10-05 before marking it planned.
 - **F-08. The skill radar only keeps the latest ratings.** #40 stores one
   `performance_profiles.skill_ratings` value per athlete (schema v48), so
   each new self-rating overwrites the last. Keeping dated ratings (a small
@@ -417,10 +459,9 @@ Rules for automated runs:
     team, and as an anonymous client;
   - assert who can read and write each table.
 - **R-04. Several screens only see the first page of a large roster.**
-  `useCoachRoster` pages at 100 athletes, but four screens use only its
-  first page: the film athlete picker (`src/app/(app)/film/page.tsx`),
-  program assignment (`CustomProgramPanel`), `TeamProgressView` and
-  `TeamNudge`. That's fine for a volleyball team. A club roster past 100
+  `useCoachRoster` pages at 100 athletes, but three screens use only its
+  first page: program assignment (`CustomProgramPanel`), `TeamProgressView`
+  and `TeamNudge`. That's fine for a volleyball team. A club roster past 100
   would need "load all" or search on those screens.
 - **R-05. Reminder timing depends on GitHub's scheduler.** #45 triggers
   reminders from a scheduled GitHub workflow because Vercel's Hobby plan
@@ -431,8 +472,8 @@ Rules for automated runs:
 - **R-06. The README's setup steps leave out `schema_v53`.** Step 3 of the
   README lists every schema file to run and stops at
   `schema_v52_guardian_info.sql`. `schema_v53_film_quick_tags.sql` (F-02,
-  #58) is missing, so a fresh install following the README has no
-  `film_tags.result` column and three-tap tags fail to save.
+  #58) is missing, so a fresh install following the README has a different
+  `film_tags` table from production (the app no longer uses film, F-45).
   `docs/LAUNCH_CHECKLIST.md` already lists v53. Add it to the README list.
 
 ### Architecture
@@ -451,7 +492,7 @@ Rules for automated runs:
   `PlanProvider`, `LibraryUIProvider`, `SyncStatusProvider`), keeping
   `useTrackerContext` as a thin compatibility layer during the move.
 - **A-02. Data hooks repeat the same fetch-in-effect pattern.** Most hooks
-  in `src/hooks` (`useTeamFilm`, `useTeamCalendar`, `useCoachRoster`,
+  in `src/hooks` (`useTeamCalendar`, `useCoachRoster`,
   `useAthletePRs`, ...) hand-roll loading, error and retry state with
   `setState` inside `useEffect`. The ESLint config flags 29 of these as
   `react-hooks/set-state-in-effect` and 2 as `react-hooks/refs` (warnings
@@ -460,6 +501,23 @@ Rules for automated runs:
   the same retry behavior.
 
 ### Plan fit
+
+- **F-40. Injury and level adapt deeper.** Jayden asked on 2026-10-29 for
+  injury-adaptive and level-adaptive plans. F-31 already did most of it, so
+  this fills the gaps: knee swaps deep loaded bends for a box squat to
+  parallel, step-ups and wall sits; any jump or overhead/swing exercise the
+  swap tables don't know (coach-written ones) keeps its place with about half
+  the sets; knee days with jumping get landing practice; level moves % of max
+  (beginner -10 points, advanced +5, capped at 90%); a "None" button; and a
+  plain "not medical advice" note. Pure `adaptExercise()` for one exercise.
+- **F-41. Athlete sign-up page.** Jayden asked on 2026-10-29 for a
+  one-page public sign-up for joinnextrep.com aimed at individual athletes
+  (not coaches or parents). Lives at `/join` so `/` stays the team page and
+  `/join/CODE` invite links keep working. Headline, 3 benefits, 3 steps,
+  $14.99/month with a 7-day free trial shown as "coming soon" (Stripe isn't
+  live), and a form (name, email, optional position and age group) that
+  saves to `waitlist_signups` through `/api/waitlist` (insert-only RLS,
+  `schema_v60`). Links to account sign-up. No testimonials or stats.
 
 - **F-38. Weekly auto-adjust.** Jayden's call on 2026-10-21: keep the
   20-week plan as the skeleton and bend each week around the athlete.
@@ -506,6 +564,49 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | PR |
 | --- | --- | --- |
+| Weight targets as a percent of each athlete's estimated max (F-28) | coach feedback | #83 |
+| A day built from more than one program: add a day from another program in the plan builder (F-24) | me | #87 |
+| Engagement: 10-session and test-day badges, retest-day push reminders (schema v68; the retest push waits on B-11) (P-08) | me | #139, #143 |
+| Mobility and explosive high-flyer exercises (F-46) | me | #142 |
+| Free read-only parent and coach viewer, invited by link or email (schema v67) (P-06) | me | #136 |
+| Read-only Week 1 preview at the end of onboarding (PH1-1) | me | #135 |
+| First workout free with no card; the trial starts at checkout after workout 1 (PH1-2) | me | #134 |
+| Solo-first onboarding copy, team code optional; Topbar drops readiness and team (PH1-4) | me | #133 |
+| Continue Workout reopens the workout in progress, on the exercise reached (B-10) | bug | #140 |
+| Weekly challenge and streak weeks in the athlete's own time zone (schema v66) (G-07) | your idea | #130 |
+| Onboarding quiz: years lifting, equipment, goals, season setup (schema v66) (P-03) | me | #126 |
+| Today no longer shows the Daily check-in card; it stays under Progress (PH1-3) | me | #132 |
+| More no longer has a second Start Workout (PH1-5) | me | #131 |
+| Referral code saved on the account at sign-up, so it survives a confirmation email opened in another browser (RF-02) | your idea | #129 |
+| Stats form no longer saves a fake check-in or copies sleep and soreness into today (B-09) | bug | #128 |
+| $14.99/month athlete plan (annual built, switched off); app locked after the trial for athletes not on a team; one trial per athlete (schema v65) (P-02) | me | #124 |
+| Volleyball landing page at / from the coach's copy; unshipped features labelled "Coming soon" (P-01, covers F-44) | me | #121 |
+| Film removed from NextRep, moved to a separate tool (Film Room); film tables kept in the database (F-45) | me | #122 |
+| Referral codes: extra free week for the new athlete, 150 XP and the Recruiter badge for the referrer (schema v64) (RF-01) | me | #119 |
+| /join rewritten for athletes: Today preview, levels and badges, price and trial, FAQ, founder section (L-01) | me | #116 |
+| Weekly challenge with an opt-in leaderboard by first name + initial (schema v63) (G-06) | me | #115 |
+| Jump PR tracking: vertical and approach touch with a chart and PR celebration (schema v62) (G-04) | me | #112 |
+| Self-serve athlete sign-up with an auto-assigned plan; parent consent under 13 only (schema v61) (N-03) | me | #109 |
+| Share card with streak, level, badges and best jump, watermarked joinnextrep.com (G-05) | me | #114 |
+| Daily streak with freeze tokens earned weekly, no SQL: replayed from workout dates (G-01) | me | #113 |
+| Badges (First Rep, On Fire, Perfect Week, Sky High, Unstoppable, Half Century) with an unlock celebration (G-03) | me | #111 |
+| XP and levels (Rookie to Pro) with progress on the Today card (G-02) | me | #110 |
+| Today card lists the workout's exercises above Start; rest days show a recovery tip (N-02) | me | #108 |
+| Jumps and bodyweight work log reps with no weight box (N-01) | me | #107 |
+| Backlog catch-up: Phase 1 rows to Shipped, athlete-first rows added | me | #106 |
+| Public athlete sign-up page at /join with an early-access form (schema v60) (F-41) | me | #104 |
+| Injury and level adapt deeper: knee swaps, unknown jump/overhead work cut, % of max by level (F-40) | me | #103 |
+| Today's day in the browser's time zone, no hydration error #418 (B-08) | bug | #100 |
+| Weekly auto-adjust and the athlete's own week (schema v58) (F-38) | me | #99 |
+| Phone push reminders players turn on themselves (schema v55, needs keys) (F-30) | me | #85 |
+| One font across the whole app (F-29) | me | #84 |
+| Plan builder remembers a coach's own exercises (F-21) | me | #70 |
+| Plan builder sets and seconds boxes can be cleared and retyped (B-06) | bug | #69 |
+| Show password and confirm password on sign-up (F-25) | coach feedback | #68 |
+| Demo Workout Mode e2e test passes on rest days (B-04) | bug | #66 |
+| Daily coach summary email `text = date` fix (schema v54) (B-05) | bug | #65 |
+| Film stats from tags: set distribution, pass average, block outcomes (F-01) | me | #63 |
+| Film hotkeys work while the YouTube player loads (B-02) | bug | #62 |
 | Results card shows approach touch as logged, no inch mark (B-07) | bug | #98 |
 | Athlete plan payments: $14.99/month after a 7-day trial (off until Stripe keys are set) (F-37) | me | #97 |
 | Train solo at signup, plus a setup quiz (age, experience, sore areas) (F-06) | me | #96 |
@@ -550,5 +651,6 @@ before this file became the backlog; `bug` rows are PRs titled `fix:`.
 
 | Item | Source | Why |
 | --- | --- | --- |
+| Film in NextRep (film review, tags, stats, AI film: F-03, F-14, F-15) | me | Film moved to a separate tool (Film Room / volley-viz-studio) on 2026-11-07; see F-45 |
 | Volleyball "N" monogram as the logo (#37) | your idea | Jayden kept the current gold pulse mark and app icons |
 | Public demo team/dashboard as new work | your idea | Already shipped as `/demo`; checked end to end, no change needed |

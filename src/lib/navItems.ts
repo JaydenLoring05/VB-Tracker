@@ -4,12 +4,10 @@ import {
   BookOpen,
   CalendarDays,
   ClipboardList,
-  Clapperboard,
   Dumbbell,
   GraduationCap,
   Home,
   MessageSquare,
-  Play,
   Settings,
   type LucideIcon
 } from "lucide-react";
@@ -38,7 +36,6 @@ export const NAV_ROUTES = [
   "/workout",
   "/stats",
   "/calendar",
-  "/film",
   "/library",
   "/coach",
   "/plan",
@@ -47,10 +44,8 @@ export const NAV_ROUTES = [
   "/feedback"
 ];
 
-const startWorkout: NavLink = { href: "/workout", label: "Start Workout", icon: Play };
 const calendar: NavLink = { href: "/calendar", label: "Calendar", icon: CalendarDays };
 const library: NavLink = { href: "/library", label: "Exercise Library", icon: BookOpen };
-const film: NavLink = { href: "/film", label: "Film", icon: Clapperboard };
 const settings: NavLink = { href: "/settings", label: "Settings", icon: Settings };
 const feedback: NavLink = { href: "/feedback", label: "Send feedback", icon: MessageSquare };
 
@@ -59,23 +54,20 @@ const athleteNav: NavConfig = {
     { href: "/dashboard", label: "Today", icon: Home, alsoMatches: ["/workout", "/check-in"] },
     { href: "/workouts", label: "Plan", icon: Dumbbell, alsoMatches: ["/calendar", "/plan"] },
     // Coach-only pages redirect athletes to their own version.
-    { href: "/stats", label: "Progress", icon: BarChart3, alsoMatches: ["/team-progress"] },
-    film
+    { href: "/stats", label: "Progress", icon: BarChart3, alsoMatches: ["/team-progress"] }
   ],
-  more: [startWorkout, calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }, settings, feedback]
+  more: [calendar, library, { href: "/coach", label: "Team", icon: GraduationCap }, settings, feedback]
 };
 
 const coachNav: NavConfig = {
   primary: [
     { href: "/coach", label: "Team", icon: GraduationCap },
     { href: "/plan", label: "Plan", icon: ClipboardList },
-    film,
     { href: "/team-progress", label: "Progress", icon: BarChart3 }
   ],
   more: [
-    { href: "/dashboard", label: "My Training", icon: Home },
+    { href: "/dashboard", label: "My Training", icon: Home, alsoMatches: ["/workout", "/check-in"] },
     { href: "/workouts", label: "Workouts", icon: Dumbbell },
-    startWorkout,
     calendar,
     { href: "/stats", label: "My Stats", icon: Activity },
     library,

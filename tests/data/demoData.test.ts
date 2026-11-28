@@ -1,10 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { detailsForTag } from "@/components/film/tagMeta";
 import { buildDemoData, DEMO_TEAM_NAME, DEMO_WORKOUTS_PER_WEEK, type DemoData } from "@/data/demoData";
 import { getWorkoutDays } from "@/data/workoutPlan";
 import { getExerciseMeasure } from "@/lib/exerciseMeasure";
-import { parseYouTubeId } from "@/lib/film";
 import { computeAttentionItems } from "@/lib/attentionCenter";
 import { calculateRecovery, recoveryStatus } from "@/lib/recovery";
 
@@ -280,41 +278,6 @@ describe("buildDemoData storylines through the real attention ranking", () => {
     const scripted = new Set(["demo-sam", "demo-kayla"]);
     for (const [userId, count] of Object.entries(data.completedLast7)) {
       if (!scripted.has(userId)) expect(count, userId).toBeGreaterThanOrEqual(2);
-    }
-  });
-});
-
-describe("buildDemoData film room", () => {
-  const data = buildDemoData(NOW);
-  const rosterIds = new Set(data.roster.map((athlete) => athlete.userId));
-
-  it("has films with YouTube links the player can embed", () => {
-    expect(data.films.length).toBeGreaterThan(0);
-    for (const film of data.films) {
-      expect(parseYouTubeId(film.video_url), film.title).toMatch(/^[\w-]{11}$/);
-      expect(film.team_id).toBe(data.team.id);
-    }
-  });
-
-  it("tags only the demo films, in time order, with roster athletes", () => {
-    const filmIds = new Set(data.films.map((film) => film.id));
-    for (const film of data.films) {
-      const seconds = data.filmTags.filter((tag) => tag.film_id === film.id).map((tag) => tag.seconds);
-      expect(seconds.length, film.title).toBeGreaterThan(0);
-      expect(seconds).toEqual([...seconds].sort((a, b) => a - b));
-    }
-    for (const tag of data.filmTags) {
-      expect(filmIds.has(tag.film_id)).toBe(true);
-      if (tag.athlete_id) expect(rosterIds.has(tag.athlete_id), tag.id).toBe(true);
-    }
-    expect(new Set(data.filmTags.map((tag) => tag.id)).size).toBe(data.filmTags.length);
-  });
-
-  it("only fills in details that belong to each tag type", () => {
-    for (const tag of data.filmTags) {
-      const { pass_rating, set_zone, set_type, block_outcome, attack_direction } = tag;
-      const details = { pass_rating, set_zone, set_type, block_outcome, attack_direction };
-      expect(detailsForTag(tag.tag, details), tag.id).toEqual(details);
     }
   });
 });
